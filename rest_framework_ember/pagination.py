@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework import pagination
 from rest_framework.templatetags.rest_framework import replace_query_param
 
-from rest_framework.resource_name import get_resource_name
+from rest_framework_ember.utils import get_resource_name
 
 
 class NextPageLinkField(serializers.Field):
