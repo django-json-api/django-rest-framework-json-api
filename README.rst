@@ -1,28 +1,49 @@
 ===============================
-Ember and Django Rest Framework
+Ember Data and Django Rest Framework
 ===============================
 
-EmberJS is extremely opinionated on how JSON REST requests and responses
-should look. Going against the grain can lead to frustrated Javascript
-developers.
+The default Ember Data REST Adapter conventions differ from the default
+Django Rest Framework JSON request and response format. Instead of adding
+a Django specific adapter to Ember Data we use this adapter in Django to
+output and accept JSON in the format the Ember Data REST Adapter expects.
 
 By default, Django REST Framework will produce a response like::
 
     {
-        "id": 1,
-        "username": "john",
-        "full_name": "John Coltrane"
+        "count": 20,
+        "next": "http://example.com/api/1.0/identities/?page=2",
+        "previous": null,
+        "results": [
+            {
+                "id": 1,
+                "username": "john",
+                "full_name": "John Coltrane"
+            },
+            {
+                ...
+            }
+        ]
     }
 
 
-However, if this is an ``identity`` model in EmberJS, Ember expects a
-response to look like the following::
+However, for an ``identity`` model in EmberJS, the Ember Data REST Adapter
+expects a response to look like the following::
 
     {
-        "identity": {
-            "id": 1,
-            "username": "john",
-            "full_name": "John Coltrane"
+        "identity": [
+            {
+                "id": 1,
+                "username": "john",
+                "full_name": "John Coltrane"
+            },
+            {
+                ...
+            }
+        ],
+        "meta": {
+            "count": 20,
+            "next": "http://example.com/api/1.0/identities/?page=2",
+            "previous": null
         }
     }
 
@@ -61,6 +82,7 @@ override ``settings.REST_FRAMEWORK``::
 
 
     REST_FRAMEWORK = {
+        'PAGINATE_BY': 10,
         'DEFAULT_PARSER_CLASSES': (
             'rest_framework_ember.parsers.EmberJSONParser',
             'rest_framework.parsers.FormParser',
@@ -72,6 +94,10 @@ override ``settings.REST_FRAMEWORK``::
         ),
         'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
     }
+
+
+If PAGINATE_BY is included the renderer will return a ``meta`` object with
+record count and the next and previous links.
 
 
 resource_name property
