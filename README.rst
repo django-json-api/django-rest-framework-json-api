@@ -46,9 +46,10 @@ expects a response to look like the following::
         "meta": {
             "count": 20,
             "next": 2,
-            "nextLink": "http://example.com/api/1.0/identities/?page=2",
+            "next_link": "http://example.com/api/1.0/identities/?page=2",
+            "page": 1,
             "previous": null,
-            "prevousLink": null
+            "previous_link": null
         }
     }
 
