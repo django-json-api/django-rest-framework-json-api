@@ -64,11 +64,23 @@ Requirements
 Installation
 ------------
 
+From PyPI
+^^^^^^^^^
+
 ::
 
     pip install rest_framework_ember
 
 
+From Source
+^^^^^^^^^^^
+
+::
+
+    $ git clone https://github.com/ngenworks/rest_framework_ember.git
+    $ cd rest_framework_ember && pip install -e .
+
+    
 -----
 Usage
 -----
