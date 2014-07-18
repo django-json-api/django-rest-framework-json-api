@@ -88,6 +88,8 @@ override ``settings.REST_FRAMEWORK``::
 
     REST_FRAMEWORK = {
         'PAGINATE_BY': 10,
+        'PAGINATE_BY_PARAM': 'page_size',
+        'MAX_PAGINATE_BY': 100,
         'DEFAULT_PAGINATION_SERIALIZER_CLASS':
             'rest_framework_ember.pagination.EmberPaginationSerializer',
         'DEFAULT_PARSER_CLASSES': (
@@ -103,10 +105,10 @@ override ``settings.REST_FRAMEWORK``::
     }
 
 
-If `PAGINATE_BY` is set the renderer will return a ``meta`` object with
+If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
 record count and the next and previous links. Django Rest Framework looks 
-for the `page` GET parameter by default allowing you to make requests for
-subsets of the data with `this.store.find('identity', {page: 2});`.
+for the ``page`` GET parameter by default allowing you to make requests for
+subsets of the data with ``this.store.find('identity', {page: 2});``.
 
 
 resource_name property
