@@ -17,5 +17,18 @@ setup(
     keywords="EmberJS Django REST",
     packages=find_packages(),
     install_requires=['django', 'djangorestframework' ],
+    platforms=['any'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Framework :: Django',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: BSD License',
+        'Intended Audience :: Developers',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ]
 )
 
