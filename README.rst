@@ -42,8 +42,10 @@ expects a response to look like the following::
         ],
         "meta": {
             "count": 20,
-            "next": "http://example.com/api/1.0/identities/?page=2",
-            "previous": null
+            "next": 2,
+            "nextLink": "http://example.com/api/1.0/identities/?page=2",
+            "previous": null,
+            "prevousLink": null
         }
     }
 
@@ -83,6 +85,8 @@ override ``settings.REST_FRAMEWORK``::
 
     REST_FRAMEWORK = {
         'PAGINATE_BY': 10,
+        'DEFAULT_PAGINATION_SERIALIZER_CLASS':
+            'rest_framework_ember.pagination.EmberPaginationSerializer',
         'DEFAULT_PARSER_CLASSES': (
             'rest_framework_ember.parsers.EmberJSONParser',
             'rest_framework.parsers.FormParser',
