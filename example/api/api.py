@@ -25,7 +25,6 @@ class User(generics.GenericAPIView):
 
     GET /me
     """
-    resource_name = 'data'
     serializer_class = IdentitySerializer
     allowed_methods = ['GET']
 
@@ -43,8 +42,10 @@ class User(generics.GenericAPIView):
 
 class UserEmber(User):
     """
-    doc
+    Use the rest_framework_ember Renderer/Parser
     """
+    resource_name = 'data'
+
     renderer_classes = (renderers.JSONRenderer, )
     parser_classes = (parsers.EmberJSONParser, )
 
