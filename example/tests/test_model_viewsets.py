@@ -26,15 +26,19 @@ class ModelViewSetTests(TestBase):
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, 200)
 
-        expected = {"user": []}
-        for user in get_user_model().objects.all():
-            expected['user'].append({
-                'id': user.pk,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email})
+        user = get_user_model().objects.all()[0]
+        expected = {"user": [{
+            'id': user.pk,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
+        }]}
 
-        self.assertEquals(expected, json.loads(response.content))
+        json_content = json.loads(response.content)
+        self.assertEquals(expected.get('user'), json_content.get('user'))
+        self.assertEquals(
+            json_content.get("meta", {}).get('count', 0),
+            get_user_model().objects.count())
 
     def test_key_in_detail_result(self):
         """
