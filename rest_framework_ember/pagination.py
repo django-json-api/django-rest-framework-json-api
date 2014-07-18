@@ -69,13 +69,13 @@ class EmberPaginationSerializer(pagination.BasePaginationSerializer):
     def __init__(self, *args, **kwargs):
         super(pagination.BasePaginationSerializer, self).__init__(
                 *args, **kwargs)
-
-        # get the dynamic root key
-        results_field = get_resource_name(
-            kwargs.get('context').get('view'))
+        results_field = self.results_field
         object_serializer = self.opts.object_serializer_class
 
         if 'context' in kwargs:
+            # get the dynamic root key
+            results_field = get_resource_name(
+                kwargs.get('context').get('view'))
             context_kwarg = {'context': kwargs['context']}
         else:
             context_kwarg = {}
