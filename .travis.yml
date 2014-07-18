@@ -1,0 +1,7 @@
+language: python
+python:
+  - "2.7"
+install:
+  - pip install -e .
+script: django-admin.py test --settings=example.settings
+

@@ -2,6 +2,9 @@
 Ember Data and Django Rest Framework
 ===============================
 
+.. image:: https://travis-ci.org/ngenworks/rest_framework_ember.svg?branch=master
+   :target: https://travis-ci.org/ngenworks/rest_framework_ember
+
 The default Ember Data REST Adapter conventions differ from the default
 Django Rest Framework JSON request and response format. Instead of adding
 a Django specific adapter to Ember Data we use this adapter in Django to
