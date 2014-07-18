@@ -1,6 +1,7 @@
 import os
 
 SITE_ID = 1
+DEBUG = True
 
 MEDIA_ROOT = os.path.normcase(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = '/media/'
@@ -17,6 +18,7 @@ DATABASES = {
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sites',
+    'django.contrib.sessions',
     'django.contrib.auth',
     'django.contrib.admin',
     'rest_framework',

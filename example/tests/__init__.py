@@ -20,7 +20,6 @@ class TestBase(APITestCase):
         Helper method to create a user
         """
         User = get_user_model()
-
         user = User.objects.create_user(
             username, email, password=password
         )

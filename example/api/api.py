@@ -3,7 +3,7 @@ Test Serializer and Resource
 """
 from django.contrib.auth import models as auth_models
 
-from rest_framework import serializers, generics
+from rest_framework import serializers, generics, viewsets
 from rest_framework.response import Response
 
 from rest_framework_ember import renderers, parsers
@@ -48,4 +48,13 @@ class UserEmber(User):
 
     renderer_classes = (renderers.JSONRenderer, )
     parser_classes = (parsers.EmberJSONParser, )
+
+
+class EmberUserModelViewSet(viewsets.ModelViewSet):
+    model = auth_models.User
+    serializer_class = IdentitySerializer
+    allowed_methods = ['GET', 'POST', 'PUT', ]
+    renderer_classes = (renderers.JSONRenderer, )
+    parser_classes = (parsers.EmberJSONParser, )
+
 
