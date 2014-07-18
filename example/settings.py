@@ -34,6 +34,8 @@ PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
 
 REST_FRAMEWORK = {
     'PAGINATE_BY': 1,
+    'PAGINATE_BY_PARAM': 'page_size',
+    'MAX_PAGINATE_BY': 100,
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'rest_framework_ember.pagination.EmberPaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (

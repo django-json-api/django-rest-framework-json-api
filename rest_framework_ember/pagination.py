@@ -59,9 +59,21 @@ class PreviousPageField(serializers.Field):
         return value.previous_page_number()
 
 
+class PageField(serializers.Field):
+    """
+    Field that returns a link to the previous page in paginated results.
+    """
+    page_field = 'page'
+
+    def to_native(self, value):
+        return value.number
+
+
+
 class EmberPaginationSerializer(pagination.BasePaginationSerializer):
     next = NextPageField(source='*')
     next_link = NextPageLinkField(source='*')
+    page = PageField(source='*')
     previous = PreviousPageField(source='*')
     previous_link = PreviousPageField(source='*')
     count = serializers.Field(source='paginator.count')

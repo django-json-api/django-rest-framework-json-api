@@ -103,8 +103,10 @@ override ``settings.REST_FRAMEWORK``::
     }
 
 
-If PAGINATE_BY is included the renderer will return a ``meta`` object with
-record count and the next and previous links.
+If `PAGINATE_BY` is set the renderer will return a ``meta`` object with
+record count and the next and previous links. Django Rest Framework looks 
+for the `page` GET parameter by default allowing you to make requests for
+subsets of the data with `this.store.find('identity', {page: 2});`.
 
 
 resource_name property
