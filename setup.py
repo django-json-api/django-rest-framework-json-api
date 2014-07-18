@@ -8,7 +8,9 @@ setup(
     author="nGen Works",
     author_email='tech@ngenworks.com',
     url='http://www.ngenworks.com',
+    license='BSD',
+    keywords="EmberJS Django REST",
     packages=find_packages(),
-    package_data={'rest_framework_ember': []},
+    install_requires=['django', 'djangorestframework' ],
 )
 
