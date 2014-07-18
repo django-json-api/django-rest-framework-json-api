@@ -66,18 +66,3 @@ class EmberPaginationSerializer(pagination.BasePaginationSerializer):
     previous_link = PreviousPageField(source='*')
     count = serializers.Field(source='paginator.count')
 
-    def __init__(self, *args, **kwargs):
-        super(pagination.BasePaginationSerializer, self).__init__(
-                *args, **kwargs)
-        results_field = self.results_field
-        object_serializer = self.opts.object_serializer_class
-
-        if 'context' in kwargs:
-            # get the dynamic root key
-            results_field = get_resource_name(
-                kwargs.get('context').get('view'))
-            context_kwarg = {'context': kwargs['context']}
-        else:
-            context_kwarg = {}
-
-        self.fields[results_field] = object_serializer(source='object_list', **context_kwarg)
