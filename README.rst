@@ -81,20 +81,20 @@ From Source
     $ git clone https://github.com/ngenworks/rest_framework_ember.git
     $ cd rest_framework_ember && pip install -e .
 
-    
+
 -----
 Usage
 -----
 
 
-``rest_framework_ember`` assumes you are using class-based views in Django 
+``rest_framework_ember`` assumes you are using class-based views in Django
 Rest Framework.
 
 
 Settings
 ^^^^^^^^
 
-One can either add ``rest_framework_ember.parsers.EmberJSONParser`` and 
+One can either add ``rest_framework_ember.parsers.EmberJSONParser`` and
 ``rest_framework_ember.renderers.JSONRenderer`` to each ``ViewSet`` class, or
 override ``settings.REST_FRAMEWORK``::
 
@@ -119,7 +119,7 @@ override ``settings.REST_FRAMEWORK``::
 
 
 If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
-record count and the next and previous links. Django Rest Framework looks 
+record count and the next and previous links. Django Rest Framework looks
 for the ``page`` GET parameter by default allowing you to make requests for
 subsets of the data with ``this.store.find('identity', {page: 2});``.
 
@@ -142,5 +142,29 @@ the ``resource_name`` property is required on the class.::
         permission_classes = (permissions.IsAuthenticated, )
 
 
+Managing the trailing slash
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+By default Django expects a trailing slash on urls and will 301 redirect any
+requests lacking a trailing slash. You can change the server side by
+instantiating the Django REST Framework's router like so:
+
+    router = routers.SimpleRouter(trailing_slash=False)
+
+If you aren't using SimpleRouter you can instead set APPEND_SLASH = False
+in Django's settings.py file and modify url pattern regex to match routes
+without a trailing slash.
+
+If you prefer to make the change on the client side then add an
+application adapter to your Ember app and override the buildURL method:
+
+    App.ApplicationAdapter = DS.RESTAdapter.extend({
+      buildURL: function() {
+        var url = this._super.apply(this, arguments);
+        if (url.charAt(url.length -1) !== '/') {
+          url += '/';
+        }
+        return url;
+      }
+    });
 
