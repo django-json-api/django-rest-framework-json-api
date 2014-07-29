@@ -128,7 +128,7 @@ resource_name property
 ^^^^^^^^^^^^^^^^^^^^^^
 
 On resources that do not subclass ``rest_framework.viewsets.ModelViewSet``,
-the ``resource_name`` property is required on the class.::
+the ``resource_name`` property is required on the class::
 
     class Me(generics.GenericAPIView):
         """
@@ -147,7 +147,7 @@ Managing the trailing slash
 
 By default Django expects a trailing slash on urls and will 301 redirect any
 requests lacking a trailing slash. You can change the server side by
-instantiating the Django REST Framework's router like so:::
+instantiating the Django REST Framework's router like so::
 
     router = routers.SimpleRouter(trailing_slash=False)
 
@@ -156,7 +156,7 @@ in Django's settings.py file and modify url pattern regex to match routes
 without a trailing slash.
 
 If you prefer to make the change on the client side then add an
-application adapter to your Ember app and override the buildURL method:::
+application adapter to your Ember app and override the buildURL method::
 
     App.ApplicationAdapter = DS.RESTAdapter.extend({
       buildURL: function() {

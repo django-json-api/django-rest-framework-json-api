@@ -41,6 +41,8 @@ class ModelViewSetTests(TestBase):
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
         self.assertEquals(meta.get("next"), 2)
+        self.assertEqual('http://testserver/user-viewset/?page=2',
+            meta.get("next_link"))
         self.assertEqual(meta.get("page"), 1)
 
     def test_page_two_in_list_result(self):
@@ -65,7 +67,10 @@ class ModelViewSetTests(TestBase):
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
         self.assertIsNone(meta.get("next"))
+        self.assertIsNone(meta.get("next_link"))
         self.assertEqual(meta.get("previous"), 1)
+        self.assertEqual('http://testserver/user-viewset/?page=1',
+            meta.get("previous_link"))
         self.assertEqual(meta.get("page"), 2)
 
     def test_page_range_in_list_result(self):

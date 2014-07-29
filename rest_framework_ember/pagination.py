@@ -75,6 +75,6 @@ class EmberPaginationSerializer(pagination.BasePaginationSerializer):
     next_link = NextPageLinkField(source='*')
     page = PageField(source='*')
     previous = PreviousPageField(source='*')
-    previous_link = PreviousPageField(source='*')
+    previous_link = PreviousPageLinkField(source='*')
     count = serializers.Field(source='paginator.count')
 
