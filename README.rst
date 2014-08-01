@@ -1,6 +1,6 @@
-===============================
+====================================
 Ember Data and Django Rest Framework
-===============================
+====================================
 
 .. image:: https://travis-ci.org/ngenworks/rest_framework_ember.svg?branch=master
    :target: https://travis-ci.org/ngenworks/rest_framework_ember
