@@ -12,7 +12,7 @@ setup(
     long_description=get_readme(),
     author="nGen Works",
     author_email='tech@ngenworks.com',
-    url='http://www.ngenworks.com',
+    url='https://github.com/ngenworks/rest_framework_ember',
     license='BSD',
     keywords="EmberJS Django REST",
     packages=find_packages(),
