@@ -168,3 +168,52 @@ application adapter to your Ember app and override the buildURL method::
       }
     });
 
+Displaying Server Side Validation Messages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ember Data does not ship with a default implementation of a validation error
+handler except in the Rails ActiveModelAdapter so to display validation errors
+you will need to add a small client adapter::
+
+    App.ApplicationAdapter = DS.RESTAdapter.extend({
+      ajaxError: function(jqXHR) {
+        var error = this._super(jqXHR);
+        if (jqXHR && jqXHR.status === 400) {
+          var response = Ember.$.parseJSON(jqXHR.responseText),
+              errors = {},
+              keys = Ember.keys(response);
+          if (keys.length === 1) {
+            var jsonErrors = response[keys[0]];
+            Ember.EnumerableUtils.forEach(Ember.keys(jsonErrors), function(key) {
+              errors[key] = jsonErrors[key];
+            });
+          }
+          return new DS.InvalidError(errors);
+        } else {
+          return error;
+        }
+      }
+    });
+
+The adapter above will handle the following response format when the response has
+a 400 status code. The root key ("post" in this example) is discarded::
+
+    {
+      "post": {
+        "slug": ["Post with this Slug already exists."]
+      }
+    }
+
+To display all errors add the following to the template::
+
+    {{#each message in errors.messages}}
+      {{message}}
+    {{/each}}
+
+To display a specific error inline use the following::
+
+    {{#each errors.title}}
+      <div class="error">{{message}}</div>
+    {{/each}}
+    {{input name="title" value=title}}
+
