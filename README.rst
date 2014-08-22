@@ -114,7 +114,6 @@ override ``settings.REST_FRAMEWORK``::
             'rest_framework_ember.renderers.JSONRenderer',
             'rest_framework.renderers.BrowsableAPIRenderer',
         ),
-        'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
     }
 
 
