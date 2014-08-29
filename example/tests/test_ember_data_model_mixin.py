@@ -17,13 +17,13 @@ class EmberDataModelMixinTests(TestBase):
 
     def setUp(self):
         super(EmberDataModelMixinTests, self).setUp()
-        self.detail_url = '/user-mixin-viewset/?ids[]=%s' % self.miles.pk
 
     def test_single_id_in_query_params(self):
         """
-        Ensure the result has a "user" key.
+        Ensure single ID in query params returns correct result
         """
-        response = self.client.get(self.detail_url)
+        url = '/user-mixin-viewset/?ids[]=%s' % self.miles.pk
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         expected = {
@@ -46,7 +46,7 @@ class EmberDataModelMixinTests(TestBase):
 
     def test_multiple_ids_in_query_params(self):
         """
-        Ensure the result has a "user" key.
+        Ensure multiple IDs in query params return correct result
         """
         url = '/user-mixin-viewset/?ids[]=%s&ids[]=%s' % (self.miles.pk, self.john.pk)
         response = self.client.get(url)
