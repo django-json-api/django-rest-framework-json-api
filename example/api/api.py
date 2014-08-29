@@ -6,7 +6,7 @@ from django.contrib.auth import models as auth_models
 from rest_framework import serializers, generics, viewsets
 from rest_framework.response import Response
 
-from rest_framework_ember import renderers, parsers
+from rest_framework_ember import renderers, parsers, mixins
 
 
 class IdentitySerializer(serializers.ModelSerializer):
@@ -58,3 +58,5 @@ class EmberUserModelViewSet(viewsets.ModelViewSet):
     parser_classes = (parsers.EmberJSONParser, )
 
 
+class EmberDataMixinUserModelViewSet(mixins.EmberDataModelMixin, EmberUserModelViewSet):
+    queryset = auth_models.User.objects.all()
