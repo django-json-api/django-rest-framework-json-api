@@ -58,7 +58,7 @@ class EmberUserModelViewSet(viewsets.ModelViewSet):
     parser_classes = (parsers.EmberJSONParser, )
 
 
-class EmberDataMixinUserModelViewSet(mixins.MultipleIDMixin,
+class MultipleIDMixinUserModelViewSet(mixins.MultipleIDMixin,
                                      EmberUserModelViewSet):
 
     queryset = auth_models.User.objects.all()
