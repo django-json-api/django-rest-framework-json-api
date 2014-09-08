@@ -19,6 +19,21 @@ class IdentitySerializer(serializers.ModelSerializer):
             'id', 'first_name', 'last_name', 'email', )
 
 
+class CarSerializer(serializers.Serializer):
+    """
+    Cars serializer
+    """
+    name = serializers.CharField(max_length=50)
+
+
+class UserCarSerializer(serializers.Serializer):
+    """
+    Serializer that returns a list of users & cars.
+    """
+    users = IdentitySerializer(many=True)
+    cars = CarSerializer(many=True)
+
+
 class User(generics.GenericAPIView):
     """
     Current user's identity endpoint.
@@ -62,4 +77,26 @@ class MultipleIDMixinUserModelViewSet(mixins.MultipleIDMixin,
                                      EmberUserModelViewSet):
 
     queryset = auth_models.User.objects.all()
+
+
+class UserCarResource(UserEmber):
+    """
+    Resource that returns a list of users and cars.
+    """
+    resource_name = False
+
+    cars = [
+        {'id': 1, 'name': 'BMW'},
+        {'id': 2, 'name': 'Mercedes'},
+        {'id': 3, 'name': 'Mini'},
+        {'id': 4, 'name': 'Ford'}
+    ]
+
+    def get(self, request, *args, **kwargs):
+        data = {
+            'users': self.get_queryset(),
+            'cars': self.cars
+        }
+        serializer = UserCarSerializer(data)
+        return Response(serializer.data)
 

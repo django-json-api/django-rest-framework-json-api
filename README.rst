@@ -117,11 +117,11 @@ override ``settings.REST_FRAMEWORK``::
     }
 
 
+
 If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
 record count and the next and previous links. Django Rest Framework looks
 for the ``page`` GET parameter by default allowing you to make requests for
 subsets of the data with ``this.store.find('identity', {page: 2});``.
-
 
 resource_name property
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -216,16 +216,35 @@ To display a specific error inline use the following::
     {{/each}}
     {{input name="title" value=title}}
 
-======
+
+---------------------
+Sideloading Resources
+---------------------
+
+If you are using the JSON Renderer globally, this can lead to issues
+when hitting endpoints that are intended to sideload other objects.
+
+For example::
+
+    {
+        "users": [],
+        "cars": []
+    }
+
+
+Set the ``resource_name`` property on the object to ``False``, and the data
+will be returned as it is above.
+
+
+------
 Mixins
-======
+------
 
 The following mixin classes are available to use with Rest Framework
 resources.
 
--------------------------------------------
 rest_framework_ember.mixins.MultipleIDMixin
--------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Overrides ``get_queryset`` to filter by ``ids[]`` in URL query params.
 

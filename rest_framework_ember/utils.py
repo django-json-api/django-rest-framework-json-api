@@ -4,8 +4,8 @@ Resource name utilities.
 
 def get_resource_name(view):
     """
-Return the name of a resource
-"""
+    Return the name of a resource
+    """
     try:
         # is the resource name set directly on the view?
         resource_name = getattr(view, 'resource_name')
