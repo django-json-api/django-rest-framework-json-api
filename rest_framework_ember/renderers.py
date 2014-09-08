@@ -21,6 +21,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
         resource_name = get_resource_name(view)
 
+        if resource_name == False:
+            return super(JSONRenderer, self).render(
+                data, accepted_media_type, renderer_context)
+
         try:
             data_copy = copy.copy(data)
             content = data_copy.pop('results')
