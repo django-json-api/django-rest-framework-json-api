@@ -7,22 +7,20 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.conf import settings
 
 
-class EmberDataModelMixinTests(TestBase):
+class MultipleIDMixin(TestBase):
     """
-    Test usage with EmberDataModelMixin
+    Test usage with MultipleIDMixin
 
-    [<RegexURLPattern user-list ^user-viewsets/$>, <RegexURLPattern user-detail ^user-viewsets/(?P<pk>[^/]+)/$>]
+    [<RegexURLPattern user-list ^user-viewsets/$>,
+     <RegexURLPattern user-detail ^user-viewsets/(?P<pk>[^/]+)/$>]
     """
     list_url = reverse_lazy('user-list')
-
-    def setUp(self):
-        super(EmberDataModelMixinTests, self).setUp()
 
     def test_single_id_in_query_params(self):
         """
         Ensure single ID in query params returns correct result
         """
-        url = '/user-mixin-viewset/?ids[]=%s' % self.miles.pk
+        url = '/user-mixin-viewset/?ids[]={0}'.format(self.miles.pk)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -48,7 +46,8 @@ class EmberDataModelMixinTests(TestBase):
         """
         Ensure multiple IDs in query params return correct result
         """
-        url = '/user-mixin-viewset/?ids[]=%s&ids[]=%s' % (self.miles.pk, self.john.pk)
+        url = '/user-mixin-viewset/?ids[]={0}&ids[]={1}'.format(
+            self.miles.pk, self.john.pk)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -67,5 +66,8 @@ class EmberDataModelMixinTests(TestBase):
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 2)
         self.assertEquals(meta.get("next"), 2)
-        self.assertEqual('http://testserver/user-mixin-viewset/?ids%5B%5D=2&ids%5B%5D=1&page=2', meta.get("next_link"))
+        self.assertEqual(
+            'http://testserver/user-mixin-viewset/?ids%5B%5D=2&ids%5B%5D=1&page=2',
+            meta.get("next_link"))
         self.assertEqual(meta.get("page"), 1)
+

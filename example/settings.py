@@ -31,6 +31,7 @@ SECRET_KEY = 'abc123'
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
 
+MIDDLEWARE_CLASSES = ()
 
 REST_FRAMEWORK = {
     'PAGINATE_BY': 1,

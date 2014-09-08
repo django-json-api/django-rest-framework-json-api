@@ -1,6 +1,8 @@
+"""
+Class Mixins.
+"""
 
-
-class EmberDataModelMixin(object):
+class MultipleIDMixin(object):
     """
     Override get_queryset for multiple id support
     """
@@ -9,3 +11,4 @@ class EmberDataModelMixin(object):
         if ids:
             self.queryset = self.queryset.filter(id__in=ids)
         return self.queryset
+

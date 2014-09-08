@@ -216,3 +216,16 @@ To display a specific error inline use the following::
     {{/each}}
     {{input name="title" value=title}}
 
+======
+Mixins
+======
+
+The following mixin classes are available to use with Rest Framework
+resources.
+
+-------------------------------------------
+rest_framework_ember.mixins.MultipleIDMixin
+-------------------------------------------
+
+Overrides ``get_queryset`` to filter by ``ids[]`` in URL query params.
+
