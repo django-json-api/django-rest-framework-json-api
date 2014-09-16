@@ -34,4 +34,4 @@ class EmberJSONParser(JSONParser):
         data = result.get(resource_name)
         for item in data:
             data[inflection.underscore(item)] = data.pop(item)
-        return result
+        return data
