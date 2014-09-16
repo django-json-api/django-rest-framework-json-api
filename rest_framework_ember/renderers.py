@@ -1,6 +1,8 @@
 import copy
-from rest_framework import renderers
+import collections
+import inflection
 
+from rest_framework import renderers
 from rest_framework_ember.utils import get_resource_name
 
 
@@ -18,12 +20,25 @@ class JSONRenderer(renderers.JSONRenderer):
     """
     def render(self, data, accepted_media_type=None, renderer_context=None):
         view = renderer_context.get('view')
-
         resource_name = get_resource_name(view)
+        _data = collections.OrderedDict()
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                data[inflection.camelize(key, False)] = data.pop(key)
+
+        elif isinstance(data, (list, tuple)):
+            for obj in data:
+                if hasattr(obj, 'items'):
+                    for key, value in obj.items():
+                        obj[inflection.camelize(key, False)] = obj.pop(key)
 
         if resource_name == False:
             return super(JSONRenderer, self).render(
                 data, accepted_media_type, renderer_context)
+
+        if len(data) > 1:
+            resource_name = inflection.pluralize(resource_name)
 
         try:
             data_copy = copy.copy(data)
@@ -33,4 +48,3 @@ class JSONRenderer(renderers.JSONRenderer):
             data = {resource_name : data}
         return super(JSONRenderer, self).render(
             data, accepted_media_type, renderer_context)
-
