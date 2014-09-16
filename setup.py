@@ -15,8 +15,8 @@ setup(
     url='https://github.com/ngenworks/rest_framework_ember',
     license='BSD',
     keywords="EmberJS Django REST",
-    packages='inflection',
-    install_requires=['django', 'djangorestframework' ],
+    packages=find_packages(),
+    install_requires=['django', 'djangorestframework', 'inflection' ],
     platforms=['any'],
     classifiers=[
         'Development Status :: 4 - Beta',
