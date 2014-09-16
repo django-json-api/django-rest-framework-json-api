@@ -30,13 +30,11 @@ class JSONRenderer(renderers.JSONRenderer):
                 if hasattr(obj, 'items'):
                     for key, value in obj.items():
                         obj[inflection.camelize(key, False)] = obj.pop(key)
+            resource_name = inflection.pluralize(resource_name)
 
         if resource_name == False:
             return super(JSONRenderer, self).render(
                 data, accepted_media_type, renderer_context)
-
-        if len(data) > 1:
-            resource_name = inflection.pluralize(resource_name)
 
         try:
             data_copy = copy.copy(data)
