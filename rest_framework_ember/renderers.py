@@ -1,5 +1,4 @@
 import copy
-import collections
 import inflection
 
 from rest_framework import renderers
@@ -21,7 +20,6 @@ class JSONRenderer(renderers.JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         view = renderer_context.get('view')
         resource_name = get_resource_name(view)
-        _data = collections.OrderedDict()
 
         if isinstance(data, dict):
             for key, value in data.items():
