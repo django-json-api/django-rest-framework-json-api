@@ -1,7 +1,9 @@
 import copy
 from rest_framework import renderers
 
-from rest_framework_ember.utils import get_resource_name
+from rest_framework_ember.utils import (get_resource_name,
+                                        camelize,
+                                        recursive_key_map)
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -31,6 +33,8 @@ class JSONRenderer(renderers.JSONRenderer):
             data = {resource_name : content, "meta" : data_copy}
         except (TypeError, KeyError, AttributeError) as e:
             data = {resource_name : data}
+
+        if data:
+            data = recursive_key_map(camelize, data)
         return super(JSONRenderer, self).render(
             data, accepted_media_type, renderer_context)
-

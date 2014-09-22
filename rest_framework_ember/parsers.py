@@ -3,7 +3,10 @@ Parsers
 """
 from rest_framework.parsers import JSONParser
 
-from rest_framework_ember.utils import get_resource_name
+from rest_framework_ember.utils import (get_resource_name,
+                                        underscore,
+                                        camelize,
+                                        recursive_key_map)
 
 
 class EmberJSONParser(JSONParser):
@@ -30,5 +33,5 @@ class EmberJSONParser(JSONParser):
             stream, media_type=None, parser_context=None)
 
         resource_name = get_resource_name(parser_context.get('view', None))
-        return result.get(resource_name)
-
+        data = result.get(camelize(resource_name))
+        return recursive_key_map(underscore, data)
