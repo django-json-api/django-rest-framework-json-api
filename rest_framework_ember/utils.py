@@ -38,7 +38,7 @@ def get_resource_name(view):
 
             resource_name = name[:1].lower() + name[1:]
 
-    if view.action == 'list':
+    if hasattr(view, 'action') and view.action == 'list':
         resource_name = inflection.pluralize(resource_name)
     return inflection.underscore(resource_name)
 
