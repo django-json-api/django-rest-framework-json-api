@@ -2,18 +2,17 @@ import copy
 import inflection
 
 from rest_framework import renderers
-from rest_framework_ember.utils import get_resource_name
+from rest_emberdata.utils import get_resource
 
 
-class JSONRenderer(renderers.JSONRenderer):
+class EmberJSONRenderer(renderers.JSONRenderer):
     """
     Render a JSON response the way Ember Data wants it. Such as:
     {
-        "company": {
+        "resource": {
             "id": 1,
-            "name": "nGen Works",
-            "slug": "ngen-works",
-            "date_created": "2014-03-13 16:33:37"
+            "field": "lorem ipsum",
+            "pub_date": "2014-03-13 16:33:37"
         }
     }
     """
