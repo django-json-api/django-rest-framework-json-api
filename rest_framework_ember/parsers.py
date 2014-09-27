@@ -1,7 +1,7 @@
 import inflection
 
 from rest_framework.parsers import JSONParser
-from rest_emberdata import get_resource
+from rest_framework_ember.utils import get_resource_name
 
 
 class EmberJSONParser(JSONParser):
@@ -25,7 +25,7 @@ class EmberJSONParser(JSONParser):
         """
         data = super(EmberJSONParser, self).parse(stream, media_type=None,
                                                   parser_context=None)
-        data = data.get(get_resource(parser_context.get('view', None)))
+        data = data.get(get_resource_name(parser_context.get('view', None)))
         for item in data:
             data[inflection.underscore(item)] = data.pop(item)
         return data 

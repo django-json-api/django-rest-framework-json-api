@@ -2,7 +2,7 @@ import copy
 import inflection
 
 from rest_framework import renderers
-from rest_emberdata.utils import get_resource
+from rest_framework_ember.utils import get_resource_name
 
 
 class EmberJSONRenderer(renderers.JSONRenderer):
