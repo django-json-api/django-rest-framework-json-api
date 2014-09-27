@@ -5,7 +5,7 @@ from rest_framework import renderers
 from rest_framework_ember.utils import get_resource_name
 
 
-class EmberJSONRenderer(renderers.JSONRenderer):
+class JSONRenderer(renderers.JSONRenderer):
     """
     Render a JSON response the way Ember Data wants it. Such as:
     {
