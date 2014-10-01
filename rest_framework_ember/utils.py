@@ -1,7 +1,7 @@
 import inflection
 
 
-def get_resource(view):
+def get_resource_name(view):
     """Return the name of a resource."""
     try:
         # Check the view

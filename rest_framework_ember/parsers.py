@@ -1,3 +1,6 @@
+"""
+Parsers
+"""
 import inflection
 
 from rest_framework.parsers import JSONParser
@@ -23,9 +26,9 @@ class EmberJSONParser(JSONParser):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
         """
-        data = super(EmberJSONParser, self).parse(stream, media_type=None,
+        result = super(EmberJSONParser, self).parse(stream, media_type=None,
                                                   parser_context=None)
-        data = data.get(get_resource_name(parser_context.get('view', None)))
-        for item in data:
-            data[inflection.underscore(item)] = data.pop(item)
-        return data 
+        resource_name = result.get(get_resource_name(parser_context.get('view', None)))
+        for item in resource_name:
+            resource_name[inflection.underscore(item)] = resource_name.pop(item)
+        return resource_name

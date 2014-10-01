@@ -9,10 +9,11 @@ class JSONRenderer(renderers.JSONRenderer):
     """
     Render a JSON response the way Ember Data wants it. Such as:
     {
-        "resource": {
+        "company": {
             "id": 1,
-            "field": "lorem ipsum",
-            "pub_date": "2014-03-13 16:33:37"
+            "name": "nGen Works",
+            "slug": "ngen-works",
+            "date_created": "2014-03-13 16:33:37"
         }
     }
     """
