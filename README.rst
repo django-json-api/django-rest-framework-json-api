@@ -248,3 +248,51 @@ rest_framework_ember.mixins.MultipleIDMixin
 
 Overrides ``get_queryset`` to filter by ``ids[]`` in URL query params.
 
+
+rest_framework_ember.mixins.SparseFieldsetMixin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For use with a :class:``ModelViewSet`` and its corresponding
+:class:``ModelSerializer``.
+
+:class:``SparseFieldsetMixin`` allows for fields to be removed
+from the response so the entire payload is not returned.
+
+Read more: http://jsonapi.org/format/#fetching-sparse-fieldsets
+
+Example::
+
+    resp = requests.get('http://example.com/api/users')
+
+Could return the following::
+
+    [{
+        "id": 1,
+        "name": "John Coltrane",
+        "bio": "some long bio"
+
+    },{
+        "id": 2,
+        "name": "Miles Davis",
+        "bio": "some long bio"
+    }]
+
+However, if only ``id`` and ``name`` are required, it can be wasteful
+to pull down ``bio`` as well.
+
+Example::
+
+    resp = requests.get('http://example.com/api/users?fields=id,name')
+
+Would return the following::
+
+    [{
+        "id": 1,
+        "name": "John Coltrane"
+    },{
+        "id": 2,
+        "name": "Miles Davis"
+    }]
+
+
+
