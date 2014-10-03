@@ -65,7 +65,7 @@ class UserEmber(User):
     parser_classes = (parsers.EmberJSONParser, )
 
 
-class EmberUserModelViewSet(viewsets.ModelViewSet):
+class EmberUserModelViewSet(mixins.SparseFieldsetMixin, viewsets.ModelViewSet):
     model = auth_models.User
     serializer_class = IdentitySerializer
     allowed_methods = ['GET', 'POST', 'PUT', ]
