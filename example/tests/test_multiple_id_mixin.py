@@ -26,10 +26,10 @@ class MultipleIDMixin(TestBase):
 
         expected = {
             'user': [{
-                'id': self.miles.pk,
-                'first_name': self.miles.first_name,
-                'last_name': self.miles.last_name,
-                'email': self.miles.email
+                u'id': self.miles.pk,
+                u'first_name': self.miles.first_name,
+                u'last_name': self.miles.last_name,
+                u'email': self.miles.email
             }]
         }
 
@@ -53,10 +53,10 @@ class MultipleIDMixin(TestBase):
 
         expected = {
             'user': [{
-                'id': self.john.pk,
-                'first_name': self.john.first_name,
-                'last_name': self.john.last_name,
-                'email': self.john.email
+                u'id': self.john.pk,
+                u'first_name': self.john.first_name,
+                u'last_name': self.john.last_name,
+                u'email': self.john.email
             }]
         }
 

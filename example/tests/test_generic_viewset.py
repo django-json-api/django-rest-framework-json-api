@@ -21,10 +21,10 @@ class GenericViewSet(TestBase):
         self.assertEqual(
             json.loads(response.content),
             {
-                'id': 2,
-                'first_name': u'Miles',
-                'last_name': u'Davis',
-                'email': u'miles@example.com'
+                'id': self.miles.pk,
+                'first_name': self.miles.first_name,
+                'last_name': self.miles.last_name,
+                'email': self.miles.email
             }
         )
 
@@ -41,10 +41,10 @@ class GenericViewSet(TestBase):
             json.loads(response.content),
             {
                 'data': {
-                    'id': 2,
-                    'first_name': u'Miles',
-                    'last_name': u'Davis',
-                    'email': u'miles@example.com'
+                    'id': self.miles.pk,
+                    'first_name': self.miles.first_name,
+                    'last_name': self.miles.last_name,
+                    'email': self.miles.email
                 }
             }
         )
