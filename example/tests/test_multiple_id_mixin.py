@@ -36,7 +36,7 @@ class MultipleIDMixin(TestBase):
         json_content = json.loads(response.content)
         meta = json_content.get("meta")
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
+        self.assertItemsEqual(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 1)
         self.assertEquals(meta.get("next"), None)
         self.assertEqual(None, meta.get("next_link"))
@@ -63,7 +63,7 @@ class MultipleIDMixin(TestBase):
         json_content = json.loads(response.content)
         meta = json_content.get("meta")
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
+        self.assertItemsEqual(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 2)
         self.assertEquals(meta.get("next"), 2)
         self.assertEqual(
