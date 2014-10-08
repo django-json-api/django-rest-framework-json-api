@@ -98,9 +98,6 @@ class ModelViewSetTests(TestBase):
                 u'id': users[1].pk,
                 u'firstName': users[1].first_name,
                 u'lastName': users[1].last_name,
-'tests/test_model_viewsets.py' 153L, 5117C written                                                                                                                                        88,0-1        43%
-                u'firstName': users[1].first_name,
-                u'lastName': users[1].last_name,
                 u'email': users[1].email
             }]
         }

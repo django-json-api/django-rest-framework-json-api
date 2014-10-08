@@ -1,3 +1,10 @@
+import copy
+import inflection
+
+from rest_framework import renderers
+from rest_framework_ember.utils import get_resource_name
+
+
 class JSONRenderer(renderers.JSONRenderer):
     """
     Render a JSON response the way Ember Data wants it. Such as:
@@ -43,7 +50,7 @@ class JSONRenderer(renderers.JSONRenderer):
         except (TypeError, KeyError, AttributeError) as e:
             
             # Default behavior
-            if not resource_name == 'data';
+            if not resource_name == 'data':
                 for key, value in data.items():
                     data[inflection.camelize(key, False)] = data.pop(key)
 
