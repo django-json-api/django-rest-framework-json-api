@@ -27,8 +27,8 @@ class EmberJSONParser(JSONParser):
         Parses the incoming bytestream as JSON and returns the resulting data
         """
         result = super(EmberJSONParser, self).parse(stream, media_type=None,
-                                                  parser_context=None)
-        resource_name = result.get(get_resource_name(parser_context.get('view', None)))
-        for item in resource_name:
-            resource_name[inflection.underscore(item)] = resource_name.pop(item)
-        return resource_name
+                                                    parser_context=None)
+        resource = result.get(get_resource_name(parser_context.get('view', None)))
+        for item in resource:
+            resource[inflection.underscore(item)] = resource.pop(item)
+        return resource
