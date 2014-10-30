@@ -25,27 +25,22 @@ class JSONRenderer(renderers.JSONRenderer):
             return super(JSONRenderer, self).render(
                 data, accepted_media_type, renderer_context)
 
+        if isinstance(data, dict):
+            for key, value in content.items():
+                data[inflection.camelize(key, False)] = data.pop(key)
+
+        elif isinstance(data, (list, tuple)):
+            for obj in content:
+                if hasattr(obj, 'items'):
+                    for key, value in obj.items():
+                        obj[inflection.camelize(key, False)] = obj.pop(key)
+
+            if len(content) > 1:
+                resource_name = inflection.pluralize(resource_name)
+
         try:
             data_copy = copy.copy(data)
             content = data_copy.pop('results')
-
-            # Handle meta
-            for key, value in data_copy.items():
-                data_copy[inflection.camelize(key, False)] = data_copy.pop(key)
-
-            if isinstance(content, dict):
-                for key, value in content.items():
-                    content[inflection.camelize(key, False)] = content.pop(key)
-
-            elif isinstance(content, (list, tuple)):
-                for obj in content:
-                    if hasattr(obj, 'items'):
-                        for key, value in obj.items():
-                            obj[inflection.camelize(key, False)] = obj.pop(key)
-
-                if len(content) > 1:
-                    resource_name = inflection.pluralize(resource_name)
-
             data = {resource_name : content, "meta" : data_copy}
         except (TypeError, KeyError, AttributeError) as e:
             
