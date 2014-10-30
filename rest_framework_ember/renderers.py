@@ -46,8 +46,9 @@ class JSONRenderer(renderers.JSONRenderer):
                         for key, value in obj.items():
                             obj[get_key(key)] = obj.pop(key)
 
-                if len(content) > 1:
-                    resource_name = inflection.pluralize(resource_name)
+                if getattr(settings, 'REST_FRAMEWORK_PLURALIZE_KEYS', False):
+                    if len(content) > 1:
+                        resource_name = inflection.pluralize(resource_name)
 
             data = {resource_name : content, "meta" : data_copy}
         except (TypeError, KeyError, AttributeError) as e:

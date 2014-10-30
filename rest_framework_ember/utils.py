@@ -17,7 +17,9 @@ def get_key(key):
 
 
 def get_resource_name(view):
-    """Return the name of a resource."""
+    """
+    Return the name of a resource.
+    """
     try:
         # Check the view
         resource_name = getattr(view, 'resource_name')
@@ -37,6 +39,8 @@ def get_resource_name(view):
                 except AttributeError:
                     name = view.__class__.__name__
 
-            resource_name = get_key(name)
+            name = get_key(name)
+            resource_name = name[:1].lower() + name[1:]
 
     return resource_name
+
