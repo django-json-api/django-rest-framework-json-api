@@ -39,7 +39,7 @@ def format_keys(obj, format_type=None):
 
     :format_type: Either 'camelize' or 'underscore'
     """
-    if settings.REST_EMBER_FORMAT_KEYS and format_type in ('camelize', 'underscore'):
+    if getattr(settings, REST_EMBER_FORMAT_KEYS, False) and format_type in ('camelize', 'underscore'):
         if isinstance(obj, dict):
             formatted = {}
             for key, value in obj.items():

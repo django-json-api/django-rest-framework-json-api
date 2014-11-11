@@ -1,6 +1,7 @@
 import json
 
 from example.tests import TestBase
+
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.conf import settings
