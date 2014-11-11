@@ -4,6 +4,8 @@ import inflection
 from rest_framework import renderers
 from rest_framework_ember.utils import get_resource_name
 
+from .utils import camelize_keys
+
 
 class JSONRenderer(renderers.JSONRenderer):
     """
@@ -25,16 +27,9 @@ class JSONRenderer(renderers.JSONRenderer):
             return super(JSONRenderer, self).render(
                 data, accepted_media_type, renderer_context)
 
-        if isinstance(data, dict):
-            for key, value in data.items():
-                data[inflection.camelize(key, False)] = data.pop(key)
+        data = camelize_keys(data)        
 
-        elif isinstance(data, (list, tuple)):
-            for obj in data:
-                if hasattr(obj, 'items'):
-                    for key, value in obj.items():
-                        obj[inflection.camelize(key, False)] = obj.pop(key)
-
+        if isinstance(data, list):
             if len(data) > 1:
                 resource_name = inflection.pluralize(resource_name)
 
@@ -46,8 +41,7 @@ class JSONRenderer(renderers.JSONRenderer):
             
             # Default behavior
             if not resource_name == 'data':
-                for key, value in data.items():
-                    data[inflection.camelize(key, False)] = data.pop(key)
+                camelize_keys(data)
 
             data = {resource_name : data}
         return super(JSONRenderer, self).render(

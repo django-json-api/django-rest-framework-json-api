@@ -1,5 +1,7 @@
 import inflection
+
 from django.conf import settings
+
 
 def get_key(key):
     """
@@ -44,3 +46,17 @@ def get_resource_name(view):
 
     return resource_name
 
+
+def camelize_keys(obj):
+    """
+    Takes either a dict or list and returns it with camelized keys.
+    """
+    if isinstance(obj, dict):
+        camelized = {}
+        for key, value in obj.items():
+            camelized[inflection.camelize(key, False)] = camelize_keys(value)
+        return camelized
+    if isinstance(obj, list):
+        return [camelize_keys(item) for item in obj]
+    else:
+        return obj
