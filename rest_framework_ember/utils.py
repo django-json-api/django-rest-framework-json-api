@@ -1,8 +1,12 @@
 import inflection
 
+from django.conf import settings
+
 
 def get_resource_name(view):
-    """Return the name of a resource."""
+    """
+    Return the name of a resource.
+    """
     try:
         # Check the view
         resource_name = getattr(view, 'resource_name')
@@ -22,6 +26,31 @@ def get_resource_name(view):
                 except AttributeError:
                     name = view.__class__.__name__
 
-            resource_name = inflection.camelize(name, False)
+            name = format_keys(name)
+            resource_name = name[:1].lower() + name[1:]
 
     return resource_name
+
+
+def format_keys(obj, format_type=None):
+    """
+    Takes either a dict or list and returns it with camelized keys only if
+    REST_EMBER_FORMAT_KEYS is set.
+
+    :format_type: Either 'camelize' or 'underscore'
+    """
+    if settings.REST_EMBER_FORMAT_KEYS and format_type in ('camelize', 'underscore'):
+        if isinstance(obj, dict):
+            formatted = {}
+            for key, value in obj.items():
+                if format_type == 'camelize':
+                    formatted[inflection.camelize(key, False)] = format_keys(value, format_type)
+                elif format_type == 'underscore':
+                    formatted[inflection.underscore(key)] = format_keys(value, format_type)
+            return formatted
+        if isinstance(obj, list):
+            return [format_keys(item, format_type) for item in obj]
+        else:
+            return obj
+    else:
+        return obj
