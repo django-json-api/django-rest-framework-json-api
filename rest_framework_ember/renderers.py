@@ -31,7 +31,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
         data = format_keys(data, 'camelize') 
 
-        if isinstance(data, list) and getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False):
+        if isinstance(data, list) and getattr(settings,
+                                              'REST_EMBER_PLURALIZE_KEYS', False):
             if len(data) > 1:
                 resource_name = inflection.pluralize(resource_name)
 
