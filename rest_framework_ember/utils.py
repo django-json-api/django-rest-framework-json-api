@@ -3,21 +3,6 @@ import inflection
 from django.conf import settings
 
 
-def get_key(key):
-    """
-    https://github.com/ngenworks/rest_framework_ember/pull/10
-
-    Introduces camelizing of key names in the JSON response.
-    Unfortunately, this breaks backwards compatibility. In the event
-    one would like that functionality, they can use the
-    ``REST_FRAMEWORK_CAMELIZE_KEYS`` setting.
-    """
-    camelize = getattr(settings, 'REST_FRAMEWORK_CAMELIZE_KEYS', False)
-    if camelize:
-        return inflection.camelize(key, False)
-    return key
-
-
 def get_resource_name(view):
     """
     Return the name of a resource.
@@ -41,22 +26,31 @@ def get_resource_name(view):
                 except AttributeError:
                     name = view.__class__.__name__
 
-            name = get_key(name)
+            name = format_keys(name)
             resource_name = name[:1].lower() + name[1:]
 
     return resource_name
 
 
-def camelize_keys(obj):
+def format_keys(obj, format_type=None):
     """
-    Takes either a dict or list and returns it with camelized keys.
+    Takes either a dict or list and returns it with camelized keys only if
+    REST_EMBER_FORMAT_KEYS is set.
+
+    :format_type: Either 'camelize' or 'underscore'
     """
-    if isinstance(obj, dict):
-        camelized = {}
-        for key, value in obj.items():
-            camelized[inflection.camelize(key, False)] = camelize_keys(value)
-        return camelized
-    if isinstance(obj, list):
-        return [camelize_keys(item) for item in obj]
+    if settings.REST_EMBER_FORMAT_KEYS and format_type in ('camelize', 'underscore'):
+        if isinstance(obj, dict):
+            formatted = {}
+            for key, value in obj.items():
+                if format_type == 'camelize':
+                    formatted[inflection.camelize(key, False)] = format_keys(value, format_type)
+                elif format_type == 'underscore':
+                    formatted[inflection.underscore(key)] = format_keys(value, format_type)
+            return formatted
+        if isinstance(obj, list):
+            return [format_keys(item, format_type) for item in obj]
+        else:
+            return obj
     else:
         return obj
