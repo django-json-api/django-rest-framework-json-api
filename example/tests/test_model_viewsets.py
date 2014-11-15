@@ -32,8 +32,8 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'user': [{
                 u'id': user.pk,
-                u'firstName': user.first_name,
-                u'lastName': user.last_name,
+                u'first_name': user.first_name,
+                u'last_name': user.last_name,
                 u'email': user.email
             }]
         }
@@ -46,7 +46,7 @@ class ModelViewSetTests(TestBase):
             get_user_model().objects.count())
         self.assertEquals(meta.get('next'), 2)
         self.assertEqual('http://testserver/user-viewset/?page=2',
-            meta.get('nextLink'))
+            meta.get('next_link'))
         self.assertEqual(meta.get('page'), 1)
 
     def test_page_two_in_list_result(self):
@@ -60,8 +60,8 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'user': [{
                 u'id': user.pk,
-                u'firstName': user.first_name,
-                u'lastName': user.last_name,
+                u'first_name': user.first_name,
+                u'last_name': user.last_name,
                 u'email': user.email
             }]
         }
@@ -76,7 +76,7 @@ class ModelViewSetTests(TestBase):
         self.assertIsNone(meta.get('next_link'))
         self.assertEqual(meta.get('previous'), 1)
         self.assertEqual('http://testserver/user-viewset/?page=1',
-            meta.get('previousLink'))
+            meta.get('previous_link'))
         self.assertEqual(meta.get('page'), 2)
 
     def test_page_range_in_list_result(self):
@@ -92,20 +92,20 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'users': [{
                 u'id': users[0].pk,
-                u'firstName': users[0].first_name,
-                u'lastName': users[0].last_name,
+                u'first_name': users[0].first_name,
+                u'last_name': users[0].last_name,
                 u'email': users[0].email
             },{
                 u'id': users[1].pk,
-                u'firstName': users[1].first_name,
-                u'lastName': users[1].last_name,
+                u'first_name': users[1].first_name,
+                u'last_name': users[1].last_name,
                 u'email': users[1].email
             }]
         }
 
         json_content = json.loads(response.content)
         meta = json_content.get('meta')
-        self.assertEquals(expected.get('user'), json_content.get('user'))
+        self.assertEquals(expected.get('users'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
 
@@ -121,8 +121,8 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'user': {
                 u'id': self.miles.pk,
-                u'firstName': self.miles.first_name,
-                u'lastName': self.miles.last_name,
+                u'first_name': self.miles.first_name,
+                u'last_name': self.miles.last_name,
                 u'email': self.miles.email
             }
         }
@@ -136,8 +136,8 @@ class ModelViewSetTests(TestBase):
         data = {
             u'user': {
                 u'id': self.miles.pk,
-                u'firstName': self.miles.first_name,
-                u'lastName': self.miles.last_name,
+                u'first_name': self.miles.first_name,
+                u'last_name': self.miles.last_name,
                 u'email': 'miles@trumpet.org'
             }
         }
