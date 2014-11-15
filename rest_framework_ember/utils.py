@@ -58,3 +58,13 @@ def format_keys(obj, format_type=None):
             return obj
     else:
         return obj
+
+
+def format_resource_name(obj, name):
+    """
+    Pluralize the resource name if more than one object in results.
+    """
+    if getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False):
+        return inflection.pluralize(name) if len(obj) > 1 else name
+    else:
+        return name

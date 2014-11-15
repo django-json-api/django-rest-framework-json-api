@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework import renderers
 from rest_framework_ember.utils import get_resource_name
 
-from .utils import format_keys
+from .utils import format_keys, format_resource_name
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -31,14 +31,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
         data = format_keys(data, 'camelize') 
 
-        if isinstance(data, list) and getattr(settings,
-                                              'REST_EMBER_PLURALIZE_KEYS', False):
-            if len(data) > 1:
-                resource_name = inflection.pluralize(resource_name)
-
         try:
             data_copy = copy.copy(data)
             content = data_copy.pop('results')
+            resource_name = format_resource_name(content, resource_name)
             data = {resource_name : content, "meta" : data_copy}
         except (TypeError, KeyError, AttributeError) as e:
             
@@ -49,4 +45,3 @@ class JSONRenderer(renderers.JSONRenderer):
             data = {resource_name : data}
         return super(JSONRenderer, self).render(
             data, accepted_media_type, renderer_context)
-
