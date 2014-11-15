@@ -64,7 +64,7 @@ def format_resource_name(obj, name):
     """
     Pluralize the resource name if more than one object in results.
     """
-    if getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False):
+    if getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False) and isinstance(obj, list):
         return inflection.pluralize(name) if len(obj) > 1 else name
     else:
         return name

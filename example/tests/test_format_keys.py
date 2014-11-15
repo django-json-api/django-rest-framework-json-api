@@ -73,5 +73,4 @@ class FormatKeysSetTests(TestBase):
         }
 
         json_content = json.loads(response.content)
-        meta = json_content.get('meta')
         self.assertEquals(expected.get('users'), json_content.get('users'))

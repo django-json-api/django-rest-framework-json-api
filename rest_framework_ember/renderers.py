@@ -41,6 +41,7 @@ class JSONRenderer(renderers.JSONRenderer):
             # Default behavior
             if not resource_name == 'data':
                 format_keys(data, 'camelize')
+                resource_name = format_resource_name(data, resource_name)
 
             data = {resource_name : data}
         return super(JSONRenderer, self).render(
