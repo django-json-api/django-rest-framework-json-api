@@ -116,8 +116,6 @@ override ``settings.REST_FRAMEWORK``::
         ),
     }
 
-
-
 If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
 record count and the next and previous links. Django Rest Framework looks
 for the ``page`` GET parameter by default allowing you to make requests for
@@ -139,6 +137,20 @@ the ``resource_name`` property is required on the class::
         serializer_class = identity_serializers.IdentitySerializer
         allowed_methods = ['GET']
         permission_classes = (permissions.IsAuthenticated, )
+
+
+Ember Data <-> Rest Framework Format Conversion
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*(camelization/underscore/pluralize)*
+
+This package includes the optional ability to automatically convert json requests
+and responses from the Ember Data camelCase to python/rest_framework's preferred 
+underscore. Additionally resource names can be pluralized if more than one object 
+is included in a serialized response as Ember Data expects. To hook this up, 
+include the following in your project settings::
+
+   REST_FRAMEWORK_FORMAT_KEYS = True
+   REST_FRAMEWORK_PLURALIZE_KEYS = True
 
 
 Managing the trailing slash
