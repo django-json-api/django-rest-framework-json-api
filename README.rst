@@ -153,6 +153,47 @@ include the following in your project settings::
    REST_FRAMEWORK_PLURALIZE_KEYS = True
 
 
+Example - Without format conversion::
+
+   {
+      "identity": [
+         {
+            "id": 1,
+            "username": "john",
+            "first_name": "John",
+            "last_name": "Coltrane"
+         },
+         {
+            "id": 2,
+            "username": "frodo",
+            "first_name": "Bilbo",
+            "last_name": "Baggins"
+         },
+      ],
+      ...
+   }
+
+Example - With format conversion::
+
+   {
+      "identities": [
+         {
+            "id": 1,
+            "username": "john",
+            "firstName": "John",
+            "lastName": "Coltrane"
+         },
+         {
+            "id": 2,
+            "username": "frodo",
+            "firstName": "Bilbo",
+            "lastName": "Baggins"
+         },
+      ],
+      ...
+   }
+
+
 Managing the trailing slash
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
