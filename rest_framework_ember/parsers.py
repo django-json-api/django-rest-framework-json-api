@@ -31,4 +31,6 @@ class EmberJSONParser(JSONParser):
         result = super(EmberJSONParser, self).parse(stream, media_type=None,
                                                     parser_context=None)
         resource = result.get(get_resource_name(parser_context.get('view', None)))
-        return camelize_keys(resource, 'underscore')
+        for item in resource:
+            resource[inflection.underscore(item)] = resource.pop(item)
+        return resource

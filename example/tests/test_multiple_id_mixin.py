@@ -25,8 +25,8 @@ class MultipleIDMixin(TestBase):
         expected = {
             u'user': [{
                 u'id': self.miles.pk,
-                u'firstName': self.miles.first_name,
-                u'lastName': self.miles.last_name,
+                u'first_name': self.miles.first_name,
+                u'last_name': self.miles.last_name,
                 u'email': self.miles.email
             }]
         }
@@ -37,7 +37,7 @@ class MultipleIDMixin(TestBase):
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 1)
         self.assertEquals(meta.get('next'), None)
-        self.assertEqual(None, meta.get('nextLink'))
+        self.assertEqual(None, meta.get('next_link'))
         self.assertEqual(meta.get('page'), 1)
 
     def test_multiple_ids_in_query_params(self):
@@ -52,8 +52,8 @@ class MultipleIDMixin(TestBase):
         expected = {
             u'user': [{
                 u'id': self.john.pk,
-                u'firstName': self.john.first_name,
-                u'lastName': self.john.last_name,
+                u'first_name': self.john.first_name,
+                u'last_name': self.john.last_name,
                 u'email': self.john.email
             }]
         }
@@ -66,6 +66,6 @@ class MultipleIDMixin(TestBase):
         self.assertEquals(meta.get('next'), 2)
         self.assertEqual(
             'http://testserver/user-mixin-viewset/?ids%5B%5D=2&ids%5B%5D=1&page=2',
-            meta.get('nextLink'))
+            meta.get('next_link'))
         self.assertEqual(meta.get('page'), 1)
 
