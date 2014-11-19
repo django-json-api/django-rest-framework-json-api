@@ -116,8 +116,6 @@ override ``settings.REST_FRAMEWORK``::
         ),
     }
 
-
-
 If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
 record count and the next and previous links. Django Rest Framework looks
 for the ``page`` GET parameter by default allowing you to make requests for
@@ -139,6 +137,61 @@ the ``resource_name`` property is required on the class::
         serializer_class = identity_serializers.IdentitySerializer
         allowed_methods = ['GET']
         permission_classes = (permissions.IsAuthenticated, )
+
+
+Ember Data <-> Rest Framework Format Conversion
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*(camelization/underscore/pluralize)*
+
+This package includes the optional ability to automatically convert json requests
+and responses from the Ember Data camelCase to python/rest_framework's preferred 
+underscore. Additionally resource names can be pluralized if more than one object 
+is included in a serialized response as Ember Data expects. To hook this up, 
+include the following in your project settings::
+
+   REST_EMBER_FORMAT_KEYS = True
+   REST_EMBER_PLURALIZE_KEYS = True
+
+
+Example - Without format conversion::
+
+   {
+      "identity": [
+         {
+            "id": 1,
+            "username": "john",
+            "first_name": "John",
+            "last_name": "Coltrane"
+         },
+         {
+            "id": 2,
+            "username": "frodo",
+            "first_name": "Bilbo",
+            "last_name": "Baggins"
+         },
+      ],
+      ...
+   }
+
+Example - With format conversion::
+
+   {
+      "identities": [
+         {
+            "id": 1,
+            "username": "john",
+            "firstName": "John",
+            "lastName": "Coltrane"
+         },
+         {
+            "id": 2,
+            "username": "frodo",
+            "firstName": "Bilbo",
+            "lastName": "Baggins"
+         },
+      ],
+      ...
+   }
 
 
 Managing the trailing slash
