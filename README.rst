@@ -149,8 +149,8 @@ underscore. Additionally resource names can be pluralized if more than one objec
 is included in a serialized response as Ember Data expects. To hook this up, 
 include the following in your project settings::
 
-   REST_FRAMEWORK_FORMAT_KEYS = True
-   REST_FRAMEWORK_PLURALIZE_KEYS = True
+   REST_EMBER_FORMAT_KEYS = True
+   REST_EMBER_PLURALIZE_KEYS = True
 
 
 Example - Without format conversion::
