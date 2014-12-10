@@ -1,4 +1,3 @@
-
 import json
 from example.tests import TestBase
 from django.core.urlresolvers import reverse
@@ -48,4 +47,5 @@ class GenericViewSet(TestBase):
                 }
             }
         )
+
 
