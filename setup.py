@@ -16,7 +16,7 @@ setup(
     license='BSD',
     keywords="EmberJS Django REST",
     packages=find_packages(),
-    install_requires=['django', 'djangorestframework', 'inflection' ],
+    install_requires=['django', 'djangorestframework >= 3.0.0', 'inflection' ],
     platforms=['any'],
     classifiers=[
         'Development Status :: 4 - Beta',
