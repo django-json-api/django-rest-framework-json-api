@@ -46,7 +46,7 @@ class FormatKeysSetTests(TestBase):
 
         json_content = json.loads(response.content)
         meta = json_content.get('meta')
-       
+
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEqual('http://testserver/user-viewset/?page=2', meta.get('nextLink'))
 

@@ -1,4 +1,3 @@
-import copy
 import inflection
 
 from django.conf import settings
@@ -29,20 +28,20 @@ class JSONRenderer(renderers.JSONRenderer):
             return super(JSONRenderer, self).render(
                 data, accepted_media_type, renderer_context)
 
-        data = format_keys(data, 'camelize') 
+        data = format_keys(data, 'camelize')
 
         try:
-            data_copy = copy.copy(data)
-            content = data_copy.pop('results')
+            content = data.pop('results')
             resource_name = format_resource_name(content, resource_name)
-            data = {resource_name : content, "meta" : data_copy}
+            data = {resource_name : content, "meta" : data}
         except (TypeError, KeyError, AttributeError) as e:
-            
+
             # Default behavior
             if not resource_name == 'data':
                 format_keys(data, 'camelize')
                 resource_name = format_resource_name(data, resource_name)
 
             data = {resource_name : data}
+
         return super(JSONRenderer, self).render(
             data, accepted_media_type, renderer_context)
