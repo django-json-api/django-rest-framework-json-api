@@ -38,9 +38,9 @@ REST_FRAMEWORK = {
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100,
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'rest_framework_ember.pagination.EmberPaginationSerializer',
+        'rest_framework_ember.pagination.PaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (
-        # 'rest_framework_ember.parsers.EmberJSONParser',
+        # 'rest_framework_ember.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser'
     ),
@@ -49,7 +49,6 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
-    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
 }
 
 

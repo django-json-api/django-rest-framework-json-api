@@ -94,7 +94,7 @@ Rest Framework.
 Settings
 ^^^^^^^^
 
-One can either add ``rest_framework_ember.parsers.EmberJSONParser`` and
+One can either add ``rest_framework_ember.parsers.JSONParser`` and
 ``rest_framework_ember.renderers.JSONRenderer`` to each ``ViewSet`` class, or
 override ``settings.REST_FRAMEWORK``::
 
@@ -104,9 +104,9 @@ override ``settings.REST_FRAMEWORK``::
         'PAGINATE_BY_PARAM': 'page_size',
         'MAX_PAGINATE_BY': 100,
         'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-            'rest_framework_ember.pagination.EmberPaginationSerializer',
+            'rest_framework_ember.pagination.PaginationSerializer',
         'DEFAULT_PARSER_CLASSES': (
-            'rest_framework_ember.parsers.EmberJSONParser',
+            'rest_framework_ember.parsers.JSONParser',
             'rest_framework.parsers.FormParser',
             'rest_framework.parsers.MultiPartParser'
         ),

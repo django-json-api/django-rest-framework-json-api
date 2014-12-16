@@ -62,7 +62,7 @@ class UserEmber(User):
     resource_name = 'data'
 
     renderer_classes = (renderers.JSONRenderer, )
-    parser_classes = (parsers.EmberJSONParser, )
+    parser_classes = (parsers.JSONParser, )
 
 
 class EmberUserModelViewSet(viewsets.ModelViewSet):
@@ -70,7 +70,7 @@ class EmberUserModelViewSet(viewsets.ModelViewSet):
     serializer_class = IdentitySerializer
     allowed_methods = ['GET', 'POST', 'PUT', ]
     renderer_classes = (renderers.JSONRenderer, )
-    parser_classes = (parsers.EmberJSONParser, )
+    parser_classes = (parsers.JSONParser, )
 
 
 class MultipleIDMixinUserModelViewSet(mixins.MultipleIDMixin,

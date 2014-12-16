@@ -70,7 +70,7 @@ class PageField(serializers.ReadOnlyField):
 
 
 
-class EmberPaginationSerializer(pagination.BasePaginationSerializer):
+class PaginationSerializer(pagination.BasePaginationSerializer):
     next = NextPageField(source='*')
     next_link = NextPageLinkField(source='*')
     page = PageField(source='*')
@@ -78,4 +78,11 @@ class EmberPaginationSerializer(pagination.BasePaginationSerializer):
     previous_link = PreviousPageLinkField(source='*')
     count = serializers.ReadOnlyField(source='paginator.count')
     total = serializers.ReadOnlyField(source='paginator.num_pages')
+
+
+class EmberPaginationSerializer(PaginationSerializer):
+    """
+    Backwards compatibility for name change
+    """
+    pass
 
