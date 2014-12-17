@@ -1,5 +1,3 @@
-
-
 import json
 from example.tests import TestBase
 from django.contrib.auth import get_user_model
@@ -70,4 +68,5 @@ class MultipleIDMixin(TestBase):
             'http://testserver/user-mixin-viewset/?ids%5B%5D=2&ids%5B%5D=1&page=2',
             meta.get("next_link"))
         self.assertEqual(meta.get("page"), 1)
+
 
