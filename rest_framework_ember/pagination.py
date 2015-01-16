@@ -4,8 +4,11 @@ from rest_framework.templatetags.rest_framework import replace_query_param
 
 from rest_framework_ember.utils import get_resource_name
 
+# DRF 2.4.X compatibility.
+ReadOnlyField = getattr(serializers, 'ReadOnlyField', serializers.Field)
 
-class NextPageLinkField(serializers.ReadOnlyField):
+
+class NextPageLinkField(ReadOnlyField):
     """
     Field that returns a link to the next page in paginated results.
     """
@@ -20,7 +23,7 @@ class NextPageLinkField(serializers.ReadOnlyField):
         return replace_query_param(url, self.page_field, page)
 
 
-class NextPageField(serializers.ReadOnlyField):
+class NextPageField(ReadOnlyField):
     """
     Field that returns a link to the next page in paginated results.
     """
@@ -32,7 +35,7 @@ class NextPageField(serializers.ReadOnlyField):
         return value.next_page_number()
 
 
-class PreviousPageLinkField(serializers.ReadOnlyField):
+class PreviousPageLinkField(ReadOnlyField):
     """
     Field that returns a link to the previous page in paginated results.
     """
@@ -47,7 +50,7 @@ class PreviousPageLinkField(serializers.ReadOnlyField):
         return replace_query_param(url, self.page_field, page)
 
 
-class PreviousPageField(serializers.ReadOnlyField):
+class PreviousPageField(ReadOnlyField):
     """
     Field that returns a link to the previous page in paginated results.
     """
@@ -59,7 +62,7 @@ class PreviousPageField(serializers.ReadOnlyField):
         return value.previous_page_number()
 
 
-class PageField(serializers.ReadOnlyField):
+class PageField(ReadOnlyField):
     """
     Field that returns a link to the previous page in paginated results.
     """
@@ -76,8 +79,8 @@ class PaginationSerializer(pagination.BasePaginationSerializer):
     page = PageField(source='*')
     previous = PreviousPageField(source='*')
     previous_link = PreviousPageLinkField(source='*')
-    count = serializers.ReadOnlyField(source='paginator.count')
-    total = serializers.ReadOnlyField(source='paginator.num_pages')
+    count = ReadOnlyField(source='paginator.count')
+    total = ReadOnlyField(source='paginator.num_pages')
 
 
 class EmberPaginationSerializer(PaginationSerializer):
