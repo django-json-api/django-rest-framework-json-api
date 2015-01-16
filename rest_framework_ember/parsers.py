@@ -27,7 +27,7 @@ class JSONParser(parsers.JSONParser):
         Parses the incoming bytestream as JSON and returns the resulting data
         """
         result = super(JSONParser, self).parse(stream, media_type=media_type,
-                                                    parser_context=None)
+                                               parser_context=parser_context)
         resource = result.get(get_resource_name(parser_context.get('view', None)))
         return format_keys(resource, 'underscore')
 
