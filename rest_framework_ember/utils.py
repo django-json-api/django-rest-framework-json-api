@@ -29,6 +29,9 @@ def get_resource_name(view):
             name = format_keys(name)
             resource_name = name[:1].lower() + name[1:]
 
+    if getattr(settings, 'REST_EMBER_FORMAT_KEYS', False):
+        return inflection.camelize(resource_name, False)
+
     return resource_name
 
 
@@ -39,18 +42,18 @@ def format_keys(obj, format_type=None):
 
     :format_type: Either 'camelize' or 'underscore'
     """
-    if getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)\
-        and format_type in ('camelize', 'underscore'):
+    if (getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)
+        and format_type in ('camelize', 'underscore')):
         
         if isinstance(obj, dict):
             formatted = {}
             for key, value in obj.items():
                 if format_type == 'camelize':
-                    formatted[inflection.camelize(key, False)]\
-                        = format_keys(value, format_type)
+                    (formatted[inflection.camelize(key, False)]
+                        = format_keys(value, format_type))
                 elif format_type == 'underscore':
-                    formatted[inflection.underscore(key)]\
-                        = format_keys(value, format_type)
+                    (formatted[inflection.underscore(key)]
+                        = format_keys(value, format_type))
             return formatted
         if isinstance(obj, list):
             return [format_keys(item, format_type) for item in obj]
@@ -64,7 +67,9 @@ def format_resource_name(obj, name):
     """
     Pluralize the resource name if more than one object in results.
     """
-    if getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False) and isinstance(obj, list):
+    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False)
+        and isinstance(obj, list)):
+        
         return inflection.pluralize(name) if len(obj) > 1 else name
     else:
         return name
