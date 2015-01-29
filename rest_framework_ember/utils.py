@@ -29,7 +29,9 @@ def get_resource_name(view):
             name = format_keys(name)
             resource_name = name[:1].lower() + name[1:]
 
-    if getattr(settings, 'REST_EMBER_FORMAT_KEYS', False):
+    if (getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)
+        and isinstance(resource_name, basestring)):
+
         return inflection.camelize(resource_name, False)
 
     return resource_name
