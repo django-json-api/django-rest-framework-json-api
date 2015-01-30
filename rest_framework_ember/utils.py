@@ -13,18 +13,18 @@ def get_resource_name(view):
     except AttributeError:
         try:
             # Check the meta class
-            resource_name = getattr(view, 'serializer_class')\
-                .Meta.resource_name
+            resource_name = (getattr(view, 'serializer_class')
+                            .Meta.resource_name)
         except AttributeError:
             # Use the model
             try:
-                name = resource_name = getattr(view, 'serializer_class')\
-                    .Meta.model.__name__
+                resource_name = (getattr(view, 'serializer_class')
+                                .Meta.model.__name__)
             except AttributeError:
                 try:
-                    name = view.model.__name__
+                    resource_name = view.model.__name__
                 except AttributeError:
-                    name = view.__class__.__name__
+                    resource_name = view.__class__.__name__
 
         if isinstance(resource_name, basestring):
             return inflection.camelize(resource_name, False)
