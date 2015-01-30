@@ -26,8 +26,8 @@ def get_resource_name(view):
                 except AttributeError:
                     resource_name = view.__class__.__name__
 
-        if isinstance(resource_name, basestring):
-            return inflection.camelize(resource_name, False)
+    if isinstance(resource_name, basestring):
+        return inflection.camelize(resource_name, False)
 
     return resource_name
 
@@ -41,7 +41,7 @@ def format_keys(obj, format_type=None):
     """
     if getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)\
         and format_type in ('camelize', 'underscore'):
-        
+
         if isinstance(obj, dict):
             formatted = {}
             for key, value in obj.items():
