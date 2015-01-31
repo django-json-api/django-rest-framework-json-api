@@ -82,6 +82,14 @@ From Source
     $ cd rest_framework_ember && pip install -e .
 
 
+Running Tests
+^^^^^^^^^^^^^
+
+::
+
+    $ python runtests.py
+
+
 -----
 Usage
 -----
@@ -144,10 +152,9 @@ Ember Data <-> Rest Framework Format Conversion
 *(camelization/underscore/pluralize)*
 
 This package includes the optional ability to automatically convert json requests
-and responses from the Ember Data camelCase to python/rest_framework's preferred 
-underscore. Additionally resource names can be pluralized if more than one object 
-is included in a serialized response as Ember Data expects. To hook this up, 
-include the following in your project settings::
+and responses from the Ember Data camelCase to python/rest_framework's preferred
+underscore. Additionally resource names can be pluralized when an array of objects
+are returned. To hook this up include the following in your project settings::
 
    REST_EMBER_FORMAT_KEYS = True
    REST_EMBER_PLURALIZE_KEYS = True
