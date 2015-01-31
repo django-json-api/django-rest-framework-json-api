@@ -66,7 +66,6 @@ def format_resource_name(obj, name):
     """
     if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False)
         and isinstance(obj, list)):
-
-        return inflection.pluralize(name) if len(obj) > 1 else name
+        return inflection.pluralize(name)
     else:
         return name
