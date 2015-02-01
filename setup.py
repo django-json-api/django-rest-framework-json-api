@@ -7,7 +7,7 @@ def get_readme():
 
 setup(
     name='rest_framework_ember',
-    version='1.1.0',
+    version='1.2.0',
     description="Make EmberJS and Django Rest Framework play nice together. Follows jsonapi.org spec",
     long_description=get_readme(),
     author="nGen Works",
