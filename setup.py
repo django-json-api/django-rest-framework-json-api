@@ -7,7 +7,7 @@ def get_readme():
 
 setup(
     name='rest_framework_ember',
-    version='1.1.0',
+    version='1.2.0',
     description="Make EmberJS and Django Rest Framework play nice together. Follows jsonapi.org spec",
     long_description=get_readme(),
     author="nGen Works",
@@ -16,7 +16,7 @@ setup(
     license='BSD',
     keywords="EmberJS Django REST",
     packages=find_packages(),
-    install_requires=['django', 'djangorestframework >= 3.0.0', 'inflection' ],
+    install_requires=['django', 'djangorestframework >= 2.4.0', 'inflection' ],
     platforms=['any'],
     classifiers=[
         'Development Status :: 4 - Beta',

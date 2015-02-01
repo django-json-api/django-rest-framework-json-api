@@ -12,8 +12,8 @@ class ModelViewSetTests(TestBase):
     Test usage with ModelViewSets, also tests pluralization, camelization,
     and underscore.
 
-    [<RegexURLPattern user-list ^user-viewsets/$>,
-    <RegexURLPattern user-detail ^user-viewsets/(?P<pk>[^/]+)/$>]
+    [<RegexURLPattern user-list ^identities/$>,
+    <RegexURLPattern user-detail ^identities/(?P<pk>[^/]+)/$>]
     """
     list_url = reverse_lazy('user-list')
 
@@ -45,7 +45,7 @@ class ModelViewSetTests(TestBase):
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
         self.assertEquals(meta.get('next'), 2)
-        self.assertEqual('http://testserver/user-viewset/?page=2',
+        self.assertEqual(u'http://testserver/identities?page=2',
             meta.get('next_link'))
         self.assertEqual(meta.get('page'), 1)
 
@@ -75,7 +75,7 @@ class ModelViewSetTests(TestBase):
         self.assertIsNone(meta.get('next'))
         self.assertIsNone(meta.get('next_link'))
         self.assertEqual(meta.get('previous'), 1)
-        self.assertEqual('http://testserver/user-viewset/?page=1',
+        self.assertEqual(u'http://testserver/identities?page=1',
             meta.get('previous_link'))
         self.assertEqual(meta.get('page'), 2)
 
@@ -152,3 +152,4 @@ class ModelViewSetTests(TestBase):
         self.assertEqual(
             get_user_model().objects.get(pk=self.miles.pk).email,
             'miles@trumpet.org')
+

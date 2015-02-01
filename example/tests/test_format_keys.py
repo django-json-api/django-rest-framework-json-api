@@ -36,7 +36,7 @@ class FormatKeysSetTests(TestBase):
 
         user = get_user_model().objects.all()[0]
         expected = {
-            u'user': [{
+            u'users': [{
                 u'id': user.pk,
                 u'firstName': user.first_name,
                 u'lastName': user.last_name,
@@ -47,8 +47,9 @@ class FormatKeysSetTests(TestBase):
         json_content = json.loads(response.content)
         meta = json_content.get('meta')
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
-        self.assertEqual('http://testserver/user-viewset/?page=2', meta.get('nextLink'))
+        self.assertEquals(expected.get('users'), json_content.get('users'))
+        self.assertEqual(u'http://testserver/identities?page=2',
+            meta.get('nextLink'))
 
     def test_pluralization(self):
         """
@@ -74,3 +75,13 @@ class FormatKeysSetTests(TestBase):
 
         json_content = json.loads(response.content)
         self.assertEquals(expected.get('users'), json_content.get('users'))
+
+    def test_empty_pluralization(self):
+        #test that the key is still pluralized when there are no records for the
+        #model, as long as the endpoint serves a list
+        response = self.client.get(reverse('user-empty-list'))
+        self.assertEqual(response.status_code, 200)
+
+        json_content = json.loads(response.content)
+        self.assertEqual(json_content.get('users'), [])
+
