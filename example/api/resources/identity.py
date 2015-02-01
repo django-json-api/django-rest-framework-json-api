@@ -33,7 +33,7 @@ class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
 
 class GenericIdentity(generics.GenericAPIView):
     """
-    Current user's identity endpoint.
+    An endpoint that uses DRF's default format so we can test that.
 
     GET /identities/generic
     """
