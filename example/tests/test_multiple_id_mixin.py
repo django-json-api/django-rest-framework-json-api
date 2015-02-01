@@ -18,7 +18,7 @@ class MultipleIDMixin(TestBase):
         """
         Ensure single ID in query params returns correct result
         """
-        url = '/user-mixin-viewset/?ids[]={0}'.format(self.miles.pk)
+        url = '/identities?ids[]={0}'.format(self.miles.pk)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -44,7 +44,7 @@ class MultipleIDMixin(TestBase):
         """
         Ensure multiple IDs in query params return correct result
         """
-        url = '/user-mixin-viewset/?ids[]={0}&ids[]={1}'.format(
+        url = '/identities?ids[]={0}&ids[]={1}'.format(
             self.miles.pk, self.john.pk)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -65,7 +65,7 @@ class MultipleIDMixin(TestBase):
         self.assertEquals(meta.get('count', 0), 2)
         self.assertEquals(meta.get("next"), 2)
         self.assertEqual(
-            'http://testserver/user-mixin-viewset/?ids%5B%5D=2&ids%5B%5D=1&page=2',
+            'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2',
             meta.get("next_link"))
         self.assertEqual(meta.get("page"), 1)
 

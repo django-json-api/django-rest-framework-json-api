@@ -32,7 +32,7 @@ class GenericViewSet(TestBase):
         The :class:`UserEmber` ViewSet has the ``resource_name`` of 'data'
         so that should be the key in the JSON response.
         """
-        url = reverse('user-ember', kwargs={'pk': self.miles.pk})
+        url = reverse('user-manual-resource-name', kwargs={'pk': self.miles.pk})
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)

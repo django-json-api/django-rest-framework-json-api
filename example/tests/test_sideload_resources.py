@@ -11,7 +11,7 @@ class SideloadResourceTest(TestBase):
     """
     Test that sideloading resources returns expected output.
     """
-    url = reverse_lazy('users-cars')
+    url = reverse_lazy('user-posts')
 
     def test_get_sideloaded_data(self):
         """
@@ -21,5 +21,5 @@ class SideloadResourceTest(TestBase):
         response = self.client.get(self.url)
         content = json.loads(response.content)
 
-        self.assertEqual(content.keys(), ['cars', 'users'])
+        self.assertEqual(content.keys(), [u'identities', u'posts'])
 

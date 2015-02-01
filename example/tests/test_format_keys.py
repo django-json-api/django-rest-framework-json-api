@@ -48,7 +48,7 @@ class FormatKeysSetTests(TestBase):
         meta = json_content.get('meta')
 
         self.assertEquals(expected.get('users'), json_content.get('users'))
-        self.assertEqual('http://testserver/user-viewset/?page=2',
+        self.assertEqual(u'http://testserver/identities?page=2',
             meta.get('nextLink'))
 
     def test_pluralization(self):
@@ -76,6 +76,7 @@ class FormatKeysSetTests(TestBase):
         json_content = json.loads(response.content)
         self.assertEquals(expected.get('users'), json_content.get('users'))
 
+    def test_empty_pluralization(self):
         #test that the key is still pluralized when there are no records for the
         #model, as long as the endpoint serves a list
         get_user_model().objects.all().delete()
@@ -84,3 +85,4 @@ class FormatKeysSetTests(TestBase):
 
         json_content = json.loads(response.content)
         self.assertEqual(json_content.get('users'), [])
+

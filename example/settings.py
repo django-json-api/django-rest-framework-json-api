@@ -40,12 +40,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'rest_framework_ember.pagination.PaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (
-        # 'rest_framework_ember.parsers.JSONParser',
+        'rest_framework_ember.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser'
     ),
     'DEFAULT_RENDERER_CLASSES': (
-        # 'rest_framework_ember.renderers.JSONRenderer',
+        'rest_framework_ember.renderers.JSONRenderer',
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
