@@ -79,8 +79,7 @@ class FormatKeysSetTests(TestBase):
     def test_empty_pluralization(self):
         #test that the key is still pluralized when there are no records for the
         #model, as long as the endpoint serves a list
-        get_user_model().objects.all().delete()
-        response = self.client.get(self.list_url)
+        response = self.client.get(reverse('user-empty-list'))
         self.assertEqual(response.status_code, 200)
 
         json_content = json.loads(response.content)
