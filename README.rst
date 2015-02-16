@@ -159,6 +159,10 @@ are returned. To hook this up include the following in your project settings::
    REST_EMBER_FORMAT_KEYS = True
    REST_EMBER_PLURALIZE_KEYS = True
 
+Note: due to the way the inflector works address_1 will convert to address1
+on output but cannot convert address1 back to address_1 on POST or PUT. Keep
+this in mind when naming fields with numbers in them.
+
 
 Example - Without format conversion::
 
