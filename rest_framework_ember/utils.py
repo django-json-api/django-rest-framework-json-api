@@ -1,7 +1,7 @@
-import six
 import inflection
 
 from django.conf import settings
+from django.utils import six
 
 
 def get_resource_name(view):
