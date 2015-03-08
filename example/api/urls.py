@@ -12,6 +12,7 @@ router.register(r'identities', Identity)
 urlpatterns = router.urls
 
 urlpatterns += patterns('',
-    url(r'identities/default/(?P<pk>\d+)', GenericIdentity.as_view(), name='user-default'),
+    url(r'identities/default/(?P<pk>\d+)',
+        GenericIdentity.as_view(), name='user-default'),
 )
 

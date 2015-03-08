@@ -1,3 +1,6 @@
+"""
+Utils.
+"""
 import inflection
 
 from django.conf import settings
@@ -14,13 +17,15 @@ def get_resource_name(view):
     except AttributeError:
         try:
             # Check the meta class
-            resource_name = (getattr(view, 'serializer_class')
-                            .Meta.resource_name)
+            resource_name = (
+                getattr(view, 'serializer_class')
+                .Meta.resource_name)
         except AttributeError:
             # Use the model
             try:
-                resource_name = (getattr(view, 'serializer_class')
-                                .Meta.model.__name__)
+                resource_name = (
+                    getattr(view, 'serializer_class')
+                    .Meta.model.__name__)
             except AttributeError:
                 try:
                     resource_name = view.model.__name__
@@ -41,7 +46,7 @@ def format_keys(obj, format_type=None):
     :format_type: Either 'camelize' or 'underscore'
     """
     if (getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)
-        and format_type in ('camelize', 'underscore')):
+            and format_type in ('camelize', 'underscore')):
 
         if isinstance(obj, dict):
             formatted = {}
@@ -66,7 +71,7 @@ def format_resource_name(obj, name):
     Pluralize the resource name if more than one object in results.
     """
     if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False)
-        and isinstance(obj, list)):
+            and isinstance(obj, list)):
+
         return inflection.pluralize(name)
-    else:
-        return name
+    return name

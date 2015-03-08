@@ -1,8 +1,12 @@
+"""
+Pagination fields
+"""
+# pylint: disable=no-init, too-few-public-methods, no-self-use
+
+
 from rest_framework import serializers
 from rest_framework import pagination
 from rest_framework.templatetags.rest_framework import replace_query_param
-
-from rest_framework_ember.utils import get_resource_name
 
 # DRF 2.4.X compatibility.
 ReadOnlyField = getattr(serializers, 'ReadOnlyField', serializers.Field)
@@ -72,8 +76,10 @@ class PageField(ReadOnlyField):
         return value.number
 
 
-
 class PaginationSerializer(pagination.BasePaginationSerializer):
+    """
+    Pagination serializer.
+    """
     next = NextPageField(source='*')
     next_link = NextPageLinkField(source='*')
     page = PageField(source='*')
