@@ -1,3 +1,4 @@
+import six
 import inflection
 
 from django.conf import settings
@@ -26,7 +27,7 @@ def get_resource_name(view):
                 except AttributeError:
                     resource_name = view.__class__.__name__
 
-    if isinstance(resource_name, basestring):
+    if isinstance(resource_name, six.string_types):
         return inflection.camelize(resource_name, False)
 
     return resource_name
@@ -39,8 +40,8 @@ def format_keys(obj, format_type=None):
 
     :format_type: Either 'camelize' or 'underscore'
     """
-    if getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)\
-        and format_type in ('camelize', 'underscore'):
+    if (getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)
+        and format_type in ('camelize', 'underscore')):
 
         if isinstance(obj, dict):
             formatted = {}
