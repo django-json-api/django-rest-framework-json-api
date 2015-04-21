@@ -42,6 +42,7 @@ class ModelViewSetTests(TestBase):
         meta = json_content.get('meta')
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
+        self.assertEquals(meta.get('total'), 2)
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
         self.assertEquals(meta.get('next'), 2)
@@ -75,9 +76,15 @@ class ModelViewSetTests(TestBase):
         self.assertIsNone(meta.get('next'))
         self.assertIsNone(meta.get('next_link'))
         self.assertEqual(meta.get('previous'), 1)
-        self.assertEqual(u'http://testserver/identities?page=1',
-            meta.get('previous_link'))
         self.assertEqual(meta.get('page'), 2)
+
+        # Older versions of DRF add page=1 for first page. Later trim to root
+        try:
+            self.assertEqual(u'http://testserver/identities',
+                meta.get('previous_link'))
+        except AssertionError:
+            self.assertEqual(u'http://testserver/identities?page=1',
+                meta.get('previous_link'))
 
     def test_page_range_in_list_result(self):
         """

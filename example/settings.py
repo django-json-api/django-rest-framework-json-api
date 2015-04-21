@@ -37,6 +37,10 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 1,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100,
+    # DRF v3.1+
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework_ember.pagination.PageNumberPagination',
+    # DRF v3.0 and older
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
         'rest_framework_ember.pagination.PaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (
