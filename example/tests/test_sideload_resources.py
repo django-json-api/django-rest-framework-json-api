@@ -3,7 +3,7 @@ Test sideloading resources
 """
 import json
 from example.tests import TestBase
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 
@@ -11,7 +11,7 @@ class SideloadResourceTest(TestBase):
     """
     Test that sideloading resources returns expected output.
     """
-    url = reverse_lazy('user-posts')
+    url = reverse('user-posts')
 
     def test_get_sideloaded_data(self):
         """
@@ -19,7 +19,7 @@ class SideloadResourceTest(TestBase):
         do not return a single root key.
         """
         response = self.client.get(self.url)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf8'))
 
-        self.assertEqual(content.keys(), [u'identities', u'posts'])
+        self.assertEqual(sorted(content.keys()), [u'identities', u'posts'])
 

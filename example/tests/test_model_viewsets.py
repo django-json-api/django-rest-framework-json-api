@@ -3,7 +3,7 @@ import json
 from example.tests import TestBase
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 
@@ -15,7 +15,7 @@ class ModelViewSetTests(TestBase):
     [<RegexURLPattern user-list ^identities/$>,
     <RegexURLPattern user-detail ^identities/(?P<pk>[^/]+)/$>]
     """
-    list_url = reverse_lazy('user-list')
+    list_url = reverse('user-list')
 
     def setUp(self):
         super(ModelViewSetTests, self).setUp()
@@ -38,7 +38,7 @@ class ModelViewSetTests(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         meta = json_content.get('meta')
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
@@ -66,7 +66,7 @@ class ModelViewSetTests(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         meta = json_content.get('meta')
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
@@ -103,7 +103,7 @@ class ModelViewSetTests(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         meta = json_content.get('meta')
         self.assertEquals(expected.get('users'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0),
@@ -117,7 +117,7 @@ class ModelViewSetTests(TestBase):
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
 
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode('utf8'))
         expected = {
             u'user': {
                 u'id': self.miles.pk,
@@ -143,7 +143,7 @@ class ModelViewSetTests(TestBase):
         }
         response = self.client.put(self.detail_url, data=data, format='json')
 
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode('utf8'))
 
         self.assertIn('user', result.keys())
         self.assertEqual(result['user']['email'], 'miles@trumpet.org')

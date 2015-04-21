@@ -1,7 +1,7 @@
 import json
 from example.tests import TestBase
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 
@@ -12,7 +12,7 @@ class MultipleIDMixin(TestBase):
     [<RegexURLPattern user-list ^user-viewsets/$>,
      <RegexURLPattern user-detail ^user-viewsets/(?P<pk>[^/]+)/$>]
     """
-    list_url = reverse_lazy('user-list')
+    list_url = reverse('user-list')
 
     def test_single_id_in_query_params(self):
         """
@@ -31,7 +31,7 @@ class MultipleIDMixin(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         meta = json_content.get("meta")
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
@@ -58,15 +58,20 @@ class MultipleIDMixin(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         meta = json_content.get("meta")
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 2)
         self.assertEquals(meta.get("next"), 2)
         self.assertEqual(
-            'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2',
-            meta.get("next_link"))
+            sorted(
+                'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2'\
+                .split('?')[1].split('&')
+            ),
+            sorted(
+                meta.get("next_link").split('?')[1].split('&'))
+            )
         self.assertEqual(meta.get("page"), 1)
 
 

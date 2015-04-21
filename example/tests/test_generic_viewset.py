@@ -18,7 +18,7 @@ class GenericViewSet(TestBase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(
-            json.loads(response.content),
+            json.loads(response.content.decode('utf8')),
             {
                 'id': 2,
                 'first_name': u'Miles',
@@ -37,7 +37,7 @@ class GenericViewSet(TestBase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertEqual(
-            json.loads(response.content),
+            json.loads(response.content.decode('utf8')),
             {
                 'data': {
                     'id': 2,

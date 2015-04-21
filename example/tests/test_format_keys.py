@@ -3,7 +3,7 @@ import json
 from example.tests import TestBase
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse, reverse
 from django.conf import settings
 
 
@@ -11,7 +11,7 @@ class FormatKeysSetTests(TestBase):
     """
     Test that camelization and underscoring of key names works if they are activated.
     """
-    list_url = reverse_lazy('user-list')
+    list_url = reverse('user-list')
 
     def setUp(self):
         super(FormatKeysSetTests, self).setUp()
@@ -44,7 +44,7 @@ class FormatKeysSetTests(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         meta = json_content.get('meta')
 
         self.assertEquals(expected.get('users'), json_content.get('users'))
@@ -73,7 +73,7 @@ class FormatKeysSetTests(TestBase):
             }]
         }
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         self.assertEquals(expected.get('users'), json_content.get('users'))
 
     def test_empty_pluralization(self):
@@ -82,6 +82,6 @@ class FormatKeysSetTests(TestBase):
         response = self.client.get(reverse('user-empty-list'))
         self.assertEqual(response.status_code, 200)
 
-        json_content = json.loads(response.content)
+        json_content = json.loads(response.content.decode('utf8'))
         self.assertEqual(json_content.get('users'), [])
 
