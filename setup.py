@@ -12,13 +12,13 @@ def get_readme():
 
 setup(
     name='rest_framework_ember',
-    version='1.2.0',
-    description="Make EmberJS and Django Rest Framework play nice together. \
-        Follows jsonapi.org spec",
+    version='1.2.1',
+    description="A Django Rest Framework adapter that provides Ember Data \
+        support. When jsonapi.org reaches 1.0 this adapter plans to adopt it.",
     long_description=get_readme(),
     url='https://github.com/django-json-api/rest_framework_ember',
     license='BSD',
-    keywords="EmberJS Django REST",
+    keywords="EmberJS Ember Data Django REST",
     packages=find_packages(),
     install_requires=['django', 'djangorestframework >= 2.4.0', 'inflection'],
     platforms=['any'],
