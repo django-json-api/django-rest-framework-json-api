@@ -6,6 +6,8 @@ import inflection
 from django.conf import settings
 from django.utils import six
 
+from rest_framework.compat import OrderedDict
+
 
 def get_resource_name(view):
     """
@@ -49,7 +51,7 @@ def format_keys(obj, format_type=None):
             and format_type in ('camelize', 'underscore')):
 
         if isinstance(obj, dict):
-            formatted = {}
+            formatted = OrderedDict()
             for key, value in obj.items():
                 if format_type == 'camelize':
                     formatted[inflection.camelize(key, False)]\
