@@ -6,7 +6,10 @@ import inflection
 from django.conf import settings
 from django.utils import six
 
-from rest_framework.compat import OrderedDict
+try:
+    from rest_framework.compat import OrderedDict
+except ImportError:
+    OrderedDict = dict
 
 
 def get_resource_name(view):
