@@ -16,26 +16,26 @@ def get_resource_name(view):
     """
     Return the name of a resource.
     """
-    try:
-        # Check the view
-        resource_name = getattr(view, 'resource_name')
-    except AttributeError:
-        try:
-            # Check the meta class
-            resource_name = (
-                getattr(view, 'serializer_class')
-                .Meta.resource_name)
-        except AttributeError:
-            # Use the model
+    # Check the view
+    resource_name = getattr(view, 'resource_name', None)
+    if not resource_name:
+        # Check the meta class
+        serializer_class = getattr(view, 'serializer_class', None)
+        if serializer_class:
             try:
-                resource_name = (
-                    getattr(view, 'serializer_class')
-                    .Meta.model.__name__)
+                resource_name = serializer_class.Meta.resource_name
             except AttributeError:
                 try:
-                    resource_name = view.model.__name__
+                    resource_name = serializer_class.Meta.model.__name__
                 except AttributeError:
-                    resource_name = view.__class__.__name__
+                    pass
+
+    if not resource_name:
+        # Use the model
+        try:
+            resource_name = view.model.__name__
+        except AttributeError:
+            resource_name = view.__class__.__name__
 
     if isinstance(resource_name, six.string_types):
         return inflection.camelize(resource_name, False)
