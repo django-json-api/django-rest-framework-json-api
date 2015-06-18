@@ -38,6 +38,7 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 1,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100,
+    'EXCEPTION_HANDLER': 'rest_framework_ember.exceptions.exception_handler',
     # DRF v3.1+
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework_json_api.pagination.PageNumberPagination',

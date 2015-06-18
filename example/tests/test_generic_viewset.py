@@ -48,4 +48,30 @@ class GenericViewSet(TestBase):
             }
         )
 
+    def test_custom_exceptions(self):
+        """
+        Exceptions should conform to json api spec
+        """
+        response = self.client.post('/identities', {
+            'email': 'bar', 'first_name': 'alajflajaljalajlfjafljalj'})
+        self.assertEqual(
+            json.loads(response.content.decode('utf8')),
+            {
+                'errors': [
+                    {
+                        'source': {
+                            'parameter': 'email'
+                        },
+                        'detail': 'Enter a valid email address.'
+                    },
+                    {
+                        'source': {
+                            'parameter': 'first_name'
+                        },
+                        'detail': 'There\'s a problem with first name'
+                    },
+                ]
+            }
+        )
+
 
