@@ -30,11 +30,3 @@ class JSONParser(parsers.JSONParser):
                                                parser_context=parser_context)
         resource = result.get(get_resource_name(parser_context))
         return format_keys(resource, 'underscore')
-
-
-class EmberJSONParser(JSONParser):
-    """
-    Backward compatability for our first uniquely named parser
-    """
-    pass
-
