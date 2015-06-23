@@ -35,10 +35,8 @@ def get_resource_name(context):
         if code.startswith('4') or code.startswith('5'):
             return 'errors'
 
-    try:
-        # Check the view
-        resource_name = getattr(view, 'resource_name')
-    except AttributeError:
+    resource_name = getattr(view, 'resource_name')
+    if not resource_name:
         try:
             # Check the meta class
             resource_name = (
