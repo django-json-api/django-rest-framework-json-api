@@ -2,8 +2,8 @@
 Ember Data and Django Rest Framework
 ====================================
 
-.. image:: https://travis-ci.org/ngenworks/rest_framework_ember.svg?branch=master
-   :target: https://travis-ci.org/ngenworks/rest_framework_ember
+.. image:: https://travis-ci.org/django-json-api/rest_framework_ember.svg?branch=master
+   :target: https://travis-ci.org/django-json-api/rest_framework_ember
 
 The default Ember Data REST Adapter conventions differ from the default
 Django Rest Framework JSON request and response format. Instead of adding
@@ -111,6 +111,10 @@ override ``settings.REST_FRAMEWORK``::
         'PAGINATE_BY': 10,
         'PAGINATE_BY_PARAM': 'page_size',
         'MAX_PAGINATE_BY': 100,
+        # DRF v3.1+
+        'DEFAULT_PAGINATION_CLASS':
+            'rest_framework_ember.pagination.PageNumberPagination',
+        # older than DRF v3.1
         'DEFAULT_PAGINATION_SERIALIZER_CLASS':
             'rest_framework_ember.pagination.PaginationSerializer',
         'DEFAULT_PARSER_CLASSES': (

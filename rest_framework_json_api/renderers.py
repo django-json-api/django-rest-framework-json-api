@@ -1,7 +1,6 @@
-import inflection
-
-from django.conf import settings
-
+"""
+Renderers
+"""
 from rest_framework import renderers
 from rest_framework_ember.utils import get_resource_name
 
