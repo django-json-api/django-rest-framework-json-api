@@ -38,10 +38,8 @@ class JSONRenderer(renderers.JSONRenderer):
         formatted_data = utils.format_keys(data, 'camelize')
 
         # Check if it's paginated data and contains a `results` key.
-        if isinstance(formatted_data, dict):
-            results = formatted_data.get('results')
-        else:
-            results = None
+        results = (formatted_data.get('results')
+                   if isinstance(formatted_data, dict) else None)
 
         # Pluralize the resource_name.
         resource_name = utils.format_resource_name(
