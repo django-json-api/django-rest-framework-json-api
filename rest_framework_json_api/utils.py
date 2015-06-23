@@ -3,8 +3,11 @@ Utils.
 """
 import inflection
 
+from rest_framework.exceptions import APIException
+
 from django.conf import settings
 from django.utils import six
+from django.utils.translation import ugettext_lazy as _
 
 try:
     from rest_framework.compat import OrderedDict
@@ -12,10 +15,26 @@ except ImportError:
     OrderedDict = dict
 
 
-def get_resource_name(view):
+def get_resource_name(context):
     """
     Return the name of a resource.
     """
+    view = context.get('view')
+
+    # Sanity check to make sure we have a view.
+    if not view:
+        raise APIException(_('Could not find view.'))
+
+    # Check to see if there is a status code and return early
+    # with the resource_name value of `errors`.
+    try:
+        code = str(view.response.status_code)
+    except (AttributeError, ValueError):
+        pass
+    else:
+        if code.startswith('4') or code.startswith('5'):
+            return 'errors'
+
     try:
         # Check the view
         resource_name = getattr(view, 'resource_name')
@@ -75,7 +94,7 @@ def format_resource_name(obj, name):
     """
     Pluralize the resource name if more than one object in results.
     """
-    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', False)
+    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS')
             and isinstance(obj, list)):
 
         return inflection.pluralize(name)

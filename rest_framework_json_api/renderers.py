@@ -2,9 +2,8 @@
 Renderers
 """
 from rest_framework import renderers
-from rest_framework_ember.utils import get_resource_name
 
-from .utils import format_keys, format_resource_name
+from . import utils
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -20,27 +19,43 @@ class JSONRenderer(renderers.JSONRenderer):
     }
     """
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        view = renderer_context.get('view')
-        resource_name = get_resource_name(view)
+        # Get the resource name.
+        resource_name = utils.get_resource_name(view)
 
-        if resource_name == False:
+        # If no `resource_name` is found, render the default response.
+        if not resource_name:
             return super(JSONRenderer, self).render(
-                data, accepted_media_type, renderer_context)
+                data, accepted_media_type, renderer_context
+            )
 
-        data = format_keys(data, 'camelize')
+        # If this is an error response, skip the rest.
+        if 'errors' in resource_name or resource_name == 'data':
+            return super(JSONRenderer, self).render(
+                {resource_name: data}, accepted_media_type, renderer_context
+            )
 
-        try:
-            content = data.pop('results')
-            resource_name = format_resource_name(content, resource_name)
-            data = {resource_name : content, "meta" : data}
-        except (TypeError, KeyError, AttributeError) as e:
+        # Camelize the keynames.
+        formatted_data = utils.format_keys(data, 'camelize')
 
-            # Default behavior
-            if not resource_name == 'data':
-                format_keys(data, 'camelize')
-                resource_name = format_resource_name(data, resource_name)
+        # Check if it's paginated data and contains a `results` key.
+        results = (formatted_data.get('results')
+                   if isinstance(formatted_data, dict) else None)
 
-            data = {resource_name : data}
+        # Pluralize the resource_name.
+        resource_name = utils.format_resource_name(
+            results or formatted_data, resource_name
+        )
+
+        if results:
+            rendered_data = {
+                resource_name: results,
+                'meta': formatted_data
+            }
+        else:
+            rendered_data = {
+                resource_name: formatted_data
+            }
 
         return super(JSONRenderer, self).render(
-            data, accepted_media_type, renderer_context)
+            rendered_data, accepted_media_type, renderer_context
+        )
