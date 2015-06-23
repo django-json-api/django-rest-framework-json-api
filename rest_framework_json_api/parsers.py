@@ -2,9 +2,8 @@
 Parsers
 """
 from rest_framework import parsers
-from rest_framework_ember.utils import get_resource_name
 
-from .utils import format_keys
+from . import utils
 
 
 class JSONParser(parsers.JSONParser):
@@ -28,5 +27,5 @@ class JSONParser(parsers.JSONParser):
         """
         result = super(JSONParser, self).parse(stream, media_type=media_type,
                                                parser_context=parser_context)
-        resource = result.get(get_resource_name(parser_context))
-        return format_keys(resource, 'underscore')
+        resource = result.get(utils.get_resource_name(parser_context))
+        return utils.format_keys(resource, 'underscore')

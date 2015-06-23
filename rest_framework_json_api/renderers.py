@@ -2,9 +2,8 @@
 Renderers
 """
 from rest_framework import renderers
-from rest_framework_ember.utils import get_resource_name
 
-from .utils import format_keys, format_resource_name
+from . import utils
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -21,7 +20,7 @@ class JSONRenderer(renderers.JSONRenderer):
     """
     def render(self, data, accepted_media_type=None, renderer_context=None):
         # Get the resource name.
-        resource_name = get_resource_name(view)
+        resource_name = utils.get_resource_name(view)
 
         # If no `resource_name` is found, render the default response.
         if not resource_name:
@@ -36,7 +35,7 @@ class JSONRenderer(renderers.JSONRenderer):
             )
 
         # Camelize the keynames.
-        formatted_data = format_keys(data, 'camelize')
+        formatted_data = utils.format_keys(data, 'camelize')
 
         # Check if it's paginated data and contains a `results` key.
         if isinstance(formatted_data, dict):
@@ -45,7 +44,7 @@ class JSONRenderer(renderers.JSONRenderer):
             results = None
 
         # Pluralize the resource_name.
-        resource_name = format_resource_name(
+        resource_name = utils.format_resource_name(
             results or formatted_data, resource_name
         )
 
