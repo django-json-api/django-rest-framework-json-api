@@ -39,17 +39,17 @@ REST_FRAMEWORK = {
     'MAX_PAGINATE_BY': 100,
     # DRF v3.1+
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_ember.pagination.PageNumberPagination',
+        'rest_framework_json_api.pagination.PageNumberPagination',
     # DRF v3.0 and older
     'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'rest_framework_ember.pagination.PaginationSerializer',
+        'rest_framework_json_api.pagination.PaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (
-        'rest_framework_ember.parsers.JSONParser',
+        'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser'
     ),
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework_ember.renderers.JSONRenderer',
+        'rest_framework_json_api.renderers.JSONRenderer',
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
