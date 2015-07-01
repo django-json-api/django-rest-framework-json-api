@@ -20,7 +20,7 @@ class JSONRenderer(renderers.JSONRenderer):
     """
     def render(self, data, accepted_media_type=None, renderer_context=None):
         # Get the resource name.
-        resource_name = utils.get_resource_name(view)
+        resource_name = utils.get_resource_name(renderer_context)
 
         # If no `resource_name` is found, render the default response.
         if not resource_name:
