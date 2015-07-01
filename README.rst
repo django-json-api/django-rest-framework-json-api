@@ -1,56 +1,44 @@
 ====================================
-Ember Data and Django Rest Framework
+JSON API and Django Rest Framework
 ====================================
 
-.. image:: https://travis-ci.org/django-json-api/rest_framework_ember.svg?branch=master
-   :target: https://travis-ci.org/django-json-api/rest_framework_ember
-
-The default Ember Data REST Adapter conventions differ from the default
-Django Rest Framework JSON request and response format. Instead of adding
-a Django specific adapter to Ember Data we use this adapter in Django to
-output and accept JSON in the format the Ember Data REST Adapter expects.
+.. image:: https://travis-ci.org/django-json-api/rest_framework_json_api.svg?branch=develop
+   :target: https://travis-ci.org/django-json-api/rest_framework_json_api
 
 By default, Django REST Framework will produce a response like::
 
     {
         "count": 20,
-        "next": "http://example.com/api/1.0/identities/?page=2",
-        "previous": null,
-        "results": [
-            {
-                "id": 1,
-                "username": "john",
-                "full_name": "John Coltrane"
-            },
-            {
-                ...
-            }
-        ]
+        "next": "http://example.com/api/1.0/identities/?page=3",
+        "previous": "http://example.com/api/1.0/identities/?page=1",
+        "results": [{
+            "id": 3,
+            "username": "john",
+            "full_name": "John Coltrane"
+        }]
     }
 
 
-However, for an ``identity`` model in EmberJS, the Ember Data REST Adapter
-expects a response to look like the following::
+However, for an ``identity`` model in JSON API format the response should look
+like the following::
 
     {
-        "identity": [
-            {
-                "id": 1,
+        "links": {
+            "prev": "http://example.com/api/1.0/identities",
+            "self": "http://example.com/api/1.0/identities?page=2",
+            "next": "http://example.com/api/1.0/identities?page=3",
+        },
+        "data": [{
+            "type": "identities",
+            "id": 3,
+            "attributes": {
                 "username": "john",
                 "full_name": "John Coltrane"
             },
-            {
-                ...
-            }
-        ],
-        "meta": {
-            "count": 20,
-            "next": 2,
-            "next_link": "http://example.com/api/1.0/identities/?page=2",
-            "page": 1,
-            "previous": null,
-            "previous_link": null
-        }
+            "meta": {
+                "count": 20,
+            },
+        }],
     }
 
 
@@ -70,7 +58,7 @@ From PyPI
 
 ::
 
-    pip install rest_framework_ember
+    pip install rest_framework_json_api
 
 
 From Source
@@ -78,8 +66,8 @@ From Source
 
 ::
 
-    $ git clone https://github.com/ngenworks/rest_framework_ember.git
-    $ cd rest_framework_ember && pip install -e .
+    $ git clone https://github.com/django-json-api/rest_framework_json_api.git
+    $ cd rest_framework_json_api && pip install -e .
 
 
 Running Tests
@@ -95,15 +83,15 @@ Usage
 -----
 
 
-``rest_framework_ember`` assumes you are using class-based views in Django
+``rest_framework_json_api`` assumes you are using class-based views in Django
 Rest Framework.
 
 
 Settings
 ^^^^^^^^
 
-One can either add ``rest_framework_ember.parsers.JSONParser`` and
-``rest_framework_ember.renderers.JSONRenderer`` to each ``ViewSet`` class, or
+One can either add ``rest_framework_json_api.parsers.JSONParser`` and
+``rest_framework_json_api.renderers.JSONRenderer`` to each ``ViewSet`` class, or
 override ``settings.REST_FRAMEWORK``::
 
 
@@ -113,17 +101,17 @@ override ``settings.REST_FRAMEWORK``::
         'MAX_PAGINATE_BY': 100,
         # DRF v3.1+
         'DEFAULT_PAGINATION_CLASS':
-            'rest_framework_ember.pagination.PageNumberPagination',
+            'rest_framework_json_api.pagination.PageNumberPagination',
         # older than DRF v3.1
         'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-            'rest_framework_ember.pagination.PaginationSerializer',
+            'rest_framework_json_api.pagination.PaginationSerializer',
         'DEFAULT_PARSER_CLASSES': (
-            'rest_framework_ember.parsers.JSONParser',
+            'rest_framework_json_api.parsers.JSONParser',
             'rest_framework.parsers.FormParser',
             'rest_framework.parsers.MultiPartParser'
         ),
         'DEFAULT_RENDERER_CLASSES': (
-            'rest_framework_ember.renderers.JSONRenderer',
+            'rest_framework_json_api.renderers.JSONRenderer',
             'rest_framework.renderers.BrowsableAPIRenderer',
         ),
     }
@@ -311,7 +299,7 @@ Mixins
 The following mixin classes are available to use with Rest Framework
 resources.
 
-rest_framework_ember.mixins.MultipleIDMixin
+rest_framework_json_api.mixins.MultipleIDMixin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Overrides ``get_queryset`` to filter by ``ids[]`` in URL query params.
