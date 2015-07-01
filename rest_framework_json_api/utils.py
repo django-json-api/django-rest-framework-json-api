@@ -35,8 +35,9 @@ def get_resource_name(context):
         if code.startswith('4') or code.startswith('5'):
             return 'errors'
 
-    resource_name = getattr(view, 'resource_name')
-    if not resource_name:
+    try:
+        resource_name = getattr(view, 'resource_name')
+    except AttributeError:
         try:
             # Check the meta class
             resource_name = (
@@ -92,7 +93,7 @@ def format_resource_name(obj, name):
     """
     Pluralize the resource name if more than one object in results.
     """
-    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS')
+    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', None)
             and isinstance(obj, list)):
 
         return inflection.pluralize(name)
