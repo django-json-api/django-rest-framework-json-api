@@ -8,18 +8,20 @@ from . import utils
 
 class JSONParser(parsers.JSONParser):
     """
-    By default, EmberJS sends a payload that looks like the following::
+    A JSON API client will send a payload that looks like this:
 
         {
-            "identity": {
+            "data": {
+                "type": "identities",
                 "id": 1,
-                "first_name": "John",
-                "last_name": "Coltrane"
+                "attributes": {
+                    "first_name": "John",
+                    "last_name": "Coltrane"
+                }
             }
         }
 
-    So we can work with the grain on both Ember and RestFramework,
-    Do some tweaks to the payload so DRF gets what it expects.
+    We extract the attributes so that DRF serializers can work as normal.
     """
     def parse(self, stream, media_type=None, parser_context=None):
         """
@@ -27,5 +29,8 @@ class JSONParser(parsers.JSONParser):
         """
         result = super(JSONParser, self).parse(stream, media_type=media_type,
                                                parser_context=parser_context)
-        resource = result.get(utils.get_resource_name(parser_context))
-        return utils.format_keys(resource, 'underscore')
+        data = result.get('data', {})
+        attributes = data.get('attributes')
+        if attributes:
+            attributes['id'] = data.get('id')
+        return utils.format_keys(attributes, 'underscore')

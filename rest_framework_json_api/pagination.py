@@ -108,22 +108,34 @@ class PageNumberPagination(BasePagination):
     """
     An Ember (soon to be json-api) compatible pagination format
     """
+    def build_link(self, index):
+        if not index:
+            return None
+        url = self.request and self.request.build_absolute_uri() or ''
+        return replace_query_param(url, 'page', index)
+
     def get_paginated_response(self, data):
-        previous = None
         next = None
-        if self.page.has_previous():
-            previous = self.page.previous_page_number()
+        previous = None
+
         if self.page.has_next():
             next = self.page.next_page_number()
+        if self.page.has_previous():
+            previous = self.page.previous_page_number()
 
         return Response({
             'results': data,
-            'next': next,
-            'next_link': self.get_next_link(),
-            'page': self.page.number,
-            'previous': previous,
-            'previous_link': self.get_previous_link(),
-            'count': self.page.paginator.count,
-            'total': self.page.paginator.num_pages,
+            'meta': {
+                'pagination': {
+                    'page': self.page.number,
+                    'count': self.page.paginator.count,
+                    'total': self.page.paginator.num_pages,
+                }
+            },
+            'links': {
+                'first': self.build_link(self.page.start_index()),
+                'last': self.build_link(self.page.end_index()),
+                'next': self.build_link(next),
+                'prev': self.build_link(previous),
+            }
         })
-

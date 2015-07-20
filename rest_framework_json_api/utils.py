@@ -55,8 +55,19 @@ def get_resource_name(context):
                 except AttributeError:
                     resource_name = view.__class__.__name__
 
-    if isinstance(resource_name, six.string_types):
-        return inflection.camelize(resource_name, False)
+            # if the name was calculated automatically then pluralize and format
+            if not isinstance(resource_name, six.string_types):
+                return resource_name
+
+            resource_name = inflection.pluralize(resource_name.lower())
+
+            format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+            if format_type == 'dasherize':
+                resource_name = inflection.dasherize(resource_name)
+            elif format_type == 'camelize':
+                resource_name = inflection.camelize(resource_name)
+            elif format_type == 'underscore':
+                resource_name = inflection.underscore(resource_name)
 
     return resource_name
 
@@ -64,17 +75,22 @@ def get_resource_name(context):
 def format_keys(obj, format_type=None):
     """
     Takes either a dict or list and returns it with camelized keys only if
-    REST_EMBER_FORMAT_KEYS is set.
+    JSON_API_FORMAT_KEYS is set.
 
-    :format_type: Either 'camelize' or 'underscore'
+    :format_type: Either 'dasherize', 'camelize' or 'underscore'
     """
-    if (getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)
-            and format_type in ('camelize', 'underscore')):
+    if format_type is None:
+        format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+
+    if format_type in ('dasherize', 'camelize', 'underscore'):
 
         if isinstance(obj, dict):
             formatted = OrderedDict()
             for key, value in obj.items():
-                if format_type == 'camelize':
+                if format_type == 'dasherize':
+                    formatted[inflection.dasherize(key)]\
+                        = format_keys(value, format_type)
+                elif format_type == 'camelize':
                     formatted[inflection.camelize(key, False)]\
                         = format_keys(value, format_type)
                 elif format_type == 'underscore':
@@ -87,14 +103,3 @@ def format_keys(obj, format_type=None):
             return obj
     else:
         return obj
-
-
-def format_resource_name(obj, name):
-    """
-    Pluralize the resource name if more than one object in results.
-    """
-    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', None)
-            and isinstance(obj, list)):
-
-        return inflection.pluralize(name)
-    return name

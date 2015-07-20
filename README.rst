@@ -2,8 +2,8 @@
 JSON API and Django Rest Framework
 ====================================
 
-.. image:: https://travis-ci.org/django-json-api/rest_framework_json_api.svg?branch=develop
-   :target: https://travis-ci.org/django-json-api/rest_framework_json_api
+.. image:: https://travis-ci.org/django-json-api/rest_framework_ember.svg?branch=develop
+   :target: https://travis-ci.org/django-json-api/rest_framework_ember
 
 By default, Django REST Framework will produce a response like::
 
@@ -33,12 +33,14 @@ like the following::
             "id": 3,
             "attributes": {
                 "username": "john",
-                "full_name": "John Coltrane"
-            },
-            "meta": {
-                "count": 20,
-            },
+                "full-name": "John Coltrane"
+            }
         }],
+        "meta": {
+            "pagination": {
+              "count": 20
+            }
+        }
     }
 
 
@@ -117,15 +119,16 @@ override ``settings.REST_FRAMEWORK``::
     }
 
 If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
-record count and the next and previous links. Django Rest Framework looks
-for the ``page`` GET parameter by default allowing you to make requests for
-subsets of the data with ``this.store.find('identity', {page: 2});``.
+record count and a ``links`` object with the next and previous links. Pages
+can be specified with the ``page`` GET parameter.
 
 resource_name property
 ^^^^^^^^^^^^^^^^^^^^^^
 
-On resources that do not subclass ``rest_framework.viewsets.ModelViewSet``,
-the ``resource_name`` property is required on the class::
+You may manually set the ``resource_name`` property on views or serializers to
+specify the ``type`` key in the json output. It is automatically set for you as the
+plural of the view or model name except on resources that do not subclass
+``rest_framework.viewsets.ModelViewSet``::
 
     class Me(generics.GenericAPIView):
         """
@@ -133,67 +136,66 @@ the ``resource_name`` property is required on the class::
 
         GET /me
         """
-        resource_name = 'data'
+        resource_name = 'users'
         serializer_class = identity_serializers.IdentitySerializer
         allowed_methods = ['GET']
         permission_classes = (permissions.IsAuthenticated, )
 
 
-Ember Data <-> Rest Framework Format Conversion
+Object Key Formats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-*(camelization/underscore/pluralize)*
+*(dasherize/camelize/underscore/pluralize)*
 
-This package includes the optional ability to automatically convert json requests
-and responses from the Ember Data camelCase to python/rest_framework's preferred
-underscore. Additionally resource names can be pluralized when an array of objects
-are returned. To hook this up include the following in your project settings::
+This package includes the ability (off by default) to automatically convert json
+requests and responses from the python/rest_framework's preferred underscore to
+a format of your choice. To hook this up include the following in your project
+settings::
 
-   REST_EMBER_FORMAT_KEYS = True
-   REST_EMBER_PLURALIZE_KEYS = True
+   JSON_API_FORMAT_KEYS = True
 
-Note: due to the way the inflector works address_1 will convert to address1
-on output but cannot convert address1 back to address_1 on POST or PUT. Keep
+Note: due to the way the inflector works address_1 can camelize to address1
+on output but it cannot convert address1 back to address_1 on POST or PUT. Keep
 this in mind when naming fields with numbers in them.
 
 
 Example - Without format conversion::
 
    {
-      "identity": [
-         {
-            "id": 1,
-            "username": "john",
-            "first_name": "John",
-            "last_name": "Coltrane"
-         },
-         {
-            "id": 2,
-            "username": "frodo",
-            "first_name": "Bilbo",
-            "last_name": "Baggins"
-         },
-      ],
-      ...
+        "data": [{
+            "type": "identities",
+            "id": 3,
+            "attributes": {
+                "username": "john",
+                "first_name": "John",
+                "last_name": "Coltrane",
+                "full_name": "John Coltrane"
+            },
+        }],
+        "meta": {
+            "pagination": {
+              "count": 20
+            }
+        }
    }
 
-Example - With format conversion::
+Example - With format conversion set to ``dasherize``::
 
    {
-      "identities": [
-         {
-            "id": 1,
-            "username": "john",
-            "firstName": "John",
-            "lastName": "Coltrane"
-         },
-         {
-            "id": 2,
-            "username": "frodo",
-            "firstName": "Bilbo",
-            "lastName": "Baggins"
-         },
-      ],
-      ...
+        "data": [{
+            "type": "identities",
+            "id": 3,
+            "attributes": {
+                "username": "john",
+                "first-name": "John",
+                "last-name": "Coltrane",
+                "full-name": "John Coltrane"
+            },
+        }],
+        "meta": {
+            "pagination": {
+              "count": 20
+            }
+        }
    }
 
 
@@ -289,7 +291,7 @@ For example::
 
 
 Set the ``resource_name`` property on the object to ``False``, and the data
-will be returned as it is above.
+will be returned without modification.
 
 
 ------
@@ -303,4 +305,3 @@ rest_framework_json_api.mixins.MultipleIDMixin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Overrides ``get_queryset`` to filter by ``ids[]`` in URL query params.
-

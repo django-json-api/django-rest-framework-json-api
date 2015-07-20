@@ -33,6 +33,7 @@ PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
 
 MIDDLEWARE_CLASSES = ()
 
+JSON_API_FORMAT_KEYS = 'dasherize'
 REST_FRAMEWORK = {
     'PAGINATE_BY': 1,
     'PAGINATE_BY_PARAM': 'page_size',

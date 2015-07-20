@@ -30,25 +30,30 @@ class ModelViewSetTests(TestBase):
 
         user = get_user_model().objects.all()[0]
         expected = {
-            u'user': [{
+            u'data': [{
+                u'type': u'users',
                 u'id': user.pk,
-                u'first_name': user.first_name,
-                u'last_name': user.last_name,
-                u'email': user.email
+                u'attributes': {
+                    u'first-name': user.first_name,
+                    u'last-name': user.last_name,
+                    u'email': user.email
+                },
             }]
         }
 
         json_content = json.loads(response.content.decode('utf8'))
-        meta = json_content.get('meta')
+        links = json_content.get('links')
+        meta = json_content.get('meta').get('pagination')
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
+        self.assertEquals(sorted(expected.get('data')), sorted(
+            json_content.get('data')))
         self.assertEquals(meta.get('total'), 2)
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
-        self.assertEquals(meta.get('next'), 2)
         self.assertEqual(u'http://testserver/identities?page=2',
-            meta.get('next_link'))
+            links.get('next'))
         self.assertEqual(meta.get('page'), 1)
+        self.assertIsNone(links.get('prev'))
 
     def test_page_two_in_list_result(self):
         """
@@ -59,32 +64,34 @@ class ModelViewSetTests(TestBase):
 
         user = get_user_model().objects.all()[1]
         expected = {
-            u'user': [{
+            u'data': [{
+                u'type': u'users',
                 u'id': user.pk,
-                u'first_name': user.first_name,
-                u'last_name': user.last_name,
-                u'email': user.email
+                u'attributes': {
+                    u'first-name': user.first_name,
+                    u'last-name': user.last_name,
+                    u'email': user.email
+                },
             }]
         }
 
         json_content = json.loads(response.content.decode('utf8'))
-        meta = json_content.get('meta')
+        links = json_content.get('links')
+        meta = json_content.get('meta').get('pagination')
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
-        self.assertIsNone(meta.get('next'))
-        self.assertIsNone(meta.get('next_link'))
-        self.assertEqual(meta.get('previous'), 1)
         self.assertEqual(meta.get('page'), 2)
+        self.assertIsNone(links.get('next'))
 
         # Older versions of DRF add page=1 for first page. Later trim to root
         try:
             self.assertEqual(u'http://testserver/identities',
-                meta.get('previous_link'))
+                links.get('prev'))
         except AssertionError:
             self.assertEqual(u'http://testserver/identities?page=1',
-                meta.get('previous_link'))
+                links.get('prev'))
 
     def test_page_range_in_list_result(self):
         """
@@ -97,21 +104,27 @@ class ModelViewSetTests(TestBase):
 
         users = get_user_model().objects.all()
         expected = {
-            u'users': [{
+            u'data': [{
+                u'type': u'users',
                 u'id': users[0].pk,
-                u'first_name': users[0].first_name,
-                u'last_name': users[0].last_name,
-                u'email': users[0].email
+                u'attributes': {
+                    u'first-name': users[0].first_name,
+                    u'last-name': users[0].last_name,
+                    u'email': users[0].email
+                },
             },{
+                u'type': u'users',
                 u'id': users[1].pk,
-                u'first_name': users[1].first_name,
-                u'last_name': users[1].last_name,
-                u'email': users[1].email
+                u'attributes': {
+                    u'first-name': users[1].first_name,
+                    u'last-name': users[1].last_name,
+                    u'email': users[1].email
+                },
             }]
         }
 
         json_content = json.loads(response.content.decode('utf8'))
-        meta = json_content.get('meta')
+        meta = json_content.get('meta').get('pagination')
         self.assertEquals(expected.get('users'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
@@ -126,11 +139,14 @@ class ModelViewSetTests(TestBase):
 
         result = json.loads(response.content.decode('utf8'))
         expected = {
-            u'user': {
+            u'data': {
+                u'type': u'users',
                 u'id': self.miles.pk,
-                u'first_name': self.miles.first_name,
-                u'last_name': self.miles.last_name,
-                u'email': self.miles.email
+                u'attributes': {
+                    u'first-name': self.miles.first_name,
+                    u'last-name': self.miles.last_name,
+                    u'email': self.miles.email
+                },
             }
         }
         self.assertEqual(result, expected)
@@ -141,22 +157,26 @@ class ModelViewSetTests(TestBase):
         """
         self.client.login(username='miles', password='pw')
         data = {
-            u'user': {
+            u'data': {
+                u'type': u'users',
                 u'id': self.miles.pk,
-                u'first_name': self.miles.first_name,
-                u'last_name': self.miles.last_name,
-                u'email': 'miles@trumpet.org'
+                u'attributes': {
+                    u'first-name': self.miles.first_name,
+                    u'last-name': self.miles.last_name,
+                    u'email': 'miles@trumpet.org'
+                },
             }
         }
+        data_attributes = data['data']['attributes']
         response = self.client.put(self.detail_url, data=data, format='json')
 
         result = json.loads(response.content.decode('utf8'))
+        result_attributes = result['data']['attributes']
 
-        self.assertIn('user', result.keys())
-        self.assertEqual(result['user']['email'], 'miles@trumpet.org')
+        self.assertEqual(data_attributes.keys(), result_attributes.keys())
+        self.assertEqual(result_attributes['email'], 'miles@trumpet.org')
 
         # is it updated?
         self.assertEqual(
             get_user_model().objects.get(pk=self.miles.pk).email,
             'miles@trumpet.org')
-
