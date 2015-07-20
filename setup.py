@@ -53,7 +53,8 @@ if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist upload")
     os.system("python setup.py bdist_wheel upload")
     print("You probably want to also tag the version now:")
-    print("  git tag -a {0} -m 'version {0}'".format(version))
+    print("  git tag -a {0} -m 'version {0}'".format(
+        get_version('rest_framework_json_api')))
     print("  git push --tags")
     sys.exit()
 
@@ -62,10 +63,10 @@ setup(
     name='djangorestframework-jsonapi',
     version=get_version('rest_framework_json_api'),
     url='https://github.com/django-json-api/django-rest-framework-json-api',
-    license='BSD',
+    license='MIT',
     description='A Django REST framework API adapter for the json-api spec.',
     long_description=read('README.rst'),
-    author='',
+    author='Jerel Unruh',
     author_email='',
     packages=get_packages('rest_framework_json_api'),
     package_data=get_package_data('rest_framework_json_api'),
@@ -75,15 +76,14 @@ setup(
         'inflection>=0.3.0'
     ],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
