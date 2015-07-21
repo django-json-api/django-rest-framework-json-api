@@ -2,13 +2,17 @@
 Ember Data and Django Rest Framework
 ====================================
 
-.. image:: https://travis-ci.org/django-json-api/rest_framework_ember.svg?branch=master
-   :target: https://travis-ci.org/django-json-api/rest_framework_ember
+.. image:: https://travis-ci.org/django-json-api/django-rest-framework-json-api.svg?branch=master
+   :target: https://travis-ci.org/django-json-api/django-rest-framework-json-api
 
 This package started out as an Ember Data specific DRF adapter. It is now moving
 to the JSON API spec and supporting Ember as a side effect. See the
 `develop branch <https://github.com/django-json-api/django-rest-framework-json-api/tree/develop>`_
 for the JSON API compliant version.
+
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
+   :target: https://gitter.im/django-json-api/django-rest-framework-json-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 The default Ember Data REST Adapter conventions differ from the default
 Django Rest Framework JSON request and response format. Instead of adding
