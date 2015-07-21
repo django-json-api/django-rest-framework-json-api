@@ -7,8 +7,8 @@ Ember Data and Django Rest Framework
 
 This package started out as an Ember Data specific DRF adapter. It is now moving
 to the JSON API spec and supporting Ember as a side effect. See the
-[develop branch](django-rest-framework-json-api/tree/develop) for the
-JSON API compliant version.
+`develop branch <https://github.com/django-json-api/django-rest-framework-json-api/tree/develop>`_
+for the JSON API compliant version.
 
 The default Ember Data REST Adapter conventions differ from the default
 Django Rest Framework JSON request and response format. Instead of adding
@@ -83,7 +83,7 @@ From Source
 
 ::
 
-    $ git clone https://github.com/ngenworks/rest_framework_ember.git
+    $ git clone https://github.com/django-json-api/rest_framework_ember.git
     $ cd rest_framework_ember && pip install -e .
 
 
