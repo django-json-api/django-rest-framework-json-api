@@ -2,8 +2,12 @@
 JSON API and Django Rest Framework
 ====================================
 
-.. image:: https://travis-ci.org/django-json-api/rest_framework_ember.svg?branch=develop
-   :target: https://travis-ci.org/django-json-api/rest_framework_ember
+.. image:: https://travis-ci.org/django-json-api/django-rest-framework-json-api.svg?branch=master
+   :target: https://travis-ci.org/django-json-api/django-rest-framework-json-api
+
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
+   :target: https://gitter.im/django-json-api/django-rest-framework-json-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 By default, Django REST Framework will produce a response like::
 
