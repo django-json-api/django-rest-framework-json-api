@@ -3,7 +3,7 @@ import json
 from example.tests import TestBase
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse, reverse
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 
