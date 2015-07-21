@@ -64,11 +64,11 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
         else:
             result_id = data.pop('id', None)
-        json_api_data = {
-            'type': resource_name,
-            'id': result_id,
-            'attributes': utils.format_keys(data),
-        }
+            json_api_data = {
+                'type': resource_name,
+                'id': result_id,
+                'attributes': utils.format_keys(data),
+            }
 
         # remove results from the dict
         data.pop('results', None)
