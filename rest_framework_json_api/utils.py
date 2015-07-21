@@ -15,9 +15,9 @@ except ImportError:
     OrderedDict = dict
 
 
-def get_resource_name(context):
+def get_resource_type(context):
     """
-    Return the name of a resource.
+    Return the type of a resource.
     """
     view = context.get('view')
 
@@ -64,11 +64,11 @@ def get_resource_name(context):
 def format_keys(obj, format_type=None):
     """
     Takes either a dict or list and returns it with camelized keys only if
-    REST_EMBER_FORMAT_KEYS is set.
+    DRF_JSONAPI_FORMAT_KEYS is set.
 
     :format_type: Either 'camelize' or 'underscore'
     """
-    if (getattr(settings, 'REST_EMBER_FORMAT_KEYS', False)
+    if (getattr(settings, 'DRF_JSONAPI_FORMAT_KEYS', False)
             and format_type in ('camelize', 'underscore')):
 
         if isinstance(obj, dict):
@@ -93,8 +93,25 @@ def format_resource_name(obj, name):
     """
     Pluralize the resource name if more than one object in results.
     """
-    if (getattr(settings, 'REST_EMBER_PLURALIZE_KEYS', None)
+    if (getattr(settings, 'DRF_JSONAPI_PLURALIZE_KEYS', True)
             and isinstance(obj, list)):
 
         return inflection.pluralize(name)
     return name
+
+
+def format_resource_data(resource_type, resource_data):
+    attributes = resource_data
+    relationships = {}
+    links = {}
+
+
+    for attribute in attributes:
+        if isinstance(attribute, list):
+            relationships.update({attribute: attributes.pop(attribute)})
+
+    return {
+        'type': resource_type,
+        'attributes': attributes,
+        'relationships': relationships
+    }

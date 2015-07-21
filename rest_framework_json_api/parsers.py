@@ -27,5 +27,5 @@ class JSONParser(parsers.JSONParser):
         """
         result = super(JSONParser, self).parse(stream, media_type=media_type,
                                                parser_context=parser_context)
-        resource = result.get(utils.get_resource_name(parser_context))
+        resource = result.get(utils.get_resource_type(parser_context))
         return utils.format_keys(resource, 'underscore')
