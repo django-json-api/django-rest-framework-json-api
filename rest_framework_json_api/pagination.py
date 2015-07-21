@@ -2,7 +2,7 @@
 Pagination fields
 """
 # pylint: disable=no-init, too-few-public-methods, no-self-use
-
+from collections import OrderedDict
 
 from rest_framework import serializers
 from rest_framework import pagination
@@ -108,6 +108,7 @@ class PageNumberPagination(BasePagination):
     """
     An Ember (soon to be json-api) compatible pagination format
     """
+
     def build_link(self, index):
         if not index:
             return None
@@ -126,16 +127,18 @@ class PageNumberPagination(BasePagination):
         return Response({
             'results': data,
             'meta': {
-                'pagination': {
-                    'page': self.page.number,
-                    'count': self.page.paginator.count,
-                    'total': self.page.paginator.num_pages,
-                }
+                'pagination': OrderedDict([
+                    ('page', self.page.number),
+                    ('count', self.page.paginator.count),
+                    ('total', self.page.paginator.num_pages),
+                    ('start_index', self.page.start_index() - 1),
+                    ('end_index', self.page.end_index() - 1),
+                ])
             },
-            'links': {
-                'first': self.build_link(self.page.start_index()),
-                'last': self.build_link(self.page.end_index()),
-                'next': self.build_link(next),
-                'prev': self.build_link(previous),
-            }
+            'links': OrderedDict([
+                ('first', self.build_link(1)),
+                ('last', self.build_link(self.page.paginator.num_pages)),
+                ('next', self.build_link(next)),
+                ('prev', self.build_link(previous))
+            ])
         })
