@@ -5,6 +5,11 @@ Ember Data and Django Rest Framework
 .. image:: https://travis-ci.org/django-json-api/rest_framework_ember.svg?branch=master
    :target: https://travis-ci.org/django-json-api/rest_framework_ember
 
+This package started out as an Ember Data specific DRF adapter. It is now moving
+to the JSON API spec and supporting Ember as a side effect. See the
+[develop branch](django-rest-framework-json-api/tree/develop) for the
+JSON API compliant version.
+
 The default Ember Data REST Adapter conventions differ from the default
 Django Rest Framework JSON request and response format. Instead of adding
 a Django specific adapter to Ember Data we use this adapter in Django to
@@ -315,4 +320,3 @@ rest_framework_ember.mixins.MultipleIDMixin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Overrides ``get_queryset`` to filter by ``ids[]`` in URL query params.
-
