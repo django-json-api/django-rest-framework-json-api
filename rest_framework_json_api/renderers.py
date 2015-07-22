@@ -1,9 +1,12 @@
 """
 Renderers
 """
+from collections import OrderedDict
 from rest_framework import renderers
 
 from . import utils
+from rest_framework.relations import RelatedField
+from rest_framework.settings import api_settings
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -53,15 +56,26 @@ class JSONRenderer(renderers.JSONRenderer):
             # Check for paginated results
             results = (data["results"] if isinstance(data, dict) else data)
 
+            resource_serializer = results.serializer
+
+            # Get the serializer fields
+            if hasattr(resource_serializer, 'child'):
+                fields = getattr(resource_serializer.child, 'fields')
+            else:
+                fields = getattr(resource_serializer, 'fields')
+
             json_api_data = []
-            for result in results:
-                result_id = result.pop('id', None)
-                json_api_data.append({
-                    'type': resource_name,
-                    'id': result_id,
-                    'attributes': utils.format_keys(result),
-                    'meta': utils.convert_resource(result, results, request)
-                })
+            for resource in results:
+                resource_data = [
+                    ('type', resource_name),
+                    ('id', utils.extract_id(fields, resource)),
+                    ('attributes', utils.format_keys(utils.extract_attributes(fields, resource)))
+                ]
+                # Add 'self' link if field is present and valid
+                if api_settings.URL_FIELD_NAME in resource and \
+                        isinstance(fields[api_settings.URL_FIELD_NAME], RelatedField):
+                        resource_data.append(('links', {'self': resource[api_settings.URL_FIELD_NAME]}))
+                json_api_data.append(OrderedDict(resource_data))
         else:
             result_id = data.pop('id', None)
             json_api_data = {

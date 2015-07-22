@@ -10,7 +10,8 @@ from django.utils import six, encoding
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import relations, serializers
+from rest_framework.serializers import Serializer, BaseSerializer
+from rest_framework.relations import RelatedField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
 
@@ -120,339 +121,28 @@ def format_keys(obj, format_type=None):
         return obj
 
 
-def convert_to_text(resource, field, field_name, request):
-    data = dict()
-
-    data[field_name] = encoding.force_text(resource[field_name])
-
-    return {
-        "data": data,
-    }
-
-
-def rename_to_href(resource, field, field_name, request):
-    data = dict()
-
-    data["links"] = dict()
-    data["links"]["self"] = resource[field_name]
-
-    return {
-        "data": data,
-    }
-
-
-def get_related_field(field):
-    if isinstance(field, ManyRelatedField):
-        return field.child_relation
-
-    if isinstance(field, ListSerializer):
-        return field.child
-
-    return field
-
-
-def is_related_many(field):
-    if hasattr(field, "many"):
-        return field.many
-
-    if isinstance(field, ManyRelatedField):
-        return True
-
-    if isinstance(field, ListSerializer):
-        return True
-
-    return False
-
-
-def model_from_obj(obj):
-    model = getattr(obj, "model", None)
-
-    if model is not None:
-        return model
-
-    queryset = getattr(obj, "queryset", None)
-
-    if queryset is not None:
-        return queryset.model
-
-    return None
-
-
-def model_to_resource_type(model):
-    """
-    Return the verbose plural form of a model name, with underscores
-
-    Examples:
-    Person -> "people"
-    ProfileImage -> "profile_image"
-    """
-    if model is None:
-        return "data"
-
-    return encoding.force_text(model._meta.verbose_name_plural)
-
-
-def handle_nested_serializer(resource, field, field_name, request):
-    serializer_field = get_related_field(field)
-
-    if hasattr(serializer_field, "opts"):
-        model = serializer_field.opts.model
-    else:
-        model = serializer_field.Meta.model
-
-    resource_type = model_to_resource_type(model)
-
-    linked_ids = dict()
-    links = dict()
-    linked = dict()
-    linked[resource_type] = []
-
-    if is_related_many(field):
-        items = resource[field_name]
-    else:
-        items = [resource[field_name]]
-
-    obj_ids = []
-
-    resource.serializer = serializer_field
-
-    for item in items:
-        converted = convert_resource(item, resource, request)
-        linked_obj = converted["data"]
-        linked_ids = converted.pop("linked_ids", {})
-
-        if linked_ids:
-            linked_obj["links"] = linked_ids
-
-        # FIXME: need to add nested ids to obj_ids
-        # obj_ids.append(converted["data"]["id"])
-
-        # field_links = prepend_links_with_name(
-        #     converted.get("links", {}), resource_type)
-        field_links = dict()
-
-        field_links[field_name] = {
-            "type": resource_type,
-        }
-
-        if "href" in converted["data"]:
-            url_field_name = api_settings.URL_FIELD_NAME
-            url_field = serializer_field.fields[url_field_name]
-
-            field_links[field_name]["href"] = url_to_template(
-                url_field.view_name, request, field_name,
-            )
-
-        links.update(field_links)
-
-        linked[resource_type].append(linked_obj)
-
-    if is_related_many(field):
-        linked_ids[field_name] = obj_ids
-    else:
-        linked_ids[field_name] = obj_ids[0]
-
-    return {"linked_ids": linked_ids, "links": links, "linked": linked}
-
-
-def handle_related_field(resource, field, field_name, request):
-    related_field = get_related_field(field)
-
-    model = model_from_obj(related_field)
-    resource_type = model_to_resource_type(model)
-
-    linkage = None
-
-    if field_name in resource:
-        if is_related_many(field):
-            linkage = []
-
-            pks = [encoding.force_text(pk) for pk in resource[field_name]]
-            for pk in pks:
-                link = {
-                    "type": resource_type,
-                    "id": pk,
-                }
-                linkage.append(link)
-        elif resource[field_name]:
-            linkage = {
-                "type": resource_type,
-                "id": encoding.force_text(resource[field_name]),
-            }
-
-    return {
-        "data": {
-            "links": {
-                field_name: {
-                    "linkage": linkage,
-                },
-            },
-        },
-    }
-
-
-def handle_url_field(resource, field, field_name, request):
-    if field_name not in resource:
-        return {}
-
-    related_field = get_related_field(field)
-
-    model = model_from_obj(related_field)
-    resource_type = model_to_resource_type(model)
-
-    linkage = None
-
-    pks = url_to_pk(resource[field_name], field)
-
-    if not isinstance(pks, list):
-        if pks:
-            linkage = {
-                "type": resource_type,
-                "id": pks,
-            }
-    else:
-        linkage = []
-
-        for pk in pks:
-            link = {
-                "type": resource_type,
-                "id": pk,
-            }
-
-            linkage.append(link)
-
-    return {
-        "data": {
-            "links": {
-                field_name: {
-                    "linkage": linkage,
-                },
-            },
-        },
-    }
-
-
-def url_to_pk(url_data, field):
-    if is_related_many(field):
-        try:
-            obj_list = field.to_internal_value(url_data)
-        except AttributeError:
-            obj_list = [field.from_native(url) for url in url_data]
-
-        return [encoding.force_text(obj.pk) for obj in obj_list]
-
-    if url_data:
-        try:
-            obj = field.to_internal_value(url_data)
-        except AttributeError:
-            obj = field.from_native(url_data)
-
-        return encoding.force_text(obj.pk)
-    else:
-        return None
-
-
-def url_to_template(view_name, request, template_name):
-    resolver = urlresolvers.get_resolver(None)
-    info = resolver.reverse_dict[view_name]
-
-    path_template = info[0][0][0]
-    # FIXME: what happens when URL has more than one dynamic values?
-    # e.g. nested relations: manufacturer/%(id)s/cars/%(card_id)s
-    path = path_template % {info[0][0][1][0]: '{%s}' % template_name}
-
-    parsed_url = urlparse(request.build_absolute_uri())
-
-    return urlunparse(
-        [parsed_url.scheme, parsed_url.netloc, path, '', '', '']
-    )
-
-
-def fields_from_resource(resource, data):
-    if hasattr(data, "serializer"):
-        resource = data.serializer
-
-        if hasattr(resource, "child"):
-            resource = resource.child
-
-    return getattr(resource, "fields", None)
-
-
-def update_nested(original, update):
-    for key, value in update.items():
-        if key in original:
-            if isinstance(original[key], list):
-                original[key].extend(update[key])
-            elif isinstance(original[key], dict):
-                original[key].update(update[key])
-        else:
-            original[key] = value
-
-    return original
-
-
-def convert_resource(resource, resource_data, request):
-    convert_by_name = {
-        'id': convert_to_text,
-        api_settings.URL_FIELD_NAME: rename_to_href,
-    }
-    convert_by_type = {
-        relations.PrimaryKeyRelatedField: handle_related_field,
-        relations.HyperlinkedRelatedField: handle_url_field,
-        serializers.ModelSerializer: handle_nested_serializer,
-    }
-
-    fields = fields_from_resource(resource, resource_data)
-
-    if not fields:
-        raise AttributeError('Resource must have a fields attribute.')
-
-    data = dict()
-    included = dict()
-    meta = dict()
-
+def extract_id(fields, resource):
     for field_name, field in six.iteritems(fields):
-        converted = None
+        if field_name == 'id':
+            return encoding.force_text(resource[field_name])
+        if field_name == api_settings.URL_FIELD_NAME:
+            url = resource[field_name]
+            http_prefix = url.startswith(('http:', 'https:'))
+            if http_prefix:
+                # If needed convert absolute URLs to relative path
+                data = urlparse(url).path
+                prefix = urlresolvers.get_script_prefix()
+                if data.startswith(prefix):
+                    url = '/' + data[len(prefix):]
 
-        if field_name in convert_by_name:
-            converter = convert_by_name[field_name]
-            converted = converter(resource, field, field_name, request)
-        else:
-            related_field = get_related_field(field)
+            match = urlresolvers.resolve(url)
+            return encoding.force_text(match.kwargs['pk'])
 
-            for field_type, converter in \
-                    six.iteritems(convert_by_type):
-                if isinstance(related_field, field_type):
-                    converted = converter(
-                        resource, field, field_name, request)
-                    break
 
-        if converted:
-            data = update_nested(
-                data,
-                converted.pop("data", {})
-            )
-            included = update_nested(
-                included,
-                converted.get("included", {})
-            )
-            meta = update_nested(
-                meta,
-                converted.get("meta", {})
-            )
-        else:
-            data[field_name] = resource[field_name]
+def extract_attributes(fields, resource):
+    data = OrderedDict()
+    for field_name, field in six.iteritems(fields):
+        if not (isinstance(field, RelatedField) or isinstance(field, BaseSerializer)):
+            data.update({field_name: encoding.force_text(resource[field_name])})
 
-    if hasattr(resource, "serializer"):
-        serializer = resource.serializer
-        model = serializer.Meta.model
-
-        resource_type = model_to_resource_type(model)
-
-        data["type"] = resource_type
-
-    return {
-        "data": data,
-        "included": included,
-        "meta": meta,
-    }
+    return format_keys(data)
