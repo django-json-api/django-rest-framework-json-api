@@ -10,7 +10,7 @@ from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.serializers import BaseSerializer, ListSerializer
-from rest_framework.relations import RelatedField, HyperlinkedRelatedField
+from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
 
@@ -193,6 +193,34 @@ def extract_relationships(fields, resource):
                     relation_data.append(OrderedDict([('type', relation_type), ('id', extract_id_from_url(link))]))
 
                 data.update({field_name: {'data': relation_data}})
+                continue
+
+            if isinstance(relation, PrimaryKeyRelatedField):
+                for pk in resource[field_name]:
+                    relation_data.append(OrderedDict([('type', relation_type), ('id', encoding.force_text(pk))]))
+
+                data.update({field_name: {'data': relation_data}})
+                continue
+
+        if isinstance(field, ListSerializer):
+            relation_data = list()
+
+            serializer = field.child
+            model = serializer.Meta.model
+            relation_type = inflection.pluralize(model.__name__).lower()
+
+            # Get the serializer fields
+            serializer_fields = get_serializer_fields(serializer)
+            serializer_data = resource[field_name]
+            if isinstance(serializer_data, list):
+                for serializer_resource in serializer_data:
+                    relation_data.append(
+                        OrderedDict([
+                            ('type', relation_type), ('id', extract_id(serializer_fields, serializer_resource))
+                        ]))
+
+                data.update({field_name: {'data': relation_data}})
+                continue
 
     return format_keys(data)
 
