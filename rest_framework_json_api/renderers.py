@@ -74,18 +74,20 @@ class JSONRenderer(renderers.JSONRenderer):
             fields = data.serializer.fields
             json_api_data = utils.build_root(fields, data, resource_name)
 
-        render_data = {
-            'data': json_api_data
-        }
-
-        if data.get('meta'):
-            render_data['meta'] = data.get('meta')
+        # Make sure we render data in a specific order
+        render_data = OrderedDict()
 
         if data.get('links'):
             render_data['links'] = data.get('links')
 
+        render_data['data'] = json_api_data
+
         if len(json_api_included) > 0:
+            # Sort the items by type then by id
             render_data['included'] = sorted(json_api_included, key=lambda item: (item['type'], item['id']))
+
+        if data.get('meta'):
+            render_data['meta'] = data.get('meta')
 
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context
