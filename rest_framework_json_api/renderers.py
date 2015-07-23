@@ -50,6 +50,8 @@ class JSONRenderer(renderers.JSONRenderer):
                 {resource_name: data}, accepted_media_type, renderer_context
             )
 
+        json_api_included = list()
+
         # If detail view then json api spec expects dict, otherwise a list
         # - http://jsonapi.org/format/#document-top-level
         if view and view.action == 'list':
@@ -59,15 +61,15 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_serializer = results.serializer
 
             # Get the serializer fields
-            if hasattr(resource_serializer, 'child'):
-                fields = getattr(resource_serializer.child, 'fields')
-            else:
-                fields = getattr(resource_serializer, 'fields')
+            fields = utils.get_serializer_fields(resource_serializer)
 
-            json_api_data = []
+            json_api_data = list()
             for resource in results:
                 json_api_data.append(
                     utils.build_root(fields, resource, resource_name))
+                included = utils.extract_included(fields, resource)
+                if included:
+                    json_api_included.extend(included)
         else:
             fields = data.serializer.fields
             json_api_data = utils.build_root(fields, data, resource_name)
@@ -81,6 +83,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
         if data.get('links'):
             render_data['links'] = data.get('links')
+
+        if len(json_api_included) > 0:
+            render_data['included'] = sorted(json_api_included, key=lambda item: (item['type'], item['id']))
 
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context
