@@ -3,6 +3,7 @@ import json
 from example.tests import TestBase
 
 from django.contrib.auth import get_user_model
+from django.utils import encoding
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -32,7 +33,7 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'data': [{
                 u'type': u'users',
-                u'id': user.pk,
+                u'id': encoding.force_text(user.pk),
                 u'attributes': {
                     u'first-name': user.first_name,
                     u'last-name': user.last_name,
@@ -44,10 +45,8 @@ class ModelViewSetTests(TestBase):
         json_content = json.loads(response.content.decode('utf8'))
         links = json_content.get('links')
         meta = json_content.get('meta').get('pagination')
-
-        self.assertEquals(sorted(expected.get('data')), sorted(
-            json_content.get('data')))
-        self.assertEquals(meta.get('total'), 2)
+        self.assertEquals(expected.get('data'), json_content.get('data'))
+        self.assertEquals(meta.get('pages'), 2)
         self.assertEquals(meta.get('count', 0),
             get_user_model().objects.count())
         self.assertEqual(u'http://testserver/identities?page=2',
@@ -66,7 +65,7 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'data': [{
                 u'type': u'users',
-                u'id': user.pk,
+                u'id': encoding.force_text(user.pk),
                 u'attributes': {
                     u'first-name': user.first_name,
                     u'last-name': user.last_name,
@@ -141,7 +140,7 @@ class ModelViewSetTests(TestBase):
         expected = {
             u'data': {
                 u'type': u'users',
-                u'id': self.miles.pk,
+                u'id': encoding.force_text(self.miles.pk),
                 u'attributes': {
                     u'first-name': self.miles.first_name,
                     u'last-name': self.miles.last_name,

@@ -66,35 +66,22 @@ class JSONRenderer(renderers.JSONRenderer):
 
             json_api_data = []
             for resource in results:
-                resource_data = [
-                    ('type', resource_name),
-                    ('id', utils.extract_id(fields, resource)),
-                    ('attributes', utils.extract_attributes(fields, resource)),
-                    ('relationships', utils.extract_relationships(fields, resource)),
-                ]
-                # Add 'self' link if field is present and valid
-                if api_settings.URL_FIELD_NAME in resource and \
-                        isinstance(fields[api_settings.URL_FIELD_NAME], RelatedField):
-                        resource_data.append(('links', {'self': resource[api_settings.URL_FIELD_NAME]}))
-                json_api_data.append(OrderedDict(resource_data))
+                json_api_data.append(
+                    utils.build_root(fields, resource, resource_name))
         else:
-            result_id = data.pop('id', None)
-            json_api_data = {
-                'type': resource_name,
-                'id': result_id,
-                'attributes': utils.format_keys(data),
-            }
+            fields = data.serializer.fields
+            json_api_data = utils.build_root(fields, data, resource_name)
 
-        # remove results from the dict
-        data.pop('results', None)
-        if renderer_context.get('view').action == 'list':
-            # allow top level data to be added from list views
-            rendered_data = data
-        else:
-            # on detail views we don't render anything but serializer data
-            rendered_data = {}
-        rendered_data['data'] = json_api_data
+        render_data = {
+            'data': json_api_data
+        }
+
+        if data.get('meta'):
+            render_data['meta'] = data.get('meta')
+
+        if data.get('links'):
+            render_data['links'] = data.get('links')
 
         return super(JSONRenderer, self).render(
-            rendered_data, accepted_media_type, renderer_context
+            render_data, accepted_media_type, renderer_context
         )

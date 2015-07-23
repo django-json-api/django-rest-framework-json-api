@@ -115,6 +115,22 @@ def format_keys(obj, format_type=None):
         return obj
 
 
+def build_root(fields, resource, resource_name):
+    resource_data = [
+        ('type', resource_name),
+        ('id', extract_id(fields, resource)),
+        ('attributes', extract_attributes(fields, resource)),
+    ]
+    relationships = extract_relationships(fields, resource)
+    if relationships:
+        resource_data.append(('relationships', relationships))
+    # Add 'self' link if field is present and valid
+    if api_settings.URL_FIELD_NAME in resource and \
+            isinstance(fields[api_settings.URL_FIELD_NAME], RelatedField):
+            resource_data.append(('links', {'self': resource[api_settings.URL_FIELD_NAME]}))
+    return OrderedDict(resource_data)
+
+
 def extract_id_from_url(url):
     http_prefix = url.startswith(('http:', 'https:'))
     if http_prefix:
