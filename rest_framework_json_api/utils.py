@@ -118,7 +118,7 @@ def format_keys(obj, format_type=None):
         return obj
 
 
-def build_json_data(fields, resource, resource_name):
+def build_json_resource_obj(fields, resource, resource_name):
     resource_data = [
         ('type', resource_name),
         ('id', extract_id(fields, resource)),
@@ -219,6 +219,6 @@ def extract_included(fields, resource):
             serializer_data = resource[field_name]
             if isinstance(serializer_data, list):
                 for serializer_resource in serializer_data:
-                    included_data.append(build_json_data(serializer_fields, serializer_resource, relation_type))
+                    included_data.append(build_json_resource_obj(serializer_fields, serializer_resource, relation_type))
 
     return format_keys(included_data)

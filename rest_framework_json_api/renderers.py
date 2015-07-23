@@ -66,7 +66,7 @@ class JSONRenderer(renderers.JSONRenderer):
             json_api_data = list()
             for resource in results:
                 json_api_data.append(
-                    utils.build_json_data(fields, resource, resource_name))
+                    utils.build_json_resource_obj(fields, resource, resource_name))
                 included = utils.extract_included(fields, resource)
                 if included:
                     json_api_included.extend(included)
@@ -75,7 +75,7 @@ class JSONRenderer(renderers.JSONRenderer):
             if fields is None:
                 json_api_data = data
             else:
-                json_api_data = utils.build_json_data(fields, data, resource_name)
+                json_api_data = utils.build_json_resource_obj(fields, data, resource_name)
 
         # Make sure we render data in a specific order
         render_data = OrderedDict()
