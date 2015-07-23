@@ -139,6 +139,9 @@ def extract_id(fields, resource):
 def extract_attributes(fields, resource):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
+        # ID is always provided in the root of JSON API so remove it from attrs
+        if field_name == 'id':
+            continue
         # Skip fields with relations
         if isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
             continue
