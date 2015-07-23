@@ -71,8 +71,11 @@ class JSONRenderer(renderers.JSONRenderer):
                 if included:
                     json_api_included.extend(included)
         else:
-            fields = data.serializer.fields
-            json_api_data = utils.build_root(fields, data, resource_name)
+            fields = utils.get_serializer_fields(data)
+            if fields is None:
+                json_api_data = data
+            else:
+                json_api_data = utils.build_root(fields, data, resource_name)
 
         # Make sure we render data in a specific order
         render_data = OrderedDict()

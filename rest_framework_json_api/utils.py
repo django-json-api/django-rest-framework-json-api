@@ -81,7 +81,7 @@ def get_resource_name(context):
 def get_serializer_fields(serializer):
     if hasattr(serializer, 'child'):
         return getattr(serializer.child, 'fields')
-    else:
+    if hasattr(serializer, 'fields'):
         return getattr(serializer, 'fields')
 
 
