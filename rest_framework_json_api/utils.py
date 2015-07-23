@@ -118,7 +118,7 @@ def format_keys(obj, format_type=None):
         return obj
 
 
-def build_root(fields, resource, resource_name):
+def build_json_data(fields, resource, resource_name):
     resource_data = [
         ('type', resource_name),
         ('id', extract_id(fields, resource)),
@@ -219,16 +219,6 @@ def extract_included(fields, resource):
             serializer_data = resource[field_name]
             if isinstance(serializer_data, list):
                 for serializer_resource in serializer_data:
-                    resource_data = [
-                        ('type', relation_type),
-                        ('id', extract_id(serializer_fields, serializer_resource)),
-                        ('attributes', extract_attributes(serializer_fields, serializer_resource)),
-                        ('relationships', extract_relationships(serializer_fields, serializer_resource)),
-                    ]
-                    # Add 'self' link if field is present and valid
-                    if api_settings.URL_FIELD_NAME in serializer_resource and \
-                            isinstance(serializer_fields[api_settings.URL_FIELD_NAME], RelatedField):
-                        resource_data.append(('links', {'self': serializer_resource[api_settings.URL_FIELD_NAME]}))
-                    included_data.append(OrderedDict(resource_data))
+                    included_data.append(build_json_data(serializer_fields, serializer_resource, relation_type))
 
     return format_keys(included_data)
