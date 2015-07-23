@@ -129,10 +129,8 @@ class PageNumberPagination(BasePagination):
             'meta': {
                 'pagination': OrderedDict([
                     ('page', self.page.number),
+                    ('pages', self.page.paginator.num_pages),
                     ('count', self.page.paginator.count),
-                    ('total', self.page.paginator.num_pages),
-                    ('start_index', self.page.start_index() - 1),
-                    ('end_index', self.page.end_index() - 1),
                 ])
             },
             'links': OrderedDict([
