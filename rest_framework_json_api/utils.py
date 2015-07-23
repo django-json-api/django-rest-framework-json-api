@@ -3,15 +3,14 @@ Utils.
 """
 import inflection
 
-
 from django.core import urlresolvers
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework.serializers import Serializer, BaseSerializer
-from rest_framework.relations import RelatedField
+from rest_framework.serializers import BaseSerializer
+from rest_framework.relations import RelatedField, HyperlinkedRelatedField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
 
@@ -24,11 +23,6 @@ try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
     ManyRelatedField = type(None)
-
-try:
-    from rest_framework.serializers import ListSerializer
-except ImportError:
-    ListSerializer = type(None)
 
 
 def get_resource_name(context):
@@ -58,13 +52,13 @@ def get_resource_name(context):
             # Check the meta class
             resource_name = (
                 getattr(view, 'serializer_class')
-                .Meta.resource_name)
+                    .Meta.resource_name)
         except AttributeError:
             # Use the model
             try:
                 resource_name = (
                     getattr(view, 'serializer_class')
-                    .Meta.model.__name__)
+                        .Meta.model.__name__)
             except AttributeError:
                 try:
                     resource_name = view.model.__name__
@@ -121,28 +115,61 @@ def format_keys(obj, format_type=None):
         return obj
 
 
+def extract_id_from_url(url):
+    http_prefix = url.startswith(('http:', 'https:'))
+    if http_prefix:
+        # If needed convert absolute URLs to relative path
+        data = urlparse(url).path
+        prefix = urlresolvers.get_script_prefix()
+        if data.startswith(prefix):
+            url = '/' + data[len(prefix):]
+
+    match = urlresolvers.resolve(url)
+    return encoding.force_text(match.kwargs['pk'])
+
+
 def extract_id(fields, resource):
     for field_name, field in six.iteritems(fields):
         if field_name == 'id':
             return encoding.force_text(resource[field_name])
         if field_name == api_settings.URL_FIELD_NAME:
-            url = resource[field_name]
-            http_prefix = url.startswith(('http:', 'https:'))
-            if http_prefix:
-                # If needed convert absolute URLs to relative path
-                data = urlparse(url).path
-                prefix = urlresolvers.get_script_prefix()
-                if data.startswith(prefix):
-                    url = '/' + data[len(prefix):]
-
-            match = urlresolvers.resolve(url)
-            return encoding.force_text(match.kwargs['pk'])
+            return extract_id_from_url(resource[field_name])
 
 
 def extract_attributes(fields, resource):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
-        if not (isinstance(field, RelatedField) or isinstance(field, BaseSerializer)):
-            data.update({field_name: encoding.force_text(resource[field_name])})
+        # Skip fields with relations
+        if isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
+            continue
+
+        data.update({field_name: encoding.force_text(resource[field_name])})
+
+    return format_keys(data)
+
+
+def extract_relationships(fields, resource):
+    data = OrderedDict()
+    for field_name, field in six.iteritems(fields):
+        # Skip URL field
+        if field_name == api_settings.URL_FIELD_NAME:
+            continue
+
+        # Skip fields without relations
+        if not isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
+            continue
+
+        if isinstance(field, ManyRelatedField):
+            relation_data = list()
+
+            relation = field.child_relation
+            model = relation.queryset.model
+            relation_type = inflection.pluralize(model.__name__).lower()
+
+            if isinstance(relation, HyperlinkedRelatedField):
+                for link in resource[field_name]:
+                    relation_data.append(OrderedDict([('type', relation_type), ('id', extract_id_from_url(link))]))
+
+                data.update({field_name: {'data': relation_data}})
 
     return format_keys(data)

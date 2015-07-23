@@ -69,7 +69,8 @@ class JSONRenderer(renderers.JSONRenderer):
                 resource_data = [
                     ('type', resource_name),
                     ('id', utils.extract_id(fields, resource)),
-                    ('attributes', utils.format_keys(utils.extract_attributes(fields, resource)))
+                    ('attributes', utils.extract_attributes(fields, resource)),
+                    ('relationships', utils.extract_relationships(fields, resource)),
                 ]
                 # Add 'self' link if field is present and valid
                 if api_settings.URL_FIELD_NAME in resource and \
