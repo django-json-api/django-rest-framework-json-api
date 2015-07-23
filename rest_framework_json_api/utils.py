@@ -9,7 +9,7 @@ from django.utils import six, encoding
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework.serializers import BaseSerializer
+from rest_framework.serializers import BaseSerializer, ListSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
@@ -50,15 +50,11 @@ def get_resource_name(context):
     except AttributeError:
         try:
             # Check the meta class
-            resource_name = (
-                getattr(view, 'serializer_class')
-                    .Meta.resource_name)
+            resource_name = (getattr(view, 'serializer_class').Meta.resource_name)
         except AttributeError:
             # Use the model
             try:
-                resource_name = (
-                    getattr(view, 'serializer_class')
-                        .Meta.model.__name__)
+                resource_name = (getattr(view, 'serializer_class').Meta.model.__name__)
             except AttributeError:
                 try:
                     resource_name = view.model.__name__
@@ -80,6 +76,13 @@ def get_resource_name(context):
                 resource_name = inflection.underscore(resource_name)
 
     return resource_name
+
+
+def get_serializer_fields(serializer):
+    if hasattr(serializer, 'child'):
+        return getattr(serializer.child, 'fields')
+    else:
+        return getattr(serializer, 'fields')
 
 
 def format_keys(obj, format_type=None):
@@ -173,3 +176,40 @@ def extract_relationships(fields, resource):
                 data.update({field_name: {'data': relation_data}})
 
     return format_keys(data)
+
+
+def extract_included(fields, resource):
+    included_data = list()
+    for field_name, field in six.iteritems(fields):
+        # Skip URL field
+        if field_name == api_settings.URL_FIELD_NAME:
+            continue
+
+        # Skip fields without serialized data
+        if not isinstance(field, BaseSerializer):
+            continue
+
+        if isinstance(field, ListSerializer):
+
+            serializer = field.child
+            model = serializer.Meta.model
+            relation_type = inflection.pluralize(model.__name__).lower()
+
+            # Get the serializer fields
+            serializer_fields = get_serializer_fields(serializer)
+            serializer_data = resource[field_name]
+            if isinstance(serializer_data, list):
+                for serializer_resource in serializer_data:
+                    resource_data = [
+                        ('type', relation_type),
+                        ('id', extract_id(serializer_fields, serializer_resource)),
+                        ('attributes', extract_attributes(serializer_fields, serializer_resource)),
+                        ('relationships', extract_relationships(serializer_fields, serializer_resource)),
+                    ]
+                    # Add 'self' link if field is present and valid
+                    if api_settings.URL_FIELD_NAME in serializer_resource and \
+                            isinstance(serializer_fields[api_settings.URL_FIELD_NAME], RelatedField):
+                        resource_data.append(('links', {'self': serializer_resource[api_settings.URL_FIELD_NAME]}))
+                    included_data.append(OrderedDict(resource_data))
+
+    return format_keys(included_data)
