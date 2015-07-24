@@ -1,5 +1,5 @@
 from django.contrib.auth import models as auth_models
-from rest_framework import viewsets, generics, renderers, parsers
+from rest_framework import viewsets, generics, renderers, parsers, serializers
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework_json_api import mixins, utils
@@ -41,6 +41,10 @@ class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
         self.resource_name = 'data'
         return super(Identity, self).retrieve(request, args, kwargs)
 
+    @detail_route()
+    def validation(self, request, *args, **kwargs):
+        raise serializers.ValidationError('Oh nohs!')
+
 
 class GenericIdentity(generics.GenericAPIView):
     """
@@ -63,4 +67,3 @@ class GenericIdentity(generics.GenericAPIView):
         """
         obj = self.get_object()
         return Response(IdentitySerializer(obj).data)
-
