@@ -1,5 +1,6 @@
 import json
 from example.tests import TestBase
+from django.utils import encoding
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -23,21 +24,24 @@ class MultipleIDMixin(TestBase):
         self.assertEqual(response.status_code, 200)
 
         expected = {
-            'user': [{
-                'id': self.miles.pk,
-                'first_name': self.miles.first_name,
-                'last_name': self.miles.last_name,
-                'email': self.miles.email
-            }]
+            'data': {
+                'type': 'users',
+                'id': encoding.force_text(self.miles.pk),
+                'attributes': {
+                    'first_name': self.miles.first_name,
+                    'last_name': self.miles.last_name,
+                    'email': self.miles.email
+                }
+            }
         }
 
         json_content = json.loads(response.content.decode('utf8'))
-        meta = json_content.get("meta")
+        links = json_content.get("links")
+        meta = json_content.get("meta").get('pagination')
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 1)
-        self.assertEquals(meta.get("next"), None)
-        self.assertEqual(None, meta.get("next_link"))
+        self.assertEquals(links.get("next"), None)
         self.assertEqual(meta.get("page"), 1)
 
     def test_multiple_ids_in_query_params(self):
@@ -50,28 +54,29 @@ class MultipleIDMixin(TestBase):
         self.assertEqual(response.status_code, 200)
 
         expected = {
-            'user': [{
-                'id': self.john.pk,
-                'first_name': self.john.first_name,
-                'last_name': self.john.last_name,
-                'email': self.john.email
-            }]
+            'data': {
+                'type': 'users',
+                'id': encoding.force_text(self.john.pk),
+                'attributes': {
+                    'first_name': self.john.first_name,
+                    'last_name': self.john.last_name,
+                    'email': self.john.email
+                }
+            }
         }
 
         json_content = json.loads(response.content.decode('utf8'))
-        meta = json_content.get("meta")
+        links = json_content.get("links")
+        meta = json_content.get("meta").get('pagination')
 
         self.assertEquals(expected.get('user'), json_content.get('user'))
         self.assertEquals(meta.get('count', 0), 2)
-        self.assertEquals(meta.get("next"), 2)
         self.assertEqual(
             sorted(
                 'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2'\
                 .split('?')[1].split('&')
             ),
             sorted(
-                meta.get("next_link").split('?')[1].split('&'))
+                links.get("next").split('?')[1].split('&'))
             )
         self.assertEqual(meta.get("page"), 1)
-
-

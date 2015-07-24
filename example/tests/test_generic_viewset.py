@@ -40,38 +40,63 @@ class GenericViewSet(TestBase):
             json.loads(response.content.decode('utf8')),
             {
                 'data': {
-                    'id': 2,
-                    'first_name': u'Miles',
-                    'last_name': u'Davis',
-                    'email': u'miles@example.com'
+                    'type': 'data',
+                    'id': '2',
+                    'attributes': {
+                        'first-name': u'Miles',
+                        'last-name': u'Davis',
+                        'email': u'miles@example.com'
+                    }
                 }
             }
         )
 
-    def test_custom_exceptions(self):
+    def test_default_validation_exceptions(self):
         """
-        Exceptions should conform to json api spec
+        Default validation exceptions should conform to json api spec
         """
+        expected = {
+            'errors': [
+                {
+                    'status': '400',
+                    'source': {
+                        'pointer': '/data/attributes/email',
+                    },
+                    'detail': 'Enter a valid email address.',
+                },
+                {
+                    'status': '400',
+                    'source': {
+                        'pointer': '/data/attributes/first-name',
+                    },
+                    'detail': 'There\'s a problem with first name',
+                }
+            ]
+        }
         response = self.client.post('/identities', {
             'email': 'bar', 'first_name': 'alajflajaljalajlfjafljalj'})
-        self.assertEqual(
-            json.loads(response.content.decode('utf8')),
-            {
-                'errors': [
-                    {
-                        'source': {
-                            'parameter': 'email'
-                        },
-                        'detail': 'Enter a valid email address.'
-                    },
-                    {
-                        'source': {
-                            'parameter': 'first_name'
-                        },
-                        'detail': 'There\'s a problem with first name'
-                    },
-                ]
-            }
-        )
+        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
-
+    def test_custom_validation_exceptions(self):
+        """
+        Exceptions should be able to be formatted manually
+        """
+        expected = {
+            'errors': [
+                {
+                    'id': 'armageddon101',
+                    'detail': 'Hey! You need a last name!',
+                    'meta': 'something',
+                },
+                {
+                    'status': '400',
+                    'source': {
+                        'pointer': '/data/attributes/email',
+                    },
+                    'detail': 'Enter a valid email address.',
+                },
+            ]
+        }
+        response = self.client.post('/identities', {
+            'email': 'bar', 'last_name': 'alajflajaljalajlfjafljalj'})
+        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
