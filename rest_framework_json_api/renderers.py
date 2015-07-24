@@ -78,7 +78,6 @@ class JSONRenderer(renderers.JSONRenderer):
             else:
                 json_api_data = data
 
-
         # Make sure we render data in a specific order
         render_data = OrderedDict()
 
