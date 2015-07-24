@@ -178,7 +178,30 @@ def extract_relationships(fields, resource):
             continue
 
         # Skip fields without relations
-        if not isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
+        if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
+            continue
+
+        if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
+            model = field.queryset.model
+            relation_type = inflection.pluralize(model.__name__).lower()
+
+            if resource[field_name] is not None:
+                if isinstance(field, PrimaryKeyRelatedField):
+                    relation_id = encoding.force_text(resource[field_name])
+                elif isinstance(field, HyperlinkedRelatedField):
+                    relation_id = extract_id_from_url(resource[field_name])
+            else:
+                relation_id = None
+
+            data.update(
+                {
+                    field_name: {
+                        'data': (OrderedDict([
+                            ('type', relation_type), ('id', relation_id)
+                        ]) if relation_id is not None else None)
+                    }
+                }
+            )
             continue
 
         if isinstance(field, ManyRelatedField):
