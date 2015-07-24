@@ -18,11 +18,11 @@ class FormatKeysSetTests(TestBase):
         self.detail_url = reverse('user-detail', kwargs={'pk': self.miles.pk})
 
         # Set the format keys settings.
-        setattr(settings, 'JSON_API_FORMAT_KEYS', True)
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelization')
 
     def tearDown(self):
         # Remove the format keys settings.
-        delattr(settings, 'JSON_API_FORMAT_KEYS')
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'dasherize')
 
 
     def test_camelization(self):

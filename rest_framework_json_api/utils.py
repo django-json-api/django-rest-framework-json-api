@@ -115,11 +115,12 @@ def format_keys(obj, format_type=None):
 def format_value(value, format_type=None):
     format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
     if format_type == 'dasherize':
-        return inflection.dasherize(value)
-    if format_type == 'camelize':
-        return inflection.camelize(value)
-    if format_type == 'underscore':
-        return inflection.underscore(value)
+        value = inflection.dasherize(value)
+    elif format_type == 'camelize':
+        value = inflection.camelize(value)
+    elif format_type == 'underscore':
+        value = inflection.underscore(value)
+    return value
 
 
 def build_json_resource_obj(fields, resource, resource_name):

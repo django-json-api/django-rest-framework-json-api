@@ -155,7 +155,7 @@ requests and responses from the python/rest_framework's preferred underscore to
 a format of your choice. To hook this up include the following in your project
 settings::
 
-   JSON_API_FORMAT_KEYS = True
+   JSON_API_FORMAT_KEYS = 'dasherize'
 
 Note: due to the way the inflector works address_1 can camelize to address1
 on output but it cannot convert address1 back to address_1 on POST or PUT. Keep
