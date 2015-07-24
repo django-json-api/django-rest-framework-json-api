@@ -67,13 +67,7 @@ def get_resource_name(context):
 
             resource_name = inflection.pluralize(resource_name.lower())
 
-            format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
-            if format_type == 'dasherize':
-                resource_name = inflection.dasherize(resource_name)
-            elif format_type == 'camelize':
-                resource_name = inflection.camelize(resource_name)
-            elif format_type == 'underscore':
-                resource_name = inflection.underscore(resource_name)
+            resource_name = format_value(resource_name)
 
     return resource_name
 
@@ -116,6 +110,16 @@ def format_keys(obj, format_type=None):
             return obj
     else:
         return obj
+
+
+def format_value(value, format_type=None):
+    format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+    if format_type == 'dasherize':
+        return inflection.dasherize(value)
+    if format_type == 'camelize':
+        return inflection.camelize(value)
+    if format_type == 'underscore':
+        return inflection.underscore(value)
 
 
 def build_json_resource_obj(fields, resource, resource_name):
