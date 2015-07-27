@@ -187,8 +187,8 @@ def extract_relationships(fields, resource):
             continue
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
-            model = field.queryset.model
-            relation_type = inflection.pluralize(model.__name__).lower()
+            relation_model = field.queryset.model
+            relation_type = inflection.pluralize(relation_model.__name__).lower()
 
             if resource[field_name] is not None:
                 if isinstance(field, PrimaryKeyRelatedField):
@@ -213,8 +213,16 @@ def extract_relationships(fields, resource):
             relation_data = list()
 
             relation = field.child_relation
-            model = relation.queryset.model
-            relation_type = inflection.pluralize(model.__name__).lower()
+            queryset = relation.queryset
+            if queryset is not None:
+                relation_model = queryset.model
+            else:
+                parent_serializer = field.parent
+                parent_model = parent_serializer.Meta.model
+                parent_model_relation = getattr(parent_model, field_name)
+                relation_model = parent_model_relation.related.model
+
+            relation_type = inflection.pluralize(relation_model.__name__).lower()
 
             if isinstance(relation, HyperlinkedRelatedField):
                 for link in resource[field_name]:
@@ -234,8 +242,8 @@ def extract_relationships(fields, resource):
             relation_data = list()
 
             serializer = field.child
-            model = serializer.Meta.model
-            relation_type = inflection.pluralize(model.__name__).lower()
+            relation_model = serializer.Meta.model
+            relation_type = inflection.pluralize(relation_model.__name__).lower()
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
