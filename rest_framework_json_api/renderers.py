@@ -55,7 +55,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         # If detail view then json api spec expects dict, otherwise a list
         # - http://jsonapi.org/format/#document-top-level
-        if view and view.action == 'list':
+        if view and hasattr(view, 'action') and view.action == 'list':
             # Check for paginated results
             results = (data["results"] if isinstance(data, dict) else data)
 
