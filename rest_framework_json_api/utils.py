@@ -188,7 +188,7 @@ def extract_attributes(fields, resource):
         if isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
             continue
         data.update({
-            field_name: (encoding.force_text(resource[field_name]) if resource[field_name] is not None else None)
+            field_name: resource[field_name]
         })
 
     return format_keys(data)
