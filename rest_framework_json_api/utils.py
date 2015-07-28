@@ -145,8 +145,11 @@ def get_related_resource_type(relation):
         relation_model = queryset.model
     else:
         parent_serializer = relation.parent
-        parent_model = parent_serializer.Meta.model
-        parent_model_relation = getattr(parent_model, relation.field_name)
+        if hasattr(parent_serializer, 'parent'):
+            parent_model = parent_serializer.parent.Meta.model
+        else:
+            parent_model = parent_serializer.Meta.model
+        parent_model_relation = getattr(parent_model, parent_serializer.field_name)
         relation_model = parent_model_relation.related.model
     return inflection.pluralize(relation_model.__name__).lower()
 
