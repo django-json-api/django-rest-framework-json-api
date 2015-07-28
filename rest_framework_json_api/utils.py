@@ -139,6 +139,24 @@ def build_json_resource_obj(fields, resource, resource_name):
     return OrderedDict(resource_data)
 
 
+def get_related_resource_type(relation):
+    queryset = relation.queryset
+    if queryset is not None:
+        relation_model = queryset.model
+    else:
+        parent_serializer = relation.parent
+        if hasattr(parent_serializer, 'Meta'):
+            parent_model = parent_serializer.Meta.model
+        else:
+            parent_model = parent_serializer.parent.Meta.model
+        parent_model_relation = getattr(
+            parent_model,
+            (parent_serializer.field_name if parent_serializer.field_name else relation.field_name)
+        )
+        relation_model = parent_model_relation.related.model
+    return inflection.pluralize(relation_model.__name__).lower()
+
+
 def extract_id_from_url(url):
     http_prefix = url.startswith(('http:', 'https:'))
     if http_prefix:
@@ -188,8 +206,7 @@ def extract_relationships(fields, resource):
             continue
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
-            relation_model = field.queryset.model
-            relation_type = inflection.pluralize(relation_model.__name__).lower()
+            relation_type = get_related_resource_type(field)
 
             if resource[field_name] is not None:
                 if isinstance(field, PrimaryKeyRelatedField):
@@ -214,16 +231,8 @@ def extract_relationships(fields, resource):
             relation_data = list()
 
             relation = field.child_relation
-            queryset = relation.queryset
-            if queryset is not None:
-                relation_model = queryset.model
-            else:
-                parent_serializer = field.parent
-                parent_model = parent_serializer.Meta.model
-                parent_model_relation = getattr(parent_model, field_name)
-                relation_model = parent_model_relation.related.model
 
-            relation_type = inflection.pluralize(relation_model.__name__).lower()
+            relation_type = get_related_resource_type(relation)
 
             if isinstance(relation, HyperlinkedRelatedField):
                 for link in resource[field_name]:
