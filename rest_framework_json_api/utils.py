@@ -151,9 +151,14 @@ def get_related_resource_type(relation):
             parent_model = parent_serializer.parent.Meta.model
         parent_model_relation = getattr(
             parent_model,
-            (parent_serializer.field_name if parent_serializer.field_name else relation.field_name)
+            (relation.field_name if relation.field_name else parent_serializer.field_name)
         )
-        relation_model = parent_model_relation.related.model
+        if hasattr(parent_model_relation, 'related'):
+            relation_model = parent_model_relation.related.model
+        elif hasattr(parent_model_relation, 'field'):
+            relation_model = parent_model_relation.field.related.model
+        else:
+            raise APIException('Unable to find related model for relation {relation}'.format(relation=relation))
     return inflection.pluralize(relation_model.__name__).lower()
 
 
