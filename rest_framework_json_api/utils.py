@@ -9,7 +9,7 @@ from django.utils import six, encoding
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework.serializers import BaseSerializer, ListSerializer
+from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
@@ -259,6 +259,24 @@ def extract_relationships(fields, resource):
                 data.update({field_name: {'data': relation_data}})
                 continue
 
+        if isinstance(field, ModelSerializer):
+            relation_model = field.Meta.model
+            relation_type = inflection.pluralize(relation_model.__name__).lower()
+
+            # Get the serializer fields
+            serializer_fields = get_serializer_fields(field)
+            serializer_data = resource[field_name]
+            data.update({
+                field_name: {
+                    'data': (
+                        OrderedDict([
+                            ('type', relation_type),
+                            ('id', extract_id(serializer_fields, serializer_data))
+                        ]) if resource[field_name] else None)
+                }
+            })
+            continue
+
     return format_keys(data)
 
 
@@ -285,5 +303,16 @@ def extract_included(fields, resource):
             if isinstance(serializer_data, list):
                 for serializer_resource in serializer_data:
                     included_data.append(build_json_resource_obj(serializer_fields, serializer_resource, relation_type))
+
+        if isinstance(field, ModelSerializer):
+
+            model = field.Meta.model
+            relation_type = inflection.pluralize(model.__name__).lower()
+
+            # Get the serializer fields
+            serializer_fields = get_serializer_fields(field)
+            serializer_data = resource[field_name]
+            if serializer_data:
+                included_data.append(build_json_resource_obj(serializer_fields, serializer_data, relation_type))
 
     return format_keys(included_data)
