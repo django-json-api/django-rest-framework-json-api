@@ -88,8 +88,17 @@ class JSONRenderer(renderers.JSONRenderer):
         render_data['data'] = json_api_data
 
         if len(json_api_included) > 0:
+            # Iterate through compound documents to remove duplicates
+            seen = set()
+            unique_compound_documents = list()
+            for included_dict in json_api_included:
+                type_tuple = tuple((included_dict['type'], included_dict['id']))
+                if type_tuple not in seen:
+                    seen.add(type_tuple)
+                    unique_compound_documents.append(included_dict)
+
             # Sort the items by type then by id
-            render_data['included'] = sorted(json_api_included, key=lambda item: (item['type'], item['id']))
+            render_data['included'] = sorted(unique_compound_documents, key=lambda item: (item['type'], item['id']))
 
         if data.get('meta'):
             render_data['meta'] = data.get('meta')
