@@ -76,6 +76,9 @@ class JSONRenderer(renderers.JSONRenderer):
             if hasattr(data, 'serializer'):
                 fields = utils.get_serializer_fields(data.serializer)
                 json_api_data = utils.build_json_resource_obj(fields, data, resource_name)
+                included = utils.extract_included(fields, data)
+                if included:
+                    json_api_included.extend(included)
             else:
                 json_api_data = data
 
