@@ -29,6 +29,8 @@ class JSONRenderer(renderers.JSONRenderer):
     }
     """
 
+    media_type = 'application/vnd.api+json'
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         # Get the resource name.
         resource_name = utils.get_resource_name(renderer_context)
