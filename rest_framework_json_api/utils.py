@@ -151,7 +151,8 @@ def get_related_resource_type(relation):
             parent_model = parent_serializer.parent.Meta.model
         parent_model_relation = getattr(
             parent_model,
-            (relation.field_name if relation.field_name else parent_serializer.field_name)
+            (relation.field_name if relation.field_name else
+                (relation.source if relation.source else parent_serializer.field_name))
         )
         if hasattr(parent_model_relation, 'related'):
             relation_model = parent_model_relation.related.model
