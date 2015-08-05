@@ -87,7 +87,7 @@ class JSONRenderer(renderers.JSONRenderer):
         # Make sure we render data in a specific order
         render_data = OrderedDict()
 
-        if data.get('links'):
+        if isinstance(data, dict) and data.get('links'):
             render_data['links'] = data.get('links')
 
         render_data['data'] = json_api_data
@@ -105,7 +105,7 @@ class JSONRenderer(renderers.JSONRenderer):
             # Sort the items by type then by id
             render_data['included'] = sorted(unique_compound_documents, key=lambda item: (item['type'], item['id']))
 
-        if data.get('meta'):
+        if isinstance(data, dict) and data.get('meta'):
             render_data['meta'] = data.get('meta')
 
         return super(JSONRenderer, self).render(
