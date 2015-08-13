@@ -2,17 +2,16 @@
 Utils.
 """
 import inflection
-
 from django.core import urlresolvers
 from django.conf import settings
 from django.utils import six, encoding
-from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
-
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
+
+from django.utils.six.moves.urllib.parse import urlparse
 
 try:
     from rest_framework.compat import OrderedDict
@@ -178,9 +177,9 @@ def extract_id_from_url(url):
 def extract_id(fields, resource):
     for field_name, field in six.iteritems(fields):
         if field_name == 'id':
-            return encoding.force_text(resource[field_name])
+            return encoding.force_text(resource.get(field_name))
         if field_name == api_settings.URL_FIELD_NAME:
-            return extract_id_from_url(resource[field_name])
+            return extract_id_from_url(resource.get(field_name))
 
 
 def extract_attributes(fields, resource):
@@ -193,7 +192,7 @@ def extract_attributes(fields, resource):
         if isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
             continue
         data.update({
-            field_name: resource[field_name]
+            field_name: resource.get(field_name)
         })
 
     return format_keys(data)
@@ -213,11 +212,11 @@ def extract_relationships(fields, resource):
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
             relation_type = get_related_resource_type(field)
 
-            if resource[field_name] is not None:
+            if resource.get(field_name) is not None:
                 if isinstance(field, PrimaryKeyRelatedField):
-                    relation_id = encoding.force_text(resource[field_name])
+                    relation_id = encoding.force_text(resource.get(field_name))
                 elif isinstance(field, HyperlinkedRelatedField):
-                    relation_id = extract_id_from_url(resource[field_name])
+                    relation_id = extract_id_from_url(resource.get(field_name))
             else:
                 relation_id = None
 
@@ -240,14 +239,14 @@ def extract_relationships(fields, resource):
             relation_type = get_related_resource_type(relation)
 
             if isinstance(relation, HyperlinkedRelatedField):
-                for link in resource[field_name]:
+                for link in resource.get(field_name, list()):
                     relation_data.append(OrderedDict([('type', relation_type), ('id', extract_id_from_url(link))]))
 
                 data.update({field_name: {'data': relation_data}})
                 continue
 
             if isinstance(relation, PrimaryKeyRelatedField):
-                for pk in resource[field_name]:
+                for pk in resource.get(field_name, list()):
                     relation_data.append(OrderedDict([('type', relation_type), ('id', encoding.force_text(pk))]))
 
                 data.update({field_name: {'data': relation_data}})
@@ -262,7 +261,7 @@ def extract_relationships(fields, resource):
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
-            serializer_data = resource[field_name]
+            serializer_data = resource.get(field_name)
             if isinstance(serializer_data, list):
                 for serializer_resource in serializer_data:
                     relation_data.append(
@@ -279,14 +278,14 @@ def extract_relationships(fields, resource):
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
-            serializer_data = resource[field_name]
+            serializer_data = resource.get(field_name)
             data.update({
                 field_name: {
                     'data': (
                         OrderedDict([
                             ('type', relation_type),
                             ('id', extract_id(serializer_fields, serializer_data))
-                        ]) if resource[field_name] else None)
+                        ]) if resource.get(field_name) else None)
                 }
             })
             continue
@@ -313,7 +312,7 @@ def extract_included(fields, resource):
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
-            serializer_data = resource[field_name]
+            serializer_data = resource.get(field_name)
             if isinstance(serializer_data, list):
                 for serializer_resource in serializer_data:
                     included_data.append(build_json_resource_obj(serializer_fields, serializer_resource, relation_type))
@@ -325,7 +324,7 @@ def extract_included(fields, resource):
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
-            serializer_data = resource[field_name]
+            serializer_data = resource.get(field_name)
             if serializer_data:
                 included_data.append(build_json_resource_obj(serializer_fields, serializer_data, relation_type))
 
