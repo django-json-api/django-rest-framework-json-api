@@ -3,8 +3,7 @@ Parsers
 """
 from rest_framework import parsers
 
-from . import utils
-
+from . import utils, renderers
 
 class JSONParser(parsers.JSONParser):
     """
@@ -23,6 +22,9 @@ class JSONParser(parsers.JSONParser):
 
     We extract the attributes so that DRF serializers can work as normal.
     """
+    media_type = 'application/vnd.api+json'
+    renderer_class = renderers.JSONRenderer
+
     def parse(self, stream, media_type=None, parser_context=None):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
