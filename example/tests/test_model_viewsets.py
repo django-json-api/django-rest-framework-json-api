@@ -1,11 +1,10 @@
 import json
 
-from example.tests import TestBase
-
 from django.contrib.auth import get_user_model
 from django.utils import encoding
 from django.core.urlresolvers import reverse
-from django.conf import settings
+
+from example.tests import TestBase
 
 
 class ModelViewSetTests(TestBase):
@@ -167,7 +166,7 @@ class ModelViewSetTests(TestBase):
             }
         }
         data_attributes = data['data']['attributes']
-        response = self.client.put(self.detail_url, data=data, format='json')
+        response = self.client.put(self.detail_url, content_type='application/vnd.api+json', data=json.dumps(data))
 
         result = json.loads(response.content.decode('utf8'))
         result_attributes = result['data']['attributes']
