@@ -47,7 +47,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         # If this is an error response, skip the rest.
         if resource_name == 'errors':
-            if len(data) > 1:
+            if len(data) > 1 and isinstance(data, list):
                 data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
             return super(JSONRenderer, self).render(
                 {resource_name: data}, accepted_media_type, renderer_context
