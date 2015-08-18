@@ -59,12 +59,12 @@ like the following:
 
 From PyPI
 
-    pip install rest_framework_json_api
+    pip install djangorestframework-jsonapi
 
 From Source
 
-    git clone https://github.com/django-json-api/rest_framework_json_api.git
-    cd rest_framework_json_api && pip install -e .
+    git clone https://github.com/django-json-api/django-rest-framework-json-api.git
+    cd django-rest-framework-json-api && pip install -e .
 
 ## Running Tests
 
