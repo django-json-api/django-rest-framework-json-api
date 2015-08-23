@@ -1,9 +1,45 @@
 language: python
 sudo: false
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-install:
-  - pip install -e .
-script: python runtests.py
+install: pip install tox
+script: tox
+env:
+  - TOXENV=py27-django16-drf24
+  - TOXENV=py27-django16-drf30
+  - TOXENV=py27-django16-drf31
+  - TOXENV=py27-django16-drf32
+  - TOXENV=py32-django16-drf24
+  - TOXENV=py32-django16-drf30
+  - TOXENV=py32-django16-drf31
+  - TOXENV=py32-django16-drf32
+  - TOXENV=py33-django16-drf24
+  - TOXENV=py33-django16-drf30
+  - TOXENV=py33-django16-drf31
+  - TOXENV=py33-django16-drf32
+  - TOXENV=py27-django17-drf24
+  - TOXENV=py27-django17-drf30
+  - TOXENV=py27-django17-drf31
+  - TOXENV=py27-django17-drf32
+  - TOXENV=py32-django17-drf24
+  - TOXENV=py32-django17-drf30
+  - TOXENV=py32-django17-drf31
+  - TOXENV=py32-django17-drf32
+  - TOXENV=py33-django17-drf24
+  - TOXENV=py33-django17-drf30
+  - TOXENV=py33-django17-drf31
+  - TOXENV=py33-django17-drf32
+  - TOXENV=py34-django17-drf24
+  - TOXENV=py34-django17-drf30
+  - TOXENV=py34-django17-drf31
+  - TOXENV=py34-django17-drf32
+  - TOXENV=py27-django18-drf30
+  - TOXENV=py27-django18-drf31
+  - TOXENV=py27-django18-drf32
+  - TOXENV=py32-django18-drf30
+  - TOXENV=py32-django18-drf31
+  - TOXENV=py32-django18-drf32
+  - TOXENV=py33-django18-drf30
+  - TOXENV=py33-django18-drf31
+  - TOXENV=py33-django18-drf32
+  - TOXENV=py34-django18-drf30
+  - TOXENV=py34-django18-drf31
+  - TOXENV=py34-django18-drf32

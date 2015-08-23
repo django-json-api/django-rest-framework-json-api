@@ -27,3 +27,6 @@ pip-delete-this-directory.txt
 
 # Pycharm project files
 .idea/
+
+# Tox
+.tox/
