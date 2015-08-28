@@ -23,6 +23,11 @@ try:
 except ImportError:
     ManyRelatedField = type(None)
 
+try:
+    from rest_framework_nested.relations import HyperlinkedRouterField
+except ImportError:
+    HyperlinkedRouterField = type(None)
+
 
 def get_resource_name(context):
     """
@@ -207,6 +212,25 @@ def extract_relationships(fields, resource):
 
         # Skip fields without relations
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
+            continue
+
+        if isinstance(field, HyperlinkedRouterField):
+            # special case for HyperlinkedRouterField
+            relation_data = list()
+            relation_type = get_related_resource_type(field)
+            parent_instance = field.parent.instance
+            related = getattr(parent_instance, field_name).all() if hasattr(parent_instance, field_name) else list()
+            for relation in related:
+                relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
+
+            data.update({field_name: {
+                'links': {
+                    "related": resource.get(field_name)},
+                'data': relation_data,
+                'meta': {
+                    'count': len(relation_data)
+                }
+            }})
             continue
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
