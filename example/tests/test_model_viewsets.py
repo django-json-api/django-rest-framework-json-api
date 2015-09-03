@@ -84,12 +84,13 @@ class ModelViewSetTests(TestBase):
         self.assertIsNone(links.get('next'))
 
         # Older versions of DRF add page=1 for first page. Later trim to root
-        try:
-            self.assertEqual(u'http://testserver/identities',
-                links.get('prev'))
-        except AssertionError:
+        previous_page = links.get('prev')
+        if 'page=1' in previous_page:
             self.assertEqual(u'http://testserver/identities?page=1',
-                links.get('prev'))
+                previous_page)
+        else:
+            self.assertEqual(u'http://testserver/identities',
+                previous_page)
 
     def test_page_range_in_list_result(self):
         """
