@@ -2,9 +2,12 @@
 Test sideloading resources
 """
 import json
-from example.tests import TestBase
+
 from django.core.urlresolvers import reverse
+from django.utils import encoding
 from django.conf import settings
+
+from example.tests import TestBase
 
 
 class SideloadResourceTest(TestBase):
@@ -21,5 +24,7 @@ class SideloadResourceTest(TestBase):
         response = self.client.get(self.url)
         content = json.loads(response.content.decode('utf8'))
 
-        self.assertEqual(sorted(content.keys()), [u'identities', u'posts'])
-
+        self.assertEqual(
+            sorted(content.keys()),
+            [encoding.force_text('identities'),
+             encoding.force_text('posts')])
