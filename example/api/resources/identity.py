@@ -1,4 +1,6 @@
 from django.contrib.auth import models as auth_models
+from django.utils import encoding
+
 from rest_framework import viewsets, generics, renderers, parsers, serializers
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
@@ -31,8 +33,8 @@ class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
         posts = [{'id': 1, 'title': 'Test Blog Post'}]
 
         data = {
-            u'identities': IdentitySerializer(identities, many=True).data,
-            u'posts': PostSerializer(posts, many=True).data,
+            encoding.force_text('identities'): IdentitySerializer(identities, many=True).data,
+            encoding.force_text('posts'): PostSerializer(posts, many=True).data,
         }
         return Response(utils.format_keys(data, format_type='camelize'))
 

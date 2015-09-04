@@ -1,10 +1,10 @@
-import json
-
-from example.tests import TestBase
-
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils import encoding
+
+from example.tests import TestBase
+from example.tests.utils import dump_json, redump_json
 
 
 class FormatKeysSetTests(TestBase):
@@ -18,7 +18,8 @@ class FormatKeysSetTests(TestBase):
         self.detail_url = reverse('user-detail', kwargs={'pk': self.miles.pk})
 
         # Set the format keys settings.
-        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelization')
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelize')
+        # CAMELIZE capitalize the type, needs to be checked
 
     def tearDown(self):
         # Remove the format keys settings.
@@ -34,20 +35,33 @@ class FormatKeysSetTests(TestBase):
 
         user = get_user_model().objects.all()[0]
         expected = {
-            u'data': {
-                u'type': u'users',
-                u'id': user.pk,
-                u'attributes': {
-                    u'firstName': user.first_name,
-                    u'lastName': user.last_name,
-                    u'email': user.email
-                },
+            'data': [
+                {
+                    'type': 'Users',
+                    'id': encoding.force_text(user.pk),
+                    'attributes': {
+                        'firstName': user.first_name,
+                        'lastName': user.last_name,
+                        'email': user.email
+                    },
+                }
+            ],
+            'links': {
+                'first': 'http://testserver/identities?page=1',
+                'last': 'http://testserver/identities?page=2',
+                'next': 'http://testserver/identities?page=2',
+                'prev': None
+            },
+            'meta': {
+                'pagination': {
+                    'page': 1,
+                    'pages': 2,
+                    'count': 2
+                }
             }
         }
 
-        json_content = json.loads(response.content.decode('utf8'))
-        links = json_content.get('links')
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
 
-        self.assertEquals(expected.get('users'), json_content.get('users'))
-        self.assertEqual(u'http://testserver/identities?page=2',
-            links.get('next'))
+        assert expected_dump == content_dump
