@@ -22,10 +22,10 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.admin',
     'rest_framework',
-    'example.api',
+    'example',
 ]
 
-ROOT_URLCONF = 'example.api.urls'
+ROOT_URLCONF = 'example.urls'
 
 SECRET_KEY = 'abc123'
 
