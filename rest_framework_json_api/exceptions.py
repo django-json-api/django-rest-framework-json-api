@@ -27,7 +27,8 @@ def exception_handler(exc, context):
             field = format_value(field)
             pointer = '/data/attributes/{}'.format(field)
             # see if they passed a dictionary to ValidationError manually
-            if isinstance(error, dict):
+            # or a string in case of AuthenticationError
+            if isinstance(error, dict) or isinstance(error, str):
                 errors.append(error)
             else:
                 for message in error:
