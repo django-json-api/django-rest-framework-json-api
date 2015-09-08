@@ -27,9 +27,14 @@ def exception_handler(exc, context):
             field = format_value(field)
             pointer = '/data/attributes/{}'.format(field)
             # see if they passed a dictionary to ValidationError manually
-            # or a string in case of AuthenticationError
-            if isinstance(error, dict) or isinstance(error, str):
+            if isinstance(error, dict):
                 errors.append(error)
+            # or a string in case of AuthenticationError
+            elif isinstance(error, str):
+                # An error MUST be a JSON object in JSON API spec
+                errors.append({
+                    'detail': error
+                })
             else:
                 for message in error:
                     errors.append({
