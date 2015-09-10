@@ -144,9 +144,8 @@ def build_json_resource_obj(fields, resource, resource_name):
 
 
 def get_related_resource_type(relation):
-    queryset = relation.queryset
-    if queryset is not None:
-        relation_model = queryset.model
+    if hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
+        relation_model = relation.get_queryset().model
     else:
         parent_serializer = relation.parent
         if hasattr(parent_serializer, 'Meta'):
@@ -217,7 +216,7 @@ def extract_relationships(fields, resource):
         if isinstance(field, HyperlinkedRouterField):
             # special case for HyperlinkedRouterField
             relation_data = list()
-            relation_type = get_related_resource_type(field)
+            relation_type = get_related_resource_type(getattr(field.parent.instance, field_name))
             parent_instance = field.parent.instance
             related = getattr(parent_instance, field_name).all() if hasattr(parent_instance, field_name) else list()
             for relation in related:
