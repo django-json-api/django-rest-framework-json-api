@@ -216,7 +216,7 @@ def extract_relationships(fields, resource):
         if isinstance(field, HyperlinkedRouterField):
             # special case for HyperlinkedRouterField
             relation_data = list()
-            relation_type = get_related_resource_type(getattr(field.parent.instance, field_name))
+            relation_type = get_related_resource_type(field)
             parent_instance = field.parent.instance
             related = getattr(parent_instance, field_name).all() if hasattr(parent_instance, field_name) else list()
             for relation in related:
