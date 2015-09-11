@@ -128,13 +128,13 @@ def format_value(value, format_type=None):
     return value
 
 
-def build_json_resource_obj(fields, resource, resource_name):
+def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
         ('id', extract_id(fields, resource)),
         ('attributes', extract_attributes(fields, resource)),
     ]
-    relationships = extract_relationships(fields, resource)
+    relationships = extract_relationships(fields, resource, resource_instance)
     if relationships:
         resource_data.append(('relationships', relationships))
     # Add 'self' link if field is present and valid
@@ -164,18 +164,6 @@ def get_related_resource_type(relation):
         else:
             raise APIException('Unable to find related model for relation {relation}'.format(relation=relation))
     return inflection.pluralize(relation_model.__name__).lower()
-
-
-def get_current_instance(fields, resource):
-    serializer_instance = fields.serializer.instance
-    if isinstance(serializer_instance, list):
-        current_id = extract_id(fields, resource)
-        for instance in serializer_instance:
-            # Search for our own instance
-            if encoding.force_text(instance.pk) == current_id:
-                return instance
-    else:
-        return serializer_instance
 
 
 def extract_id_from_url(url):
@@ -215,7 +203,7 @@ def extract_attributes(fields, resource):
     return format_keys(data)
 
 
-def extract_relationships(fields, resource):
+def extract_relationships(fields, resource, resource_instance):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -230,7 +218,7 @@ def extract_relationships(fields, resource):
             # special case for HyperlinkedRouterField
             relation_data = list()
             relation_type = get_related_resource_type(field)
-            related = getattr(get_current_instance(fields, resource), field_name).all()
+            related = getattr(resource_instance, field_name).all()
             for relation in related:
                 relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
 
