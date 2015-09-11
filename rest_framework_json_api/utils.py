@@ -13,6 +13,7 @@ from rest_framework.exceptions import APIException
 
 from django.utils.six.moves.urllib.parse import urlparse
 
+
 try:
     from rest_framework.compat import OrderedDict
 except ImportError:
@@ -22,6 +23,11 @@ try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
     ManyRelatedField = type(None)
+
+try:
+    from rest_framework_nested.relations import HyperlinkedRouterField
+except ImportError:
+    HyperlinkedRouterField = type(None)
 
 
 def get_resource_name(context):
@@ -122,13 +128,13 @@ def format_value(value, format_type=None):
     return value
 
 
-def build_json_resource_obj(fields, resource, resource_name):
+def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
         ('id', extract_id(fields, resource)),
         ('attributes', extract_attributes(fields, resource)),
     ]
-    relationships = extract_relationships(fields, resource)
+    relationships = extract_relationships(fields, resource, resource_instance)
     if relationships:
         resource_data.append(('relationships', relationships))
     # Add 'self' link if field is present and valid
@@ -139,9 +145,8 @@ def build_json_resource_obj(fields, resource, resource_name):
 
 
 def get_related_resource_type(relation):
-    queryset = relation.queryset
-    if queryset is not None:
-        relation_model = queryset.model
+    if hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
+        relation_model = relation.get_queryset().model
     else:
         parent_serializer = relation.parent
         if hasattr(parent_serializer, 'Meta'):
@@ -198,7 +203,7 @@ def extract_attributes(fields, resource):
     return format_keys(data)
 
 
-def extract_relationships(fields, resource):
+def extract_relationships(fields, resource, resource_instance):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -207,6 +212,24 @@ def extract_relationships(fields, resource):
 
         # Skip fields without relations
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
+            continue
+
+        if isinstance(field, HyperlinkedRouterField):
+            # special case for HyperlinkedRouterField
+            relation_data = list()
+            relation_type = get_related_resource_type(field)
+            related = getattr(resource_instance, field_name).all()
+            for relation in related:
+                relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
+
+            data.update({field_name: {
+                'links': {
+                    "related": resource.get(field_name)},
+                'data': relation_data,
+                'meta': {
+                    'count': len(relation_data)
+                }
+            }})
             continue
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):

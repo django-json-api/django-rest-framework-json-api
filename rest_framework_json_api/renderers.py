@@ -69,9 +69,11 @@ class JSONRenderer(renderers.JSONRenderer):
             fields = utils.get_serializer_fields(resource_serializer)
 
             json_api_data = list()
-            for resource in results:
+            for position in range(len(results)):
+                resource = results[position]  # Get current resource
+                resource_instance = resource_serializer.instance[position]  # Get current instance
                 json_api_data.append(
-                    utils.build_json_resource_obj(fields, resource, resource_name))
+                    utils.build_json_resource_obj(fields, resource, resource_instance, resource_name))
                 included = utils.extract_included(fields, resource)
                 if included:
                     json_api_included.extend(included)
@@ -79,7 +81,8 @@ class JSONRenderer(renderers.JSONRenderer):
             # Check if data contains a serializer
             if hasattr(data, 'serializer'):
                 fields = utils.get_serializer_fields(data.serializer)
-                json_api_data = utils.build_json_resource_obj(fields, data, resource_name)
+                resource_instance = data.serializer.instance
+                json_api_data = utils.build_json_resource_obj(fields, data, resource_instance, resource_name)
                 included = utils.extract_included(fields, data)
                 if included:
                     json_api_included.extend(included)
