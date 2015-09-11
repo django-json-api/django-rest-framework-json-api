@@ -13,6 +13,7 @@ from rest_framework.exceptions import APIException
 
 from django.utils.six.moves.urllib.parse import urlparse
 
+
 try:
     from rest_framework.compat import OrderedDict
 except ImportError:
@@ -165,6 +166,18 @@ def get_related_resource_type(relation):
     return inflection.pluralize(relation_model.__name__).lower()
 
 
+def get_current_instance(fields, resource):
+    serializer_instance = fields.serializer.instance
+    if isinstance(serializer_instance, list):
+        current_id = extract_id(fields, resource)
+        for instance in serializer_instance:
+            # Search for our own instance
+            if encoding.force_text(instance.pk) == current_id:
+                return instance
+    else:
+        return serializer_instance
+
+
 def extract_id_from_url(url):
     http_prefix = url.startswith(('http:', 'https:'))
     if http_prefix:
@@ -217,8 +230,7 @@ def extract_relationships(fields, resource):
             # special case for HyperlinkedRouterField
             relation_data = list()
             relation_type = get_related_resource_type(field)
-            parent_instance = field.parent.instance
-            related = getattr(parent_instance, field_name).all() if hasattr(parent_instance, field_name) else list()
+            related = getattr(get_current_instance(fields, resource), field_name).all()
             for relation in related:
                 relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
 
