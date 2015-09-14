@@ -223,7 +223,9 @@ def extract_relationships(fields, resource, resource_instance):
             # special case for HyperlinkedIdentityField
             relation_data = list()
             relation_type = get_related_resource_type(field)
-            related = getattr(resource_instance, field_name).all()
+            relation_manager = getattr(resource_instance, field_name)
+            # Don't try to query an empty relation
+            related = relation_manager.all() if relation_manager is not None else list()
             for relation in related:
                 relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
 
@@ -314,7 +316,7 @@ def extract_relationships(fields, resource, resource_instance):
     return format_keys(data)
 
 
-def extract_included(fields, resource):
+def extract_included(fields, resource, resource_instance):
     included_data = list()
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -335,8 +337,15 @@ def extract_included(fields, resource):
             serializer_fields = get_serializer_fields(serializer)
             serializer_data = resource.get(field_name)
             if isinstance(serializer_data, list):
-                for serializer_resource in serializer_data:
-                    included_data.append(build_json_resource_obj(serializer_fields, serializer_resource, relation_type))
+                for position in range(len(serializer_data)):
+                    serializer_resource = serializer_data[position]
+                    resource_instance_manager = getattr(resource_instance, field_name).all()
+                    nested_resource_instance = resource_instance_manager[position]
+                    included_data.append(
+                        build_json_resource_obj(
+                            serializer_fields, serializer_resource, nested_resource_instance, relation_type
+                        )
+                    )
 
         if isinstance(field, ModelSerializer):
 
@@ -346,7 +355,10 @@ def extract_included(fields, resource):
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
             serializer_data = resource.get(field_name)
+            nested_resource_instance = getattr(resource_instance, field_name).all()
             if serializer_data:
-                included_data.append(build_json_resource_obj(serializer_fields, serializer_data, relation_type))
+                included_data.append(
+                    build_json_resource_obj(serializer_fields, serializer_data, nested_resource_instance, relation_type)
+                )
 
     return format_keys(included_data)
