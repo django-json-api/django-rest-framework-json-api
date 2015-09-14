@@ -219,24 +219,6 @@ def extract_relationships(fields, resource, resource_instance):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        if isinstance(field, HyperlinkedRouterField):
-            # special case for HyperlinkedRouterField
-            relation_data = list()
-            relation_type = get_related_resource_type(field)
-            related = getattr(resource_instance, field_name).all()
-            for relation in related:
-                relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
-
-            data.update({field_name: {
-                'links': {
-                    "related": resource.get(field_name)},
-                'data': relation_data,
-                'meta': {
-                    'count': len(relation_data)
-                }
-            }})
-            continue
-
         if isinstance(field, HyperlinkedIdentityField):
             # special case for HyperlinkedIdentityField
             relation_data = list()
