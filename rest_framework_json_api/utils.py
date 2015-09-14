@@ -13,7 +13,6 @@ from rest_framework.exceptions import APIException
 
 from django.utils.six.moves.urllib.parse import urlparse
 
-
 try:
     from rest_framework.compat import OrderedDict
 except ImportError:
@@ -234,46 +233,39 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
             relation_type = get_related_resource_type(field)
+            relation_id = getattr(resource_instance, field_name).pk if resource.get(field_name) else None
 
-            if resource.get(field_name) is not None:
-                if isinstance(field, PrimaryKeyRelatedField):
-                    relation_id = encoding.force_text(resource.get(field_name))
-                elif isinstance(field, HyperlinkedRelatedField):
-                    relation_id = extract_id_from_url(resource.get(field_name))
-            else:
-                relation_id = None
+            relation_data = {
+                'data': (OrderedDict([
+                    ('type', relation_type), ('id', relation_id)
+                ]) if relation_id is not None else None)
+            }
 
-            data.update(
-                {
-                    field_name: {
-                        'data': (OrderedDict([
-                            ('type', relation_type), ('id', relation_id)
-                        ]) if relation_id is not None else None)
-                    }
-                }
+            relation_data.update(
+                {'links': {'related': resource.get(field_name)}}
+                if isinstance(field, HyperlinkedRelatedField) and resource.get(field_name) else {}
             )
+            data.update({field_name: relation_data})
             continue
 
         if isinstance(field, ManyRelatedField):
             relation_data = list()
-
             relation = field.child_relation
-
             relation_type = get_related_resource_type(relation)
-
-            if isinstance(relation, HyperlinkedRelatedField):
-                for link in resource.get(field_name, list()):
-                    relation_data.append(OrderedDict([('type', relation_type), ('id', extract_id_from_url(link))]))
-
-                data.update({field_name: {'data': relation_data}})
-                continue
-
-            if isinstance(relation, PrimaryKeyRelatedField):
-                for pk in resource.get(field_name, list()):
-                    relation_data.append(OrderedDict([('type', relation_type), ('id', encoding.force_text(pk))]))
-
-                data.update({field_name: {'data': relation_data}})
-                continue
+            for related_object in getattr(resource_instance, field_name).all():
+                relation_data.append(OrderedDict([
+                    ('type', relation_type),
+                    ('id', encoding.force_text(related_object.pk))
+                ]))
+            data.update({
+                field_name: {
+                    'data': relation_data,
+                    'meta': {
+                        'count': len(relation_data)
+                    }
+                }
+            })
+            continue
 
         if isinstance(field, ListSerializer):
             relation_data = list()
