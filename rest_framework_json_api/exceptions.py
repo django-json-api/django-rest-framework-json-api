@@ -35,17 +35,8 @@ def exception_handler(exc, context):
                 errors.append({
                     'detail': error
                 })
-            else:
-                if isinstance(error, list):
-                    for message in error:
-                        errors.append({
-                            'detail': message,
-                            'source': {
-                                'pointer': pointer,
-                            },
-                            'status': encoding.force_text(response.status_code),
-                        })
-                else:
+            elif isinstance(error, list):
+                for message in error:
                     errors.append({
                         'detail': message,
                         'source': {
@@ -53,6 +44,14 @@ def exception_handler(exc, context):
                         },
                         'status': encoding.force_text(response.status_code),
                     })
+            else:
+                errors.append({
+                    'detail': message,
+                    'source': {
+                        'pointer': pointer,
+                    },
+                    'status': encoding.force_text(response.status_code),
+                })
 
 
     context['view'].resource_name = 'errors'
