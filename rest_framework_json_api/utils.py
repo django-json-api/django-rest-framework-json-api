@@ -7,7 +7,8 @@ from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
-from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField
+from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
+    HyperlinkedIdentityField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
 
@@ -152,10 +153,15 @@ def get_related_resource_type(relation):
             parent_model = parent_serializer.Meta.model
         else:
             parent_model = parent_serializer.parent.Meta.model
-        parent_model_relation = getattr(
-            parent_model,
-            (relation.source if relation.source else parent_serializer.field_name)
-        )
+
+        if relation.source:
+            if relation.source != '*':
+                parent_model_relation = getattr(parent_model, relation.source)
+            else:
+                parent_model_relation = getattr(parent_model, relation.field_name)
+        else:
+            parent_model_relation = getattr(parent_model, parent_serializer.field_name)
+
         if hasattr(parent_model_relation, 'related'):
             relation_model = parent_model_relation.related.model
         elif hasattr(parent_model_relation, 'field'):
@@ -213,8 +219,8 @@ def extract_relationships(fields, resource, resource_instance):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        if isinstance(field, HyperlinkedRouterField):
-            # special case for HyperlinkedRouterField
+        if isinstance(field, HyperlinkedIdentityField):
+            # special case for HyperlinkedIdentityField
             relation_data = list()
             relation_type = get_related_resource_type(field)
             related = getattr(resource_instance, field_name).all()
