@@ -166,19 +166,6 @@ def get_related_resource_type(relation):
     return inflection.pluralize(relation_model.__name__).lower()
 
 
-def extract_id_from_url(url):
-    http_prefix = url.startswith(('http:', 'https:'))
-    if http_prefix:
-        # If needed convert absolute URLs to relative path
-        data = urlparse(url).path
-        prefix = urlresolvers.get_script_prefix()
-        if data.startswith(prefix):
-            url = '/' + data[len(prefix):]
-
-    match = urlresolvers.resolve(url)
-    return encoding.force_text(match.kwargs['pk'])
-
-
 def extract_attributes(fields, resource):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
@@ -228,10 +215,7 @@ def extract_relationships(fields, resource, resource_instance):
             relation_type = get_related_resource_type(field)
 
             if resource.get(field_name) is not None:
-                if isinstance(field, PrimaryKeyRelatedField):
-                    relation_id = encoding.force_text(resource.get(field_name))
-                elif isinstance(field, HyperlinkedRelatedField):
-                    relation_id = extract_id_from_url(resource.get(field_name))
+                relation_id = getattr(resource_instance, field_name).id
             else:
                 relation_id = None
 
@@ -250,19 +234,14 @@ def extract_relationships(fields, resource, resource_instance):
             relation_data = list()
 
             relation = field.child_relation
-
             relation_type = get_related_resource_type(relation)
-
-            if isinstance(relation, HyperlinkedRelatedField):
-                for link in resource.get(field_name, list()):
-                    relation_data.append(OrderedDict([('type', relation_type), ('id', extract_id_from_url(link))]))
-
-                data.update({field_name: {'data': relation_data}})
-                continue
-
-            if isinstance(relation, PrimaryKeyRelatedField):
-                for pk in resource.get(field_name, list()):
-                    relation_data.append(OrderedDict([('type', relation_type), ('id', encoding.force_text(pk))]))
+            nested_resource_queryset = getattr(resource_instance, field_name).all()
+            if isinstance(relation, (HyperlinkedRelatedField, PrimaryKeyRelatedField)):
+                for position in range(len(nested_resource_queryset)):
+                    nested_resource_instance = nested_resource_queryset[position]
+                    relation_data.append(
+                        OrderedDict([('type', relation_type), ('id', encoding.force_text(nested_resource_instance.pk))])
+                    )
 
                 data.update({field_name: {'data': relation_data}})
                 continue
@@ -275,10 +254,10 @@ def extract_relationships(fields, resource, resource_instance):
             relation_type = inflection.pluralize(relation_model.__name__).lower()
 
             serializer_data = resource.get(field_name)
+            resource_instance_queryset = getattr(resource_instance, field_name).all()
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
-                    resource_instance_manager = getattr(resource_instance, field_name).all()
-                    nested_resource_instance = resource_instance_manager[position]
+                    nested_resource_instance = resource_instance_queryset[position]
                     relation_data.append(
                         OrderedDict([
                             ('type', relation_type), ('id', encoding.force_text(nested_resource_instance.pk))
