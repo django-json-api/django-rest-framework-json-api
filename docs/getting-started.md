@@ -53,7 +53,7 @@ like the following:
 
 1. Python >= 2.7
 2. Django
-3. Django REST Framework >= 2.4
+3. Django REST Framework >= 3.1
 
 ## Installation
 

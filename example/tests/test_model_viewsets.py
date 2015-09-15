@@ -5,6 +5,7 @@ from django.utils import encoding
 from django.core.urlresolvers import reverse
 
 from example.tests import TestBase
+from example.tests.utils import dump_json, redump_json
 
 
 class ModelViewSetTests(TestBase):
@@ -30,28 +31,36 @@ class ModelViewSetTests(TestBase):
 
         user = get_user_model().objects.all()[0]
         expected = {
-            u'data': [{
-                u'type': u'users',
-                u'id': encoding.force_text(user.pk),
-                u'attributes': {
-                    u'first-name': user.first_name,
-                    u'last-name': user.last_name,
-                    u'email': user.email
-                },
-            }]
+            'data': [
+                {
+                    'type': 'users',
+                    'id': encoding.force_text(user.pk),
+                    'attributes': {
+                        'first-name': user.first_name,
+                        'last-name': user.last_name,
+                        'email': user.email
+                    },
+                }
+            ],
+            'links': {
+                'first': 'http://testserver/identities?page=1',
+                'last': 'http://testserver/identities?page=2',
+                'next': 'http://testserver/identities?page=2',
+                'prev': None
+            },
+            'meta': {
+                'pagination': {
+                    'page': 1,
+                    'pages': 2,
+                    'count': 2
+                }
+            }
         }
 
-        json_content = json.loads(response.content.decode('utf8'))
-        links = json_content.get('links')
-        meta = json_content.get('meta').get('pagination')
-        self.assertEquals(expected.get('data'), json_content.get('data'))
-        self.assertEquals(meta.get('pages'), 2)
-        self.assertEquals(meta.get('count', 0),
-            get_user_model().objects.count())
-        self.assertEqual(u'http://testserver/identities?page=2',
-            links.get('next'))
-        self.assertEqual(meta.get('page'), 1)
-        self.assertIsNone(links.get('prev'))
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump
 
     def test_page_two_in_list_result(self):
         """
@@ -62,34 +71,36 @@ class ModelViewSetTests(TestBase):
 
         user = get_user_model().objects.all()[1]
         expected = {
-            u'data': [{
-                u'type': u'users',
-                u'id': encoding.force_text(user.pk),
-                u'attributes': {
-                    u'first-name': user.first_name,
-                    u'last-name': user.last_name,
-                    u'email': user.email
+            'data': [
+                {
+                'type': 'users',
+                'id': encoding.force_text(user.pk),
+                'attributes': {
+                    'first-name': user.first_name,
+                    'last-name': user.last_name,
+                    'email': user.email
                 },
-            }]
+            }
+            ],
+            'links': {
+                'first': 'http://testserver/identities?page=1',
+                'last': 'http://testserver/identities?page=2',
+                'next': None,
+                'prev': 'http://testserver/identities?page=1',
+            },
+            'meta': {
+                'pagination': {
+                    'page': 2,
+                    'pages': 2,
+                    'count': 2
+                }
+            }
         }
 
-        json_content = json.loads(response.content.decode('utf8'))
-        links = json_content.get('links')
-        meta = json_content.get('meta').get('pagination')
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
-        self.assertEquals(meta.get('count', 0),
-            get_user_model().objects.count())
-        self.assertEqual(meta.get('page'), 2)
-        self.assertIsNone(links.get('next'))
-
-        # Older versions of DRF add page=1 for first page. Later trim to root
-        try:
-            self.assertEqual(u'http://testserver/identities',
-                links.get('prev'))
-        except AssertionError:
-            self.assertEqual(u'http://testserver/identities?page=1',
-                links.get('prev'))
+        assert expected_dump == content_dump
 
     def test_page_range_in_list_result(self):
         """
@@ -102,31 +113,45 @@ class ModelViewSetTests(TestBase):
 
         users = get_user_model().objects.all()
         expected = {
-            u'data': [{
-                u'type': u'users',
-                u'id': users[0].pk,
-                u'attributes': {
-                    u'first-name': users[0].first_name,
-                    u'last-name': users[0].last_name,
-                    u'email': users[0].email
+            'data': [
+                {
+                    'type': 'users',
+                    'id': encoding.force_text(users[0].pk),
+                    'attributes': {
+                        'first-name': users[0].first_name,
+                        'last-name': users[0].last_name,
+                        'email': users[0].email
+                    },
                 },
-            },{
-                u'type': u'users',
-                u'id': users[1].pk,
-                u'attributes': {
-                    u'first-name': users[1].first_name,
-                    u'last-name': users[1].last_name,
-                    u'email': users[1].email
-                },
-            }]
+                {
+                    'type': 'users',
+                    'id': encoding.force_text(users[1].pk),
+                    'attributes': {
+                        'first-name': users[1].first_name,
+                        'last-name': users[1].last_name,
+                        'email': users[1].email
+                    },
+                }
+            ],
+            'links': {
+                'first': 'http://testserver/identities?page=1&page_size=2',
+                'last': 'http://testserver/identities?page=1&page_size=2',
+                'next': None,
+                'prev': None
+            },
+            'meta': {
+                'pagination': {
+                    'page': 1,
+                    'pages': 1,
+                    'count': 2
+                }
+            }
         }
 
-        json_content = json.loads(response.content.decode('utf8'))
-        meta = json_content.get('meta').get('pagination')
-        self.assertEquals(expected.get('users'), json_content.get('user'))
-        self.assertEquals(meta.get('count', 0),
-            get_user_model().objects.count())
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
 
+        assert expected_dump == content_dump
 
     def test_key_in_detail_result(self):
         """
@@ -135,19 +160,22 @@ class ModelViewSetTests(TestBase):
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
 
-        result = json.loads(response.content.decode('utf8'))
         expected = {
-            u'data': {
-                u'type': u'users',
-                u'id': encoding.force_text(self.miles.pk),
-                u'attributes': {
-                    u'first-name': self.miles.first_name,
-                    u'last-name': self.miles.last_name,
-                    u'email': self.miles.email
+            'data': {
+                'type': 'users',
+                'id': encoding.force_text(self.miles.pk),
+                'attributes': {
+                    'first-name': self.miles.first_name,
+                    'last-name': self.miles.last_name,
+                    'email': self.miles.email
                 },
             }
         }
-        self.assertEqual(result, expected)
+
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump
 
     def test_key_in_post(self):
         """
@@ -155,24 +183,25 @@ class ModelViewSetTests(TestBase):
         """
         self.client.login(username='miles', password='pw')
         data = {
-            u'data': {
-                u'type': u'users',
-                u'id': self.miles.pk,
-                u'attributes': {
-                    u'first-name': self.miles.first_name,
-                    u'last-name': self.miles.last_name,
-                    u'email': 'miles@trumpet.org'
+            'data': {
+                'type': 'users',
+                'id': encoding.force_text(self.miles.pk),
+                'attributes': {
+                    'first-name': self.miles.first_name,
+                    'last-name': self.miles.last_name,
+                    'email': 'miles@trumpet.org'
                 },
             }
         }
-        data_attributes = data['data']['attributes']
-        response = self.client.put(self.detail_url, content_type='application/vnd.api+json', data=json.dumps(data))
 
-        result = json.loads(response.content.decode('utf8'))
-        result_attributes = result['data']['attributes']
+        response = self.client.put(self.detail_url,
+                                   content_type='application/vnd.api+json',
+                                   data=dump_json(data))
 
-        self.assertEqual(data_attributes.keys(), result_attributes.keys())
-        self.assertEqual(result_attributes['email'], 'miles@trumpet.org')
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(data)
+
+        assert expected_dump == content_dump
 
         # is it updated?
         self.assertEqual(

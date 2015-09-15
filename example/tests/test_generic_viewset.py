@@ -1,7 +1,10 @@
 import json
-from example.tests import TestBase
+
 from django.core.urlresolvers import reverse
 from django.conf import settings
+
+from example.tests import TestBase
+from example.tests.utils import dump_json, redump_json
 
 
 class GenericViewSet(TestBase):
@@ -17,15 +20,19 @@ class GenericViewSet(TestBase):
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            json.loads(response.content.decode('utf8')),
-            {
-                'id': 2,
-                'first_name': u'Miles',
-                'last_name': u'Davis',
-                'email': u'miles@example.com'
-            }
-        )
+
+        expected = {
+            'id': 2,
+            'first_name': 'Miles',
+            'last_name': 'Davis',
+            'email': 'miles@example.com'
+        }
+
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump
+
 
     def test_ember_expected_renderer(self):
         """
@@ -36,20 +43,23 @@ class GenericViewSet(TestBase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            json.loads(response.content.decode('utf8')),
-            {
-                'data': {
-                    'type': 'data',
-                    'id': '2',
-                    'attributes': {
-                        'first-name': u'Miles',
-                        'last-name': u'Davis',
-                        'email': u'miles@example.com'
-                    }
+
+        expected = {
+            'data': {
+                'type': 'data',
+                'id': '2',
+                'attributes': {
+                    'first-name': 'Miles',
+                    'last-name': 'Davis',
+                    'email': 'miles@example.com'
                 }
             }
-        )
+        }
+
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump
 
     def test_default_validation_exceptions(self):
         """
@@ -75,7 +85,11 @@ class GenericViewSet(TestBase):
         }
         response = self.client.post('/identities', {
             'email': 'bar', 'first_name': 'alajflajaljalajlfjafljalj'})
-        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
+
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump
 
     def test_custom_validation_exceptions(self):
         """
@@ -99,4 +113,8 @@ class GenericViewSet(TestBase):
         }
         response = self.client.post('/identities', {
             'email': 'bar', 'last_name': 'alajflajaljalajlfjafljalj'})
-        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
+
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump

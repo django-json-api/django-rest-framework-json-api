@@ -72,7 +72,7 @@ setup(
     package_data=get_package_data('rest_framework_json_api'),
     install_requires=[
         'django',
-        'djangorestframework>=2.4.0',
+        'djangorestframework>=3.1.0',
         'inflection>=0.3.0'
     ],
     classifiers=[

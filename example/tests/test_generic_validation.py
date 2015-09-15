@@ -1,8 +1,12 @@
 import json
-from example.tests import TestBase
+
 from django.core.urlresolvers import reverse
 from django.conf import settings
+
 from rest_framework.serializers import ValidationError
+
+from example.tests import TestBase
+from example.tests.utils import dump_json, redump_json
 
 
 class GenericValidationTest(TestBase):
@@ -20,7 +24,6 @@ class GenericValidationTest(TestBase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 400)
 
-        result = json.loads(response.content.decode('utf8'))
         expected = {
             'errors': [{
                 'status': '400',
@@ -30,4 +33,8 @@ class GenericValidationTest(TestBase):
                 'detail': 'Oh nohs!'
             }]
         }
-        self.assertEqual(result, expected)
+
+        content_dump = redump_json(response.content)
+        expected_dump = dump_json(expected)
+
+        assert expected_dump == content_dump
