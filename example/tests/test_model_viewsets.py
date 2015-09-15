@@ -62,10 +62,6 @@ class ModelViewSetTests(TestBase):
 
         assert expected_dump == content_dump
 
-        # WHY zero?
-        # self.assertEquals(meta.get('count', 0),
-        #     get_user_model().objects.count())
-
     def test_page_two_in_list_result(self):
         """
         Ensure that the second page is reachable and is the correct data.
@@ -156,10 +152,6 @@ class ModelViewSetTests(TestBase):
         expected_dump = dump_json(expected)
 
         assert expected_dump == content_dump
-
-        # WHY zero?
-        # self.assertEquals(meta.get('count', 0),
-        #     get_user_model().objects.count())
 
     def test_key_in_detail_result(self):
         """
