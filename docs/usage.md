@@ -55,7 +55,7 @@ If you set the `resource_name` property on the object to `False` the data
 will be returned without modification.
 
 
-### Inflecting object keys
+### Inflecting object and relation keys
 
 This package includes the ability (off by default) to automatically convert json
 requests and responses from the python/rest_framework's preferred underscore to
@@ -119,6 +119,60 @@ Example - With format conversion set to `dasherize`:
     }
 }
 ```
+
+#### Relationship types
+
+A similar option to JSON\_API\_FORMAT\_KEYS can be set for the relationship names:
+
+``` python
+JSON_API_FORMAT_RELATION_KEYS = 'dasherize'
+```
+
+Example without format conversion:
+
+``` js
+{
+	"data": [{
+        "type": "identities",
+        "id": 3,
+        "attributes": {
+                ...
+        },
+        "relationships": {
+            "home_town": {
+                "data": [{
+                    "type": "home_town",
+                    "id": 3
+                }]
+            }
+        }
+    }]
+}
+```
+
+When set to dasherize:
+
+
+``` js
+{
+	"data": [{
+        "type": "identities",
+        "id": 3,
+        "attributes": {
+                ...
+        },
+        "relationships": {
+            "home_town": {
+                "data": [{
+                    "type": "home-town",
+                    "id": 3
+                }]
+            }
+        }
+    }]
+}
+```
+
 
 <!-- 
 ### Relationships

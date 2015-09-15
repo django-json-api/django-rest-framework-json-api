@@ -128,6 +128,21 @@ def format_value(value, format_type=None):
     return value
 
 
+def format_relation_name(value, format_type=None):
+    format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
+
+    value = inflection.underscore(value)
+
+    if format_type == 'dasherize':
+        value = inflection.dasherize(value)
+    elif format_type == 'camelize':
+        value = inflection.camelize(value)
+    elif format_type == 'underscore':
+        value = inflection.underscore(value)
+
+    return inflection.pluralize(value)
+
+
 def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
@@ -168,7 +183,7 @@ def get_related_resource_type(relation):
             relation_model = parent_model_relation.field.related.model
         else:
             raise APIException('Unable to find related model for relation {relation}'.format(relation=relation))
-    return inflection.pluralize(relation_model.__name__).lower()
+    return format_relation_name(relation_model.__name__)
 
 
 def extract_id_from_url(url):
@@ -280,7 +295,7 @@ def extract_relationships(fields, resource, resource_instance):
 
             serializer = field.child
             relation_model = serializer.Meta.model
-            relation_type = inflection.pluralize(relation_model.__name__).lower()
+            relation_type = format_relation_name(relation_model.__name__)
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
@@ -297,7 +312,7 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, ModelSerializer):
             relation_model = field.Meta.model
-            relation_type = inflection.pluralize(relation_model.__name__).lower()
+            relation_type = format_relation_name(relation_model.__name__)
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
@@ -331,7 +346,7 @@ def extract_included(fields, resource, resource_instance):
 
             serializer = field.child
             model = serializer.Meta.model
-            relation_type = inflection.pluralize(model.__name__).lower()
+            relation_type = format_relation_name(model.__name__)
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
@@ -350,7 +365,7 @@ def extract_included(fields, resource, resource_instance):
         if isinstance(field, ModelSerializer):
 
             model = field.Meta.model
-            relation_type = inflection.pluralize(model.__name__).lower()
+            relation_type = format_relation_name(model.__name__)
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
