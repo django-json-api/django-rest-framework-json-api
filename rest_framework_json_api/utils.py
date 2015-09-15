@@ -118,7 +118,8 @@ def format_keys(obj, format_type=None):
 
 
 def format_value(value, format_type=None):
-    format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+    if format_type is None:
+        format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
     if format_type == 'dasherize':
         value = inflection.dasherize(value)
     elif format_type == 'camelize':
@@ -129,16 +130,11 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
-    format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
+    if format_type is None:
+        format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
 
-    value = inflection.underscore(value)
-
-    if format_type == 'dasherize':
-        value = inflection.dasherize(value)
-    elif format_type == 'camelize':
-        value = inflection.camelize(value)
-    elif format_type == 'underscore':
-        value = inflection.underscore(value)
+    # format_type will never be None here so we can use format_value
+    value = format_value(value, format_type)
 
     return inflection.pluralize(value)
 
