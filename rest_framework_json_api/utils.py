@@ -146,12 +146,15 @@ def format_relation_name(value, format_type=None):
 def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
-        ('id', encoding.force_text(resource_instance.pk)),
-        ('attributes', extract_attributes(fields, resource)),
     ]
-    relationships = extract_relationships(fields, resource, resource_instance)
-    if relationships:
-        resource_data.append(('relationships', relationships))
+    if resource_instance:
+        resource_data.append(('id', encoding.force_text(resource_instance.pk)))
+
+    resource_data.append(('attributes', extract_attributes(fields, resource)))
+    if resource_instance:
+        relationships = extract_relationships(fields, resource, resource_instance)
+        if relationships:
+            resource_data.append(('relationships', relationships))
     # Add 'self' link if field is present and valid
     if api_settings.URL_FIELD_NAME in resource and \
             isinstance(fields[api_settings.URL_FIELD_NAME], RelatedField):
