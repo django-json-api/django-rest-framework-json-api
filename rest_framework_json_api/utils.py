@@ -146,7 +146,7 @@ def format_relation_name(value, format_type=None):
 def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
-        ('id', encoding.force_text(resource_instance.pk)),
+        ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
         ('attributes', extract_attributes(fields, resource)),
     ]
     relationships = extract_relationships(fields, resource, resource_instance)
@@ -204,6 +204,11 @@ def extract_attributes(fields, resource):
 
 def extract_relationships(fields, resource, resource_instance):
     data = OrderedDict()
+
+    # Don't try to extract relationships from a non-existent resource
+    if resource_instance is None:
+        return
+
     for field_name, field in six.iteritems(fields):
         # Skip URL field
         if field_name == api_settings.URL_FIELD_NAME:
