@@ -7,12 +7,12 @@ from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
-from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField
+from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
+    HyperlinkedIdentityField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
 
 from django.utils.six.moves.urllib.parse import urlparse
-
 
 try:
     from rest_framework.compat import OrderedDict
@@ -153,10 +153,15 @@ def get_related_resource_type(relation):
             parent_model = parent_serializer.Meta.model
         else:
             parent_model = parent_serializer.parent.Meta.model
-        parent_model_relation = getattr(
-            parent_model,
-            (relation.source if relation.source else parent_serializer.field_name)
-        )
+
+        if relation.source:
+            if relation.source != '*':
+                parent_model_relation = getattr(parent_model, relation.source)
+            else:
+                parent_model_relation = getattr(parent_model, relation.field_name)
+        else:
+            parent_model_relation = getattr(parent_model, parent_serializer.field_name)
+
         if hasattr(parent_model_relation, 'related'):
             relation_model = parent_model_relation.related.model
         elif hasattr(parent_model_relation, 'field'):
@@ -193,11 +198,13 @@ def extract_relationships(fields, resource, resource_instance):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        if isinstance(field, HyperlinkedRouterField):
-            # special case for HyperlinkedRouterField
+        if isinstance(field, HyperlinkedIdentityField):
+            # special case for HyperlinkedIdentityField
             relation_data = list()
             relation_type = get_related_resource_type(field)
-            related = getattr(resource_instance, field_name).all()
+            relation_manager = getattr(resource_instance, field_name)
+            # Don't try to query an empty relation
+            related = relation_manager.all() if relation_manager is not None else list()
             for relation in related:
                 relation_data.append(OrderedDict([('type', relation_type), ('id', encoding.force_text(relation.pk))]))
 
@@ -213,38 +220,39 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
             relation_type = get_related_resource_type(field)
+            relation_id = getattr(resource_instance, field_name).pk if resource.get(field_name) else None
 
-            if resource.get(field_name) is not None:
-                relation_id = getattr(resource_instance, field_name).id
-            else:
-                relation_id = None
+            relation_data = {
+                'data': (OrderedDict([
+                    ('type', relation_type), ('id', encoding.force_text(relation_id))
+                ]) if relation_id is not None else None)
+            }
 
-            data.update(
-                {
-                    field_name: {
-                        'data': (OrderedDict([
-                            ('type', relation_type), ('id', encoding.force_text(relation_id))
-                        ]) if relation_id is not None else None)
-                    }
-                }
+            relation_data.update(
+                {'links': {'related': resource.get(field_name)}}
+                if isinstance(field, HyperlinkedRelatedField) and resource.get(field_name) else {}
             )
+            data.update({field_name: relation_data})
             continue
 
         if isinstance(field, ManyRelatedField):
             relation_data = list()
-
             relation = field.child_relation
             relation_type = get_related_resource_type(relation)
-            nested_resource_queryset = getattr(resource_instance, field_name).all()
-            if isinstance(relation, (HyperlinkedRelatedField, PrimaryKeyRelatedField)):
-                for position in range(len(nested_resource_queryset)):
-                    nested_resource_instance = nested_resource_queryset[position]
-                    relation_data.append(
-                        OrderedDict([('type', relation_type), ('id', encoding.force_text(nested_resource_instance.pk))])
-                    )
-
-                data.update({field_name: {'data': relation_data}})
-                continue
+            for related_object in getattr(resource_instance, field_name).all():
+                relation_data.append(OrderedDict([
+                    ('type', relation_type),
+                    ('id', encoding.force_text(related_object.pk))
+                ]))
+            data.update({
+                field_name: {
+                    'data': relation_data,
+                    'meta': {
+                        'count': len(relation_data)
+                    }
+                }
+            })
+            continue
 
         if isinstance(field, ListSerializer):
             relation_data = list()
@@ -284,7 +292,7 @@ def extract_relationships(fields, resource, resource_instance):
     return format_keys(data)
 
 
-def extract_included(fields, resource):
+def extract_included(fields, resource, resource_instance):
     included_data = list()
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -305,8 +313,15 @@ def extract_included(fields, resource):
             serializer_fields = get_serializer_fields(serializer)
             serializer_data = resource.get(field_name)
             if isinstance(serializer_data, list):
-                for serializer_resource in serializer_data:
-                    included_data.append(build_json_resource_obj(serializer_fields, serializer_resource, relation_type))
+                for position in range(len(serializer_data)):
+                    serializer_resource = serializer_data[position]
+                    resource_instance_manager = getattr(resource_instance, field_name).all()
+                    nested_resource_instance = resource_instance_manager[position]
+                    included_data.append(
+                        build_json_resource_obj(
+                            serializer_fields, serializer_resource, nested_resource_instance, relation_type
+                        )
+                    )
 
         if isinstance(field, ModelSerializer):
 
@@ -316,7 +331,10 @@ def extract_included(fields, resource):
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
             serializer_data = resource.get(field_name)
+            nested_resource_instance = getattr(resource_instance, field_name).all()
             if serializer_data:
-                included_data.append(build_json_resource_obj(serializer_fields, serializer_data, relation_type))
+                included_data.append(
+                    build_json_resource_obj(serializer_fields, serializer_data, nested_resource_instance, relation_type)
+                )
 
     return format_keys(included_data)

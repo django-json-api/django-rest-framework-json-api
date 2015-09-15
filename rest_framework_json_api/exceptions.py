@@ -29,7 +29,13 @@ def exception_handler(exc, context):
             # see if they passed a dictionary to ValidationError manually
             if isinstance(error, dict):
                 errors.append(error)
-            else:
+            # or a string in case of AuthenticationError
+            elif isinstance(error, str):
+                # An error MUST be a JSON object in JSON API spec
+                errors.append({
+                    'detail': error
+                })
+            elif isinstance(error, list):
                 for message in error:
                     errors.append({
                         'detail': message,
@@ -38,6 +44,15 @@ def exception_handler(exc, context):
                         },
                         'status': encoding.force_text(response.status_code),
                     })
+            else:
+                errors.append({
+                    'detail': message,
+                    'source': {
+                        'pointer': pointer,
+                    },
+                    'status': encoding.force_text(response.status_code),
+                })
+
 
     context['view'].resource_name = 'errors'
     response.data = errors
