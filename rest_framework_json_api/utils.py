@@ -131,7 +131,7 @@ def format_value(value, format_type=None):
 def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
-        ('id', resource_instance.pk),
+        ('id', encoding.force_text(resource_instance.pk)),
         ('attributes', extract_attributes(fields, resource)),
     ]
     relationships = extract_relationships(fields, resource, resource_instance)
@@ -212,7 +212,7 @@ def extract_relationships(fields, resource, resource_instance):
             relation_type = get_related_resource_type(field)
             related = getattr(resource_instance, field_name).all()
             for relation in related:
-                relation_data.append(OrderedDict([('type', relation_type), ('id', relation.pk)]))
+                relation_data.append(OrderedDict([('type', relation_type), ('id', encoding.force_text(relation.pk))]))
 
             data.update({field_name: {
                 'links': {
@@ -239,7 +239,7 @@ def extract_relationships(fields, resource, resource_instance):
                 {
                     field_name: {
                         'data': (OrderedDict([
-                            ('type', relation_type), ('id', relation_id)
+                            ('type', relation_type), ('id', encoding.force_text(relation_id))
                         ]) if relation_id is not None else None)
                     }
                 }
@@ -281,7 +281,7 @@ def extract_relationships(fields, resource, resource_instance):
                     nested_resource_instance = resource_instance_manager[position]
                     relation_data.append(
                         OrderedDict([
-                            ('type', relation_type), ('id', nested_resource_instance.pk)
+                            ('type', relation_type), ('id', encoding.force_text(nested_resource_instance.pk))
                         ]))
 
                 data.update({field_name: {'data': relation_data}})
@@ -296,7 +296,7 @@ def extract_relationships(fields, resource, resource_instance):
                     'data': (
                         OrderedDict([
                             ('type', relation_type),
-                            ('id', getattr(resource_instance, field_name).pk)
+                            ('id', encoding.force_text(getattr(resource_instance, field_name).pk))
                         ]) if resource.get(field_name) else None)
                 }
             })
