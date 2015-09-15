@@ -198,10 +198,11 @@ def extract_relationships(fields, resource, resource_instance):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
+        relation_type = get_related_resource_type(field)
+
         if isinstance(field, HyperlinkedIdentityField):
             # special case for HyperlinkedIdentityField
             relation_data = list()
-            relation_type = get_related_resource_type(field)
             relation_manager = getattr(resource_instance, field_name)
             # Don't try to query an empty relation
             related = relation_manager.all() if relation_manager is not None else list()
@@ -219,7 +220,6 @@ def extract_relationships(fields, resource, resource_instance):
             continue
 
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
-            relation_type = get_related_resource_type(field)
             relation_id = getattr(resource_instance, field_name).pk if resource.get(field_name) else None
 
             relation_data = {
@@ -256,7 +256,6 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, ListSerializer):
             relation_data = list()
-
             serializer = field.child
             relation_model = serializer.Meta.model
             relation_type = inflection.pluralize(relation_model.__name__).lower()
