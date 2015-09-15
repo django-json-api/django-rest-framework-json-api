@@ -202,9 +202,9 @@ def extract_id_from_url(url):
 def extract_id(fields, resource):
     for field_name, field in six.iteritems(fields):
         if field_name == 'id':
-            return encoding.force_text(resource.get(field_name))
+            return encoding.force_text(resource.get(field_name)) if resource.get(field_name) else None
         if field_name == api_settings.URL_FIELD_NAME:
-            return extract_id_from_url(resource.get(field_name))
+            return extract_id_from_url(resource.get(field_name)) if resource.get(field_name) else None
 
 
 def extract_attributes(fields, resource):
