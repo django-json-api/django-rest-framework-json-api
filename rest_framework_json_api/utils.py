@@ -131,7 +131,7 @@ def format_value(value, format_type=None):
 def build_json_resource_obj(fields, resource, resource_instance, resource_name):
     resource_data = [
         ('type', resource_name),
-        ('id', extract_id(fields, resource)),
+        ('id', resource_instance.pk),
         ('attributes', extract_attributes(fields, resource)),
     ]
     relationships = extract_relationships(fields, resource, resource_instance)
@@ -179,18 +179,10 @@ def extract_id_from_url(url):
     return encoding.force_text(match.kwargs['pk'])
 
 
-def extract_id(fields, resource):
-    for field_name, field in six.iteritems(fields):
-        if field_name == 'id':
-            return encoding.force_text(resource.get(field_name))
-        if field_name == api_settings.URL_FIELD_NAME:
-            return extract_id_from_url(resource.get(field_name))
-
-
 def extract_attributes(fields, resource):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
-        # ID is always provided in the root of JSON API so remove it from attrs
+        # ID is always provided in the root of JSON API so remove it from attributes
         if field_name == 'id':
             continue
         # Skip fields with relations
@@ -282,14 +274,14 @@ def extract_relationships(fields, resource, resource_instance):
             relation_model = serializer.Meta.model
             relation_type = inflection.pluralize(relation_model.__name__).lower()
 
-            # Get the serializer fields
-            serializer_fields = get_serializer_fields(serializer)
             serializer_data = resource.get(field_name)
             if isinstance(serializer_data, list):
-                for serializer_resource in serializer_data:
+                for position in range(len(serializer_data)):
+                    resource_instance_manager = getattr(resource_instance, field_name).all()
+                    nested_resource_instance = resource_instance_manager[position]
                     relation_data.append(
                         OrderedDict([
-                            ('type', relation_type), ('id', extract_id(serializer_fields, serializer_resource))
+                            ('type', relation_type), ('id', nested_resource_instance.pk)
                         ]))
 
                 data.update({field_name: {'data': relation_data}})
@@ -299,15 +291,12 @@ def extract_relationships(fields, resource, resource_instance):
             relation_model = field.Meta.model
             relation_type = inflection.pluralize(relation_model.__name__).lower()
 
-            # Get the serializer fields
-            serializer_fields = get_serializer_fields(field)
-            serializer_data = resource.get(field_name)
             data.update({
                 field_name: {
                     'data': (
                         OrderedDict([
                             ('type', relation_type),
-                            ('id', extract_id(serializer_fields, serializer_data))
+                            ('id', getattr(resource_instance, field_name).pk)
                         ]) if resource.get(field_name) else None)
                 }
             })
