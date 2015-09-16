@@ -1,14 +1,12 @@
 from collections import OrderedDict
+
 from django.db.models.fields import related
-from django.http import Http404
 from django.utils.encoding import force_text
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.metadata import BaseMetadata, SimpleMetadata
-from rest_framework.request import clone_request
+from rest_framework.metadata import SimpleMetadata
 from rest_framework.utils.field_mapping import ClassLookupDict
-from rest_framework_json_api import exceptions
-from rest_framework_json_api.utils import format_relation_name, get_related_resource_type
+
+from rest_framework_json_api.utils import get_related_resource_type
 
 
 class JSONAPIMetadata(SimpleMetadata):
