@@ -17,6 +17,7 @@ class JSONAPIMetadata(SimpleMetadata):
     for us to base this on.
     """
     type_lookup = ClassLookupDict({
+        serializers.Field: 'GenericField',
         serializers.HyperlinkedIdentityField: 'Relationship',
         serializers.HyperlinkedRelatedField: 'Relationship',
         serializers.BooleanField: 'Boolean',
