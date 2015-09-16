@@ -71,10 +71,9 @@ class JSONAPIMetadata(SimpleMetadata):
             # If this is a `ListSerializer` then we want to examine the
             # underlying child serializer instance instead.
             serializer = serializer.child
-        return OrderedDict([
-                               (field_name, self.get_field_info(field, serializer))
-                               for field_name, field in serializer.fields.items()
-                               ])
+        return OrderedDict(
+            [(field_name, self.get_field_info(field, serializer)) for field_name, field in serializer.fields.items()]
+        )
 
     def get_field_info(self, field, serializer):
         """
