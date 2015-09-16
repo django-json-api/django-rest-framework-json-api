@@ -2,7 +2,6 @@
 Utils.
 """
 import inflection
-from django.core import urlresolvers
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
@@ -11,8 +10,6 @@ from rest_framework.relations import RelatedField, HyperlinkedRelatedField, Prim
     HyperlinkedIdentityField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
-
-from django.utils.six.moves.urllib.parse import urlparse
 
 try:
     from rest_framework.compat import OrderedDict
@@ -191,6 +188,12 @@ def extract_attributes(fields, resource):
         # Skip fields with relations
         if isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
             continue
+
+        # Skip read_only attribute fields when the resource is non-existent
+        # Needed for the "Raw data" form of the browseable API
+        if resource.get('id') is None and fields[field_name].read_only:
+            continue
+
         data.update({
             field_name: resource.get(field_name)
         })
