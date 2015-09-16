@@ -10,6 +10,9 @@ from rest_framework_json_api.utils import format_value
 def exception_handler(exc, context):
     response = drf_exception_handler(exc, context)
 
+    if not response:
+        return response
+
     errors = []
     # handle generic errors. ValidationError('test') in a view for example
     if isinstance(response.data, list):
