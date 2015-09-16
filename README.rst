@@ -14,7 +14,8 @@ JSON API and Django Rest Framework
    :target: https://gitter.im/django-json-api/django-rest-framework-json-api
 
    
-Documentation: http://django-rest-framework-json-api.readthedocs.org/
+Documentation: http://django-rest-framework-json-api.readthedocs.org/  
+Format specification: http://jsonapi.org/format/
 
 By default, Django REST Framework will produce a response like::
 
