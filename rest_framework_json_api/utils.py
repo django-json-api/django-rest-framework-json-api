@@ -70,9 +70,9 @@ def get_resource_name(context):
             if not isinstance(resource_name, six.string_types):
                 return resource_name
 
-            resource_name = inflection.pluralize(resource_name.lower())
-
             resource_name = format_value(resource_name)
+
+            resource_name = inflection.pluralize(resource_name)
 
     return resource_name
 

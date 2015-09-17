@@ -1,5 +1,6 @@
 import pytest
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -8,7 +9,7 @@ from rest_framework_json_api import utils
 
 pytestmark = pytest.mark.django_db
 
-class Resource(APIView):
+class ResourceView(APIView):
     pass
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -17,9 +18,15 @@ class ResourceSerializer(serializers.ModelSerializer):
         model = get_user_model()
 
 def test_get_resource_name():
-    view = Resource()
+    view = ResourceView()
     context = {'view': view}
-    assert 'resources' == utils.get_resource_name(context), 'derived from view'
+    setattr(settings, 'JSON_API_FORMAT_KEYS', None)
+    assert 'ResourceViews' == utils.get_resource_name(context), 'not formatted'
+
+    view = ResourceView()
+    context = {'view': view}
+    setattr(settings, 'JSON_API_FORMAT_KEYS', 'dasherize')
+    assert 'resource-views' == utils.get_resource_name(context), 'derived from view'
 
     view.model = get_user_model()
     assert 'users' == utils.get_resource_name(context), 'derived from view model'
@@ -33,7 +40,7 @@ def test_get_resource_name():
     view.response = Response(status=500)
     assert 'errors' == utils.get_resource_name(context), 'handles 500 error'
 
-    view = Resource()
+    view = ResourceView()
     context = {'view': view}
     view.serializer_class = ResourceSerializer
     assert 'users' == utils.get_resource_name(context), 'derived from serializer'
