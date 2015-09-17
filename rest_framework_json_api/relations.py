@@ -13,7 +13,7 @@ class HyperlinkedRelatedField(HyperlinkedRelatedField):
 
     def to_internal_value(self, data):
         try:
-            super(HyperlinkedRelatedField, self).to_internal_value(data)
+            return super(HyperlinkedRelatedField, self).to_internal_value(data)
         except AssertionError:
             if self.pk_field is not None:
                 data = self.pk_field.to_internal_value(data)
