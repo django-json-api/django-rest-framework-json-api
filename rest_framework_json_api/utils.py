@@ -94,16 +94,21 @@ def format_keys(obj, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
 
-    if format_type in ('dasherize', 'camelize', 'underscore'):
+    if format_type in ('dasherize', 'camelize', 'underscore', 'capitalize'):
 
         if isinstance(obj, dict):
             formatted = OrderedDict()
             for key, value in obj.items():
                 if format_type == 'dasherize':
+                    # inflection can't dasherize camelCase
+                    key = inflection.underscore(key)
                     formatted[inflection.dasherize(key)] \
                         = format_keys(value, format_type)
                 elif format_type == 'camelize':
                     formatted[inflection.camelize(key, False)] \
+                        = format_keys(value, format_type)
+                elif format_type == 'capitalize':
+                    formatted[inflection.camelize(key)] \
                         = format_keys(value, format_type)
                 elif format_type == 'underscore':
                     formatted[inflection.underscore(key)] \
@@ -121,8 +126,12 @@ def format_value(value, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
     if format_type == 'dasherize':
+        # inflection can't dasherize camelCase
+        value = inflection.underscore(value)
         value = inflection.dasherize(value)
     elif format_type == 'camelize':
+        value = inflection.camelize(value, False)
+    elif format_type == 'capitalize':
         value = inflection.camelize(value)
     elif format_type == 'underscore':
         value = inflection.underscore(value)
@@ -132,14 +141,9 @@ def format_value(value, format_type=None):
 def format_relation_name(value, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
-    
-    if not format_type:
-        # let's keep it the way it was
-        return value
 
-    # in case the value is going to be changed, make it underscored first
-    # because dasherize does not work with a camel cased string
-    value = inflection.underscore(value)
+    if not format_type:
+        return value
 
     # format_type will never be None here so we can use format_value
     value = format_value(value, format_type)

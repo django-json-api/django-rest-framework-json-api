@@ -50,6 +50,9 @@ def test_format_keys():
     output = {'firstName': 'a', 'lastName': 'b'}
     assert utils.format_keys(underscored, 'camelize') == output
 
+    output = {'FirstName': 'a', 'LastName': 'b'}
+    assert utils.format_keys(underscored, 'capitalize') == output
+
     output = {'first-name': 'a', 'last-name': 'b'}
     assert utils.format_keys(underscored, 'dasherize') == output
 
@@ -60,12 +63,14 @@ def test_format_keys():
     assert utils.format_keys([underscored], 'dasherize') == output
 
 def test_format_value():
-    assert utils.format_value('first_name', 'camelize') == 'FirstName'
+    assert utils.format_value('first_name', 'camelize') == 'firstName'
+    assert utils.format_value('first_name', 'capitalize') == 'FirstName'
     assert utils.format_value('first_name', 'dasherize') == 'first-name'
     assert utils.format_value('first-name', 'underscore') == 'first_name'
 
 def test_format_relation_name():
-    assert utils.format_relation_name('first_name', 'camelize') == 'FirstNames'
+    assert utils.format_relation_name('first_name', 'capitalize') == 'FirstNames'
+    assert utils.format_relation_name('first_name', 'camelize') == 'firstNames'
 
 def test_build_json_resource_obj():
     resource = {
