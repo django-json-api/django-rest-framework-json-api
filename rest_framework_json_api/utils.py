@@ -187,14 +187,31 @@ def get_related_resource_type(relation):
         if hasattr(parent_model_relation, 'related'):
             relation_model = parent_model_relation.related.related_model
         elif hasattr(parent_model_relation, 'field'):
-            relation_model = parent_model_relation.field.related_model
+            relation_model = parent_model_relation.field.related.model
         else:
             raise APIException('Unable to find related model for relation {relation}'.format(relation=relation))
     return format_relation_name(relation_model.__name__)
 
 
-def get_model_name_from_queryset(qs):
-    return qs.model._meta.model_name
+def get_instance_or_manager_resource_type(resource_instance_or_manager):
+
+    if hasattr(resource_instance_or_manager, 'model'):
+        return get_resource_type_from_manager(resource_instance_or_manager)
+    if hasattr(resource_instance_or_manager, '_meta'):
+        return get_resource_type_from_instance(resource_instance_or_manager)
+    pass
+
+
+def get_resource_type_from_queryset(qs):
+    return format_relation_name(qs.model._meta.model.__name__)
+
+
+def get_resource_type_from_instance(instance):
+    return format_relation_name(instance._meta.model.__name__)
+
+
+def get_resource_type_from_manager(manager):
+    return format_relation_name(manager.model.__name__)
 
 
 def extract_attributes(fields, resource):
@@ -235,8 +252,8 @@ def extract_relationships(fields, resource, resource_instance):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        relation_type = get_related_resource_type(field)
         relation_instance_or_manager = getattr(resource_instance, field_name)
+        relation_type = get_instance_or_manager_resource_type(relation_instance_or_manager)
 
         if isinstance(field, HyperlinkedIdentityField):
             # special case for HyperlinkedIdentityField
@@ -280,7 +297,7 @@ def extract_relationships(fields, resource, resource_instance):
         if isinstance(field, ManyRelatedField):
             relation_data = list()
             for related_object in relation_instance_or_manager.all():
-                related_object_type = get_related_resource_type(related_object)
+                related_object_type = get_instance_or_manager_resource_type(relation_instance_or_manager)
                 relation_data.append(OrderedDict([
                     ('type', related_object_type),
                     ('id', encoding.force_text(related_object.pk))
@@ -303,8 +320,7 @@ def extract_relationships(fields, resource, resource_instance):
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
                     nested_resource_instance = resource_instance_queryset[position]
-                    nested_resource_instance_type = get_related_resource_type(
-                        nested_resource_instance)
+                    nested_resource_instance_type = get_resource_type_from_instance(nested_resource_instance)
                     relation_data.append(OrderedDict([
                         ('type', nested_resource_instance_type),
                         ('id', encoding.force_text(nested_resource_instance.pk))

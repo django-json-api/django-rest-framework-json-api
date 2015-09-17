@@ -1,6 +1,7 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import *
-from rest_framework_json_api.utils import format_relation_name, get_related_resource_type
+from rest_framework_json_api.utils import format_relation_name, get_related_resource_type, \
+    get_resource_type_from_queryset, get_resource_type_from_instance
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -47,14 +48,14 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
     }
 
     def to_internal_value(self, data):
-        expected_relation_type = format_relation_name(get_related_resource_type(self))
+        expected_relation_type = get_resource_type_from_queryset(self.queryset)
         if data['type'] != expected_relation_type:
             self.fail('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
 
     def to_representation(self, value):
         return {
-            'type': format_relation_name(get_related_resource_type(self)),
+            'type': format_relation_name(get_resource_type_from_instance(value)),
             'id': str(value.pk)
         }
 
