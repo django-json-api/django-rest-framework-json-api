@@ -37,7 +37,7 @@ class FormatKeysSetTests(TestBase):
         expected = {
             'data': [
                 {
-                    'type': 'Users',
+                    'type': 'users',
                     'id': encoding.force_text(user.pk),
                     'attributes': {
                         'firstName': user.first_name,

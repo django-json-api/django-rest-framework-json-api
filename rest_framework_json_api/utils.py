@@ -67,9 +67,9 @@ def get_resource_name(context):
             if not isinstance(resource_name, six.string_types):
                 return resource_name
 
-            resource_name = inflection.pluralize(resource_name.lower())
-
             resource_name = format_value(resource_name)
+
+            resource_name = inflection.pluralize(resource_name)
 
     return resource_name
 
@@ -91,16 +91,21 @@ def format_keys(obj, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
 
-    if format_type in ('dasherize', 'camelize', 'underscore'):
+    if format_type in ('dasherize', 'camelize', 'underscore', 'capitalize'):
 
         if isinstance(obj, dict):
             formatted = OrderedDict()
             for key, value in obj.items():
                 if format_type == 'dasherize':
+                    # inflection can't dasherize camelCase
+                    key = inflection.underscore(key)
                     formatted[inflection.dasherize(key)] \
                         = format_keys(value, format_type)
                 elif format_type == 'camelize':
                     formatted[inflection.camelize(key, False)] \
+                        = format_keys(value, format_type)
+                elif format_type == 'capitalize':
+                    formatted[inflection.camelize(key)] \
                         = format_keys(value, format_type)
                 elif format_type == 'underscore':
                     formatted[inflection.underscore(key)] \
@@ -118,8 +123,12 @@ def format_value(value, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
     if format_type == 'dasherize':
+        # inflection can't dasherize camelCase
+        value = inflection.underscore(value)
         value = inflection.dasherize(value)
     elif format_type == 'camelize':
+        value = inflection.camelize(value, False)
+    elif format_type == 'capitalize':
         value = inflection.camelize(value)
     elif format_type == 'underscore':
         value = inflection.underscore(value)
@@ -129,6 +138,9 @@ def format_value(value, format_type=None):
 def format_relation_name(value, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
+
+    if not format_type:
+        return value
 
     # format_type will never be None here so we can use format_value
     value = format_value(value, format_type)
@@ -153,7 +165,9 @@ def build_json_resource_obj(fields, resource, resource_instance, resource_name):
 
 
 def get_related_resource_type(relation):
-    if hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
+    if hasattr(relation, '_meta'):
+        relation_model = relation._meta.model
+    elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
     else:
         parent_serializer = relation.parent
@@ -265,11 +279,10 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, ManyRelatedField):
             relation_data = list()
-            related_object = field.child_relation
-            relation_type = get_related_resource_type(related_object)
             for related_object in relation_instance_or_manager.all():
+                related_object_type = get_related_resource_type(related_object)
                 relation_data.append(OrderedDict([
-                    ('type', relation_type),
+                    ('type', related_object_type),
                     ('id', encoding.force_text(related_object.pk))
                 ]))
             data.update({
@@ -284,20 +297,18 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, ListSerializer):
             relation_data = list()
-            serializer = field.child
-            relation_model = serializer.Meta.model
-            relation_type = format_relation_name(relation_model.__name__)
 
             serializer_data = resource.get(field_name)
             resource_instance_queryset = relation_instance_or_manager.all()
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
                     nested_resource_instance = resource_instance_queryset[position]
-                    relation_data.append(
-                        OrderedDict(
-                            [('type', relation_type), ('id', encoding.force_text(nested_resource_instance.pk))]
-                        )
-                    )
+                    nested_resource_instance_type = get_related_resource_type(
+                        nested_resource_instance)
+                    relation_data.append(OrderedDict([
+                        ('type', nested_resource_instance_type),
+                        ('id', encoding.force_text(nested_resource_instance.pk))
+                    ]))
 
                 data.update({field_name: {'data': relation_data}})
                 continue
