@@ -132,6 +132,14 @@ def format_value(value, format_type=None):
 def format_relation_name(value, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
+    
+    if not format_type:
+        # let's keep it the way it was
+        return value
+
+    # in case the value is going to be changed, make it underscored first
+    # because dasherize does not work with a camel cased string
+    value = inflection.underscore(value)
 
     # format_type will never be None here so we can use format_value
     value = format_value(value, format_type)
