@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.relations import *
 
 
@@ -13,8 +14,9 @@ class HyperlinkedRelatedField(HyperlinkedRelatedField):
 
     def to_internal_value(self, data):
         try:
+            # Try parsing links first for the browseable API
             return super(HyperlinkedRelatedField, self).to_internal_value(data)
-        except AssertionError:
+        except ValidationError:
             if self.pk_field is not None:
                 data = self.pk_field.to_internal_value(data)
             try:
