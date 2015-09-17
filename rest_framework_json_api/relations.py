@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import *
+from rest_framework_json_api.utils import format_relation_name, get_related_resource_type
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -35,3 +36,25 @@ class HyperlinkedRelatedField(HyperlinkedRelatedField):
                 self.fail('pk_does_not_exist', pk_value=data)
             except (TypeError, ValueError):
                 self.fail('incorrect_pk_type', data_type=type(data).__name__)
+
+
+class ResourceRelatedField(PrimaryKeyRelatedField):
+    default_error_messages = {
+        'required': _('This field is required.'),
+        'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
+        'incorrect_type': _('Incorrect type. Expected pk value, received {data_type}.'),
+        'incorrect_relation_type': _('Incorrect relation type. Expected {relation_type}, received {received_type}.'),
+    }
+
+    def to_internal_value(self, data):
+        expected_relation_type = format_relation_name(get_related_resource_type(self))
+        if data['type'] != expected_relation_type:
+            self.fail('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
+        return super(ResourceRelatedField, self).to_internal_value(data['id'])
+
+    def to_representation(self, value):
+        return {
+            'type': format_relation_name(get_related_resource_type(self)),
+            'id': str(value.pk)
+        }
+
