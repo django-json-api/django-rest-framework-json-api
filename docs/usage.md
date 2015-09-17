@@ -69,9 +69,9 @@ JSON_API_FORMAT_KEYS = 'dasherize'
 Possible values:
 
 * dasherize
-* camelize
+* camelize (first letter is lowercase)
+* capitalize (camelize but with first letter uppercase)
 * underscore
-* pluralize
 
 Note: due to the way the inflector works `address_1` can camelize to `address1`
 on output but it cannot convert `address1` back to `address_1` on POST or PUT. Keep
