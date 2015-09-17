@@ -164,7 +164,9 @@ def build_json_resource_obj(fields, resource, resource_instance, resource_name):
 
 
 def get_related_resource_type(relation):
-    if hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
+    if hasattr(relation, '_meta'):
+        relation_model = relation._meta.model
+    elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
     else:
         parent_serializer = relation.parent
@@ -266,11 +268,10 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, ManyRelatedField):
             relation_data = list()
-            related_object = field.child_relation
-            relation_type = get_related_resource_type(related_object)
             for related_object in relation_instance_or_manager.all():
+                related_object_type = get_related_resource_type(related_object)
                 relation_data.append(OrderedDict([
-                    ('type', relation_type),
+                    ('type', related_object_type),
                     ('id', encoding.force_text(related_object.pk))
                 ]))
             data.update({
@@ -285,20 +286,18 @@ def extract_relationships(fields, resource, resource_instance):
 
         if isinstance(field, ListSerializer):
             relation_data = list()
-            serializer = field.child
-            relation_model = serializer.Meta.model
-            relation_type = format_relation_name(relation_model.__name__)
 
             serializer_data = resource.get(field_name)
             resource_instance_queryset = relation_instance_or_manager.all()
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
                     nested_resource_instance = resource_instance_queryset[position]
-                    relation_data.append(
-                        OrderedDict(
-                            [('type', relation_type), ('id', encoding.force_text(nested_resource_instance.pk))]
-                        )
-                    )
+                    nested_resource_instance_type = get_related_resource_type(
+                        nested_resource_instance)
+                    relation_data.append(OrderedDict([
+                        ('type', nested_resource_instance_type),
+                        ('id', encoding.force_text(nested_resource_instance.pk))
+                    ]))
 
                 data.update({field_name: {'data': relation_data}})
                 continue
