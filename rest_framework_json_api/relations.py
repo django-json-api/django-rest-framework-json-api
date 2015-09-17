@@ -1,8 +1,7 @@
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.relations import HyperlinkedRelatedField
+from rest_framework.relations import *
 
 
-class JSONAPIRelatedField(HyperlinkedRelatedField):
+class HyperlinkedRelatedField(HyperlinkedRelatedField):
     """
     This field exists for the sole purpose of accepting PKs as well as URLs
     when data is submitted back to the serializer
@@ -10,11 +9,11 @@ class JSONAPIRelatedField(HyperlinkedRelatedField):
 
     def __init__(self, **kwargs):
         self.pk_field = kwargs.pop('pk_field', None)
-        super(JSONAPIRelatedField, self).__init__(**kwargs)
+        super(HyperlinkedRelatedField, self).__init__(**kwargs)
 
     def to_internal_value(self, data):
         try:
-            super(JSONAPIRelatedField, self).to_internal_value(data)
+            super(HyperlinkedRelatedField, self).to_internal_value(data)
         except AssertionError:
             if self.pk_field is not None:
                 data = self.pk_field.to_internal_value(data)
