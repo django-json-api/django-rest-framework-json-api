@@ -179,6 +179,10 @@ def get_related_resource_type(relation):
     return format_relation_name(relation_model.__name__)
 
 
+def get_model_name_from_queryset(qs):
+    return qs.model._meta.model_name
+
+
 def extract_attributes(fields, resource):
     data = OrderedDict()
     for field_name, field in six.iteritems(fields):
