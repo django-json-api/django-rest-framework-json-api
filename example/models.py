@@ -42,9 +42,10 @@ class Entry(BaseModel):
     pub_date = models.DateField()
     mod_date = models.DateField()
     authors = models.ManyToManyField(Author)
-    n_comments = models.IntegerField()
-    n_pingbacks = models.IntegerField()
-    rating = models.IntegerField()
+    n_comments = models.IntegerField(default=0)
+    n_pingbacks = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0)
 
     def __str__(self):
         return self.headline
+
