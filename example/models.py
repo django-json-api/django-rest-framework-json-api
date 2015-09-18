@@ -38,9 +38,9 @@ class Author(BaseModel):
 class Entry(BaseModel):
     blog = models.ForeignKey(Blog)
     headline = models.CharField(max_length=255)
-    body_text = models.TextField()
-    pub_date = models.DateField()
-    mod_date = models.DateField()
+    body_text = models.TextField(null=True)
+    pub_date = models.DateField(null=True)
+    mod_date = models.DateField(null=True)
     authors = models.ManyToManyField(Author)
     n_comments = models.IntegerField(default=0)
     n_pingbacks = models.IntegerField(default=0)
@@ -48,4 +48,3 @@ class Entry(BaseModel):
 
     def __str__(self):
         return self.headline
-
