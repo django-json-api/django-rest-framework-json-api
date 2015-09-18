@@ -11,7 +11,7 @@ DATABASE_ENGINE = 'sqlite3'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': 'drf_example',
     }
 }
 
@@ -36,18 +36,15 @@ PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
 
 MIDDLEWARE_CLASSES = ()
 
-JSON_API_FORMAT_KEYS = 'dasherize'
+JSON_API_FORMAT_KEYS = 'camelize'
+JSON_API_FORMAT_RELATION_KEYS = 'camelize'
 REST_FRAMEWORK = {
-    'PAGINATE_BY': 1,
+    'PAGINATE_BY': 5,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
-    # DRF v3.1+
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework_json_api.pagination.PageNumberPagination',
-    # DRF v3.0 and older
-    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'rest_framework_json_api.pagination.PaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -55,7 +52,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
-        'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+    'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
 }
