@@ -1,4 +1,5 @@
 from django.utils import timezone
+from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from rest_framework_json_api.utils import format_relation_name
@@ -8,7 +9,6 @@ from example.views import EntryRelationshipView, BlogRelationshipView
 
 
 class TestRelationshipView(APITestCase):
-
     def setUp(self):
         self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
         self.entry = Entry.objects.create(
@@ -23,7 +23,8 @@ class TestRelationshipView(APITestCase):
         )
 
     def test_get_entry_relationship_blog(self):
-        response = self.client.get('/entries/{}/relationships/blog'.format(self.entry.id))
+        url = reverse('entry-relationships', kwargs={'pk': self.entry.id, 'related_field': 'blog'})
+        response = self.client.get(url)
         expected_data = {'type': format_relation_name('Blog'), 'id': str(self.entry.blog.id)}
 
         assert response.data == expected_data
