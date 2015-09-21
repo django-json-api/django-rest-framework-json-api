@@ -1,7 +1,7 @@
-from django.utils import encoding
+import inspect
+from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework import status, exceptions
 from rest_framework.views import exception_handler as drf_exception_handler
 
 from rest_framework_json_api.utils import format_value
@@ -32,11 +32,17 @@ def exception_handler(exc, context):
             # see if they passed a dictionary to ValidationError manually
             if isinstance(error, dict):
                 errors.append(error)
-            # or a string in case of AuthenticationError
-            elif isinstance(error, str):
-                # An error MUST be a JSON object in JSON API spec
+            elif isinstance(error, six.string_types):
+                classes = inspect.getmembers(exceptions, inspect.isclass)
+                # DRF sets the `field` to 'detail' for its own exceptions
+                if isinstance(exc, tuple(x[1] for x in classes)):
+                    pointer = '/data'
                 errors.append({
-                    'detail': error
+                    'detail': error,
+                    'source': {
+                        'pointer': pointer,
+                    },
+                    'status': encoding.force_text(response.status_code),
                 })
             elif isinstance(error, list):
                 for message in error:
@@ -49,7 +55,7 @@ def exception_handler(exc, context):
                     })
             else:
                 errors.append({
-                    'detail': message,
+                    'detail': error,
                     'source': {
                         'pointer': pointer,
                     },
@@ -62,6 +68,7 @@ def exception_handler(exc, context):
     return response
 
 
-class Conflict(APIException):
+class Conflict(exceptions.APIException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = _('Conflict.')
+
