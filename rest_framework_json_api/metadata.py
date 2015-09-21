@@ -86,8 +86,8 @@ class JSONAPIMetadata(SimpleMetadata):
         else:
             field_info['type'] = self.type_lookup[field]
 
-        serializer_model = getattr(serializer.Meta, 'model')
         try:
+            serializer_model = getattr(serializer.Meta, 'model')
             field_info['relationship_type'] = self.relation_type_lookup[getattr(serializer_model, field.field_name)]
         except KeyError:
             pass
