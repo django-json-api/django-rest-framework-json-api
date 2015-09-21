@@ -2,15 +2,14 @@ from django.db.models import Model, QuerySet
 from django.db.models.manager import BaseManager
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
+from rest_framework.exceptions import NotFound
+
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance
-from rest_framework.exceptions import NotFound
 
 
 class RelationshipView(generics.GenericAPIView):
     serializer_class = ResourceIdentifierObjectSerializer
-    renderer_classes = (JSONRenderer, )
 
     def get(self, request, *args, **kwargs):
         related_instance = self.get_related_instance()
@@ -40,7 +39,7 @@ class RelationshipView(generics.GenericAPIView):
             raise NotFound
 
     def _instantiate_serializer(self, instance):
-        if isinstance(instance, Model):
+        if isinstance(instance, Model) or instance is None:
             return self.get_serializer(instance=instance)
         else:
             if isinstance(instance, (QuerySet, BaseManager)):
