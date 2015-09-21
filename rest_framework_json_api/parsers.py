@@ -2,6 +2,7 @@
 Parsers
 """
 from rest_framework import parsers
+from rest_framework.exceptions import ParseError
 
 from . import utils, renderers, exceptions
 
@@ -31,12 +32,20 @@ class JSONParser(parsers.JSONParser):
         Parses the incoming bytestream as JSON and returns the resulting data
         """
         result = super(JSONParser, self).parse(stream, media_type=media_type, parser_context=parser_context)
-        data = result.get('data', {})
+        data = result.get('data')
 
         if data:
             from rest_framework_json_api.views import RelationshipView
             if isinstance(parser_context['view'], RelationshipView):
-                return data  # temporary workaround
+                # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular Resource Object
+                if isinstance(data, list):
+                    for resource_identifier_object in data:
+                        if not (resource_identifier_object.get('id') and resource_identifier_object.get('type')):
+                            raise ParseError('Received data contains a malformed JSONAPI Resource Identifier Object')
+                elif not (data.get('id') and data.get('type')):
+                    raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
+
+                return data
             # Check for inconsistencies
             resource_name = utils.get_resource_name(parser_context)
             if data.get('type') != resource_name:
@@ -70,3 +79,6 @@ class JSONParser(parsers.JSONParser):
             parsed_data.update(attributes)
             parsed_data.update(parsed_relationships)
             return parsed_data
+
+        else:
+            raise ParseError('Received document does not contain primary data')

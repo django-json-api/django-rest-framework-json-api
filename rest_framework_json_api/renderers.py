@@ -55,11 +55,15 @@ class JSONRenderer(renderers.JSONRenderer):
 
         json_api_included = list()
 
-        # If detail view then json api spec expects dict, otherwise a list
-        # - http://jsonapi.org/format/#document-top-level
-        # The `results` key may be missing if unpaginated or an OPTIONS request
-        if view and hasattr(view, 'action') and view.action == 'list' and \
+        from rest_framework_json_api.views import RelationshipView
+        if isinstance(view, RelationshipView):
+            # Special case for RelationshipView
+            json_api_data = data
+        elif view and hasattr(view, 'action') and view.action == 'list' and \
                 isinstance(data, dict) and 'results' in data:
+            # If detail view then json api spec expects dict, otherwise a list
+            # - http://jsonapi.org/format/#document-top-level
+            # The `results` key may be missing if unpaginated or an OPTIONS request
 
             results = data["results"]
 
