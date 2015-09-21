@@ -1,7 +1,8 @@
 from django.conf.urls import include, url
 from rest_framework import routers
 
-from example.views import BlogViewSet, EntryViewSet, AuthorViewSet, EntryRelationshipView, BlogRelationshipView
+from example.views import BlogViewSet, EntryViewSet, AuthorViewSet, EntryRelationshipView, BlogRelationshipView, \
+    CommentRelationshipView, AuthorRelationshipView
 from .api.resources.identity import Identity, GenericIdentity
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -27,5 +28,11 @@ urlpatterns = [
     url(r'^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         BlogRelationshipView.as_view(),
         name='blog-relationships'),
+    url(r'^comments/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+        CommentRelationshipView.as_view(),
+        name='comment-relationships'),
+    url(r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+        AuthorRelationshipView.as_view(),
+        name='author-relationships'),
 ]
 

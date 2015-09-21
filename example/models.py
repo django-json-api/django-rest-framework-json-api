@@ -54,7 +54,11 @@ class Entry(BaseModel):
 class Comment(BaseModel):
     entry = models.ForeignKey(Entry)
     body = models.TextField()
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(
+        Author,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.body
