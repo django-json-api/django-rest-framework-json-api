@@ -1,6 +1,7 @@
 from django.utils import timezone
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIRequestFactory
+import json
 
 from rest_framework_json_api.utils import format_relation_name
 
@@ -11,6 +12,7 @@ from example.views import EntryRelationshipView, BlogRelationshipView
 class TestRelationshipView(APITestCase):
     def setUp(self):
         self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+        self.other_blog = Blog.objects.create(name='Other blog', tagline="It's another blog")
         self.entry = Entry.objects.create(
             blog=self.blog,
             headline='headline',
@@ -36,3 +38,19 @@ class TestRelationshipView(APITestCase):
 
     def test_get_blog_relationship_entry_set(self):
         response = self.client.get('/blogs/{}/relationships/entry_set'.format(self.blog.id))
+
+    def test_put_entry_relationship_blog_returns_405(self):
+        url = '/entries/{}/relationships/blog'.format(self.entry.id)
+        response = self.client.put(url, data={})
+        assert response.status_code == 405
+
+    def test_patch_to_one_relationship(self):
+        url = '/entries/{}/relationships/blog'.format(self.entry.id)
+        request_data = {
+            'data': {'type': format_relation_name('Blog'), 'id': str(self.other_blog.id)}
+        }
+        response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        assert response.status_code == 200, response.content.decode()
+
+        response = self.client.get(url)
+        assert response.data == request_data['data']

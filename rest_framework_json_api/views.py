@@ -4,6 +4,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
+from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance
 from rest_framework.exceptions import NotFound
 
 
@@ -12,15 +13,19 @@ class RelationshipView(generics.GenericAPIView):
     renderer_classes = (JSONRenderer, )
 
     def get(self, request, *args, **kwargs):
-        related_instance = self.get_related_instance(kwargs)
-        serializer_instance = self.instantiate_serializer(related_instance)
+        related_instance = self.get_related_instance()
+        serializer_instance = self._instantiate_serializer(related_instance)
         return Response(serializer_instance.data)
 
-    def put(self, request, *args, **kwargs):
-        return Response()
-
     def patch(self, request, *args, **kwargs):
-        return Response()
+        parent_obj = self.get_object()
+        if hasattr(parent_obj, kwargs['related_field']):
+            related_model_class = self.get_related_instance().__class__
+            serializer = self.get_serializer(data=request.data, model_class=related_model_class)
+            serializer.is_valid(raise_exception=True)
+            setattr(parent_obj, kwargs['related_field'], serializer.validated_data)
+            parent_obj.save()
+            return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
         return Response()
@@ -28,20 +33,28 @@ class RelationshipView(generics.GenericAPIView):
     def delete(self, request, *args, **kwargs):
         return Response()
 
-    def get_related_instance(self, kwargs):
+    def get_related_instance(self):
         try:
-            return getattr(self.get_object(), kwargs['related_field'])
+            return getattr(self.get_object(), self.kwargs['related_field'])
         except AttributeError:
             raise NotFound
 
-    def instantiate_serializer(self, instance):
-        serializer_class = self.get_serializer_class()
+    def _instantiate_serializer(self, instance):
         if isinstance(instance, Model):
-            return serializer_class(instance=instance)
+            return self.get_serializer(instance=instance)
         else:
             if isinstance(instance, (QuerySet, BaseManager)):
                 instance = instance.all()
 
-            return serializer_class(instance=instance, many=True)
+            return self.get_serializer(instance=instance, many=True)
 
+    def get_resource_name(self):
+        if not hasattr(self, '_resource_name'):
+            instance = getattr(self.get_object(), self.kwargs['related_field'])
+            self._resource_name = format_relation_name(get_resource_type_from_instance(instance))
+        return self._resource_name
 
+    def set_resource_name(self, value):
+        self._resource_name = value
+
+    resource_name = property(get_resource_name, set_resource_name)

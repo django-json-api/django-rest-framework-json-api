@@ -34,6 +34,9 @@ class JSONParser(parsers.JSONParser):
         data = result.get('data', {})
 
         if data:
+            from rest_framework_json_api.views import RelationshipView
+            if isinstance(parser_context['view'], RelationshipView):
+                return data  # temporary workaround
             # Check for inconsistencies
             resource_name = utils.get_resource_name(parser_context)
             if data.get('type') != resource_name:
