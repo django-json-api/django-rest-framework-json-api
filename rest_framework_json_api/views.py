@@ -2,8 +2,9 @@ from django.db.models import Model, QuerySet
 from django.db.models.manager import BaseManager
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, MethodNotAllowed
 
+from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance
 
@@ -18,19 +19,57 @@ class RelationshipView(generics.GenericAPIView):
 
     def patch(self, request, *args, **kwargs):
         parent_obj = self.get_object()
-        if hasattr(parent_obj, kwargs['related_field']):
-            related_model_class = self.get_related_instance().__class__
+        related_instance_or_manager = self.get_related_instance()
+
+        if isinstance(related_instance_or_manager, BaseManager):
+            related_model_class = related_instance_or_manager.model
+            serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
+            serializer.is_valid(raise_exception=True)
+            related_instance_or_manager.all().delete()
+            related_instance_or_manager.add(*serializer.validated_data)
+        else:
+            related_model_class = related_instance_or_manager.__class__
             serializer = self.get_serializer(data=request.data, model_class=related_model_class)
             serializer.is_valid(raise_exception=True)
             setattr(parent_obj, kwargs['related_field'], serializer.validated_data)
             parent_obj.save()
-            return Response(serializer.data)
+        result_serializer = self._instantiate_serializer(related_instance_or_manager)
+        return Response(result_serializer.data)
 
     def post(self, request, *args, **kwargs):
-        return Response()
+        related_instance_or_manager = self.get_related_instance()
+
+        if isinstance(related_instance_or_manager, BaseManager):
+            related_model_class = related_instance_or_manager.model
+            serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
+            serializer.is_valid(raise_exception=True)
+            if frozenset(serializer.validated_data) <= frozenset(related_instance_or_manager.all()):
+                return Response(status=204)
+            related_instance_or_manager.add(*serializer.validated_data)
+        else:
+            raise MethodNotAllowed('POST')
+        result_serializer = self._instantiate_serializer(related_instance_or_manager)
+        return Response(result_serializer.data)
 
     def delete(self, request, *args, **kwargs):
-        return Response()
+        related_instance_or_manager = self.get_related_instance()
+
+        if isinstance(related_instance_or_manager, BaseManager):
+            related_model_class = related_instance_or_manager.model
+            serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
+            serializer.is_valid(raise_exception=True)
+            if frozenset(serializer.validated_data).isdisjoint(frozenset(related_instance_or_manager.all())):
+                return Response(status=204)
+            try:
+                related_instance_or_manager.remove(*serializer.validated_data)
+            except AttributeError:
+                raise Conflict(
+                    'This object cannot be removed from this relationship without being added to another'
+                )
+        else:
+            raise MethodNotAllowed('DELETE')
+        result_serializer = self._instantiate_serializer(related_instance_or_manager)
+        return Response(result_serializer.data)
 
     def get_related_instance(self):
         try:
