@@ -99,7 +99,12 @@ class JSONRenderer(renderers.JSONRenderer):
         if isinstance(data, dict) and data.get('links'):
             render_data['links'] = data.get('links')
 
-        render_data['data'] = json_api_data
+        # format the api root link list
+        if view.__class__ and view.__class__.__name__ == 'APIRoot':
+            render_data['data'] = None
+            render_data['links'] = json_api_data
+        else:
+            render_data['data'] = json_api_data
 
         if len(json_api_included) > 0:
             # Iterate through compound documents to remove duplicates
