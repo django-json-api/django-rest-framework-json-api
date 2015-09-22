@@ -49,3 +49,16 @@ class Entry(BaseModel):
     def __str__(self):
         return self.headline
 
+
+@python_2_unicode_compatible
+class Comment(BaseModel):
+    entry = models.ForeignKey(Entry)
+    body = models.TextField()
+    author = models.ForeignKey(
+        Author,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.body

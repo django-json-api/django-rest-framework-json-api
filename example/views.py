@@ -1,21 +1,38 @@
 from rest_framework import viewsets
-from example.models import Blog, Entry, Author
+
+from rest_framework_json_api.views import RelationshipView
+from example.models import Blog, Entry, Author, Comment
 from example.serializers import BlogSerializer, EntrySerializer, AuthorSerializer
 
 
 class BlogViewSet(viewsets.ModelViewSet):
-
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
 
-class EntryViewSet(viewsets.ModelViewSet):
 
+class EntryViewSet(viewsets.ModelViewSet):
     queryset = Entry.objects.all()
     serializer_class = EntrySerializer
     resource_name = 'posts'
 
-class AuthorViewSet(viewsets.ModelViewSet):
 
+class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
+
+class EntryRelationshipView(RelationshipView):
+    queryset = Entry.objects
+
+
+class BlogRelationshipView(RelationshipView):
+    queryset = Blog.objects
+
+
+class CommentRelationshipView(RelationshipView):
+    queryset = Comment.objects
+
+
+class AuthorRelationshipView(RelationshipView):
+    queryset = Author.objects
+    self_link_view_name = 'author-relationships'
