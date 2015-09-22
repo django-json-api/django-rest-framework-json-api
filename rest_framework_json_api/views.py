@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch
-from django.db.models import Model, QuerySet
+from django.db.models import Model
+from django.db.models.query import QuerySet
 from django.db.models.manager import BaseManager
 from rest_framework import generics
 from rest_framework.relations import Hyperlink
