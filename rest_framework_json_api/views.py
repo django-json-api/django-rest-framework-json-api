@@ -6,11 +6,29 @@ from rest_framework.exceptions import NotFound, MethodNotAllowed
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance
+from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, OrderedDict
 
 
 class RelationshipView(generics.GenericAPIView):
     serializer_class = ResourceIdentifierObjectSerializer
+    self_view_name = None
+    related_view_name = None
+
+    def get_self_link(self):
+        return 'self_link'
+
+    def get_related_link(self):
+        return 'related_link'
+
+    def get_links(self):
+        return_data = OrderedDict()
+        self_link = self.get_self_link()
+        related_link = self.get_related_link()
+        if self_link:
+            return_data.update({'self': self_link})
+        if related_link:
+            return_data.update({'related': related_link})
+        return return_data
 
     def get(self, request, *args, **kwargs):
         related_instance = self.get_related_instance()
