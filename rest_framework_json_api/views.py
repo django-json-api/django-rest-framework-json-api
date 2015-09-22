@@ -3,11 +3,11 @@ from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
+from django.utils import six
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.reverse import reverse
-import six
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
