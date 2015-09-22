@@ -41,7 +41,9 @@ class JSONParser(parsers.JSONParser):
                 if isinstance(data, list):
                     for resource_identifier_object in data:
                         if not (resource_identifier_object.get('id') and resource_identifier_object.get('type')):
-                            raise ParseError('Received data contains a malformed JSONAPI Resource Identifier Object')
+                            raise ParseError(
+                                'Received data contains one or more malformed JSONAPI Resource Identifier Object(s)'
+                            )
                 elif not (data.get('id') and data.get('type')):
                     raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
 
