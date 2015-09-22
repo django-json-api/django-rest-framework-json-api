@@ -39,11 +39,12 @@ class JSONRenderer(renderers.JSONRenderer):
         from rest_framework_json_api.views import RelationshipView
         if isinstance(view, RelationshipView):
             # Special case for RelationshipView
-            links = view.get_links()
             render_data = OrderedDict([
-                ('data', data),
-                (('links', links) if links else None),
+                ('data', data)
             ])
+            links = view.get_links()
+            if links:
+                render_data.update({'links': links}),
             return super(JSONRenderer, self).render(
                 render_data, accepted_media_type, renderer_context
             )

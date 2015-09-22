@@ -79,6 +79,16 @@ class TestRelationshipView(APITestCase):
 
         assert response.data == expected_data
 
+    def test_get_to_many_relationship_self_link(self):
+        url = '/authors/{}/relationships/comment_set'.format(self.author.id)
+
+        response = self.client.get(url)
+        expected_data = {
+            'links': {'self': 'http://testserver/authors/1/relationships/comment_set'},
+            'data': [{'id': str(self.second_comment.id), 'type': format_relation_name('Comment')}]
+        }
+        assert json.loads(response.content.decode('utf-8')) == expected_data
+
     def test_patch_to_one_relationship(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
