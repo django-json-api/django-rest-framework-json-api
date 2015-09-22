@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
-from django.db.models.manager import BaseManager
+from django.db.models.manager import Manager
 from rest_framework import generics
 from rest_framework.relations import Hyperlink
 from rest_framework.response import Response
@@ -77,7 +77,7 @@ class RelationshipView(generics.GenericAPIView):
         parent_obj = self.get_object()
         related_instance_or_manager = self.get_related_instance()
 
-        if isinstance(related_instance_or_manager, BaseManager):
+        if isinstance(related_instance_or_manager, Manager):
             related_model_class = related_instance_or_manager.model
             serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
             serializer.is_valid(raise_exception=True)
@@ -95,7 +95,7 @@ class RelationshipView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         related_instance_or_manager = self.get_related_instance()
 
-        if isinstance(related_instance_or_manager, BaseManager):
+        if isinstance(related_instance_or_manager, Manager):
             related_model_class = related_instance_or_manager.model
             serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
             serializer.is_valid(raise_exception=True)
@@ -110,7 +110,7 @@ class RelationshipView(generics.GenericAPIView):
     def delete(self, request, *args, **kwargs):
         related_instance_or_manager = self.get_related_instance()
 
-        if isinstance(related_instance_or_manager, BaseManager):
+        if isinstance(related_instance_or_manager, Manager):
             related_model_class = related_instance_or_manager.model
             serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
             serializer.is_valid(raise_exception=True)
@@ -137,7 +137,7 @@ class RelationshipView(generics.GenericAPIView):
         if isinstance(instance, Model) or instance is None:
             return self.get_serializer(instance=instance)
         else:
-            if isinstance(instance, (QuerySet, BaseManager)):
+            if isinstance(instance, (QuerySet, Manager)):
                 instance = instance.all()
 
             return self.get_serializer(instance=instance, many=True)
