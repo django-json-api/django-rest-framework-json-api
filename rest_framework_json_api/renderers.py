@@ -32,11 +32,24 @@ class JSONRenderer(renderers.JSONRenderer):
     format = 'vnd.api+json'
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        # Get the resource name.
-        resource_name = utils.get_resource_name(renderer_context)
 
         view = renderer_context.get("view", None)
         request = renderer_context.get("request", None)
+
+        from rest_framework_json_api.views import RelationshipView
+        if isinstance(view, RelationshipView):
+            # Special case for RelationshipView
+            links = view.get_links()
+            render_data = OrderedDict([
+                ('data', data),
+                (('links', links) if links else None),
+            ])
+            return super(JSONRenderer, self).render(
+                render_data, accepted_media_type, renderer_context
+            )
+
+        # Get the resource name.
+        resource_name = utils.get_resource_name(renderer_context)
 
         # If `resource_name` is set to None then render default as the dev
         # wants to build the output format manually.
@@ -55,11 +68,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         json_api_included = list()
 
-        from rest_framework_json_api.views import RelationshipView
-        if isinstance(view, RelationshipView):
-            # Special case for RelationshipView
-            json_api_data = data
-        elif view and hasattr(view, 'action') and view.action == 'list' and \
+        if view and hasattr(view, 'action') and view.action == 'list' and \
                 isinstance(data, dict) and 'results' in data:
             # If detail view then json api spec expects dict, otherwise a list
             # - http://jsonapi.org/format/#document-top-level
