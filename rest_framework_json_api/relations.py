@@ -40,12 +40,45 @@ class HyperlinkedRelatedField(HyperlinkedRelatedField):
 
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
+    lookup_field = 'pk'
+    view_name = None
+
+
+
+
     default_error_messages = {
         'required': _('This field is required.'),
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
         'incorrect_type': _('Incorrect type. Expected pk value, received {data_type}.'),
         'incorrect_relation_type': _('Incorrect relation type. Expected {relation_type}, received {received_type}.'),
+        'no_match': _('Invalid hyperlink - No URL match.'),
     }
+
+    def __init__(self, view_name=None, **kwargs):
+        self.lookup_field = kwargs.pop('lookup_field', self.lookup_field)
+        self.lookup_url_kwarg = kwargs.pop('lookup_url_kwarg', self.lookup_field)
+
+        # We include this simply for dependency injection in tests.
+        # We can't add it as a class attributes or it would expect an
+        # implicit `self` argument to be passed.
+        self.reverse = reverse
+
+        super(ResourceRelatedField, self).__init__(**kwargs)
+
+    def get_url(self, obj, view_name, request):
+        """
+        Given an object, return the URL that hyperlinks to the object.
+
+        May raise a `NoReverseMatch` if the `view_name` and `lookup_field`
+        attributes are not configured to correctly match the URL conf.
+        """
+        # Unsaved objects will not yet have a valid URL.
+        if hasattr(obj, 'pk') and obj.pk is None:
+            return None
+
+        lookup_value = getattr(obj, self.lookup_field)
+        kwargs = {self.lookup_url_kwarg: lookup_value}
+        return self.reverse(view_name, kwargs=kwargs, request=request)
 
     def to_internal_value(self, data):
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
