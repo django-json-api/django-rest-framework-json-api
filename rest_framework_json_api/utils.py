@@ -228,11 +228,12 @@ def extract_relationships(fields, resource, resource_instance):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        relation_type = get_related_resource_type(field)
         try:
             relation_instance_or_manager = getattr(resource_instance, field_name)
         except AttributeError: # Skip fields defined on the serializer that don't correspond to a field on the model
             continue
+
+        relation_type = get_related_resource_type(field)
 
         if isinstance(field, HyperlinkedIdentityField):
             # special case for HyperlinkedIdentityField
