@@ -229,7 +229,10 @@ def extract_relationships(fields, resource, resource_instance):
             continue
 
         relation_type = get_related_resource_type(field)
-        relation_instance_or_manager = getattr(resource_instance, field_name)
+        try:
+            relation_instance_or_manager = getattr(resource_instance, field_name)
+        except AttributeError: # Skip fields defined on the serializer that don't correspond to a field on the model
+            continue
 
         if isinstance(field, HyperlinkedIdentityField):
             # special case for HyperlinkedIdentityField
