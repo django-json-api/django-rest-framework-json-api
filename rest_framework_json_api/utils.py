@@ -336,13 +336,13 @@ def extract_included(fields, resource, resource_instance):
             continue
 
         relation_instance_or_manager = getattr(resource_instance, field_name)
-        relation_queryset = relation_instance_or_manager.all()
         serializer_data = resource.get(field_name)
 
         if isinstance(field, ListSerializer):
             serializer = field.child
             model = serializer.Meta.model
             relation_type = format_relation_name(model.__name__)
+            relation_queryset = relation_instance_or_manager.all()
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
@@ -364,7 +364,7 @@ def extract_included(fields, resource, resource_instance):
             serializer_fields = get_serializer_fields(field)
             if serializer_data:
                 included_data.append(
-                    build_json_resource_obj(serializer_fields, serializer_data, relation_queryset, relation_type)
+                    build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager, relation_type)
                 )
 
     return format_keys(included_data)
