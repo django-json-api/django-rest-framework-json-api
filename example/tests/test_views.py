@@ -55,6 +55,10 @@ class TestRelationshipView(APITestCase):
 
     def test_get_blog_relationship_entry_set(self):
         response = self.client.get('/blogs/{}/relationships/entry_set'.format(self.blog.id))
+        expected_data = [{'type': format_relation_name('Entry'), 'id': str(self.first_entry.id)},
+                         {'type': format_relation_name('Entry'), 'id': str(self.second_entry.id)}]
+
+        assert response.data == expected_data
 
     def test_put_entry_relationship_blog_returns_405(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
