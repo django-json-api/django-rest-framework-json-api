@@ -27,6 +27,25 @@ class JSONParser(parsers.JSONParser):
     media_type = 'application/vnd.api+json'
     renderer_class = renderers.JSONRenderer
 
+    @staticmethod
+    def parse_attributes(data):
+        return utils.format_keys(data.get('attributes'), 'underscore') if data.get('attributes') else dict()
+
+    @staticmethod
+    def parse_relationships(data):
+        relationships = (utils.format_keys(data.get('relationships'), 'underscore')
+                         if data.get('relationships') else dict())
+
+        # Parse the relationships
+        parsed_relationships = dict()
+        for field_name, field_data in relationships.items():
+            field_data = field_data.get('data')
+            if isinstance(field_data, dict):
+                parsed_relationships[field_name] = field_data
+            elif isinstance(field_data, list):
+                parsed_relationships[field_name] = list(relation for relation in field_data)
+        return parsed_relationships
+
     def parse(self, stream, media_type=None, parser_context=None):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
@@ -61,28 +80,11 @@ class JSONParser(parsers.JSONParser):
                         resource_type=resource_name
                     )
                 )
-            # Get the ID
-            data_id = data.get('id')
-            # Get the attributes
-            attributes = utils.format_keys(data.get('attributes'), 'underscore') if data.get(
-                'attributes') else dict()
-            # Get the relationships
-            relationships = utils.format_keys(data.get('relationships'), 'underscore') if data.get(
-                'relationships') else dict()
-
-            # Parse the relationships
-            parsed_relationships = dict()
-            for field_name, field_data in relationships.items():
-                field_data = field_data.get('data')
-                if isinstance(field_data, dict):
-                    parsed_relationships[field_name] = field_data
-                elif isinstance(field_data, list):
-                    parsed_relationships[field_name] = list(relation for relation in field_data)
 
             # Construct the return data
-            parsed_data = {'id': data_id}
-            parsed_data.update(attributes)
-            parsed_data.update(parsed_relationships)
+            parsed_data = {'id': data.get('id')}
+            parsed_data.update(self.parse_attributes(data))
+            parsed_data.update(self.parse_relationships(data))
             return parsed_data
 
         else:
