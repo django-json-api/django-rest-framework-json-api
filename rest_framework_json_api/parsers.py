@@ -48,9 +48,12 @@ class JSONParser(parsers.JSONParser):
                     raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
 
                 return data
+
+            request = parser_context.get('request')
+
             # Check for inconsistencies
             resource_name = utils.get_resource_name(parser_context)
-            if data.get('type') != resource_name:
+            if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
                 raise exceptions.Conflict(
                     "The resource object's type ({data_type}) is not the type "
                     "that constitute the collection represented by the endpoint ({resource_type}).".format(
