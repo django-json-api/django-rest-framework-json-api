@@ -30,7 +30,7 @@ class NextPageLinkField(ReadOnlyField):
 
 class NextPageField(ReadOnlyField):
     """
-    Field that returns a link to the next page in paginated results.
+    Field that returns a the next page number in paginated results.
     """
     page_field = 'page'
 
@@ -57,7 +57,7 @@ class PreviousPageLinkField(ReadOnlyField):
 
 class PreviousPageField(ReadOnlyField):
     """
-    Field that returns a link to the previous page in paginated results.
+    Field that returns the previous page number in paginated results.
     """
     page_field = 'page'
 
@@ -69,7 +69,7 @@ class PreviousPageField(ReadOnlyField):
 
 class PageField(ReadOnlyField):
     """
-    Field that returns a link to the previous page in paginated results.
+    Field that returns the current page number in paginated results.
     """
     page_field = 'page'
 
@@ -106,7 +106,7 @@ class EmberPaginationSerializer(PaginationSerializer):
 
 class PageNumberPagination(BasePagination):
     """
-    An Ember (soon to be json-api) compatible pagination format
+    A json-api compatible pagination format
     """
 
     def build_link(self, index):
