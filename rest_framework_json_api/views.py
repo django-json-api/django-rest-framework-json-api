@@ -7,6 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.reverse import reverse
+from rest_framework.serializers import Serializer
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
@@ -17,6 +18,11 @@ class RelationshipView(generics.GenericAPIView):
     serializer_class = ResourceIdentifierObjectSerializer
     self_link_view_name = None
     related_link_view_name = None
+
+    def get_serializer_class(self):
+        if getattr(self, 'action', False) is None:
+            return Serializer
+        return self.serializer_class
 
     def __init__(self, **kwargs):
         super(RelationshipView, self).__init__(**kwargs)
