@@ -11,6 +11,7 @@ from rest_framework.relations import RelatedField, HyperlinkedRelatedField, Prim
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
 
+
 try:
     from rest_framework.compat import OrderedDict
 except ImportError:
@@ -237,6 +238,9 @@ def extract_attributes(fields, resource):
 
 
 def extract_relationships(fields, resource, resource_instance):
+    # Avoid circular deps
+    from rest_framework_json_api.relations import ResourceRelatedField
+
     data = OrderedDict()
 
     # Don't try to extract relationships from a non-existent resource
@@ -254,7 +258,7 @@ def extract_relationships(fields, resource, resource_instance):
 
         try:
             relation_instance_or_manager = getattr(resource_instance, field_name)
-        except AttributeError: # Skip fields defined on the serializer that don't correspond to a field on the model
+        except AttributeError:  # Skip fields defined on the serializer that don't correspond to a field on the model
             continue
 
         relation_type = get_related_resource_type(field)
@@ -282,6 +286,20 @@ def extract_relationships(fields, resource, resource_instance):
             }})
             continue
 
+        if isinstance(field, ResourceRelatedField):
+            # special case for ResourceRelatedField
+            relation_data = {
+                'data': resource.get(field_name)
+            }
+
+            field_links = field.get_links()
+            relation_data.update(
+                {'links': field_links}
+                if field_links else dict()
+            )
+            data.update({field_name: relation_data})
+            continue
+
         if isinstance(field, (PrimaryKeyRelatedField, HyperlinkedRelatedField)):
             relation_id = relation_instance_or_manager.pk if resource.get(field_name) else None
 
@@ -299,6 +317,28 @@ def extract_relationships(fields, resource, resource_instance):
             continue
 
         if isinstance(field, ManyRelatedField):
+
+            if isinstance(field.child_relation, ResourceRelatedField):
+                # special case for ResourceRelatedField
+                relation_data = {
+                    'data': resource.get(field_name)
+                }
+
+                field_links = field.child_relation.get_links()
+                relation_data.update(
+                    {'links': field_links}
+                    if field_links else dict()
+                )
+                relation_data.update(
+                    {
+                        'meta': {
+                            'count': len(resource.get(field_name))
+                        }
+                    }
+                )
+                data.update({field_name: relation_data})
+                continue
+
             relation_data = list()
             for related_object in relation_instance_or_manager.all():
                 related_object_type = get_instance_or_manager_resource_type(relation_instance_or_manager)
