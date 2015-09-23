@@ -324,7 +324,7 @@ def extract_relationships(fields, resource, resource_instance):
                     'data': resource.get(field_name)
                 }
 
-                field_links = field.child_relation.get_links()
+                field_links = field.child_relation.get_links(resource_instance)
                 relation_data.update(
                     {'links': field_links}
                     if field_links else dict()
