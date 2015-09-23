@@ -3,7 +3,6 @@ from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
-from django.utils import six
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
@@ -11,7 +10,7 @@ from rest_framework.reverse import reverse
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, OrderedDict
+from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, OrderedDict, Hyperlink
 
 
 class RelationshipView(generics.GenericAPIView):
@@ -28,28 +27,11 @@ class RelationshipView(generics.GenericAPIView):
 
     def get_url(self, name, view_name, kwargs, request):
         """
-        Given an object, return the URL that hyperlinks to the object.
+        Given a name, view name and kwargs, return the URL that hyperlinks to the object.
 
         May raise a `NoReverseMatch` if the `view_name` and `lookup_field`
         attributes are not configured to correctly match the URL conf.
         """
-
-        class Hyperlink(six.text_type):
-            """
-            A string like object that additionally has an associated name.
-            We use this for hyperlinked URLs that may render as a named link
-            in some contexts, or render as a plain URL in others.
-
-            Comes from Django REST framework 3.2
-            https://github.com/tomchristie/django-rest-framework
-            """
-
-            def __new__(self, url, name):
-                ret = six.text_type.__new__(self, url)
-                ret.name = name
-                return ret
-
-            is_hyperlink = True
 
         # Return None if the view name is not supplied
         if not view_name:

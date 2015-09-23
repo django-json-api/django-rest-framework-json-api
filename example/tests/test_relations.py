@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
 from django.utils import timezone
-
 from rest_framework import serializers
 
 from . import TestBase
+from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import format_relation_name
 from example.models import Blog, Entry, Comment, Author
 from rest_framework_json_api.relations import ResourceRelatedField
@@ -74,15 +74,17 @@ class TestResourceRelatedField(TestBase):
         self.assertEqual(serializer.validated_data['blog'], self.blog)
 
     def test_validation_fails_for_wrong_type(self):
-        serializer = BlogFKSerializer(data={
-            'blog': {
-                'type': 'Entries',
-                'id': str(self.blog.id)
+        with self.assertRaises(Conflict) as cm:
+            serializer = BlogFKSerializer(data={
+                'blog': {
+                    'type': 'Entries',
+                    'id': str(self.blog.id)
+                }
             }
-        }
-        )
-
-        self.assertFalse(serializer.is_valid())
+                                          )
+            serializer.is_valid()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.status_code, 409)
 
     def test_serialize_many_to_many_relation(self):
         serializer = EntryModelSerializer(instance=self.entry)
