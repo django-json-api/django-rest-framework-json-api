@@ -227,7 +227,7 @@ def extract_attributes(fields, resource):
 
         # Skip read_only attribute fields when the resource is non-existent
         # Needed for the "Raw data" form of the browseable API
-        if resource.get('id') is None and fields[field_name].read_only:
+        if len(data) == 0 and fields[field_name].read_only:
             continue
 
         data.update({
