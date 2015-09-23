@@ -395,3 +395,21 @@ def extract_included(fields, resource, resource_instance):
                 )
 
     return format_keys(included_data)
+
+
+class Hyperlink(six.text_type):
+    """
+    A string like object that additionally has an associated name.
+    We use this for hyperlinked URLs that may render as a named link
+    in some contexts, or render as a plain URL in others.
+
+    Comes from Django REST framework 3.2
+    https://github.com/tomchristie/django-rest-framework
+    """
+
+    def __new__(self, url, name):
+        ret = six.text_type.__new__(self, url)
+        ret.name = name
+        return ret
+
+    is_hyperlink = True
