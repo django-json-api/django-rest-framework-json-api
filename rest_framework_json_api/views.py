@@ -27,7 +27,7 @@ class RelationshipView(generics.GenericAPIView):
 
     def get_url(self, name, view_name, kwargs, request):
         """
-        Given an object, return the URL that hyperlinks to the object.
+        Given a name, view name and kwargs, return the URL that hyperlinks to the object.
 
         May raise a `NoReverseMatch` if the `view_name` and `lookup_field`
         attributes are not configured to correctly match the URL conf.
