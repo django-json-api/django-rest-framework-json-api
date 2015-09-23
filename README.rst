@@ -18,7 +18,9 @@ JSON API and Django Rest Framework
    :target: https://gitter.im/django-json-api/django-rest-framework-json-api
 
    
-Documentation: http://django-rest-framework-json-api.readthedocs.org/     
+Documentation: http://django-rest-framework-json-api.readthedocs.org/
+
+Live demo (resets every hour): http://json-api.jerel.co/
 
 Format specification: http://jsonapi.org/format/
 
