@@ -9,6 +9,10 @@ JSON API and Django Rest Framework
    :alt: Read the docs
    :target: http://django-rest-framework-json-api.readthedocs.org/
    
+.. image:: https://codeclimate.com/github/django-json-api/django-rest-framework-json-api/badges/gpa.svg
+   :target: https://codeclimate.com/github/django-json-api/django-rest-framework-json-api
+   :alt: Code Climate
+   
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
    :target: https://gitter.im/django-json-api/django-rest-framework-json-api
