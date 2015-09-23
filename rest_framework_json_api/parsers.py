@@ -75,9 +75,9 @@ class JSONParser(parsers.JSONParser):
             for field_name, field_data in relationships.items():
                 field_data = field_data.get('data')
                 if isinstance(field_data, dict):
-                    parsed_relationships[field_name] = field_data.get('id')
+                    parsed_relationships[field_name] = field_data
                 elif isinstance(field_data, list):
-                    parsed_relationships[field_name] = list(relation.get('id') for relation in field_data)
+                    parsed_relationships[field_name] = list(relation for relation in field_data)
 
             # Construct the return data
             parsed_data = {'id': data_id}
