@@ -141,7 +141,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
 
     def to_representation(self, value):
-        if self.pk_field is not None:
+        if getattr(self, 'pk_field', None) is not None:
             pk = self.pk_field.to_representation(value.pk)
         else:
             pk = value.pk
