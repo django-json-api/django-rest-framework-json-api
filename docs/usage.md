@@ -122,7 +122,7 @@ Example - With format conversion set to `dasherize`:
 
 #### Relationship types
 
-A similar option to JSON\_API\_FORMAT\_KEYS can be set for the relationship names:
+A similar option to JSON\_API\_FORMAT\_RELATION\_KEYS can be set for the relationship names:
 
 ``` python
 JSON_API_FORMAT_RELATION_KEYS = 'dasherize'

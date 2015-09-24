@@ -11,6 +11,7 @@ ROOT_URLCONF = 'example.urls_test'
 
 JSON_API_FORMAT_KEYS = 'camelize'
 JSON_API_FORMAT_RELATION_KEYS = 'camelize'
+JSON_API_PLURALIZE_RELATION_TYPE = True
 REST_FRAMEWORK.update({
     'PAGINATE_BY': 1,
 })
