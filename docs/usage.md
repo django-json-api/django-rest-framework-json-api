@@ -122,7 +122,7 @@ Example - With format conversion set to `dasherize`:
 
 #### Relationship types
 
-A similar option to JSON\_API\_FORMAT\_KEYS can be set for the relationship names:
+A similar option to JSON\_API\_FORMAT\_RELATION\_KEYS can be set for the relationship names:
 
 ``` python
 JSON_API_FORMAT_RELATION_KEYS = 'dasherize'
@@ -172,7 +172,57 @@ When set to dasherize:
     }]
 }
 ```
+It is also possible to pluralize the types like so:
 
+```python
+JSON_API_PLURALIZE_RELATION_TYPE = True
+```
+Example without pluralization:
+
+``` js
+{
+	"data": [{
+        "type": "identity",
+        "id": 3,
+        "attributes": {
+                ...
+        },
+        "relationships": {
+            "home_towns": {
+                "data": [{
+                    "type": "home_town",
+                    "id": 3
+                }]
+            }
+        }
+    }]
+}
+```
+
+When set to pluralize:
+
+
+``` js
+{
+	"data": [{
+        "type": "identities",
+        "id": 3,
+        "attributes": {
+                ...
+        },
+        "relationships": {
+            "home_towns": {
+                "data": [{
+                    "type": "home_towns",
+                    "id": 3
+                }]
+            }
+        }
+    }]
+}
+
+Both `JSON_API_PLURALIZE_RELATION_TYPE` and `JSON_API_FORMAT_RELATION_KEYS` can be combined to 
+achieve different results.
 
 <!-- 
 ### Relationships
