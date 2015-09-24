@@ -68,9 +68,7 @@ def get_resource_name(context):
             if not isinstance(resource_name, six.string_types):
                 return resource_name
 
-            resource_name = format_value(resource_name)
-
-            resource_name = inflection.pluralize(resource_name)
+            resource_name = format_relation_name(resource_name)
 
     return resource_name
 
@@ -140,13 +138,13 @@ def format_relation_name(value, format_type=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
 
-    if not format_type:
-        return value
+    pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', False)
 
-    # format_type will never be None here so we can use format_value
-    value = format_value(value, format_type)
+    if format_type:
+        # format_type will never be None here so we can use format_value
+        value = format_value(value, format_type)
 
-    return inflection.pluralize(value)
+    return inflection.pluralize(value) if pluralize else value
 
 
 def build_json_resource_obj(fields, resource, resource_instance, resource_name):
