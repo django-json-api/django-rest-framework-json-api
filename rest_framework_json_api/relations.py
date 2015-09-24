@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import *
@@ -136,9 +138,11 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         return return_data
 
     def to_internal_value(self, data):
-        expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        if isinstance(data, six.text_type):
+            data = json.loads(data)
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
+        expected_relation_type = get_resource_type_from_queryset(self.queryset)
         if data['type'] != expected_relation_type:
             self.conflict('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
@@ -150,4 +154,20 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             pk = value.pk
 
         return OrderedDict([('type', format_relation_name(get_resource_type_from_instance(value))), ('id', str(pk))])
+
+    @property
+    def choices(self):
+        queryset = self.get_queryset()
+        if queryset is None:
+            # Ensure that field.choices returns something sensible
+            # even when accessed with a read-only field.
+            return {}
+
+        return OrderedDict([
+            (
+                json.dumps(self.to_representation(item)),
+                self.display_value(item)
+            )
+            for item in queryset
+        ])
 
