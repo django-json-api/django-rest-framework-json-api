@@ -199,7 +199,7 @@ Example without pluralization:
 }
 ```
 
-When set to dasherize:
+When set to pluralize:
 
 
 ``` js
