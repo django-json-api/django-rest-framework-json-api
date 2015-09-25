@@ -220,6 +220,7 @@ When set to pluralize:
         }
     }]
 }
+```
 
 Both `JSON_API_PLURALIZE_RELATION_TYPE` and `JSON_API_FORMAT_RELATION_KEYS` can be combined to 
 achieve different results.
