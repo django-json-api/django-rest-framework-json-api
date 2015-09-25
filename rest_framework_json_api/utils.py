@@ -215,7 +215,7 @@ def get_resource_type_from_serializer(serializer):
         # Check the meta class for resource_name
         return serializer.Meta.resource_name
     except AttributeError:
-        # Use the serializer model then then pluralize and format
+        # Use the serializer model then pluralize and format
         return format_relation_name(serializer.Meta.model.__name__)
 
 
