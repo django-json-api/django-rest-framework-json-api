@@ -1,20 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.serializers import *
-from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance
 
-from rest_framework_json_api.relations import HyperlinkedRelatedField
-
-
-class HyperlinkedModelSerializer(HyperlinkedModelSerializer):
-    """
-    A type of `ModelSerializer` that uses hyperlinked relationships instead
-    of primary key relationships. Specifically:
-
-    * A 'url' field is included instead of the 'id' field.
-    * Relationships to other instances are hyperlinks, instead of primary keys.
-    * Uses django-rest-framework-json-api HyperlinkedRelatedField instead of the default HyperlinkedRelatedField
-    """
-    serializer_related_field = HyperlinkedRelatedField
+from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, \
+    get_resource_type_from_serializer
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -46,3 +34,37 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
             self.fail('does_not_exist', pk_value=pk)
         except (TypeError, ValueError):
             self.fail('incorrect_type', data_type=type(data['pk']).__name__)
+
+
+class SparseFieldsetsMixin(object):
+    def __init__(self, *args, **kwargs):
+        context = kwargs.get('context')
+        request = context.get('request') if context else None
+
+        if request:
+            sparse_fieldset_query_param = 'fields[{}]'.format(get_resource_type_from_serializer(self))
+            try:
+                param_name = next(key for key in request.query_params if sparse_fieldset_query_param in key)
+            except StopIteration:
+                pass
+            else:
+                fieldset = request.query_params.get(param_name).split(',')
+                for field_name, field in self.fields.items():
+                    if field_name == api_settings.URL_FIELD_NAME:  # leave self link there
+                        continue
+                    if field_name not in fieldset:
+                        self.fields.pop(field_name)
+
+        super(SparseFieldsetsMixin, self).__init__(*args, **kwargs)
+
+
+class HyperlinkedModelSerializer(SparseFieldsetsMixin, HyperlinkedModelSerializer):
+    """
+    A type of `ModelSerializer` that uses hyperlinked relationships instead
+    of primary key relationships. Specifically:
+
+    * A 'url' field is included instead of the 'id' field.
+    * Relationships to other instances are hyperlinks, instead of primary keys.
+
+    * A mixin class to enable sparse fieldsets is included
+    """
