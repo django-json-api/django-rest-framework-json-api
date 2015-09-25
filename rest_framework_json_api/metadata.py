@@ -4,6 +4,7 @@ from django.db.models.fields import related
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.metadata import SimpleMetadata
+from rest_framework.settings import api_settings
 from rest_framework.utils.field_mapping import ClassLookupDict
 
 from rest_framework_json_api.utils import get_related_resource_type
@@ -18,8 +19,7 @@ class JSONAPIMetadata(SimpleMetadata):
     """
     type_lookup = ClassLookupDict({
         serializers.Field: 'GenericField',
-        serializers.HyperlinkedIdentityField: 'Relationship',
-        serializers.HyperlinkedRelatedField: 'Relationship',
+        serializers.RelatedField: 'Relationship',
         serializers.BooleanField: 'Boolean',
         serializers.NullBooleanField: 'Boolean',
         serializers.CharField: 'String',
@@ -43,6 +43,7 @@ class JSONAPIMetadata(SimpleMetadata):
     })
 
     relation_type_lookup = ClassLookupDict({
+        related.ManyRelatedObjectsDescriptor: 'ManyToMany',
         related.ReverseManyRelatedObjectsDescriptor: 'ManyToMany',
         related.ForeignRelatedObjectsDescriptor: 'OneToMany',
         related.ReverseSingleRelatedObjectDescriptor: 'ManyToOne',
@@ -70,6 +71,10 @@ class JSONAPIMetadata(SimpleMetadata):
             # If this is a `ListSerializer` then we want to examine the
             # underlying child serializer instance instead.
             serializer = serializer.child
+
+        # Remove the URL field if present
+        serializer.fields.pop(api_settings.URL_FIELD_NAME)
+
         return OrderedDict(
             [(field_name, self.get_field_info(field, serializer)) for field_name, field in serializer.fields.items()]
         )
