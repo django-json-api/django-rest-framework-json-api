@@ -52,22 +52,19 @@ def get_resource_name(context):
         resource_name = getattr(view, 'resource_name')
     except AttributeError:
         try:
-            # Check the meta class
-            resource_name = (getattr(view, 'serializer_class').Meta.resource_name)
+            serializer = getattr(view, 'serializer_class')
+            return get_resource_type_from_serializer(serializer)
         except AttributeError:
-            # Use the model
             try:
-                resource_name = (getattr(view, 'serializer_class').Meta.model.__name__)
+                resource_name = view.model.__name__
             except AttributeError:
-                try:
-                    resource_name = view.model.__name__
-                except AttributeError:
-                    resource_name = view.__class__.__name__
+                resource_name = view.__class__.__name__
 
-            # if the name was calculated automatically then pluralize and format
             if not isinstance(resource_name, six.string_types):
+                # The resource name is not a string - return as is
                 return resource_name
 
+            # the name was calculated automatically from the view > pluralize and format
             resource_name = format_relation_name(resource_name)
 
     return resource_name
@@ -211,6 +208,15 @@ def get_resource_type_from_instance(instance):
 
 def get_resource_type_from_manager(manager):
     return format_relation_name(manager.model.__name__)
+
+
+def get_resource_type_from_serializer(serializer):
+    try:
+        # Check the meta class for resource_name
+        return serializer.Meta.resource_name
+    except AttributeError:
+        # Use the serializer model then then pluralize and format
+        return format_relation_name(serializer.Meta.model.__name__)
 
 
 def extract_attributes(fields, resource):
