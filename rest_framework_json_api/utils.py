@@ -261,7 +261,8 @@ def extract_relationships(fields, resource, resource_instance):
             continue
 
         try:
-            relation_instance_or_manager = getattr(resource_instance, field_name)
+            source = field.source
+            relation_instance_or_manager = getattr(resource_instance, source)
         except AttributeError:  # Skip fields defined on the serializer that don't correspond to a field on the model
             continue
 
