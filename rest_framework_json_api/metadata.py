@@ -73,7 +73,7 @@ class JSONAPIMetadata(SimpleMetadata):
             serializer = serializer.child
 
         # Remove the URL field if present
-        serializer.fields.pop(api_settings.URL_FIELD_NAME)
+        serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
         return OrderedDict(
             [(field_name, self.get_field_info(field, serializer)) for field_name, field in serializer.fields.items()]
