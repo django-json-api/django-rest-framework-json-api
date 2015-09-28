@@ -5,12 +5,12 @@ import inflection
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
+import re
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
     HyperlinkedIdentityField
 from rest_framework.settings import api_settings
-from rest_framework.exceptions import APIException
-
+from rest_framework.exceptions import APIException, ParseError
 
 try:
     from rest_framework.compat import OrderedDict
@@ -395,19 +395,43 @@ def extract_relationships(fields, resource, resource_instance):
     return format_keys(data)
 
 
-def extract_included(fields, resource, resource_instance):
+def extract_included(fields, resource, resource_instance, included_resources):
     included_data = list()
+
+    context = fields.serializer.context
+    included_serializers = getattr(context['view'], 'included_serializers', None)
+
+    for resource_name in included_resources:
+        # we do not support inclusion of resources in a path
+        match = re.search(r'\.', resource_name)
+        if match is not None:
+            raise ParseError('This endpoint does not support inclusion of resources from a path')
+
     for field_name, field in six.iteritems(fields):
         # Skip URL field
         if field_name == api_settings.URL_FIELD_NAME:
             continue
 
-        # Skip fields without serialized data
-        if not isinstance(field, BaseSerializer):
+        # Skip fields without relations or serialized data
+        if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
+            continue
+
+        # Skip fields not in requested included resources
+        if field_name not in included_resources:
             continue
 
         relation_instance_or_manager = getattr(resource_instance, field_name)
         serializer_data = resource.get(field_name)
+
+        if isinstance(field, ManyRelatedField):
+            serializer_class = included_serializers.get(field_name)
+            field = serializer_class(relation_instance_or_manager.all(), many=True, context=context)
+            serializer_data = field.data
+
+        if isinstance(field, RelatedField):
+            serializer_class = included_serializers.get(field_name)
+            field = serializer_class(relation_instance_or_manager, context=context)
+            serializer_data = field.data
 
         if isinstance(field, ListSerializer):
             serializer = field.child
