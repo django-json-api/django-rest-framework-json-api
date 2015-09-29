@@ -4,6 +4,10 @@
 The DJA package implements a custom renderer, parser, exception handler, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
+Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`. 
+The easiest way to make use of those features is to import ModelSerializer variants 
+from `rest_framework_json_api` instead of the usual `rest_framework`
+
 ### Configuration
 We suggest that you simply copy the settings block below and modify it if necessary.
 ``` python
