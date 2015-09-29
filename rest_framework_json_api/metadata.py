@@ -119,4 +119,15 @@ class JSONAPIMetadata(SimpleMetadata):
         elif getattr(field, 'fields', None):
             field_info['children'] = self.get_serializer_info(field)
 
+        if (not field_info.get('read_only')
+            and hasattr(field, 'choices')
+            and not field_info.get('relationship_resource')):
+            field_info['choices'] = [
+                {
+                    'value': choice_value,
+                    'display_name': force_text(choice_name, strings_only=True)
+                }
+                for choice_value, choice_name in field.choices.items()
+            ]
+
         return field_info
