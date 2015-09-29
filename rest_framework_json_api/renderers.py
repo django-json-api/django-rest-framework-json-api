@@ -6,7 +6,6 @@ from collections import OrderedDict
 from rest_framework import renderers
 
 from . import utils
-from rest_framework.exceptions import APIException
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -71,13 +70,6 @@ class JSONRenderer(renderers.JSONRenderer):
         include_resources_param = request.query_params.get('include') if request else None
         if include_resources_param:
             included_resources = include_resources_param.split(',')
-            for included_field_name in included_resources:
-                if not hasattr(view, 'included_serializers'):
-                    raise APIException('This endpoint does not support the include parameter')
-                if view.included_serializers.get(included_field_name) is None:
-                    raise APIException(
-                        'This endpoint does not support the include parameter for field {}'.format(included_field_name)
-                    )
         else:
             included_resources = list()
 
