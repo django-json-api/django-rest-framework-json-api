@@ -65,19 +65,37 @@ class IncludedResourcesValidationMixin(object):
         request = context.get('request') if context else None
         view = context.get('view') if context else None
 
+        def validate_path(serializer_class, field_path, serializers, path):
+            serializers = {
+                key: serializer_class if serializer == 'self' else serializer
+                for key, serializer in serializers.items()
+                } if serializers else dict()
+            if serializers is None:
+                raise ParseError('This endpoint does not support the include parameter')
+            this_field_name = field_path[0]
+            this_included_serializer = serializers.get(this_field_name)
+            if this_included_serializer is None:
+                raise ParseError(
+                    'This endpoint does not support the include parameter for path {}'.format(
+                        path
+                    )
+                )
+            if len(field_path) > 1:
+                new_included_field_path = field_path[-1:]
+                # We go down one level in the path
+                validate_path(this_included_serializer, new_included_field_path, serializers, path)
+
         if request and view:
             include_resources_param = request.query_params.get('include') if request else None
             if include_resources_param:
                 included_resources = include_resources_param.split(',')
                 for included_field_name in included_resources:
-                    if not hasattr(view, 'included_serializers'):
-                        raise ParseError('This endpoint does not support the include parameter')
-                    if view.included_serializers.get(included_field_name) is None:
-                        raise ParseError(
-                            'This endpoint does not support the include parameter for field {}'.format(
-                                included_field_name
-                            )
-                        )
+                    included_field_path = included_field_name.split('.')
+                    this_serializer_class = view.serializer_class
+                    included_serializers = getattr(this_serializer_class, 'included_serializers', None)
+                    # lets validate the current path
+                    validate_path(this_serializer_class, included_field_path, included_serializers, included_field_name)
+
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 

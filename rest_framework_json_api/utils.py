@@ -5,12 +5,11 @@ import inflection
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
-import re
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
     HyperlinkedIdentityField
 from rest_framework.settings import api_settings
-from rest_framework.exceptions import APIException, ParseError
+from rest_framework.exceptions import APIException
 
 try:
     from rest_framework.compat import OrderedDict
@@ -190,7 +189,6 @@ def get_related_resource_type(relation):
 
 
 def get_instance_or_manager_resource_type(resource_instance_or_manager):
-
     if hasattr(resource_instance_or_manager, 'model'):
         return get_resource_type_from_manager(resource_instance_or_manager)
     if hasattr(resource_instance_or_manager, '_meta'):
@@ -398,14 +396,14 @@ def extract_relationships(fields, resource, resource_instance):
 def extract_included(fields, resource, resource_instance, included_resources):
     included_data = list()
 
-    context = fields.serializer.context
-    included_serializers = getattr(context['view'], 'included_serializers', None)
+    current_serializer = fields.serializer
+    context = current_serializer.context
+    included_serializers = getattr(fields.serializer, 'included_serializers', None)
 
-    for resource_name in included_resources:
-        # we do not support inclusion of resources in a path
-        match = re.search(r'\.', resource_name)
-        if match is not None:
-            raise ParseError('This endpoint does not support inclusion of resources from a path')
+    included_serializers = {
+        key: current_serializer.__class__ if serializer == 'self' else serializer
+        for key, serializer in included_serializers.items()
+        } if included_serializers else dict()
 
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -416,12 +414,14 @@ def extract_included(fields, resource, resource_instance, included_resources):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        # Skip fields not in requested included resources
-        if field_name not in included_resources:
+        try:
+            included_resources.remove(field_name)
+            relation_instance_or_manager = getattr(resource_instance, field_name)
+            serializer_data = resource.get(field_name)
+            new_included_resources = [key.replace('%s.' % field_name, '', 1) for key in included_resources]
+        except ValueError:
+            # Skip fields not in requested included resources
             continue
-
-        relation_instance_or_manager = getattr(resource_instance, field_name)
-        serializer_data = resource.get(field_name)
 
         if isinstance(field, ManyRelatedField):
             serializer_class = included_serializers.get(field_name)
@@ -450,6 +450,11 @@ def extract_included(fields, resource, resource_instance, included_resources):
                             serializer_fields, serializer_resource, nested_resource_instance, relation_type
                         )
                     )
+                    included_data.extend(
+                        extract_included(
+                            serializer_fields, serializer_resource, nested_resource_instance, new_included_resources
+                        )
+                    )
 
         if isinstance(field, ModelSerializer):
             model = field.Meta.model
@@ -459,7 +464,13 @@ def extract_included(fields, resource, resource_instance, included_resources):
             serializer_fields = get_serializer_fields(field)
             if serializer_data:
                 included_data.append(
-                    build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager, relation_type)
+                    build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager,
+                                            relation_type)
+                )
+                included_data.extend(
+                    extract_included(
+                        serializer_fields, serializer_data, relation_instance_or_manager, new_included_resources
+                    )
                 )
 
     return format_keys(included_data)
