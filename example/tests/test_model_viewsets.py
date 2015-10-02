@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.utils import encoding
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from example.tests import TestBase
 from example.tests.utils import dump_json, redump_json
@@ -21,6 +22,12 @@ class ModelViewSetTests(TestBase):
     def setUp(self):
         super(ModelViewSetTests, self).setUp()
         self.detail_url = reverse('user-detail', kwargs={'pk': self.miles.pk})
+
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'dasherize')
+
+    def tearDown(self):
+
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelize')
 
     def test_key_in_list_result(self):
         """

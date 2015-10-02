@@ -11,6 +11,16 @@ class GenericViewSet(TestBase):
     """
     Test expected responses coming from a Generic ViewSet
     """
+
+    def setUp(self):
+        super(GenericViewSet, self).setUp()
+
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'dasherize')
+
+    def tearDown(self):
+
+        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelize')
+
     def test_default_rest_framework_behavior(self):
         """
         This is more of an example really, showing default behavior

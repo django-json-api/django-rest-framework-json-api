@@ -109,6 +109,9 @@ class PageNumberPagination(BasePagination):
     A json-api compatible pagination format
     """
 
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
     def build_link(self, index):
         if not index:
             return None
