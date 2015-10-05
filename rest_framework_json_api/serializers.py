@@ -13,8 +13,10 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
         'incorrect_type': _('Incorrect type. Expected pk value, received {data_type}.'),
     }
 
+    model_class = None
+
     def __init__(self, *args, **kwargs):
-        self.model_class = kwargs.pop('model_class', None)
+        self.model_class = kwargs.pop('model_class', self.model_class)
         if 'instance' not in kwargs and not self.model_class:
             raise RuntimeError('ResourceIdentifierObjectsSerializer must be initialized with a model class.')
         super(ResourceIdentifierObjectSerializer, self).__init__(*args, **kwargs)
