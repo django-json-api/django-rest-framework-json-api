@@ -6,19 +6,6 @@ from example.tests.utils import dump_json, redump_json
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture
-def single_entry(author_factory, entry_factory):
-
-    author = author_factory(name="Joel Spolsky")
-    entry = entry_factory(
-        headline=("The Absolute Minimum Every Software Developer"
-                  "Absolutely, Positively Must Know About Unicode "
-                  "and Character Sets (No Excuses!)"),
-        blog__name='Joel on Software',
-        authors=(author, )
-    )
-
-
 def test_pagination_with_single_entry(single_entry, client):
 
     expected = {
@@ -29,9 +16,9 @@ def test_pagination_with_single_entry(single_entry, client):
                 "attributes":
                 {
                     "headline": "The Absolute Minimum Every Software DeveloperAbsolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)",
-                    "body-text": "Here goes the body text",
-                    "pub-date": None,
-                    "mod-date": None
+                    "bodyText": "Here goes the body text",
+                    "pubDate": None,
+                    "modDate": None
                 },
                 "relationships":
                 {

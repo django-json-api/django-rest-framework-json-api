@@ -83,22 +83,26 @@ class JSONRenderer(renderers.JSONRenderer):
 
         json_api_included = list()
 
-        if view and hasattr(view, 'action') and view.action == 'list' and \
-                isinstance(data, dict) and 'results' in data:
+        if view and hasattr(view, 'action') and view.action == 'list':
+            # The below is not true for non-paginated responses
+            # and isinstance(data, dict):
+
             # If detail view then json api spec expects dict, otherwise a list
             # - http://jsonapi.org/format/#document-top-level
             # The `results` key may be missing if unpaginated or an OPTIONS request
+            if 'results' in data:
+                resources = data["results"]
+            else:
+                resources = data
 
-            results = data["results"]
-
-            resource_serializer = results.serializer
+            resource_serializer = resources.serializer
 
             # Get the serializer fields
             fields = utils.get_serializer_fields(resource_serializer)
 
             json_api_data = list()
-            for position in range(len(results)):
-                resource = results[position]  # Get current resource
+            for position in range(len(resources)):
+                resource = resources[position]  # Get current resource
                 resource_instance = resource_serializer.instance[position]  # Get current instance
                 json_api_data.append(
                     utils.build_json_resource_obj(fields, resource, resource_instance, resource_name))

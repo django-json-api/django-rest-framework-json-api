@@ -5,16 +5,12 @@ import inflection
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.compat import OrderedDict
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
     HyperlinkedIdentityField
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import APIException
-
-try:
-    from rest_framework.compat import OrderedDict
-except ImportError:
-    OrderedDict = dict
 
 try:
     from rest_framework.serializers import ManyRelatedField
