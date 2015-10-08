@@ -131,4 +131,7 @@ class JSONAPIMetadata(SimpleMetadata):
                 for choice_value, choice_name in field.choices.items()
             ]
 
+        if hasattr(serializer, 'included_serializers') and 'relationship_resource' in field_info:
+            field_info['allows_include'] = field.field_name in serializer.included_serializers
+
         return field_info
