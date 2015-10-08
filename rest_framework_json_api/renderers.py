@@ -31,6 +31,27 @@ class JSONRenderer(renderers.JSONRenderer):
     media_type = 'application/vnd.api+json'
     format = 'vnd.api+json'
 
+    def render_relationship_view(self, data, accepted_media_type=None, renderer_context=None):
+        # Special case for RelationshipView
+        view = renderer_context.get("view", None)
+        render_data = OrderedDict([
+            ('data', data)
+        ])
+        links = view.get_links()
+        if links:
+            render_data.update({'links': links}),
+        return super(JSONRenderer, self).render(
+            render_data, accepted_media_type, renderer_context
+        )
+
+    def render_errors(self, data, accepted_media_type=None, renderer_context=None):
+        # Get the resource name.
+        if len(data) > 1 and isinstance(data, list):
+            data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
+        return super(JSONRenderer, self).render(
+            {'errors': data}, accepted_media_type, renderer_context
+        )
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
 
         view = renderer_context.get("view", None)
@@ -38,16 +59,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         from rest_framework_json_api.views import RelationshipView
         if isinstance(view, RelationshipView):
-            # Special case for RelationshipView
-            render_data = OrderedDict([
-                ('data', data)
-            ])
-            links = view.get_links()
-            if links:
-                render_data.update({'links': links}),
-            return super(JSONRenderer, self).render(
-                render_data, accepted_media_type, renderer_context
-            )
+            return self.render_relationship_view(data, accepted_media_type, renderer_context)
 
         # Get the resource name.
         resource_name = utils.get_resource_name(renderer_context)
@@ -61,11 +73,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         # If this is an error response, skip the rest.
         if resource_name == 'errors':
-            if len(data) > 1 and isinstance(data, list):
-                data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
-            return super(JSONRenderer, self).render(
-                {resource_name: data}, accepted_media_type, renderer_context
-            )
+            return self.render_errors(data, accepted_media_type, renderer_context)
 
         include_resources_param = request.query_params.get('include') if request else None
         if include_resources_param:
