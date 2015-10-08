@@ -6,7 +6,6 @@ import inflection
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
-from django.utils.module_loading import import_string
 from rest_framework.compat import OrderedDict
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
@@ -23,6 +22,12 @@ try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
     HyperlinkedRouterField = type(None)
+
+import django
+if django.VERSION < (1, 7):
+    from django.utils.module_loading import import_by_path as import_class_from_dotted_path
+else:
+    from django.utils.module_loading import import_string as import_class_from_dotted_path
 
 
 def get_resource_name(context):
@@ -478,7 +483,7 @@ def get_included_serializers(serializer):
             if value == 'self':
                 included_serializers[name] = serializer if isinstance(serializer, type) else serializer.__class__
             else:
-                included_serializers[name] = import_string(value)
+                included_serializers[name] = import_class_from_dotted_path(value)
 
     return included_serializers
 
