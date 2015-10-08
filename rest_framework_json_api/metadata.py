@@ -76,15 +76,16 @@ class JSONAPIMetadata(SimpleMetadata):
         serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
         return OrderedDict(
-            [(field_name, self.get_field_info(field, serializer)) for field_name, field in serializer.fields.items()]
+            [(field_name, self.get_field_info(field)) for field_name, field in serializer.fields.items()]
         )
 
-    def get_field_info(self, field, serializer):
+    def get_field_info(self, field):
         """
         Given an instance of a serializer field, return a dictionary
         of metadata about it.
         """
         field_info = OrderedDict()
+        serializer = field.parent
 
         if isinstance(field, serializers.ManyRelatedField):
             field_info['type'] = self.type_lookup[field.child_relation]
@@ -115,7 +116,7 @@ class JSONAPIMetadata(SimpleMetadata):
                 field_info[attr] = force_text(value, strings_only=True)
 
         if getattr(field, 'child', None):
-            field_info['child'] = self.get_field_info(field.child, field.child.serializer)
+            field_info['child'] = self.get_field_info(field.child)
         elif getattr(field, 'fields', None):
             field_info['children'] = self.get_serializer_info(field)
 
