@@ -1,10 +1,12 @@
 """
 Utils.
 """
+import copy
 import inflection
 from django.conf import settings
 from django.utils import six, encoding
 from django.utils.translation import ugettext_lazy as _
+from django.utils.module_loading import import_string
 from rest_framework.compat import OrderedDict
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.relations import RelatedField, HyperlinkedRelatedField, PrimaryKeyRelatedField, \
@@ -395,12 +397,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
 
     current_serializer = fields.serializer
     context = current_serializer.context
-    included_serializers = getattr(fields.serializer, 'included_serializers', None)
-
-    included_serializers = {
-        key: current_serializer.__class__ if serializer == 'self' else serializer
-        for key, serializer in included_serializers.items()
-        } if included_serializers else dict()
+    included_serializers = get_included_serializers(current_serializer)
 
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -471,6 +468,19 @@ def extract_included(fields, resource, resource_instance, included_resources):
                 )
 
     return format_keys(included_data)
+
+
+def get_included_serializers(serializer):
+    included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
+
+    for name, value in six.iteritems(included_serializers):
+        if not isinstance(value, type):
+            if value == 'self':
+                included_serializers[name] = serializer if isinstance(serializer, type) else serializer.__class__
+            else:
+                included_serializers[name] = import_string(value)
+
+    return included_serializers
 
 
 class Hyperlink(six.text_type):
