@@ -71,7 +71,7 @@ def test_multiple_entries_no_pagination(rf, multiple_entries):
     view = NonPaginatedEntryViewSet.as_view({'get': 'list'})
     response = view(request)
     response.render()
-    # print response.content
+
     content_dump = redump_json(response.content)
     expected_dump = dump_json(expected)
 
