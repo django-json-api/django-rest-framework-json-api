@@ -3,7 +3,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *
 
 from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, \
-    get_resource_type_from_serializer
+    get_resource_type_from_serializer, get_included_serializers
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -67,11 +67,8 @@ class IncludedResourcesValidationMixin(object):
         request = context.get('request') if context else None
         view = context.get('view') if context else None
 
-        def validate_path(serializer_class, field_path, serializers, path):
-            serializers = {
-                key: serializer_class if serializer == 'self' else serializer
-                for key, serializer in serializers.items()
-                } if serializers else dict()
+        def validate_path(serializer_class, field_path, path):
+            serializers = get_included_serializers(serializer_class)
             if serializers is None:
                 raise ParseError('This endpoint does not support the include parameter')
             this_field_name = field_path[0]
@@ -94,9 +91,8 @@ class IncludedResourcesValidationMixin(object):
                 for included_field_name in included_resources:
                     included_field_path = included_field_name.split('.')
                     this_serializer_class = view.serializer_class
-                    included_serializers = getattr(this_serializer_class, 'included_serializers', None)
                     # lets validate the current path
-                    validate_path(this_serializer_class, included_field_path, included_serializers, included_field_name)
+                    validate_path(this_serializer_class, included_field_path, included_field_name)
 
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 

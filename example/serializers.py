@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from example.models import Blog, Entry, Author
+from example.models import Blog, Entry, Author, Comment
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -21,3 +21,10 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('name', 'email',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ('entry', 'body', 'author',)

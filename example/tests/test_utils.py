@@ -1,4 +1,5 @@
 import pytest
+from django.utils import six
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -6,6 +7,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework_json_api import utils
+
+from example.serializers import (EntrySerializer, BlogSerializer,
+                                 AuthorSerializer, CommentSerializer)
+from rest_framework_json_api.utils import get_included_serializers
 
 pytestmark = pytest.mark.django_db
 
@@ -100,3 +105,43 @@ def test_build_json_resource_obj():
     assert utils.build_json_resource_obj(
             serializer.fields, resource, resource_instance, 'user') == output
 
+
+class SerializerWithIncludedSerializers(EntrySerializer):
+    included_serializers = {
+        'blog': BlogSerializer,
+        'authors': 'example.serializers.AuthorSerializer',
+        'comments': 'example.serializers.CommentSerializer',
+        'self': 'self'  # this wouldn't make sense in practice (and would be prohibited by
+                        # IncludedResourcesValidationMixin) but it's useful for the test
+    }
+
+
+def test_get_included_serializers_against_class():
+    klass = SerializerWithIncludedSerializers
+    included_serializers = get_included_serializers(klass)
+    expected_included_serializers = {
+        'blog': BlogSerializer,
+        'authors': AuthorSerializer,
+        'comments': CommentSerializer,
+        'self': klass
+    }
+    assert (six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers),
+            'the keys must be preserved')
+
+    assert included_serializers == expected_included_serializers
+
+
+def test_get_included_serializers_against_instance():
+    klass = SerializerWithIncludedSerializers
+    instance = klass()
+    included_serializers = get_included_serializers(instance)
+    expected_included_serializers = {
+        'blog': BlogSerializer,
+        'authors': AuthorSerializer,
+        'comments': CommentSerializer,
+        'self': klass
+    }
+    assert (six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers),
+            'the keys must be preserved')
+
+    assert included_serializers == expected_included_serializers
