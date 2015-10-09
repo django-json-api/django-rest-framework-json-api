@@ -347,7 +347,7 @@ def extract_relationships(fields, resource, resource_instance):
 
             relation_data = list()
             for related_object in relation_instance_or_manager.all():
-                related_object_type = get_instance_or_manager_resource_type(relation_instance_or_manager)
+                related_object_type = get_instance_or_manager_resource_type(related_object)
                 relation_data.append(OrderedDict([
                     ('type', related_object_type),
                     ('id', encoding.force_text(related_object.pk))
