@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *
 
+from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, \
     get_resource_type_from_serializer, get_included_serializers
 
@@ -132,3 +133,4 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     * A mixin class to enable sparse fieldsets is included
     * A mixin class to enable validation of included resources is included
     """
+    serializer_related_field = ResourceRelatedField
