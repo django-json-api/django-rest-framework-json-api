@@ -413,13 +413,14 @@ def extract_included(fields, resource, resource_instance, included_resources):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        if field_name not in included_resources:
+        try:
+            included_resources.remove(field_name)
+            new_included_resources = [key.replace('%s.' % field_name, '', 1) for key in included_resources]
+            relation_instance_or_manager = getattr(resource_instance, field_name)
+            serializer_data = resource.get(field_name)
+        except ValueError:
             # Skip fields not in requested included resources
             continue
-        
-        new_included_resources = [key.replace('%s.' % field_name, '', 1) for key in included_resources]
-        relation_instance_or_manager = getattr(resource_instance, field_name)
-        serializer_data = resource.get(field_name)
 
         if isinstance(field, ManyRelatedField):
             serializer_class = included_serializers.get(field_name)
