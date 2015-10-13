@@ -83,7 +83,7 @@ class IncludedResourcesValidationMixin(object):
             if len(field_path) > 1:
                 new_included_field_path = field_path[-1:]
                 # We go down one level in the path
-                validate_path(this_included_serializer, new_included_field_path, serializers, path)
+                validate_path(this_included_serializer, new_included_field_path, path)
 
         if request and view:
             include_resources_param = request.query_params.get('include') if request else None
