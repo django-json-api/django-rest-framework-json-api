@@ -42,11 +42,19 @@ class JSONAPIMetadata(SimpleMetadata):
         serializers.Serializer: 'Serializer',
     })
 
-    relation_type_lookup = ClassLookupDict({
-        related.ManyToManyDescriptor: 'ManyToMany',
-        related.ReverseManyToOneDescriptor: 'OneToMany',
-        related.ForwardManyToOneDescriptor: 'ManyToOne',
-    })
+    try:
+        relation_type_lookup = ClassLookupDict({
+            related.ManyToManyDescriptor: 'ManyToMany',
+            related.ReverseManyToOneDescriptor: 'ManyToOne',
+            related.ForwardManyToOneDescriptor: 'OneToMany',
+        })
+    except AttributeError:
+        relation_type_lookup = ClassLookupDict({
+            related.ManyRelatedObjectsDescriptor: 'ManyToMany',
+            related.ReverseManyRelatedObjectsDescriptor: 'ManyToMany',
+            related.ForeignRelatedObjectsDescriptor: 'OneToMany',
+            related.ReverseSingleRelatedObjectDescriptor: 'ManyToOne',
+        })
 
     def determine_metadata(self, request, view):
         metadata = OrderedDict()
