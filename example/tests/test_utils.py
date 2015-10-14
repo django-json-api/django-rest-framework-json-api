@@ -7,20 +7,22 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rest_framework_json_api import utils
-
 from example.serializers import (EntrySerializer, BlogSerializer,
                                  AuthorSerializer, CommentSerializer)
 from rest_framework_json_api.utils import get_included_serializers
 
 pytestmark = pytest.mark.django_db
 
+
 class ResourceView(APIView):
     pass
+
 
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta():
         fields = ('username',)
         model = get_user_model()
+
 
 def test_get_resource_name():
     view = ResourceView()
@@ -53,6 +55,7 @@ def test_get_resource_name():
     view.serializer_class.Meta.resource_name = 'rcustom'
     assert 'rcustom' == utils.get_resource_name(context), 'set on serializer'
 
+
 def test_format_keys():
     underscored = {
         'first_name': 'a',
@@ -74,15 +77,18 @@ def test_format_keys():
     output = [{'first-name': 'a', 'last-name': 'b'}]
     assert utils.format_keys([underscored], 'dasherize') == output
 
+
 def test_format_value():
     assert utils.format_value('first_name', 'camelize') == 'firstName'
     assert utils.format_value('first_name', 'capitalize') == 'FirstName'
     assert utils.format_value('first_name', 'dasherize') == 'first-name'
     assert utils.format_value('first-name', 'underscore') == 'first_name'
 
+
 def test_format_relation_name():
     assert utils.format_relation_name('first_name', 'capitalize') == 'FirstNames'
     assert utils.format_relation_name('first_name', 'camelize') == 'firstNames'
+
 
 def test_build_json_resource_obj():
     resource = {
@@ -103,7 +109,7 @@ def test_build_json_resource_obj():
     }
 
     assert utils.build_json_resource_obj(
-            serializer.fields, resource, resource_instance, 'user') == output
+        serializer.fields, resource, resource_instance, 'user') == output
 
 
 class SerializerWithIncludedSerializers(EntrySerializer):
@@ -112,7 +118,7 @@ class SerializerWithIncludedSerializers(EntrySerializer):
         'authors': 'example.serializers.AuthorSerializer',
         'comments': 'example.serializers.CommentSerializer',
         'self': 'self'  # this wouldn't make sense in practice (and would be prohibited by
-                        # IncludedResourcesValidationMixin) but it's useful for the test
+        # IncludedResourcesValidationMixin) but it's useful for the test
     }
 
 
