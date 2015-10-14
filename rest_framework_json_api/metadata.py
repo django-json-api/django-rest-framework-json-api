@@ -43,10 +43,9 @@ class JSONAPIMetadata(SimpleMetadata):
     })
 
     relation_type_lookup = ClassLookupDict({
-        related.ManyRelatedObjectsDescriptor: 'ManyToMany',
-        related.ReverseManyRelatedObjectsDescriptor: 'ManyToMany',
-        related.ForeignRelatedObjectsDescriptor: 'OneToMany',
-        related.ReverseSingleRelatedObjectDescriptor: 'ManyToOne',
+        related.ManyToManyDescriptor: 'ManyToMany',
+        related.ReverseManyToOneDescriptor: 'OneToMany',
+        related.ForwardManyToOneDescriptor: 'ManyToOne',
     })
 
     def determine_metadata(self, request, view):
