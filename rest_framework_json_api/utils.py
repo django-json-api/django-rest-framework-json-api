@@ -366,7 +366,7 @@ def extract_relationships(fields, resource, resource_instance):
             relation_data = list()
 
             serializer_data = resource.get(field_name)
-            resource_instance_queryset = relation_instance_or_manager.all()
+            resource_instance_queryset = list(relation_instance_or_manager.all())
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
                     nested_resource_instance = resource_instance_queryset[position]
@@ -413,13 +413,14 @@ def extract_included(fields, resource, resource_instance, included_resources):
         if not isinstance(field, (RelatedField, ManyRelatedField, BaseSerializer)):
             continue
 
-        if field_name not in included_resources:
+        try:
+            included_resources.remove(field_name)
+            new_included_resources = [key.replace('%s.' % field_name, '', 1) for key in included_resources]
+            relation_instance_or_manager = getattr(resource_instance, field_name)
+            serializer_data = resource.get(field_name)
+        except ValueError:
             # Skip fields not in requested included resources
             continue
-        
-        new_included_resources = [key.replace('%s.' % field_name, '', 1) for key in included_resources]
-        relation_instance_or_manager = getattr(resource_instance, field_name)
-        serializer_data = resource.get(field_name)
 
         if isinstance(field, ManyRelatedField):
             serializer_class = included_serializers.get(field_name)
@@ -437,7 +438,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
             serializer = field.child
             model = serializer.Meta.model
             relation_type = format_relation_name(model.__name__)
-            relation_queryset = relation_instance_or_manager.all()
+            relation_queryset = list(relation_instance_or_manager.all())
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(serializer)
