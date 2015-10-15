@@ -15,8 +15,8 @@ def test_pagination_with_single_entry(single_entry, client):
                 "id": "1",
                 "attributes":
                 {
-                    "headline": "The Absolute Minimum Every Software DeveloperAbsolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)",
-                    "bodyText": "Here goes the body text",
+                    "headline": single_entry.headline,
+                    "bodyText": single_entry.body_text,
                     "pubDate": None,
                     "modDate": None
                 },
@@ -28,6 +28,10 @@ def test_pagination_with_single_entry(single_entry, client):
                     "authors": {
                         "meta": {"count": 1},
                         "data": [{"type": "authors", "id": "1"}]
+                    },
+                    "comments": {
+                        "meta": {"count": 1},
+                        "data": [{"type": "comments", "id": "1"}]
                     }
                 }
             }],

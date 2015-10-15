@@ -2,31 +2,33 @@
 from __future__ import unicode_literals
 
 import factory
+from faker import Factory as FakerFactory
+from example.models import Blog, Author, Entry, Comment
 
-from example.models import Blog, Author, Entry
-
+faker = FakerFactory.create()
+faker.seed(983843)
 
 class BlogFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Blog
 
-    name = "Blog 1"
+    name = factory.LazyAttribute(lambda x: faker.name())
 
 
 class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Author
 
-    name = "Author 1"
-    email = "author1@blog1.com"
+    name = factory.LazyAttribute(lambda x: faker.name())
+    email = factory.LazyAttribute(lambda x: faker.email())
 
 
 class EntryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Entry
 
-    headline = "Headline 1"
-    body_text = "Here goes the body text"
+    headline = factory.LazyAttribute(lambda x: faker.sentence(nb_words=4))
+    body_text = factory.LazyAttribute(lambda x: faker.text())
 
     blog = factory.SubFactory(BlogFactory)
 
@@ -38,3 +40,13 @@ class EntryFactory(factory.django.DjangoModelFactory):
                     self.authors.add(author)
             else:
                 self.authors.add(extracted)
+
+
+class CommentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Comment
+
+    entry = factory.SubFactory(EntryFactory)
+    body = factory.LazyAttribute(lambda x: faker.text())
+    author = factory.SubFactory(AuthorFactory)
+

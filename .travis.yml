@@ -4,12 +4,6 @@ sudo: false
 install: pip install tox
 script: tox
 env:
-  - TOXENV=py27-django16-drf31
-  - TOXENV=py27-django16-drf32
-  - TOXENV=py32-django16-drf31
-  - TOXENV=py32-django16-drf32
-  - TOXENV=py33-django16-drf31
-  - TOXENV=py33-django16-drf32
   - TOXENV=py27-django17-drf31
   - TOXENV=py27-django17-drf32
   - TOXENV=py32-django17-drf31
