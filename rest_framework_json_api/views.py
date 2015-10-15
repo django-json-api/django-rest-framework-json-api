@@ -1,3 +1,4 @@
+import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
@@ -85,7 +86,12 @@ class RelationshipView(generics.GenericAPIView):
             serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
             serializer.is_valid(raise_exception=True)
             related_instance_or_manager.all().delete()
-            related_instance_or_manager.add(*serializer.validated_data)
+            # have to set bulk to False since data isn't saved yet
+            if django.VERSION >= (1, 9):
+                related_instance_or_manager.add(*serializer.validated_data,
+                                                bulk=False)
+            else:
+                related_instance_or_manager.add(*serializer.validated_data)
         else:
             related_model_class = related_instance_or_manager.__class__
             serializer = self.get_serializer(data=request.data, model_class=related_model_class)
