@@ -11,6 +11,10 @@ class BlogSerializer(serializers.ModelSerializer):
 
 class EntrySerializer(serializers.ModelSerializer):
 
+    included_serializers = {
+        'comments': 'example.serializers.CommentSerializer',
+    }
+
     comments = relations.ResourceRelatedField(
             source='comment_set', many=True, read_only=True)
 
