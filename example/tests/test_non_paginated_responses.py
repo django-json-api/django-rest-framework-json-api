@@ -11,7 +11,8 @@ from example.tests.utils import dump_json, redump_json
 pytestmark = pytest.mark.django_db
 
 
-def test_multiple_entries_no_pagination(rf, multiple_entries):
+# rf == request_factory
+def test_multiple_entries_no_pagination(multiple_entries, rf):
 
     expected = {
         "data": [
@@ -20,8 +21,8 @@ def test_multiple_entries_no_pagination(rf, multiple_entries):
                 "id": "1",
                 "attributes":
                 {
-                    "headline": "The Absolute Minimum Every Software DeveloperAbsolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)",
-                    "bodyText": "Here goes the body text",
+                    "headline": multiple_entries[0].headline,
+                    "bodyText": multiple_entries[0].body_text,
                     "pubDate": None,
                     "modDate": None
                 },
@@ -41,8 +42,8 @@ def test_multiple_entries_no_pagination(rf, multiple_entries):
                 "id": "2",
                 "attributes":
                 {
-                    "headline": "Pragmatic Unicode",
-                    "bodyText": "Here goes the body text",
+                    "headline": multiple_entries[1].headline,
+                    "bodyText": multiple_entries[1].body_text,
                     "pubDate": None,
                     "modDate": None
                 },
