@@ -3,7 +3,7 @@ from django.conf import settings
 
 import pytest
 
-from ..views import EntryViewSet
+from example.views import EntryViewSet
 from rest_framework_json_api.pagination import PageNumberPagination
 
 from example.tests.utils import dump_json, redump_json
