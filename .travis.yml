@@ -25,3 +25,7 @@ env:
   - TOXENV=py33-django18-drf32
   - TOXENV=py34-django18-drf31
   - TOXENV=py34-django18-drf32
+  - TOXENV=py27-django19-drf31
+  - TOXENV=py27-django19-drf32
+  - TOXENV=py34-django19-drf31
+  - TOXENV=py34-django19-drf32
