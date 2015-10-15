@@ -1,5 +1,5 @@
 -e .
-pytest==2.7.2
+pytest==2.8.2
 pytest-django
 pytest-factoryboy
 tox
