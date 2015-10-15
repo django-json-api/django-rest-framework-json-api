@@ -28,6 +28,10 @@ def test_pagination_with_single_entry(single_entry, client):
                     "authors": {
                         "meta": {"count": 1},
                         "data": [{"type": "authors", "id": "1"}]
+                    },
+                    "comments": {
+                        "meta": {"count": 1},
+                        "data": [{"type": "comments", "id": "1"}]
                     }
                 }
             }],

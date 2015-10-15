@@ -34,6 +34,10 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "authors": {
                         "meta": {"count": 1},
                         "data": [{"type": "authors", "id": "1"}]
+                    },
+                    "comments": {
+                        "meta": {"count": 1},
+                        "data": [{"type": "comments", "id": "1"}]
                     }
                 }
             },
@@ -55,6 +59,10 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "authors": {
                         "meta": {"count": 1},
                         "data": [{"type": "authors", "id": "2"}]
+                    },
+                    "comments": {
+                        "meta": {"count": 1},
+                        "data": [{"type": "comments", "id": "2"}]
                     }
                 }
             },

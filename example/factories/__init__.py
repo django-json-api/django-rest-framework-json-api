@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import factory
 from faker import Factory as FakerFactory
-from example.models import Blog, Author, Entry
+from example.models import Blog, Author, Entry, Comment
 
 faker = FakerFactory.create()
 faker.seed(983843)
@@ -40,3 +40,13 @@ class EntryFactory(factory.django.DjangoModelFactory):
                     self.authors.add(author)
             else:
                 self.authors.add(extracted)
+
+
+class CommentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Comment
+
+    entry = factory.SubFactory(EntryFactory)
+    body = factory.LazyAttribute(lambda x: faker.text())
+    author = factory.SubFactory(AuthorFactory)
+
