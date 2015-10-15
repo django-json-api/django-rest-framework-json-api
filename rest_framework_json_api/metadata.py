@@ -45,8 +45,8 @@ class JSONAPIMetadata(SimpleMetadata):
     try:
         relation_type_lookup = ClassLookupDict({
             related.ManyToManyDescriptor: 'ManyToMany',
-            related.ReverseManyToOneDescriptor: 'ManyToOne',
-            related.ForwardManyToOneDescriptor: 'OneToMany',
+            related.ReverseManyToOneDescriptor: 'OneToMany',
+            related.ForwardManyToOneDescriptor: 'ManyToOne',
         })
     except AttributeError:
         relation_type_lookup = ClassLookupDict({
