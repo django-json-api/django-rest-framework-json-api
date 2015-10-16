@@ -411,6 +411,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
     current_serializer = fields.serializer
     context = current_serializer.context
     included_serializers = get_included_serializers(current_serializer)
+    included_resources = copy.copy(included_resources)
 
     for field_name, field in six.iteritems(fields):
         # Skip URL field
@@ -422,7 +423,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
             continue
 
         try:
-            included_resources.copy().remove(field_name)
+            included_resources.remove(field_name)
         except ValueError:
             # Skip fields not in requested included resources
             continue
