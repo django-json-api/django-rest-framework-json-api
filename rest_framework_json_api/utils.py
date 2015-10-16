@@ -2,6 +2,7 @@
 Utils.
 """
 import copy
+
 import inflection
 from django.conf import settings
 from django.utils import six, encoding
@@ -421,7 +422,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
             continue
 
         try:
-            included_resources.remove(field_name)
+            included_resources.copy().remove(field_name)
         except ValueError:
             # Skip fields not in requested included resources
             continue
