@@ -2,6 +2,7 @@
 Utils.
 """
 import copy
+
 import inflection
 from django.conf import settings
 from django.utils import six, encoding
@@ -410,6 +411,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
     current_serializer = fields.serializer
     context = current_serializer.context
     included_serializers = get_included_serializers(current_serializer)
+    included_resources = copy.copy(included_resources)
 
     for field_name, field in six.iteritems(fields):
         # Skip URL field
