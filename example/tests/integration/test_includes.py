@@ -7,19 +7,21 @@ pytestmark = pytest.mark.django_db
 
 
 def test_included_data_on_list(multiple_entries, client):
-    response = client.get(reverse("entry-list") + '?include=comments')
+    response = client.get(reverse("entry-list") + '?include=comments&page_size=5')
     included = load_json(response.content).get('included')
 
-    assert len(load_json(response.content)['data']) == len(multiple_entries)
-    assert [x.get('type') for x in included] == ['comments']
-    assert (len([resource for resource in included if resource["type"] == "comments"]) ==
-            sum([entry.comment_set.count() for entry in multiple_entries]))
+    assert len(load_json(response.content)['data']) == len(multiple_entries), 'Correct entry count'
+    assert [x.get('type') for x in included] == ['comments'], 'List included types are correct'
+
+    comment_count = len([resource for resource in included if resource["type"] == "comments"])
+    expected_comment_count = sum([entry.comment_set.count() for entry in multiple_entries])
+    assert comment_count == expected_comment_count, 'List comment count is correct'
 
 
 def test_included_data_on_detail(single_entry, client):
     response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=comments')
     included = load_json(response.content).get('included')
 
-    assert [x.get('type') for x in included] == ['comments']
-    assert (len([resource for resource in included if resource["type"] == "comments"]) ==
-            single_entry.comment_set.count())
+    assert [x.get('type') for x in included] == ['comments'], 'Detail included types are correct'
+    comment_count = len([resource for resource in included if resource["type"] == "comments"])
+    assert comment_count == single_entry.comment_set.count(), 'Detail comment count is correct'
