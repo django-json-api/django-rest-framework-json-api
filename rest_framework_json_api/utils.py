@@ -25,6 +25,7 @@ except ImportError:
     HyperlinkedRouterField = type(None)
 
 import django
+
 if django.VERSION < (1, 7):
     from django.utils.module_loading import import_by_path as import_class_from_dotted_path
 else:
@@ -434,7 +435,9 @@ def extract_included(fields, resource, resource_instance, included_resources):
             # For ManyRelatedFields if `related_name` is not set we need to access `foo_set` from `source`
             relation_instance_or_manager = getattr(resource_instance, field.child_relation.source)
 
-        new_included_resources = [key.replace('%s.' % field_name, '', 1) for key in included_resources]
+        new_included_resources = [key.replace('%s.' % field_name, '', 1)
+                                  for key in included_resources
+                                  if field_name == key.split('.')[0]]
         serializer_data = resource.get(field_name)
 
         if isinstance(field, ManyRelatedField):
