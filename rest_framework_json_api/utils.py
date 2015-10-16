@@ -454,8 +454,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
 
         if isinstance(field, ListSerializer):
             serializer = field.child
-            model = serializer.Meta.model
-            relation_type = format_relation_name(model.__name__)
+            relation_type = get_resource_type_from_serializer(serializer)
             relation_queryset = list(relation_instance_or_manager.all())
 
             # Get the serializer fields
@@ -476,8 +475,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
                     )
 
         if isinstance(field, ModelSerializer):
-            model = field.Meta.model
-            relation_type = format_relation_name(model.__name__)
+            relation_type = get_resource_type_from_serializer(field)
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
