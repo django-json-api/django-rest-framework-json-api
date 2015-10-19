@@ -386,6 +386,8 @@ def extract_relationships(fields, resource, resource_instance):
                 continue
 
         if isinstance(field, ModelSerializer):
+            relation_type = get_resource_type_from_serializer(field)
+
             data.update({
                 field_name: {
                     'data': (
