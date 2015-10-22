@@ -167,6 +167,9 @@ def build_json_resource_obj(fields, resource, resource_instance, resource_name):
 def get_related_resource_type(relation):
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
+    elif hasattr(relation, 'model'):
+        # the model type was explicitly passed as a kwarg to ResourceRelatedField
+        relation_model = relation.model
     elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
     else:
@@ -270,8 +273,14 @@ def extract_relationships(fields, resource, resource_instance):
         try:
             source = field.source
             relation_instance_or_manager = getattr(resource_instance, source)
-        except AttributeError:  # Skip fields defined on the serializer that don't correspond to a field on the model
-            continue
+        except AttributeError:
+            # if the field is not defined on the model then we check the serializer
+            # and if no value is there we skip over the field completely
+            serializer_method = getattr(field.parent, source, None)
+            if serializer_method and hasattr(serializer_method, '__call__'):
+                relation_instance_or_manager = serializer_method(resource_instance)
+            else:
+                continue
 
         relation_type = get_related_resource_type(field)
 
@@ -432,8 +441,12 @@ def extract_included(fields, resource, resource_instance, included_resources):
         try:
             relation_instance_or_manager = getattr(resource_instance, field_name)
         except AttributeError:
-            # For ManyRelatedFields if `related_name` is not set we need to access `foo_set` from `source`
-            relation_instance_or_manager = getattr(resource_instance, field.child_relation.source)
+            try:
+                # For ManyRelatedFields if `related_name` is not set we need to access `foo_set` from `source`
+                relation_instance_or_manager = getattr(resource_instance, field.child_relation.source)
+            except AttributeError:
+                serializer_method = getattr(current_serializer, field.source)
+                relation_instance_or_manager = serializer_method(resource_instance)
 
         new_included_resources = [key.replace('%s.' % field_name, '', 1)
                                   for key in included_resources

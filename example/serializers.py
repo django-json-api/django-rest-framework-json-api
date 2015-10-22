@@ -11,17 +11,31 @@ class BlogSerializer(serializers.ModelSerializer):
 
 class EntrySerializer(serializers.ModelSerializer):
 
+    def __init__(self, *args, **kwargs):
+        # to make testing more concise we'll only output the
+        # `suggested` field when it's requested via `include`
+        request = kwargs.get('context', {}).get('request')
+        if request and 'suggested' not in request.query_params.get('include', []):
+            self.fields.pop('suggested')
+        super(EntrySerializer, self).__init__(*args, **kwargs)
+
     included_serializers = {
         'comments': 'example.serializers.CommentSerializer',
+        'suggested': 'example.serializers.EntrySerializer',
     }
 
     comments = relations.ResourceRelatedField(
             source='comment_set', many=True, read_only=True)
+    suggested = relations.ResourceRelatedField(
+            source='get_suggested', model=Entry, read_only=True)
+
+    def get_suggested(self, obj):
+        return Entry.objects.exclude(pk=obj.pk).first()
 
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                'authors', 'comments',)
+                'authors', 'comments', 'suggested',)
 
 
 class AuthorSerializer(serializers.ModelSerializer):
