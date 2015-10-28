@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch
@@ -12,7 +13,7 @@ from rest_framework.serializers import Serializer
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, OrderedDict, Hyperlink
+from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, Hyperlink
 
 
 class RelationshipView(generics.GenericAPIView):
