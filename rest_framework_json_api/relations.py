@@ -9,6 +9,28 @@ from rest_framework_json_api.utils import Hyperlink, \
     get_resource_type_from_queryset, get_resource_type_from_instance, \
     get_included_serializers, get_resource_type_from_serializer
 
+import pdb
+
+JSONAPI_MANY_RELATION_KWARGS = ('model', ) + MANY_RELATION_KWARGS
+
+class ManyResourceRelatedField(ManyRelatedField):
+    """
+    Allows us to use serializer method RelatedFields
+    with return querysets
+    """
+    def __init__(self, child_relation=None, *args, **kwargs):
+        model = kwargs.pop('model', None)
+        if model:
+            self.model = model
+        super(ManyResourceRelatedField, self).__init__(child_relation, *args, **kwargs)
+
+    def get_attribute(self, instance):
+        if self.source and hasattr(self.parent, self.source):
+            serializer_method = getattr(self.parent, self.source)
+            if hasattr(serializer_method, '__call__'):
+                return serializer_method(instance)
+        return super(ManyResourceRelatedField, self).get_attribute(instance)
+
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
     self_link_view_name = None
@@ -24,6 +46,21 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
         'no_match': _('Invalid hyperlink - No URL match.'),
     }
+
+    def __new__(cls, *args, **kwargs):
+        # We override this because getting
+        # serializer methods fails when many is true
+        if kwargs.pop('many', False):
+            return cls.many_init(*args, **kwargs)
+        return super(ResourceRelatedField, cls).__new__(cls, *args, **kwargs)
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        for key in kwargs.keys():
+            if key in JSONAPI_MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return ManyResourceRelatedField(**list_kwargs)
 
     def __init__(self, self_link_view_name=None, related_link_view_name=None, **kwargs):
         if self_link_view_name is not None:
