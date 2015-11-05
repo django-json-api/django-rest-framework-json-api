@@ -381,7 +381,7 @@ def extract_relationships(fields, resource, resource_instance):
             relation_data = list()
 
             serializer_data = resource.get(field_name)
-            resource_instance_queryset = list(relation_instance_or_manager.all())
+            resource_instance_queryset = relation_instance_or_manager.all()
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
                     nested_resource_instance = resource_instance_queryset[position]
