@@ -3,8 +3,9 @@ from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *
 
 from rest_framework_json_api.relations import ResourceRelatedField
-from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, \
-    get_resource_type_from_serializer, get_included_serializers
+from rest_framework_json_api.utils import (
+    get_resource_type_from_model, get_resource_type_from_instance,
+    get_resource_type_from_serializer, get_included_serializers)
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -24,7 +25,7 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
 
     def to_representation(self, instance):
         return {
-            'type': format_relation_name(get_resource_type_from_instance(instance)),
+            'type': get_resource_type_from_instance(instance),
             'id': str(instance.pk)
         }
 
