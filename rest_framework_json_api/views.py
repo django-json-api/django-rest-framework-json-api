@@ -12,7 +12,7 @@ from rest_framework.serializers import Serializer
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import format_relation_name, get_resource_type_from_instance, OrderedDict, Hyperlink
+from rest_framework_json_api.utils import get_resource_type_from_instance, OrderedDict, Hyperlink
 
 
 class RelationshipView(generics.GenericAPIView):
@@ -154,7 +154,7 @@ class RelationshipView(generics.GenericAPIView):
     def get_resource_name(self):
         if not hasattr(self, '_resource_name'):
             instance = getattr(self.get_object(), self.kwargs['related_field'])
-            self._resource_name = format_relation_name(get_resource_type_from_instance(instance))
+            self._resource_name = get_resource_type_from_instance(instance)
         return self._resource_name
 
     def set_resource_name(self, value):
