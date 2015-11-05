@@ -29,7 +29,7 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
         }
 
     def to_internal_value(self, data):
-        if data['type'] != format_relation_name(self.model_class.__name__):
+        if data['type'] != get_resource_type_from_model(self.model_class):
             self.fail('incorrect_model_type', model_type=self.model_class, received_type=data['type'])
         pk = data['id']
         try:
