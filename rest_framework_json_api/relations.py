@@ -107,14 +107,6 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             return_data.update({'related': related_link})
         return return_data
 
-    def get_attribute(self, instance):
-        # check for a source fn defined on the serializer instead of the model
-        if self.source and hasattr(self.parent, self.source):
-            serializer_method = getattr(self.parent, self.source)
-            if hasattr(serializer_method, '__call__'):
-                return serializer_method(instance)
-        return super(ResourceRelatedField, self).get_attribute(instance)
-
     def to_internal_value(self, data):
         if isinstance(data, six.text_type):
             data = json.loads(data)
@@ -149,3 +141,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             for item in queryset
         ])
 
+
+class SerializerMethodResourceRelatedField(ResourceRelatedField):
+    def get_attribute(self, instance):
+        # check for a source fn defined on the serializer instead of the model
+        if self.source and hasattr(self.parent, self.source):
+            serializer_method = getattr(self.parent, self.source)
+            if hasattr(serializer_method, '__call__'):
+                return serializer_method(instance)
+        return super(ResourceRelatedField, self).get_attribute(instance)

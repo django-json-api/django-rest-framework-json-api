@@ -26,7 +26,7 @@ class EntrySerializer(serializers.ModelSerializer):
 
     comments = relations.ResourceRelatedField(
             source='comment_set', many=True, read_only=True)
-    suggested = relations.ResourceRelatedField(
+    suggested = relations.SerializerMethodResourceRelatedField(
             source='get_suggested', model=Entry, read_only=True)
 
     def get_suggested(self, obj):
