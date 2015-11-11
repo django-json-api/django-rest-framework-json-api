@@ -142,7 +142,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         ])
 
 
-class SerializerMethodResourceField(ResourceRelatedField):
+class SerializerMethodResourceRelatedField(ResourceRelatedField):
     def get_attribute(self, instance):
         # check for a source fn defined on the serializer instead of the model
         if self.source and hasattr(self.parent, self.source):
