@@ -50,8 +50,12 @@ class JSONParser(parsers.JSONParser):
         result = {}
         for f in nested_fields:
             if data.get(f) and data.get(f).get('data').get('attributes'):
+                attr = data.get(f).get('data').get('attributes')
+                attr = utils.format_keys(
+                    data.get(f).get('data').get('attributes'),
+                    'underscore')
                 result.update({
-                    f: data.get(f).get('data').get('attributes')
+                    f: attr
                 })
 
         return result
