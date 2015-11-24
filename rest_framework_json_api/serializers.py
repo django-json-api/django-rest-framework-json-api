@@ -53,7 +53,9 @@ class SparseFieldsetsMixin(object):
                 pass
             else:
                 fieldset = request.query_params.get(param_name).split(',')
-                for field_name, field in self.fields.items():
+                # iterate over a *copy* of self.fields' underlying OrderedDict, because we may modify the
+                # original during the iteration. self.fields is a `rest_framework.utils.serializer_helpers.BindingDict`
+                for field_name, field in self.fields.fields.copy().items():
                     if field_name == api_settings.URL_FIELD_NAME:  # leave self link there
                         continue
                     if field_name not in fieldset:
