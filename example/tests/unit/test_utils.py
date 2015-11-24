@@ -111,6 +111,20 @@ def test_build_json_resource_obj():
     assert utils.build_json_resource_obj(
         serializer.fields, resource, resource_instance, 'user') == output
 
+def test_extract_attributes():
+    fields = {
+        'id': serializers.Field(),
+        'username': serializers.Field(),
+        'deleted': serializers.ReadOnlyField(),
+    }
+    resource = {'id': 1, 'deleted': None, 'username': 'jerel'}
+    expected = {
+        'username': 'jerel',
+        'deleted': None
+    }
+    assert sorted(utils.extract_attributes(fields, resource)) == sorted(expected), 'Regular fields should be extracted'
+    assert sorted(utils.extract_attributes(fields, {})) == sorted({'username': ''}), 'Should not extract read_only fields on empty serializer'
+
 
 class SerializerWithIncludedSerializers(EntrySerializer):
     included_serializers = {
