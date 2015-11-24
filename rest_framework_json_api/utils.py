@@ -239,10 +239,14 @@ def extract_attributes(fields, resource):
         if isinstance(field, (RelatedField, BaseSerializer, ManyRelatedField)):
             continue
 
-        # Skip read_only attribute fields when the resource is non-existent
-        # Needed for the "Raw data" form of the browseable API
-        if resource.get(field_name) is None and fields[field_name].read_only:
-            continue
+        # Skip read_only attribute fields when `resource` is an empty
+        # serializer. Prevents the "Raw Data" form of the browseable API
+        # from rendering `"foo": null` for read only fields
+        try:
+            resource[field_name]
+        except KeyError:
+            if fields[field_name].read_only:
+                continue
 
         data.update({
             field_name: resource.get(field_name)
