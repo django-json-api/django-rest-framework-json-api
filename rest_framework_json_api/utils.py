@@ -196,7 +196,7 @@ def get_related_resource_type(relation):
         elif hasattr(parent_model_relation, 'field'):
             relation_model = parent_model_relation.field.related.model
         else:
-            raise APIException('Unable to find related model for relation {relation}'.format(relation=relation))
+            return get_related_resource_type(parent_model_relation)
     return format_relation_name(relation_model.__name__)
 
 
