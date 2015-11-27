@@ -318,13 +318,14 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return utils.format_keys(included_data)
 
-    def build_json_resource_obj(self, fields, resource, resource_instance, resource_name):
+    @staticmethod
+    def build_json_resource_obj(fields, resource, resource_instance, resource_name):
         resource_data = [
             ('type', resource_name),
             ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
-            ('attributes', self.extract_attributes(fields, resource)),
+            ('attributes', JSONRenderer.extract_attributes(fields, resource)),
         ]
-        relationships = self.extract_relationships(fields, resource, resource_instance)
+        relationships = JSONRenderer.extract_relationships(fields, resource, resource_instance)
         if relationships:
             resource_data.append(('relationships', relationships))
         # Add 'self' link if field is present and valid
