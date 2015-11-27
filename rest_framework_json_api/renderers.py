@@ -62,7 +62,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return utils.format_keys(data)
 
-    def extract_relationships(self, fields, resource, resource_instance):
+    @staticmethod
+    def extract_relationships(fields, resource, resource_instance):
         # Avoid circular deps
         from rest_framework_json_api.relations import ResourceRelatedField
 
