@@ -70,4 +70,3 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         self.assertTrue(serializer.is_valid(), msg=serializer.errors)
 
         print(serializer.data)
-
