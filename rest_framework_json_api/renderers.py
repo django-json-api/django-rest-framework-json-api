@@ -223,7 +223,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return utils.format_keys(data)
 
-    def extract_included(self, fields, resource, resource_instance, included_resources):
+    @staticmethod
+    def extract_included(fields, resource, resource_instance, included_resources):
         # this function may be called with an empty record (example: Browsable Interface)
         if not resource_instance:
             return
@@ -289,12 +290,12 @@ class JSONRenderer(renderers.JSONRenderer):
                         serializer_resource = serializer_data[position]
                         nested_resource_instance = relation_queryset[position]
                         included_data.append(
-                            self.build_json_resource_obj(
+                            JSONRenderer.build_json_resource_obj(
                                 serializer_fields, serializer_resource, nested_resource_instance, relation_type
                             )
                         )
                         included_data.extend(
-                            self.extract_included(
+                            JSONRenderer.extract_included(
                                 serializer_fields, serializer_resource, nested_resource_instance, new_included_resources
                             )
                         )
@@ -307,11 +308,11 @@ class JSONRenderer(renderers.JSONRenderer):
                 serializer_fields = utils.get_serializer_fields(field)
                 if serializer_data:
                     included_data.append(
-                        self.build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager,
+                        JSONRenderer.build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager,
                                                      relation_type)
                     )
                     included_data.extend(
-                        self.extract_included(
+                        JSONRenderer.extract_included(
                             serializer_fields, serializer_data, relation_instance_or_manager, new_included_resources
                         )
                     )
