@@ -46,7 +46,7 @@ def get_resource_name(context):
         resource_name = getattr(view, 'resource_name')
     except AttributeError:
         try:
-            serializer = getattr(view, 'serializer_class')
+            serializer = view.get_serializer_class()
             return get_resource_type_from_serializer(serializer)
         except AttributeError:
             try:

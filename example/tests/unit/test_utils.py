@@ -1,21 +1,18 @@
 import pytest
-from django.utils import six
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils import six
 from rest_framework import serializers
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rest_framework_json_api import utils
 from example.serializers import (EntrySerializer, BlogSerializer,
                                  AuthorSerializer, CommentSerializer)
+from rest_framework_json_api import utils
 from rest_framework_json_api.utils import get_included_serializers
 
 pytestmark = pytest.mark.django_db
-
-
-class ResourceView(APIView):
-    pass
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -25,15 +22,14 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 
 def test_get_resource_name():
-    view = ResourceView()
+    view = APIView()
     context = {'view': view}
     setattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
-    assert 'ResourceViews' == utils.get_resource_name(context), 'not formatted'
+    assert 'APIViews' == utils.get_resource_name(context), 'not formatted'
 
-    view = ResourceView()
     context = {'view': view}
     setattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', 'dasherize')
-    assert 'resource-views' == utils.get_resource_name(context), 'derived from view'
+    assert 'api-views' == utils.get_resource_name(context), 'derived from view'
 
     view.model = get_user_model()
     assert 'users' == utils.get_resource_name(context), 'derived from view model'
@@ -47,9 +43,9 @@ def test_get_resource_name():
     view.response = Response(status=500)
     assert 'errors' == utils.get_resource_name(context), 'handles 500 error'
 
-    view = ResourceView()
-    context = {'view': view}
+    view = GenericAPIView()
     view.serializer_class = ResourceSerializer
+    context = {'view': view}
     assert 'users' == utils.get_resource_name(context), 'derived from serializer'
 
     view.serializer_class.Meta.resource_name = 'rcustom'
