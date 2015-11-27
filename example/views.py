@@ -41,4 +41,3 @@ class CommentRelationshipView(RelationshipView):
 class AuthorRelationshipView(RelationshipView):
     queryset = Author.objects.all()
     self_link_view_name = 'author-relationships'
-

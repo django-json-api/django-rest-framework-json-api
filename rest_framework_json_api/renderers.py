@@ -105,8 +105,8 @@ class JSONRenderer(renderers.JSONRenderer):
             for position in range(len(serializer_data)):
                 resource = serializer_data[position]  # Get current resource
                 resource_instance = resource_serializer.instance[position]  # Get current instance
-                json_api_data.append(
-                    utils.build_json_resource_obj(fields, resource, resource_instance, resource_name))
+                resource_obj = utils.build_json_resource_obj(fields, resource, resource_instance, resource_name)
+                json_api_data.append(resource_obj)
                 included = utils.extract_included(fields, resource, resource_instance, included_resources)
                 if included:
                     json_api_included.extend(included)

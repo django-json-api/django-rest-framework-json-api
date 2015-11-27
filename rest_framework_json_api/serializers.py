@@ -15,9 +15,11 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
     }
 
     model_class = None
+    pk_field = 'pk'
 
     def __init__(self, *args, **kwargs):
         self.model_class = kwargs.pop('model_class', self.model_class)
+        self.pk_field = kwargs.pop('pk_field', self.pk_field)
         if 'instance' not in kwargs and not self.model_class:
             raise RuntimeError('ResourceIdentifierObjectsSerializer must be initialized with a model class.')
         super(ResourceIdentifierObjectSerializer, self).__init__(*args, **kwargs)
@@ -25,15 +27,16 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
     def to_representation(self, instance):
         return {
             'type': format_relation_name(get_resource_type_from_instance(instance)),
-            'id': str(instance.pk)
+            'id': str(getattr(instance, self.pk_field))
         }
 
     def to_internal_value(self, data):
         if data['type'] != format_relation_name(self.model_class.__name__):
             self.fail('incorrect_model_type', model_type=self.model_class, received_type=data['type'])
         pk = data['id']
+        lookup = {self.pk_field: pk}
         try:
-            return self.model_class.objects.get(pk=pk)
+            return self.model_class.objects.get(**lookup)
         except ObjectDoesNotExist:
             self.fail('does_not_exist', pk_value=pk)
         except (TypeError, ValueError):
