@@ -36,7 +36,8 @@ class JSONRenderer(renderers.JSONRenderer):
     media_type = 'application/vnd.api+json'
     format = 'vnd.api+json'
 
-    def extract_attributes(self, fields, resource):
+    @staticmethod
+    def extract_attributes(fields, resource):
         data = OrderedDict()
         for field_name, field in six.iteritems(fields):
             # ID is always provided in the root of JSON API so remove it from attributes
