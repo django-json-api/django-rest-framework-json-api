@@ -7,6 +7,7 @@ from collections import OrderedDict
 import inflection
 from django.conf import settings
 from django.utils import six
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
 
@@ -19,13 +20,6 @@ try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
     HyperlinkedRouterField = type(None)
-
-import django
-
-if django.VERSION < (1, 7):
-    from django.utils.module_loading import import_by_path as import_class_from_dotted_path
-else:
-    from django.utils.module_loading import import_string as import_class_from_dotted_path
 
 
 def get_resource_name(context):
