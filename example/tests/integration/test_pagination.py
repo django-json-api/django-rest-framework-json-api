@@ -1,3 +1,4 @@
+import json
 from django.core.urlresolvers import reverse
 
 import pytest
@@ -22,6 +23,10 @@ def test_pagination_with_single_entry(single_entry, client):
                 },
                 "relationships":
                 {
+                    'allComments': {
+                        'meta': {'count': 1},
+                        'data': [{'id': '1','type': 'comments'}]
+                    },
                     "blog": {
                         "data": {"type": "blogs", "id": "1"}
                     },
@@ -53,7 +58,6 @@ def test_pagination_with_single_entry(single_entry, client):
     }
 
     response = client.get(reverse("entry-list"))
-    content_dump = redump_json(response.content)
-    expected_dump = dump_json(expected)
+    content = json.loads(response.content.decode('utf-8'))
 
-    assert content_dump == expected_dump
+    assert content == expected
