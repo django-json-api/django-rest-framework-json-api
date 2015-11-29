@@ -389,7 +389,7 @@ def extract_relationships(fields, resource, resource_instance):
             if isinstance(serializer_data, list):
                 for position in range(len(serializer_data)):
                     nested_resource_instance = resource_instance_queryset[position]
-                    nested_resource_instance_type = get_resource_type_from_instance(nested_resource_instance)
+                    nested_resource_instance_type = get_resource_type_from_serializer(field.child)
                     relation_data.append(OrderedDict([
                         ('type', nested_resource_instance_type),
                         ('id', encoding.force_text(nested_resource_instance.pk))
@@ -399,8 +399,7 @@ def extract_relationships(fields, resource, resource_instance):
                 continue
 
         if isinstance(field, ModelSerializer):
-            relation_model = field.Meta.model
-            relation_type = format_relation_name(relation_model.__name__)
+            relation_type = get_resource_type_from_serializer(field)
 
             data.update({
                 field_name: {
@@ -471,8 +470,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
 
         if isinstance(field, ListSerializer):
             serializer = field.child
-            model = serializer.Meta.model
-            relation_type = format_relation_name(model.__name__)
+            relation_type = get_resource_type_from_serializer(serializer)
             relation_queryset = list(relation_instance_or_manager.all())
 
             # Get the serializer fields
@@ -493,8 +491,7 @@ def extract_included(fields, resource, resource_instance, included_resources):
                     )
 
         if isinstance(field, ModelSerializer):
-            model = field.Meta.model
-            relation_type = format_relation_name(model.__name__)
+            relation_type = get_resource_type_from_serializer(field)
 
             # Get the serializer fields
             serializer_fields = get_serializer_fields(field)
