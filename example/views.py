@@ -1,8 +1,9 @@
 from rest_framework import viewsets
 from rest_framework_json_api.views import RelationshipView
-from example.models import Blog, Entry, Author, Comment
+from example.models import Blog, Entry, Author, Comment, RenamedAuthor
 from example.serializers import (
-        BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
+        BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer,
+        RenamedAuthorSerializer)
 
 
 class BlogViewSet(viewsets.ModelViewSet):
@@ -19,6 +20,11 @@ class EntryViewSet(viewsets.ModelViewSet):
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+
+
+class RenamedAuthorViewSet(viewsets.ModelViewSet):
+    queryset = RenamedAuthor.objects.all()
+    serializer_class = RenamedAuthorSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -41,4 +47,3 @@ class CommentRelationshipView(RelationshipView):
 class AuthorRelationshipView(RelationshipView):
     queryset = Author.objects.all()
     self_link_view_name = 'author-relationships'
-
