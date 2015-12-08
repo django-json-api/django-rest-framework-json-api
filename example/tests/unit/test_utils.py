@@ -16,7 +16,7 @@ pytestmark = pytest.mark.django_db
 
 
 class ResourceSerializer(serializers.ModelSerializer):
-    class Meta():
+    class Meta:
         fields = ('username',)
         model = get_user_model()
 
@@ -84,44 +84,6 @@ def test_format_value():
 def test_format_relation_name():
     assert utils.format_relation_name('first_name', 'capitalize') == 'FirstNames'
     assert utils.format_relation_name('first_name', 'camelize') == 'firstNames'
-
-
-def test_build_json_resource_obj():
-    resource = {
-        'pk': 1,
-        'username': 'Alice',
-    }
-
-    serializer = ResourceSerializer(data={'username': 'Alice'})
-    serializer.is_valid()
-    resource_instance = serializer.save()
-
-    output = {
-        'type': 'user',
-        'id': '1',
-        'attributes': {
-            'username': 'Alice'
-        },
-    }
-
-    assert utils.build_json_resource_obj(
-        serializer.fields, resource, resource_instance, 'user') == output
-
-
-def test_extract_attributes():
-    fields = {
-        'id': serializers.Field(),
-        'username': serializers.Field(),
-        'deleted': serializers.ReadOnlyField(),
-    }
-    resource = {'id': 1, 'deleted': None, 'username': 'jerel'}
-    expected = {
-        'username': 'jerel',
-        'deleted': None
-    }
-    assert sorted(utils.extract_attributes(fields, resource)) == sorted(expected), 'Regular fields should be extracted'
-    assert sorted(utils.extract_attributes(fields, {})) == sorted(
-        {'username': ''}), 'Should not extract read_only fields on empty serializer'
 
 
 class SerializerWithIncludedSerializers(EntrySerializer):
