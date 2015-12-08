@@ -31,6 +31,11 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         self.related_link_lookup_field = kwargs.pop('related_link_lookup_field', self.related_link_lookup_field)
         self.related_link_url_kwarg = kwargs.pop('related_link_url_kwarg', self.related_link_lookup_field)
 
+        # check for a model class that was passed in for the relation type
+        model = kwargs.pop('model', None)
+        if model:
+            self.model = model
+
         # We include this simply for dependency injection in tests.
         # We can't add it as a class attributes or it would expect an
         # implicit `self` argument to be passed.
@@ -104,7 +109,11 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
 
     def to_internal_value(self, data):
         if isinstance(data, six.text_type):
-            data = json.loads(data)
+            try:
+                data = json.loads(data)
+            except ValueError:
+                # show a useful error if they send a `pk` instead of resource object
+                self.fail('incorrect_type', data_type=type(data).__name__)
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
@@ -136,3 +145,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             for item in queryset
         ])
 
+
+class SerializerMethodResourceRelatedField(ResourceRelatedField):
+    def get_attribute(self, instance):
+        # check for a source fn defined on the serializer instead of the model
+        if self.source and hasattr(self.parent, self.source):
+            serializer_method = getattr(self.parent, self.source)
+            if hasattr(serializer_method, '__call__'):
+                return serializer_method(instance)
+        return super(ResourceRelatedField, self).get_attribute(instance)

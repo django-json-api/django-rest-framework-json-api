@@ -27,3 +27,12 @@ def test_included_data_on_detail(single_entry, client):
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
     expected_comment_count = single_entry.comment_set.count()
     assert comment_count == expected_comment_count, 'Detail comment count is incorrect'
+
+def test_dynamic_related_data_is_included(single_entry, entry_factory, client):
+    entry_factory()
+    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=suggested')
+    included = load_json(response.content).get('included')
+
+    assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
+    assert len(included) == 1, 'The dynamically included blog entries are of an incorrect count'
+
