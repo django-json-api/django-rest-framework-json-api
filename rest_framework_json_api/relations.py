@@ -13,6 +13,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
     self_link_view_name = None
     related_link_view_name = None
     related_link_lookup_field = 'pk'
+    related_resource_name = None
 
     default_error_messages = {
         'required': _('This field is required.'),
@@ -22,11 +23,13 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         'no_match': _('Invalid hyperlink - No URL match.'),
     }
 
-    def __init__(self, self_link_view_name=None, related_link_view_name=None, **kwargs):
+    def __init__(self, self_link_view_name=None, related_link_view_name=None, related_resource_name=None, **kwargs):
         if self_link_view_name is not None:
             self.self_link_view_name = self_link_view_name
         if related_link_view_name is not None:
             self.related_link_view_name = related_link_view_name
+        if related_resource_name is not None:
+            self.related_resource_name = related_resource_name
 
         self.related_link_lookup_field = kwargs.pop('related_link_lookup_field', self.related_link_lookup_field)
         self.related_link_url_kwarg = kwargs.pop('related_link_url_kwarg', self.related_link_lookup_field)
@@ -116,7 +119,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
                 self.fail('incorrect_type', data_type=type(data).__name__)
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
-        expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        expected_relation_type = self.related_resource_name or get_resource_type_from_queryset(self.queryset)
         if data['type'] != expected_relation_type:
             self.conflict('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
@@ -139,8 +142,8 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
 
         return OrderedDict([
             (
-                json.dumps(self.to_representation(item)),
-                self.display_value(item)
+                str(item.pk),
+                str(item)
             )
             for item in queryset
         ])
