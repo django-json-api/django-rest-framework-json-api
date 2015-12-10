@@ -192,7 +192,7 @@ Example without pluralization:
                 ...
         },
         "relationships": {
-            "home_towns": {
+            "home_town": {
                 "data": [{
                     "type": "home_town",
                     "id": 3
@@ -215,7 +215,7 @@ When set to pluralize:
                 ...
         },
         "relationships": {
-            "home_towns": {
+            "home_town": {
                 "data": [{
                     "type": "home_towns",
                     "id": 3
