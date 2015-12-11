@@ -83,8 +83,6 @@ class ResourceNameConsistencyTest(APITestCase):
             pass
 
     class _PatchedModel:
-        class Meta:
-            proxy = True
 
         class JSONAPIMeta:
             resource_name = "resource_name_from_JSONAPIMeta"
