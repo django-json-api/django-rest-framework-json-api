@@ -1,12 +1,24 @@
+from datetime import datetime
 from rest_framework_json_api import serializers, relations
 from example.models import Blog, Entry, Author, Comment
 
 
 class BlogSerializer(serializers.ModelSerializer):
 
+    copyright = serializers.SerializerMethodField()
+
+    def get_copyright(self, obj):
+        return datetime.now().year
+
+    def get_root_meta(self, obj):
+        return {
+          'api_docs': '/docs/api/blogs'
+        }
+
     class Meta:
         model = Blog
         fields = ('name', )
+        meta_fields = ('copyright',)
 
 
 class EntrySerializer(serializers.ModelSerializer):
@@ -24,6 +36,7 @@ class EntrySerializer(serializers.ModelSerializer):
         'suggested': 'example.serializers.EntrySerializer',
     }
 
+    body_format = serializers.SerializerMethodField()
     comments = relations.ResourceRelatedField(
             source='comment_set', many=True, read_only=True)
     suggested = relations.SerializerMethodResourceRelatedField(
@@ -32,10 +45,14 @@ class EntrySerializer(serializers.ModelSerializer):
     def get_suggested(self, obj):
         return Entry.objects.exclude(pk=obj.pk).first()
 
+    def get_body_format(self, obj):
+        return 'text'
+
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
                 'authors', 'comments', 'suggested',)
+        meta_fields = ('body_format',)
 
 
 class AuthorSerializer(serializers.ModelSerializer):
