@@ -20,6 +20,9 @@ def test_pagination_with_single_entry(single_entry, client):
                     "pubDate": None,
                     "modDate": None
                 },
+                "meta": {
+                    "bodyFormat": "text"
+                },
                 "relationships":
                 {
                     "blog": {
