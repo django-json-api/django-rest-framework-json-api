@@ -36,3 +36,17 @@ def test_dynamic_related_data_is_included(single_entry, entry_factory, client):
     assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
     assert len(included) == 1, 'The dynamically included blog entries are of an incorrect count'
 
+
+def test_missing_field_not_included(author_bio_factory, author_factory, client):
+    # First author does not have a bio
+    author = author_factory()
+    response = client.get(reverse('author-detail', args=[author.pk])+'?include=bio')
+    data = load_json(response.content)
+    assert 'included' not in data
+    # Second author does
+    bio = author_bio_factory()
+    response = client.get(reverse('author-detail', args=[bio.author.pk])+'?include=bio')
+    data = load_json(response.content)
+    assert 'included' in data
+    assert len(data['included']) == 1
+    assert data['included'][0]['attributes']['body'] == bio.body

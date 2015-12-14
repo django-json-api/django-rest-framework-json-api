@@ -35,6 +35,15 @@ class Author(BaseModel):
 
 
 @python_2_unicode_compatible
+class AuthorBio(BaseModel):
+    author = models.OneToOneField(Author, related_name='bio')
+    body = models.TextField()
+
+    def __str__(self):
+        return self.author.name
+
+
+@python_2_unicode_compatible
 class Entry(BaseModel):
     blog = models.ForeignKey(Blog)
     headline = models.CharField(max_length=255)

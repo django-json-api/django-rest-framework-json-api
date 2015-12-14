@@ -1,10 +1,11 @@
 import pytest
 from pytest_factoryboy import register
 
-from example.factories import BlogFactory, AuthorFactory, EntryFactory, CommentFactory
+from example.factories import BlogFactory, AuthorFactory, AuthorBioFactory, EntryFactory, CommentFactory
 
 register(BlogFactory)
 register(AuthorFactory)
+register(AuthorBioFactory)
 register(EntryFactory)
 register(CommentFactory)
 
