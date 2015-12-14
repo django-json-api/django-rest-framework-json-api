@@ -229,10 +229,28 @@ When set to pluralize:
 Both `JSON_API_PLURALIZE_RELATION_TYPE` and `JSON_API_FORMAT_RELATION_KEYS` can be combined to 
 achieve different results.
 
+### Meta
+
+You may add metadata to the rendered json in two different ways: `meta_fields` and `get_root_meta`.
+
+On any `rest_framework_json_api.serializers.ModelSerializer` you may add a `meta_fields`
+property to the `Meta` class. This behaves in the same manner as the default
+`fields` property and will cause `SerializerMethodFields` or model values to be
+added to the `meta` object within the same `data` as the serializer.
+
+To add metadata to the top level `meta` object add:
+
+``` python
+def get_root_meta(self, obj):
+    return {
+        'size': len(obj)
+    }
+```
+to the serializer. It must return a dict and will be merged with the existing top level `meta`.
+
 <!-- 
 ### Relationships
 ### Links
 ### Included
 ### Errors
-### Meta
 -->
