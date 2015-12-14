@@ -7,7 +7,7 @@ from example.tests.utils import dump_json, redump_json
 pytestmark = pytest.mark.django_db
 
 
-def test_top_level_data_meta(blog, client):
+def test_top_level_meta(blog, client):
 
     expected = {
         "data": {
@@ -19,6 +19,9 @@ def test_top_level_data_meta(blog, client):
             "meta": {
                 "copyright": datetime.now().year
             },
+        },
+        "meta": {
+            "apiDocs": "/docs/api/blogs"
         },
     }
 
