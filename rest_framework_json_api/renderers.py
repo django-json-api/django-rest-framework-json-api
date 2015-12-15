@@ -325,7 +325,7 @@ class JSONRenderer(renderers.JSONRenderer):
             meta = getattr(serializer.child, 'Meta', None)
         else:
             meta = getattr(serializer, 'Meta', None)
-        meta_fields = getattr(meta, 'meta_fields', {})
+        meta_fields = getattr(meta, 'meta_fields', [])
         data = OrderedDict()
         for field_name in meta_fields:
             data.update({

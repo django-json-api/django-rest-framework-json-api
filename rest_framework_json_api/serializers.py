@@ -148,10 +148,10 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
         We override the parent to omit explicity defined meta fields (such
         as SerializerMethodFields) from the list of declared fields
         """
-        meta_fields = getattr(self.Meta, 'meta_fields', None)
+        meta_fields = getattr(self.Meta, 'meta_fields', [])
 
         declared = OrderedDict()
-        for field_name in declared_fields.keys():
+        for field_name in set(declared_fields.keys()):
             field = declared_fields[field_name]
             if field_name not in meta_fields:
                 declared[field_name] = field
