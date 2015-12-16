@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from example.tests.utils import load_json
 
 from rest_framework.test import APITestCase
-from example import models, serializers
+from example import models, serializers, views
 pytestmark = pytest.mark.django_db
 
 
@@ -13,17 +13,61 @@ class _PatchedModel:
         resource_name = "resource_name_from_JSONAPIMeta"
 
 
-def test_match_model_resource_name_on_list(single_entry, client):
-    models.Comment.__bases__ += (_PatchedModel,)
-    response = client.get(reverse("comment-list"))
-    data = load_json(response.content)['data']
-    # name should be super-author instead of model name RenamedAuthor
-    assert [x.get('type') for x in data] == ['resource_name_from_JSONAPIMeta'], 'List included types are incorrect'
+@pytest.mark.usefixtures("single_entry")
+class ModelResourceNameTests(APITestCase):
+    def test_model_resource_name_on_list(self):
+        models.Comment.__bases__ += (_PatchedModel,)
+        response = self.client.get(reverse("comment-list"))
+        data = load_json(response.content)['data'][0]
+        # name should be super-author instead of model name RenamedAuthor
+        assert (data.get('type') == 'resource_name_from_JSONAPIMeta'), (
+            'resource_name from model incorrect on list')
+
+    # Precedence tests
+    def test_resource_name_precendence(self):
+        # default
+        response = self.client.get(reverse("comment-list"))
+        data = load_json(response.content)['data'][0]
+        assert (data.get('type') == 'comments'), (
+            'resource_name from model incorrect on list')
+
+        # model > default
+        models.Comment.__bases__ += (_PatchedModel,)
+        response = self.client.get(reverse("comment-list"))
+        data = load_json(response.content)['data'][0]
+        assert (data.get('type') == 'resource_name_from_JSONAPIMeta'), (
+            'resource_name from model incorrect on list')
+
+        # serializer > model
+        serializers.CommentSerializer.Meta.resource_name = "resource_name_from_serializer"
+        response = self.client.get(reverse("comment-list"))
+        data = load_json(response.content)['data'][0]
+        assert (data.get('type') == 'resource_name_from_serializer'), (
+            'resource_name from serializer incorrect on list')
+
+        # view > serializer > model
+        views.CommentViewSet.resource_name = 'resource_name_from_view'
+        response = self.client.get(reverse("comment-list"))
+        data = load_json(response.content)['data'][0]
+        assert (data.get('type') == 'resource_name_from_view'), (
+            'resource_name from view incorrect on list')
+
+    def tearDown(self):
+        models.Comment.__bases__ = (models.Comment.__bases__[0],)
+        try:
+            delattr(serializers.CommentSerializer.Meta, "resource_name")
+        except AttributeError:
+            pass
+        try:
+            delattr(views.CommentViewSet, "resource_name")
+        except AttributeError:
+            pass
 
 
 @pytest.mark.usefixtures("single_entry")
 class ResourceNameConsistencyTest(APITestCase):
 
+    # Included rename tests
     def test_type_match_on_included_and_inline_base(self):
         self._check_relationship_and_included_comment_type_are_the_same(reverse("entry-list"))
 
@@ -43,6 +87,7 @@ class ResourceNameConsistencyTest(APITestCase):
 
         self._check_relationship_and_included_comment_type_are_the_same(reverse("entry-list"))
 
+    # Relation rename tests
     def test_resource_and_relationship_type_match(self):
         self._check_resource_and_relationship_comment_type_match()
 
