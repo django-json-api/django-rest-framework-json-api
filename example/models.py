@@ -35,18 +35,6 @@ class Author(BaseModel):
 
 
 @python_2_unicode_compatible
-class RenamedAuthor(Author):
-    class Meta:
-        proxy = True
-
-    class JSONAPIMeta:
-        resource_name = "super-author"
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
 class Entry(BaseModel):
     blog = models.ForeignKey(Blog)
     headline = models.CharField(max_length=255)

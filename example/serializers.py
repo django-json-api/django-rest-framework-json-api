@@ -1,5 +1,5 @@
 from rest_framework_json_api import serializers, relations
-from example.models import Blog, Entry, Author, Comment, RenamedAuthor
+from example.models import Blog, Entry, Author, Comment
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -35,20 +35,13 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                'authors', 'comments', 'suggested',)
+                  'authors', 'comments', 'suggested',)
 
 
 class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('name', 'email',)
-
-
-class RenamedAuthorSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = RenamedAuthor
         fields = ('name', 'email',)
 
 
