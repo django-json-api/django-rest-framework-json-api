@@ -6,7 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import Hyperlink, \
-    get_resource_type_from_queryset, get_resource_type_from_instance
+    get_resource_type_from_queryset, get_resource_type_from_instance, \
+    get_included_serializers, get_resource_type_from_serializer
 
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
@@ -137,7 +138,18 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         else:
             pk = value.pk
 
-        return OrderedDict([('type', get_resource_type_from_instance(value)), ('id', str(pk))])
+        # check to see if this resource has a different resource_name when
+        # included and use that name
+        resource_type = None
+        root = getattr(self.parent, 'parent', self.parent)
+        field_name = self.field_name if self.field_name else self.parent.field_name
+        if getattr(root, 'included_serializers', None) is not None:
+            includes = get_included_serializers(root)
+            if field_name in includes.keys():
+                resource_type = get_resource_type_from_serializer(includes[field_name])
+
+        resource_type = resource_type if resource_type else get_resource_type_from_instance(value)
+        return OrderedDict([('type', resource_type), ('id', str(pk))])
 
     @property
     def choices(self):
