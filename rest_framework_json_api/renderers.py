@@ -281,8 +281,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, ListSerializer):
                 serializer = field.child
-                model = serializer.Meta.model
-                relation_type = utils.format_relation_name(model.__name__)
+                relation_type = utils.get_resource_type_from_serializer(serializer)
                 relation_queryset = list(relation_instance_or_manager.all())
 
                 # Get the serializer fields
@@ -303,15 +302,16 @@ class JSONRenderer(renderers.JSONRenderer):
                         )
 
             if isinstance(field, ModelSerializer):
-                model = field.Meta.model
-                relation_type = utils.format_relation_name(model.__name__)
+
+                relation_type = utils.get_resource_type_from_serializer(field)
 
                 # Get the serializer fields
                 serializer_fields = utils.get_serializer_fields(field)
                 if serializer_data:
                     included_data.append(
-                        JSONRenderer.build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager,
-                                                     relation_type)
+                        JSONRenderer.build_json_resource_obj(
+                            serializer_fields, serializer_data,
+                            relation_instance_or_manager, relation_type)
                     )
                     included_data.extend(
                         JSONRenderer.extract_included(
