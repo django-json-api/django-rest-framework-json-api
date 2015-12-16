@@ -139,7 +139,9 @@ def format_relation_name(value, format_type=None):
 
 
 def get_related_resource_type(relation):
-    if hasattr(relation, '_meta'):
+    if type(relation) == ManyRelatedField:
+        return get_related_resource_type(relation.child_relation)
+    elif hasattr(relation, '_meta'):
         relation_model = relation._meta.model
     elif hasattr(relation, 'model'):
         # the model type was explicitly passed as a kwarg to ResourceRelatedField
