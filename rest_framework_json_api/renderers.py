@@ -322,6 +322,29 @@ class JSONRenderer(renderers.JSONRenderer):
         return utils.format_keys(included_data)
 
     @staticmethod
+    def extract_meta(serializer, resource):
+        if hasattr(serializer, 'child'):
+            meta = getattr(serializer.child, 'Meta', None)
+        else:
+            meta = getattr(serializer, 'Meta', None)
+        meta_fields = getattr(meta, 'meta_fields', [])
+        data = OrderedDict()
+        for field_name in meta_fields:
+            data.update({
+                field_name: resource.get(field_name)
+            })
+        return data
+
+    @staticmethod
+    def extract_root_meta(serializer, resource, meta):
+        if getattr(serializer, 'get_root_meta', None):
+            root_meta = serializer.get_root_meta(resource)
+            if root_meta:
+                assert isinstance(root_meta, dict), 'get_root_meta must return a dict'
+                meta.update(root_meta)
+        return meta
+
+    @staticmethod
     def build_json_resource_obj(fields, resource, resource_instance, resource_name):
         resource_data = [
             ('type', resource_name),
@@ -388,6 +411,8 @@ class JSONRenderer(renderers.JSONRenderer):
             included_resources = list()
 
         json_api_included = list()
+        # initialize json_api_meta with pagination meta or an empty dict
+        json_api_meta = data.get('meta', {}) if isinstance(data, dict) else {}
 
         if data and 'results' in data:
             serializer_data = data["results"]
@@ -411,8 +436,14 @@ class JSONRenderer(renderers.JSONRenderer):
             for position in range(len(serializer_data)):
                 resource = serializer_data[position]  # Get current resource
                 resource_instance = resource_serializer.instance[position]  # Get current instance
-                json_api_data.append(
-                    self.build_json_resource_obj(fields, resource, resource_instance, resource_name))
+
+                json_resource_obj = self.build_json_resource_obj(fields, resource, resource_instance, resource_name)
+                meta = self.extract_meta(resource_serializer, resource)
+                if meta:
+                    json_resource_obj.update({'meta': utils.format_keys(meta)})
+                json_api_meta = self.extract_root_meta(resource_serializer, resource, json_api_meta)
+                json_api_data.append(json_resource_obj)
+
                 included = self.extract_included(fields, resource, resource_instance, included_resources)
                 if included:
                     json_api_included.extend(included)
@@ -422,6 +453,12 @@ class JSONRenderer(renderers.JSONRenderer):
                 fields = utils.get_serializer_fields(data.serializer)
                 resource_instance = data.serializer.instance
                 json_api_data = self.build_json_resource_obj(fields, data, resource_instance, resource_name)
+
+                meta = self.extract_meta(data.serializer, data)
+                if meta:
+                    json_api_data.update({'meta': utils.format_keys(meta)})
+                json_api_meta = self.extract_root_meta(data.serializer, data, json_api_meta)
+
                 included = self.extract_included(fields, data, resource_instance, included_resources)
                 if included:
                     json_api_included.extend(included)
@@ -454,8 +491,8 @@ class JSONRenderer(renderers.JSONRenderer):
             # Sort the items by type then by id
             render_data['included'] = sorted(unique_compound_documents, key=lambda item: (item['type'], item['id']))
 
-        if isinstance(data, dict) and data.get('meta'):
-            render_data['meta'] = data.get('meta')
+        if json_api_meta:
+            render_data['meta'] = utils.format_keys(json_api_meta)
 
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context

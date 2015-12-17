@@ -65,11 +65,22 @@ def get_resource_name(context):
 
 
 def get_serializer_fields(serializer):
+    fields = None
     if hasattr(serializer, 'child'):
-        return getattr(serializer.child, 'fields')
+        fields = getattr(serializer.child, 'fields')
+        meta = getattr(serializer.child, 'Meta', None)
     if hasattr(serializer, 'fields'):
-        return getattr(serializer, 'fields')
+        fields = getattr(serializer, 'fields')
+        meta = getattr(serializer, 'Meta', None)
 
+    if fields:
+        meta_fields = getattr(meta, 'meta_fields', {})
+        for field in meta_fields:
+            try:
+                fields.pop(field)
+            except KeyError:
+                pass
+        return fields
 
 def format_keys(obj, format_type=None):
     """
