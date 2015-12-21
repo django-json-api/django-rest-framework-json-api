@@ -26,6 +26,9 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "pubDate": None,
                     "modDate": None
                 },
+                "meta": {
+                    "bodyFormat": "text"
+                },
                 "relationships":
                 {
                     "blog": {
@@ -50,6 +53,9 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "bodyText": multiple_entries[1].body_text,
                     "pubDate": None,
                     "modDate": None
+                },
+                "meta": {
+                    "bodyFormat": "text"
                 },
                 "relationships":
                 {

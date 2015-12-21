@@ -136,3 +136,24 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     * A mixin class to enable validation of included resources is included
     """
     serializer_related_field = ResourceRelatedField
+
+    def __init__(self, *args, **kwargs):
+        meta_fields = getattr(self.Meta, 'meta_fields', [])
+        # we add meta_fields to fields so they will be serialized like usual
+        self.Meta.fields = tuple(tuple(self.Meta.fields) + tuple(meta_fields))
+        super(ModelSerializer, self).__init__(*args, **kwargs)
+
+    def get_field_names(self, declared_fields, info):
+        """
+        We override the parent to omit explicity defined meta fields (such
+        as SerializerMethodFields) from the list of declared fields
+        """
+        meta_fields = getattr(self.Meta, 'meta_fields', [])
+
+        declared = OrderedDict()
+        for field_name in set(declared_fields.keys()):
+            field = declared_fields[field_name]
+            if field_name not in meta_fields:
+                declared[field_name] = field
+        return super(ModelSerializer, self).get_field_names(declared, info)
+
