@@ -94,9 +94,10 @@ class JSONRenderer(renderers.JSONRenderer):
                 else:
                     continue
 
-            relation_type = utils.get_related_resource_type(field)
+            #relation_type = utils.get_related_resource_type(field)
 
             if isinstance(field, relations.HyperlinkedIdentityField):
+                relation_type = utils.get_related_resource_type(field)
                 # special case for HyperlinkedIdentityField
                 relation_data = list()
 
@@ -135,6 +136,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, (relations.PrimaryKeyRelatedField, relations.HyperlinkedRelatedField)):
                 relation_id = relation_instance_or_manager.pk if resource.get(field_name) else None
+                relation_type = utils.get_related_resource_type(field)
 
                 relation_data = {
                     'data': (
