@@ -26,6 +26,12 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
 
+class EntryCommentViewSet(CommentViewSet):
+
+    def get_queryset(self):
+        return self.queryset.filter(entry_id=self.kwargs['pk'])
+
+
 class EntryRelationshipView(RelationshipView):
     queryset = Entry.objects.all()
 
