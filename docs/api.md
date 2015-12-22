@@ -18,23 +18,33 @@ highly custom rendering control.
 
 Builds the `attributes` object of the JSON API resource object.
 
-#### extract_relationships(fields, resource, resource_instance)
+#### extract_relationships
+
+`extract_relationships(fields, resource, resource_instance)`
 
 Builds the `relationships` top level object based on related serializers.
 
-#### extract_included(fields, resource, resource_instance, included_resources)
+#### extract_included
+
+`extract_included(fields, resource, resource_instance, included_resources)`
 
 Adds related data to the top level `included` key when the request includes `?include=example,example_field2`
 
-#### extract_meta(serializer, resource)
+#### extract_meta
+
+`extract_meta(serializer, resource)`
 
 Gathers the data from serializer fields specified in `meta_fields` and adds it to the `meta` object.
 
-#### extract_root_meta(serializer, resource, meta)
+#### extract_root_meta
+
+`extract_root_meta(serializer, resource, meta)`
 
 Calls a `get_root_meta` function on a serializer, if it exists.
 
-#### build_json_resource_obj(fields, resource, resource_instance, resource_name)
+#### build_json_resource_obj
+
+`build_json_resource_obj(fields, resource, resource_instance, resource_name)g
 
 Builds the resource object (type, id, attributes) and extracts relationships.
 
