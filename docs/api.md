@@ -44,7 +44,7 @@ Calls a `get_root_meta` function on a serializer, if it exists.
 
 #### build_json_resource_obj
 
-`build_json_resource_obj(fields, resource, resource_instance, resource_name)g
+`build_json_resource_obj(fields, resource, resource_instance, resource_name)`
 
 Builds the resource object (type, id, attributes) and extracts relationships.
 
