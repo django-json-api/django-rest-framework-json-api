@@ -26,7 +26,11 @@ def test_pagination_with_single_entry(single_entry, client):
                 "relationships":
                 {
                     "blog": {
-                        "data": {"type": "blogs", "id": "1"}
+                        "data": {"type": "blogs", "id": "1"},
+                        "links": {
+                            "self": "http://testserver/entries/1/relationships/blog",
+                            "related": "http://testserver/blogs/1"
+                        }
                     },
                     "authors": {
                         "meta": {"count": 1},
@@ -34,7 +38,11 @@ def test_pagination_with_single_entry(single_entry, client):
                     },
                     "comments": {
                         "meta": {"count": 1},
-                        "data": [{"type": "comments", "id": "1"}]
+                        "data": [{"type": "comments", "id": "1"}],
+                        "links": {
+                            "self": "http://testserver/entries/1/relationships/comments",
+                            "related": "http://testserver/entries/1/comments",
+                        }
                     }
                 }
             }],

@@ -184,3 +184,33 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
+
+    def test_comment_related_links(self):
+        url = reverse('entry-detail', args=(self.first_entry.id,))
+        response = self.client.get(url, content_type='application/vnd.api+json')
+
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content.decode())['data']
+        got = data['relationships']['comments']['links']
+
+        expected = {
+            'related': 'http://testserver/entries/{}/comments'.format(self.first_entry.id),
+            'self': 'http://testserver/entries/{}/relationships/comments'.format(self.first_entry.id)
+        }
+        self.assertDictEqual(got, expected)
+
+    def test_blog_related_links(self):
+        url = reverse('entry-detail', args=(self.second_entry.id,))
+        response = self.client.get(url, content_type='application/vnd.api+json')
+
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content.decode())['data']
+        got = data['relationships']['blog']['links']
+
+        expected = {
+            'related': 'http://testserver/blogs/{}'.format(self.second_entry.blog_id),
+            'self': 'http://testserver/entries/{}/relationships/blog'.format(self.second_entry.id)
+        }
+        self.assertDictEqual(got, expected)

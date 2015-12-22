@@ -37,6 +37,7 @@ class EntrySerializer(serializers.ModelSerializer):
         'suggested': 'example.serializers.EntrySerializer',
     }
 
+    body_format = serializers.SerializerMethodField()
     blog = relations.ResourceRelatedField(
         self_link_view_name='entry-relationships',
         related_link_view_name='blog-detail',

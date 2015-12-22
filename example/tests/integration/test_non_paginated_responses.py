@@ -32,7 +32,11 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                 "relationships":
                 {
                     "blog": {
-                        "data": {"type": "blogs", "id": "1"}
+                        "data": {"type": "blogs", "id": "1"},
+                        "links": {
+                            "self": "http://testserver/entries/1/relationships/blog",
+                            "related": "http://testserver/blogs/1"
+                        }
                     },
                     "authors": {
                         "meta": {"count": 1},
@@ -40,7 +44,11 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     },
                     "comments": {
                         "meta": {"count": 1},
-                        "data": [{"type": "comments", "id": "1"}]
+                        "data": [{"type": "comments", "id": "1"}],
+                        "links": {
+                            "self": "http://testserver/entries/1/relationships/comments",
+                            "related": "http://testserver/entries/1/comments",
+                        }
                     }
                 }
             },
@@ -60,7 +68,11 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                 "relationships":
                 {
                     "blog": {
-                        "data": {"type": "blogs", "id": "2"}
+                        "data": {"type": "blogs", "id": "2"},
+                        "links": {
+                            "self": "http://testserver/entries/2/relationships/blog",
+                            "related": "http://testserver/blogs/2"
+                        }
                     },
                     "authors": {
                         "meta": {"count": 1},
@@ -68,7 +80,11 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     },
                     "comments": {
                         "meta": {"count": 1},
-                        "data": [{"type": "comments", "id": "2"}]
+                        "data": [{"type": "comments", "id": "2"}],
+                        "links": {
+                            "self": "http://testserver/entries/2/relationships/comments",
+                            "related": "http://testserver/entries/2/comments",
+                        }
                     }
                 }
             },
