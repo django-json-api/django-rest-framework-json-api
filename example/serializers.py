@@ -35,7 +35,7 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                'authors', 'comments', 'suggested',)
+                  'authors', 'comments', 'suggested',)
 
 
 class AuthorSerializer(serializers.ModelSerializer):
