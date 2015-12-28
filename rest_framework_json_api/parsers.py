@@ -41,9 +41,9 @@ class JSONParser(parsers.JSONParser):
         for field_name, field_data in relationships.items():
             field_data = field_data.get('data')
             if isinstance(field_data, dict):
-                parsed_relationships[field_name] = field_data
+                parsed_relationships[field_name] = field_data['id']
             elif isinstance(field_data, list):
-                parsed_relationships[field_name] = list(relation for relation in field_data)
+                parsed_relationships[field_name] = list(relation for relation in field_data['id'])
         return parsed_relationships
 
     def parse(self, stream, media_type=None, parser_context=None):
@@ -54,38 +54,44 @@ class JSONParser(parsers.JSONParser):
         data = result.get('data')
 
         if data:
-            from rest_framework_json_api.views import RelationshipView
-            if isinstance(parser_context['view'], RelationshipView):
-                # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular Resource Object
-                if isinstance(data, list):
-                    for resource_identifier_object in data:
-                        if not (resource_identifier_object.get('id') and resource_identifier_object.get('type')):
-                            raise ParseError(
-                                'Received data contains one or more malformed JSONAPI Resource Identifier Object(s)'
-                            )
-                elif not (data.get('id') and data.get('type')):
-                    raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
+            type = data.get('type')
+            # if type is defined, treat it like a full object, otherwise jsut pass through the data
+            if type:
+                from rest_framework_json_api.views import RelationshipView
+                if isinstance(parser_context['view'], RelationshipView):
+                    # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular Resource Object
+                    if isinstance(data, list):
+                        for resource_identifier_object in data:
+                            if not (resource_identifier_object.get('id') and resource_identifier_object.get('type')):
+                                raise ParseError(
+                                        'Received data contains one or more malformed JSONAPI Resource Identifier Object(s)'
+                                )
+                    elif not (data.get('id') and data.get('type')):
+                        raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
 
+                    return data
+
+                request = parser_context.get('request')
+
+                # Check for inconsistencies
+                resource_name = utils.get_resource_name(parser_context)
+                if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
+                    raise exceptions.Conflict(
+                            "The resource object's type ({data_type}) is not the type "
+                            "that constitute the collection represented by the endpoint ({resource_type}).".format(
+                                    data_type=data.get('type'),
+                                    resource_type=resource_name
+                            )
+                    )
+
+                # Construct the return data
+                parsed_data = {'id': data.get('id')}
+                parsed_data.update(self.parse_attributes(data))
+                parsed_data.update(self.parse_relationships(data))
+                return parsed_data
+
+            else:
                 return data
 
-            request = parser_context.get('request')
-
-            # Check for inconsistencies
-            resource_name = utils.get_resource_name(parser_context)
-            if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
-                raise exceptions.Conflict(
-                    "The resource object's type ({data_type}) is not the type "
-                    "that constitute the collection represented by the endpoint ({resource_type}).".format(
-                        data_type=data.get('type'),
-                        resource_type=resource_name
-                    )
-                )
-
-            # Construct the return data
-            parsed_data = {'id': data.get('id')}
-            parsed_data.update(self.parse_attributes(data))
-            parsed_data.update(self.parse_relationships(data))
-            return parsed_data
-
         else:
-            raise ParseError('Received document does not contain primary data')
+            return {}

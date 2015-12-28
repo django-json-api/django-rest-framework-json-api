@@ -108,19 +108,19 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             return_data.update({'related': related_link})
         return return_data
 
-    def to_internal_value(self, data):
-        if isinstance(data, six.text_type):
-            try:
-                data = json.loads(data)
-            except ValueError:
-                # show a useful error if they send a `pk` instead of resource object
-                self.fail('incorrect_type', data_type=type(data).__name__)
-        if not isinstance(data, dict):
-            self.fail('incorrect_type', data_type=type(data).__name__)
-        expected_relation_type = get_resource_type_from_queryset(self.queryset)
-        if data['type'] != expected_relation_type:
-            self.conflict('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
-        return super(ResourceRelatedField, self).to_internal_value(data['id'])
+    # def to_internal_value(self, data):
+        # if isinstance(data, six.text_type):
+        #     try:
+        #         data = json.loads(data)
+        #     except ValueError:
+        #         # show a useful error if they send a `pk` instead of resource object
+        #         self.fail('incorrect_type', data_type=type(data).__name__)
+        # if not isinstance(data, dict):
+        #     self.fail('incorrect_type', data_type=type(data).__name__)
+        # expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        # if data['type'] != expected_relation_type:
+        #     self.conflict('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
+    #     return super(ResourceRelatedField, self).to_internal_value(data['id'])
 
     def to_representation(self, value):
         if getattr(self, 'pk_field', None) is not None:
@@ -131,7 +131,8 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         # check to see if this resource has a different resource_name when
         # included and use that name
         resource_type = None
-        root = getattr(self.parent, 'parent', self.parent)
+        #root = getattr(self.parent, 'parent', self.parent)
+        root = self.parent
         field_name = self.field_name if self.field_name else self.parent.field_name
         if getattr(root, 'included_serializers', None) is not None:
             includes = get_included_serializers(root)
