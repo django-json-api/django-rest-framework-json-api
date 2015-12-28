@@ -199,7 +199,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 if isinstance(serializer_data, list):
                     for position in range(len(serializer_data)):
                         nested_resource_instance = resource_instance_queryset[position]
-                        nested_resource_instance_type = utils.get_resource_type_from_instance(nested_resource_instance)
+                        nested_resource_instance_type = utils.get_resource_type_from_serializer(field.child)
                         relation_data.append(OrderedDict([
                             ('type', nested_resource_instance_type),
                             ('id', encoding.force_text(nested_resource_instance.pk))
@@ -209,9 +209,6 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
             if isinstance(field, ModelSerializer):
-                relation_model = field.Meta.model
-                relation_type = utils.format_relation_name(relation_model.__name__)
-
                 data.update({
                     field_name: {
                         'data': (
@@ -283,8 +280,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, ListSerializer):
                 serializer = field.child
-                model = serializer.Meta.model
-                relation_type = utils.format_relation_name(model.__name__)
+                relation_type = utils.get_resource_type_from_serializer(serializer)
                 relation_queryset = list(relation_instance_or_manager.all())
 
                 # Get the serializer fields
@@ -305,15 +301,16 @@ class JSONRenderer(renderers.JSONRenderer):
                         )
 
             if isinstance(field, ModelSerializer):
-                model = field.Meta.model
-                relation_type = utils.format_relation_name(model.__name__)
+
+                relation_type = utils.get_resource_type_from_serializer(field)
 
                 # Get the serializer fields
                 serializer_fields = utils.get_serializer_fields(field)
                 if serializer_data:
                     included_data.append(
-                        JSONRenderer.build_json_resource_obj(serializer_fields, serializer_data, relation_instance_or_manager,
-                                                     relation_type)
+                        JSONRenderer.build_json_resource_obj(
+                            serializer_fields, serializer_data,
+                            relation_instance_or_manager, relation_type)
                     )
                     included_data.extend(
                         JSONRenderer.extract_included(
