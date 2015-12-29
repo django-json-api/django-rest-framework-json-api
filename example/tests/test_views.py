@@ -145,6 +145,22 @@ class TestRelationshipView(APITestCase):
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 405, response.content.decode()
 
+    def test_delete_relationship_overriding_with_none(self):
+        url = '/comments/{}'.format(self.second_comment.id)
+        request_data = {
+            'data': {
+                'type': 'comments',
+                'relationships': {
+                    'author': {
+                        'data': None
+                    }
+                }
+            }
+        }
+        response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        assert response.status_code == 200, response.content.decode()
+        assert response.data['author'] == None
+
     def test_delete_to_many_relationship_with_no_change(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
         request_data = {
