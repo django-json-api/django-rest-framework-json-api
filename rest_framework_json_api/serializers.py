@@ -137,110 +137,17 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     """
     serializer_related_field = ResourceRelatedField
 
-    # def __init__(self, *args, **kwargs):
-    #     meta_fields = getattr(self.Meta, 'meta_fields', [])
-    #     # we add meta_fields to fields so they will be serialized like usual
-    #     self.Meta.fields = tuple(tuple(self.Meta.fields) + tuple(meta_fields))
-    #     super(ModelSerializer, self).__init__(*args, **kwargs)
-
-    # def get_field_names(self, declared_fields, info):
-    #     """
-    #     We override the parent to omit explicity defined meta fields (such
-    #     as SerializerMethodFields) from the list of declared fields
-    #     """
-    #     meta_fields = getattr(self.Meta, 'meta_fields', [])
-    #
-    #     declared = OrderedDict()
-    #     for field_name in set(declared_fields.keys()):
-    #         field = declared_fields[field_name]
-    #         if field_name not in meta_fields:
-    #             declared[field_name] = field
-    #     return super(ModelSerializer, self).get_field_names(declared, info)
-
     def get_field_names(self, declared_fields, info):
         """
-        Returns the list of all field names that should be created when
-        instantiating this serializer class. This is based on the default
-        set of fields, but also takes into account the `Meta.fields` or
-        `Meta.exclude` options if they have been specified.
+        We override the parent to omit explicity defined meta fields (such
+        as SerializerMethodFields) from the list of declared fields
         """
-        fields = getattr(self.Meta, 'fields', None)
-        exclude = getattr(self.Meta, 'exclude', None)
+        meta_fields = getattr(self.Meta, 'meta_fields', [])
 
-        if fields and fields != ALL_FIELDS and not isinstance(fields, (list, tuple)):
-            raise TypeError(
-                'The `fields` option must be a list or tuple or "__all__". '
-                'Got %s.' % type(fields).__name__
-            )
-
-        if exclude and not isinstance(exclude, (list, tuple)):
-            raise TypeError(
-                'The `exclude` option must be a list or tuple. Got %s.' %
-                type(exclude).__name__
-            )
-
-        assert not (fields and exclude), (
-            "Cannot set both 'fields' and 'exclude' options on "
-            "serializer {serializer_class}.".format(
-                serializer_class=self.__class__.__name__
-            )
-        )
-
-        if fields is None and exclude is None:
-            warnings.warn(
-                "Creating a ModelSerializer without either the 'fields' "
-                "attribute or the 'exclude' attribute is pending deprecation "
-                "since 3.3.0. Add an explicit fields = '__all__' to the "
-                "{serializer_class} serializer.".format(
-                    serializer_class=self.__class__.__name__
-                ),
-                PendingDeprecationWarning
-            )
-
-        if fields == ALL_FIELDS:
-            fields = None
-
-        if fields is not None:
-            # add meta_fields so they will be serialized like usual
-            fields = tuple(fields) + tuple(getattr(self.Meta, 'meta_fields', ()))
-
-            # Ensure that all declared fields have also been included in the
-            # `Meta.fields` option.
-
-            # Do not require any fields that are declared a parent class,
-            # in order to allow serializer subclasses to only include
-            # a subset of fields.
-            required_field_names = set(declared_fields)
-            for cls in self.__class__.__bases__:
-                required_field_names -= set(getattr(cls, '_declared_fields', []))
-
-            for field_name in required_field_names:
-                assert field_name in fields, (
-                    "The field '{field_name}' was declared on serializer "
-                    "{serializer_class}, but has not been included in the "
-                    "'fields' option.".format(
-                        field_name=field_name,
-                        serializer_class=self.__class__.__name__
-                    )
-                )
-            return fields
-
-        # Use the default set of field names if `Meta.fields` is not specified.
-        # also add meta_fields
-        fields = (list(self.get_default_field_names(declared_fields, info)) +
-                  list(getattr(self.Meta, 'meta_fields', ())))
-
-        if exclude is not None:
-            # If `Meta.exclude` is included, then remove those fields.
-            for field_name in exclude:
-                assert field_name in fields, (
-                    "The field '{field_name}' was included on serializer "
-                    "{serializer_class} in the 'exclude' option, but does "
-                    "not match any model field.".format(
-                        field_name=field_name,
-                        serializer_class=self.__class__.__name__
-                    )
-                )
-                fields.remove(field_name)
-
-        return fields
+        declared = OrderedDict()
+        for field_name in set(declared_fields.keys()):
+            field = declared_fields[field_name]
+            if field_name not in meta_fields:
+                declared[field_name] = field
+        fields = super(ModelSerializer, self).get_field_names(declared, info)
+        return list(fields) + list(getattr(self.Meta, 'meta_fields', list()))
