@@ -137,12 +137,6 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     """
     serializer_related_field = ResourceRelatedField
 
-    def __init__(self, *args, **kwargs):
-        meta_fields = getattr(self.Meta, 'meta_fields', [])
-        # we add meta_fields to fields so they will be serialized like usual
-        self.Meta.fields = tuple(tuple(self.Meta.fields) + tuple(meta_fields))
-        super(ModelSerializer, self).__init__(*args, **kwargs)
-
     def get_field_names(self, declared_fields, info):
         """
         We override the parent to omit explicity defined meta fields (such
@@ -155,5 +149,5 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
             field = declared_fields[field_name]
             if field_name not in meta_fields:
                 declared[field_name] = field
-        return super(ModelSerializer, self).get_field_names(declared, info)
-
+        fields = super(ModelSerializer, self).get_field_names(declared, info)
+        return list(fields) + list(getattr(self.Meta, 'meta_fields', list()))

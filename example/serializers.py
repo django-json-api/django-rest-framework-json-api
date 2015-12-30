@@ -76,4 +76,5 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('entry', 'body', 'author',)
+        exclude = ('created_at', 'modified_at',)
+        # fields = ('entry', 'body', 'author',)
