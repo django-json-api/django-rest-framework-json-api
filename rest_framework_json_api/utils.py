@@ -11,6 +11,8 @@ from django.utils.module_loading import import_string as import_class_from_dotte
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
 
+import string
+
 try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
@@ -81,6 +83,7 @@ def get_serializer_fields(serializer):
             except KeyError:
                 pass
         return fields
+
 
 def format_keys(obj, format_type=None):
     """
@@ -196,11 +199,19 @@ def get_instance_or_manager_resource_type(resource_instance_or_manager):
 
 
 def get_resource_type_from_model(model):
+    serializer_class = get_default_serializer_from_model(model)
+
+    return get_resource_type_from_serializer(serializer_class)
+
+
+def get_default_serializer_from_model(model):
     json_api_meta = getattr(model, 'JSONAPIMeta', None)
-    return getattr(
-        json_api_meta,
-        'resource_name',
-        format_relation_name(model.__name__))
+    serializer_string = getattr(json_api_meta, 'default_serializer', None)
+    if serializer_string is None:
+        # return format_relation_name(model.__name__)
+        raise Exception("Must define a default_serializer on %s" % model.__name__)
+    serializer_class = import_class_from_dotted_path(serializer_string)
+    return serializer_class
 
 
 def get_resource_type_from_queryset(qs):
@@ -211,28 +222,60 @@ def get_resource_type_from_instance(instance):
     return get_resource_type_from_model(instance._meta.model)
 
 
+def get_serializer_from_instance_and_serializer(instance, serializer, field_name):
+    overrides = get_included_serializers_override(serializer)
+    if field_name in overrides:
+        return overrides[field_name]
+    return get_default_serializer_from_model(type(instance))
+
+
 def get_resource_type_from_manager(manager):
     return get_resource_type_from_model(manager.model)
 
 
 def get_resource_type_from_serializer(serializer):
-    return getattr(
-        serializer.Meta,
-        'resource_name',
-        get_resource_type_from_model(serializer.Meta.model))
+    resource_name = getattr(
+            serializer.Meta,
+            'resource_name',
+            None)
+
+    if not resource_name:
+        if isinstance(serializer, object):
+            resource_name = format_relation_name(string.replace(serializer.__class__.__name__, 'Serializer', ''))
+        else:
+            resource_name = format_relation_name(string.replace(serializer.__name__, 'Serializer', ''))
+        # resource_name = get_resource_type_from_model(serializer.Meta.model)
+
+    return resource_name
 
 
-def get_included_serializers(serializer):
-    included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
+def get_included_configuration(serializer):
+    included_resources_override = copy.copy(getattr(serializer, 'included_resources_override', dict()))
 
-    for name, value in six.iteritems(included_serializers):
+    included_resources_config = {}
+
+    # get all the related resource fields on this serializer
+    for field in serializer.fields.fields.keys():
+        if field in included_resources_override.keys() and included_resources_override[field] == False:
+            # Skip fields that are explicitly disabled
+            continue
+
+        included_resources_config[field] = True
+
+    return included_resources_config
+
+
+def get_included_serializers_override(serializer):
+    included_serializers_override = copy.copy(getattr(serializer, 'included_serializers_override', dict()))
+
+    for name, value in six.iteritems(included_serializers_override):
         if not isinstance(value, type):
             if value == 'self':
-                included_serializers[name] = serializer if isinstance(serializer, type) else serializer.__class__
+                included_serializers_override[name] = serializer if isinstance(serializer, type) else serializer.__class__
             else:
-                included_serializers[name] = import_class_from_dotted_path(value)
+                included_serializers_override[name] = import_class_from_dotted_path(value)
 
-    return included_serializers
+    return included_serializers_override
 
 
 class Hyperlink(six.text_type):

@@ -231,7 +231,7 @@ class JSONRenderer(renderers.JSONRenderer):
         included_data = list()
         current_serializer = fields.serializer
         context = current_serializer.context
-        included_serializers = utils.get_included_serializers(current_serializer)
+        include_config = utils.get_included_configuration(current_serializer)
         included_resources = copy.copy(included_resources)
 
         for field_name, field in six.iteritems(fields):
@@ -241,6 +241,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
             # Skip fields without relations or serialized data
             if not isinstance(field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)):
+                continue
+
+            # Skip disabled fields
+            if include_config[field_name] == False:
                 continue
 
             try:
@@ -267,12 +271,13 @@ class JSONRenderer(renderers.JSONRenderer):
             serializer_data = resource.get(field_name)
 
             if isinstance(field, relations.ManyRelatedField):
-                serializer_class = included_serializers.get(field_name)
+                serializer_class = include_config.get(field_name)
                 field = serializer_class(relation_instance_or_manager.all(), many=True, context=context)
                 serializer_data = field.data
 
             if isinstance(field, relations.RelatedField):
-                serializer_class = included_serializers.get(field_name)
+                #serializer_class = include_config.get(field_name)
+                serializer_class = utils.get_serializer_from_instance_and_serializer(relation_instance_or_manager, current_serializer, field_name)
                 if relation_instance_or_manager is None:
                     continue
                 field = serializer_class(relation_instance_or_manager, context=context)
