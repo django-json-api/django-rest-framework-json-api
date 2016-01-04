@@ -4,15 +4,15 @@
 The DJA package implements a custom renderer, parser, exception handler, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
-Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`. 
-The easiest way to make use of those features is to import ModelSerializer variants 
+Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`.
+The easiest way to make use of those features is to import ModelSerializer variants
 from `rest_framework_json_api` instead of the usual `rest_framework`
 
 ### Configuration
 We suggest that you simply copy the settings block below and modify it if necessary.
 ``` python
 REST_FRAMEWORK = {
-    'PAGINATE_BY': 10,
+    'PAGE_SIZE': 10,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100,
     # DRF v3.1+
@@ -33,9 +33,10 @@ REST_FRAMEWORK = {
 }
 ```
 
-If `PAGINATE_BY` is set the renderer will return a `meta` object with
+If `PAGE_SIZE` is set the renderer will return a `meta` object with
 record count and a `links` object with the next, previous, first, and last links.
-Pages can be selected with the `page` GET parameter.
+Pages can be selected with the `page` GET parameter. Page size can be controlled
+per request via the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
 
 ### Setting the resource_name
 
@@ -226,7 +227,7 @@ When set to pluralize:
 }
 ```
 
-Both `JSON_API_PLURALIZE_RELATION_TYPE` and `JSON_API_FORMAT_RELATION_KEYS` can be combined to 
+Both `JSON_API_PLURALIZE_RELATION_TYPE` and `JSON_API_FORMAT_RELATION_KEYS` can be combined to
 achieve different results.
 
 ### Meta
@@ -248,7 +249,7 @@ def get_root_meta(self, obj):
 ```
 to the serializer. It must return a dict and will be merged with the existing top level `meta`.
 
-<!-- 
+<!--
 ### Relationships
 ### Links
 ### Included
