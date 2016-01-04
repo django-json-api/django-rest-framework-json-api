@@ -240,10 +240,7 @@ def get_resource_type_from_serializer(serializer):
             None)
 
     if not resource_name:
-        if isinstance(serializer, object):
-            resource_name = format_relation_name(string.replace(serializer.__class__.__name__, 'Serializer', ''))
-        else:
-            resource_name = format_relation_name(string.replace(serializer.__name__, 'Serializer', ''))
+        resource_name = format_relation_name(string.replace(serializer.__name__, 'Serializer', ''))
         # resource_name = get_resource_type_from_model(serializer.Meta.model)
 
     return resource_name

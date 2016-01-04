@@ -307,7 +307,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, ModelSerializer):
 
-                relation_type = utils.get_resource_type_from_serializer(field)
+                relation_type = utils.get_resource_type_from_serializer(field.__class__)
 
                 # Get the serializer fields
                 serializer_fields = utils.get_serializer_fields(field)
