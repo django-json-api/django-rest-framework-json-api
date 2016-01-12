@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from rest_framework import routers
 
-from example.views import BlogViewSet, EntryViewSet, AuthorViewSet, EntryRelationshipView, BlogRelationshipView, \
+from example.views import BlogViewSet, EntryViewSet, AuthorViewSet, CommentViewSet, EntryRelationshipView, BlogRelationshipView, \
     CommentRelationshipView, AuthorRelationshipView
 from .api.resources.identity import Identity, GenericIdentity
 
@@ -10,6 +10,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'blogs', BlogViewSet)
 router.register(r'entries', EntryViewSet)
 router.register(r'authors', AuthorViewSet)
+router.register(r'comments', CommentViewSet)
 
 # for the old tests
 router.register(r'identities', Identity)
