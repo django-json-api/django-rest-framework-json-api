@@ -19,6 +19,8 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
         'incorrect_type': _('Incorrect type. Expected resource identifier object, received {data_type}.'),
         'incorrect_relation_type': _('Incorrect relation type. Expected {relation_type}, received {received_type}.'),
+        'missing_type': _('Invalid resource identifier object: missing \'type\' attribute'),
+        'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
         'no_match': _('Invalid hyperlink - No URL match.'),
     }
 
@@ -117,8 +119,16 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
+
+        if 'type' not in data:
+            self.fail('missing_type')
+
+        if 'id' not in data:
+            self.fail('missing_id')
+
         if data['type'] != expected_relation_type:
             self.conflict('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
+
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
 
     def to_representation(self, value):
