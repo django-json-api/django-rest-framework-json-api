@@ -210,7 +210,7 @@ class TestRelationshipView(APITestCase):
         got = data['relationships']['blog']['links']
 
         expected = {
-            'related': 'http://testserver/blogs/{}'.format(self.second_entry.blog_id),
+            'related': 'http://testserver/entries/{}/blog'.format(self.second_entry.id),
             'self': 'http://testserver/entries/{}/relationships/blog'.format(self.second_entry.id)
         }
         self.assertDictEqual(got, expected)

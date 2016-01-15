@@ -28,8 +28,8 @@ def test_pagination_with_single_entry(single_entry, client):
                     "blog": {
                         "data": {"type": "blogs", "id": "1"},
                         "links": {
-                            "self": "http://testserver/entries/1/relationships/blog",
-                            "related": "http://testserver/blogs/1"
+                            "self": "http://testserver/entries/{}/relationships/blog".format(single_entry.id),
+                            "related": "http://testserver/entries/{}/blog".format(single_entry.id)
                         }
                     },
                     "authors": {
@@ -40,8 +40,8 @@ def test_pagination_with_single_entry(single_entry, client):
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "1"}],
                         "links": {
-                            "self": "http://testserver/entries/1/relationships/comments",
-                            "related": "http://testserver/entries/1/comments",
+                            "self": "http://testserver/entries/{}/relationships/comments".format(single_entry.id),
+                            "related": "http://testserver/entries/{}/comments".format(single_entry.id),
                         }
                     }
                 }

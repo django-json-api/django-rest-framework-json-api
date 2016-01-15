@@ -34,8 +34,8 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "blog": {
                         "data": {"type": "blogs", "id": "1"},
                         "links": {
-                            "self": "http://testserver/entries/1/relationships/blog",
-                            "related": "http://testserver/blogs/1"
+                            "self": "http://testserver/entries/{}/relationships/blog".format(multiple_entries[0].id),
+                            "related": "http://testserver/entries/{}/blog".format(multiple_entries[0].id)
                         }
                     },
                     "authors": {
@@ -46,8 +46,8 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "1"}],
                         "links": {
-                            "self": "http://testserver/entries/1/relationships/comments",
-                            "related": "http://testserver/entries/1/comments",
+                            "self": "http://testserver/entries/{}/relationships/comments".format(multiple_entries[0].id),
+                            "related": "http://testserver/entries/{}/comments".format(multiple_entries[0].id),
                         }
                     }
                 }
@@ -70,8 +70,8 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "blog": {
                         "data": {"type": "blogs", "id": "2"},
                         "links": {
-                            "self": "http://testserver/entries/2/relationships/blog",
-                            "related": "http://testserver/blogs/2"
+                            "self": "http://testserver/entries/{}/relationships/blog".format(multiple_entries[1].id),
+                            "related": "http://testserver/entries/{}/blog".format(multiple_entries[1].id)
                         }
                     },
                     "authors": {
@@ -82,8 +82,8 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "2"}],
                         "links": {
-                            "self": "http://testserver/entries/2/relationships/comments",
-                            "related": "http://testserver/entries/2/comments",
+                            "self": "http://testserver/entries/{}/relationships/comments".format(multiple_entries[1].id),
+                            "related": "http://testserver/entries/{}/comments".format(multiple_entries[1].id),
                         }
                     }
                 }

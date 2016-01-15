@@ -27,6 +27,9 @@ urlpatterns = [
     url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         EntryRelationshipView.as_view(),
         name='entry-relationships'),
+    url(r'^entries/(?P<pk>[^/.]+)/(?P<related_field>\w+)',
+        EntryRelationshipView.as_view(),
+        name='entry-related-object'),
     url(r'^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         BlogRelationshipView.as_view(),
         name='blog-relationships'),
@@ -36,9 +39,5 @@ urlpatterns = [
     url(r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         AuthorRelationshipView.as_view(),
         name='author-relationships'),
-
-    url(r'^entries/(?P<pk>[^/.]+)/comments',
-        EntryCommentViewSet.as_view({'get': 'list'}),
-        name='entry-comment-list'),
 ]
 

@@ -40,12 +40,12 @@ class EntrySerializer(serializers.ModelSerializer):
     body_format = serializers.SerializerMethodField()
     blog = relations.ResourceRelatedField(
         self_link_view_name='entry-relationships',
-        related_link_view_name='blog-detail',
+        related_link_view_name='entry-related-object',
         read_only=True
     )
     comments = relations.ResourceRelatedField(
         self_link_view_name='entry-relationships',
-        related_link_view_name='entry-comment-list',
+        related_link_view_name='entry-related-object',
         source='comment_set', many=True, read_only=True
     )
     suggested = relations.SerializerMethodResourceRelatedField(
