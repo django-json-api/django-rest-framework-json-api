@@ -9,18 +9,13 @@ The easiest way to make use of those features is to import ModelSerializer varia
 from `rest_framework_json_api` instead of the usual `rest_framework`
 
 ### Configuration
-We suggest that you simply copy the settings block below and modify it if necessary.
+We suggest that you copy the settings block below and modify it if necessary.
 ``` python
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
-    'PAGINATE_BY_PARAM': 'page_size',
-    'MAX_PAGINATE_BY': 100,
-    # DRF v3.1+
+    'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework_json_api.pagination.PageNumberPagination',
-    # older than DRF v3.1
-    'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-        'rest_framework_json_api.pagination.PaginationSerializer',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -30,6 +25,7 @@ REST_FRAMEWORK = {
         'rest_framework_json_api.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+    'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
 }
 ```
 

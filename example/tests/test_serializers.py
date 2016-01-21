@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 
@@ -5,6 +6,11 @@ from rest_framework_json_api.utils import format_relation_name
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 
 from example.models import Blog, Entry, Author
+
+import pytest
+from example.tests.utils import dump_json, redump_json
+
+pytestmark = pytest.mark.django_db
 
 
 class TestResourceIdentifierObjectSerializer(TestCase):
@@ -71,3 +77,38 @@ class TestResourceIdentifierObjectSerializer(TestCase):
 
         print(serializer.data)
 
+
+class TestModelSerializer(object):
+    def test_model_serializer_with_implicit_fields(self, comment, client):
+        expected = {
+            "data": {
+                "type": "comments",
+                "id": str(comment.pk),
+                "attributes": {
+                    "body": comment.body
+                },
+                "relationships": {
+                    "entry": {
+                        "data": {
+                            "type": "entries",
+                            "id": str(comment.entry.pk)
+                        }
+                    },
+                    "author": {
+                        "data": {
+                            "type": "authors",
+                            "id": str(comment.author.pk)
+                        }
+                    },
+                }
+            }
+        }
+
+        response = client.get(reverse("comment-detail", kwargs={'pk': comment.pk}))
+
+        assert response.status_code == 200
+
+        actual = redump_json(response.content)
+        expected_json = dump_json(expected)
+
+        assert actual == expected_json
