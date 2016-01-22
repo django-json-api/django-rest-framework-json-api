@@ -238,6 +238,160 @@ When set to pluralize:
 Both `JSON_API_PLURALIZE_RELATION_TYPE` and `JSON_API_FORMAT_RELATION_KEYS` can be combined to
 achieve different results.
 
+### Related fields
+
+Because of the additional structure needed to represent relationships in JSON
+API, this package provides the `ResourceRelatedField` for serializers, which
+works similarly to `PrimaryKeyRelatedField`. By default,
+`rest_framework_json_api.serializers.ModelSerializer` will use this for
+related fields automatically. It can be instantiated explicitly as in the
+following example:
+
+```python
+from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import ResourceRelatedField
+
+from myapp.models import Order, LineItem, Customer
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+
+    line_items = ResourceRelatedField(
+        queryset=LineItem.objects,
+        many=True  # necessary for M2M fields & reverse FK fields
+    )
+
+    customer = ResourceRelatedField(
+        queryset=Customer.objects  # queryset argument is required
+    )                              # except when read_only=True
+
+```
+
+In the [JSON API spec](http://jsonapi.org/format/#document-resource-objects),
+relationship objects contain links to related objects. To make this work
+on a serializer we need to tell the `ResourceRelatedField` about the
+corresponding view. Use the `HyperlinkedModelSerializer` and instantiate
+the `ResourceRelatedField` with the relevant keyword arguments:
+
+```python
+from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import ResourceRelatedField
+
+from myapp.models import Order, LineItem, Customer
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+
+    line_items = ResourceRelatedField(
+        queryset=LineItem.objects,
+        many=True,
+        related_link_view_name='order-lineitems-list',
+        related_link_url_kwarg='order_pk',
+        self_link_view_name='order_relationships'
+    )
+
+    customer = ResourceRelatedField(
+        queryset=Customer.objects,
+        related_link_view-name='order-customer-detail',
+        related_link_url_kwarg='order_pk',
+        self_link_view_name='order-relationships'
+    )
+```
+
+* `related_link_view_name` is the name of the route for the related
+view.
+
+* `related_link_url_kwarg` is the keyword argument that will be passed
+to the view that identifies the 'parent' object, so that the results
+can be filtered to show only those objects related to the 'parent'.
+
+* `self_link_view_name` is the name of the route for the `RelationshipView`
+(see below).
+
+In this example, `reverse('order-lineitems-list', kwargs={'order_pk': 3}`
+should resolve to something like `/orders/3/lineitems`, and that route
+should instantiate a view or viewset for `LineItem` objects that accepts
+a keword argument `order_pk`. The
+[drf-nested-routers](https://github.com/alanjds/drf-nested-routers) package
+is useful for defining such nested routes in your urlconf.
+
+The corresponding viewset for the `line-items-list` route in the above example
+might look like the following. Note that in the typical use case this would be
+the same viewset used for the `/lineitems` endpoints; when accessed through
+the nested route `/orders/<order_pk>/lineitems` the queryset is filtered using
+the `order_pk` keyword argument to include only the lineitems related to the
+specified order.
+
+```python
+from rest_framework import viewsets
+
+from myapp.models import LineItem
+from myapp.serializers import LineItemSerializer
+
+
+class LineItemViewSet(viewsets.ModelViewSet):
+    queryset = LineItem.objects
+    serializer_class = LineItemSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        # if this viewset is accessed via the 'order-lineitems-list' route,
+        # it wll have been passed the `order_pk` kwarg and the queryset
+        # needs to be filtered accordingly; if it was accessed via the
+        # unnested '/lineitems' route, the queryset should include all LineItems
+        if 'order_pk' in self.kwargs:
+            order_pk = self.kwargs['order_pk']
+            queryset = queryset.filter(order__pk=order_pk])
+
+        return queryset
+```
+
+### RelationshipView
+`rest_framework_json_api.views.RelationshipView` is used to build
+relationship views (see the 
+[JSON API spec](http://jsonapi.org/format/#fetching-relationships)).
+The `self` link on a relationship object should point to the corresponding
+relationship view.
+
+The relationship view is fairly simple because it only serializes
+[Resource Identifier Objects](http://jsonapi.org/format/#document-resource-identifier-objects)
+rather than full resource objects. In most cases the following is sufficient:
+
+```python
+from rest_framework_json_api.views import RelationshipView
+
+from myapp.models import Order
+
+
+class OrderRelationshipView(RelationshipView):
+    queryset = Order.objects
+
+```
+
+The urlconf would need to contain a route like the following:
+
+```python
+url(
+    regex=r'^orders/(?P<pk>[^/.]+/relationships/(?P<related_field>[^/.]+)$',
+    view=OrderRelationshipView.as_view(),
+    name='order-relationships'
+)
+```
+
+The `related_field` kwarg specifies which relationship to use, so
+if we are interested in the relationship represented by the related
+model field `Order.line_items` on the Order with pk 3, the url would be
+`/order/3/relationships/line_items`. On `HyperlinkedModelSerializer`, the
+`ResourceRelatedField` will construct the url based on the provided
+`self_link_view_name` keyword argument, which should match the `name=`
+provided in the urlconf, and will use the name of the field for the
+`related_field` kwarg.
+
 ### Meta
 
 You may add metadata to the rendered json in two different ways: `meta_fields` and `get_root_meta`.
