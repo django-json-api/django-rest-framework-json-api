@@ -34,6 +34,18 @@ record count and a `links` object with the next, previous, first, and last links
 Pages can be selected with the `page` GET parameter. Page size can be controlled
 per request via the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
 
+### Serializers
+
+It is recommended to import the base serializer classes from this package
+rather than from vanilla DRF. For example,
+
+```python
+from rest_framework_json_api import serializers
+
+class MyModelSerializer(serializers.ModelSerializers):
+    # ...
+```
+
 ### Setting the resource_name
 
 You may manually set the `resource_name` property on views or serializers to
