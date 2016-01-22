@@ -80,7 +80,7 @@ From PyPI
 
 ::
 
-    $ pip install djangorestframework-jsonapi
+    $ pip install djangorestframework-jsonapi==2.0.0-beta.1
 
 
 From Source
