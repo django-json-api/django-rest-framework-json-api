@@ -156,6 +156,11 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 if isinstance(field.child_relation, ResourceRelatedField):
                     # special case for ResourceRelatedField
+
+                    if field_name not in resource:
+                        continue
+
+
                     relation_data = {
                         'data': resource.get(field_name)
                     }
