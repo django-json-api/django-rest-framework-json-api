@@ -156,6 +156,11 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 if isinstance(field.child_relation, ResourceRelatedField):
                     # special case for ResourceRelatedField
+
+                    if field_name not in resource:
+                        continue
+
+
                     relation_data = {
                         'data': resource.get(field_name)
                     }
@@ -170,7 +175,6 @@ class JSONRenderer(renderers.JSONRenderer):
                                 'meta': {
                                     'count': len(resource.get(field_name))
                                 }
-                                if resource.get(field_name) else dict()
                             }
                     )
                     data.update({field_name: relation_data})
