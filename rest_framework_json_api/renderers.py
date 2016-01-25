@@ -170,6 +170,7 @@ class JSONRenderer(renderers.JSONRenderer):
                                 'meta': {
                                     'count': len(resource.get(field_name))
                                 }
+                                if resource.get(field_name) else dict()
                             }
                     )
                     data.update({field_name: relation_data})
