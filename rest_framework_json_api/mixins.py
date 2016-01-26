@@ -19,7 +19,7 @@ class MultipleIDMixin(object):
             ids = self.request.query_params.get('filter[id]').split(',')
 
         if ids:
-            self.queryset = self.queryset.filter(id__in=ids)
+            self.queryset = self.queryset.filter(pk__in=ids)
 
         return self.queryset
 
