@@ -135,7 +135,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         #root = getattr(self.parent, 'parent', self.parent)
         root = self.parent
         field_name = self.field_name if self.field_name else self.parent.field_name
-        if getattr(root, 'included_serializers', None) is not None:
+        if getattr(root, 'included_serializers_override', None) is not None:
             include_overrides = get_included_serializers_override(root)
             if field_name in include_overrides.keys():
                 resource_type = get_resource_type_from_serializer(include_overrides[field_name])
