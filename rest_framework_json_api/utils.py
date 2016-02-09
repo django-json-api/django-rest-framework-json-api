@@ -148,6 +148,17 @@ def format_relation_name(value, format_type=None):
 
     return inflection.pluralize(value) if pluralize else value
 
+def parse_relation_name(value, format_type=None):
+    if format_type is None:
+        format_type = getattr(settings, 'JSON_API_PARSE_RELATION_KEYS', False)
+
+    singularize = getattr(settings, 'JSON_API_SINGULARIZE_INCLUDE_TYPE', False)
+
+    if format_type:
+        value = format_value(value, format_type)
+
+    return inflection.singularize(value) if singularize else value
+
 
 def get_related_resource_type(relation):
     if hasattr(relation, '_meta'):

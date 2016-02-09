@@ -406,9 +406,11 @@ class JSONRenderer(renderers.JSONRenderer):
 
         include_resources_param = request.query_params.get('include') if request else None
         if include_resources_param:
-            included_resources = include_resources_param.split(',')
+            included_resources = [".".join([utils.parse_relation_name(part) for part in resource.split('.')]) 
+                                  for resource in include_resources_param.split(',')]
         else:
             included_resources = list()
+
 
         json_api_included = list()
         # initialize json_api_meta with pagination meta or an empty dict
