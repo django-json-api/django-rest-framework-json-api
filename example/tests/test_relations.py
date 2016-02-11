@@ -7,6 +7,7 @@ from . import TestBase
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import format_relation_name
 from example.models import Blog, Entry, Comment, Author
+from example.serializers import CommentSerializer
 from rest_framework_json_api.relations import ResourceRelatedField
 
 
@@ -114,6 +115,15 @@ class TestResourceRelatedField(TestBase):
         serializer = EntryModelSerializer(data={'authors': [], 'comment_set': [{'type': 'Comments', 'id': 2}]})
         serializer.is_valid(raise_exception=True)
         self.assertNotIn('comment_set', serializer.validated_data)
+
+    def test_invalid_resource_id_object(self):
+        comment = {'body': 'testing 123', 'entry': {'type': 'entry'}, 'author': {'id': '5'}}
+        serializer = CommentSerializer(data=comment)
+        assert not serializer.is_valid()
+        assert serializer.errors == {
+            'author': ["Invalid resource identifier object: missing 'type' attribute"],
+            'entry': ["Invalid resource identifier object: missing 'id' attribute"]
+        }
 
 
 class BlogFKSerializer(serializers.Serializer):

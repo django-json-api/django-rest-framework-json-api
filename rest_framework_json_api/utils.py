@@ -50,7 +50,7 @@ def get_resource_name(context):
             return get_resource_type_from_serializer(serializer)
         except AttributeError:
             try:
-                resource_name = view.model.__name__
+                resource_name = get_resource_type_from_model(view.model)
             except AttributeError:
                 resource_name = view.__class__.__name__
 
@@ -182,7 +182,7 @@ def get_related_resource_type(relation):
             relation_model = parent_model_relation.field.related.model
         else:
             return get_related_resource_type(parent_model_relation)
-    return format_relation_name(relation_model.__name__)
+    return get_resource_type_from_model(relation_model)
 
 
 def get_instance_or_manager_resource_type(resource_instance_or_manager):
@@ -193,25 +193,31 @@ def get_instance_or_manager_resource_type(resource_instance_or_manager):
     pass
 
 
+def get_resource_type_from_model(model):
+    json_api_meta = getattr(model, 'JSONAPIMeta', None)
+    return getattr(
+        json_api_meta,
+        'resource_name',
+        format_relation_name(model.__name__))
+
+
 def get_resource_type_from_queryset(qs):
-    return format_relation_name(qs.model._meta.model.__name__)
+    return get_resource_type_from_model(qs.model)
 
 
 def get_resource_type_from_instance(instance):
-    return format_relation_name(instance._meta.model.__name__)
+    return get_resource_type_from_model(instance._meta.model)
 
 
 def get_resource_type_from_manager(manager):
-    return format_relation_name(manager.model.__name__)
+    return get_resource_type_from_model(manager.model)
 
 
 def get_resource_type_from_serializer(serializer):
-    try:
-        # Check the meta class for resource_name
-        return serializer.Meta.resource_name
-    except AttributeError:
-        # Use the serializer model then pluralize and format
-        return format_relation_name(serializer.Meta.model.__name__)
+    return getattr(
+        serializer.Meta,
+        'resource_name',
+        get_resource_type_from_model(serializer.Meta.model))
 
 
 def get_included_serializers(serializer):

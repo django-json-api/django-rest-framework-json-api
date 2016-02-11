@@ -4,20 +4,20 @@ JSON API and Django Rest Framework
 
 .. image:: https://travis-ci.org/django-json-api/django-rest-framework-json-api.svg?branch=develop
    :target: https://travis-ci.org/django-json-api/django-rest-framework-json-api
-   
+
 .. image:: https://readthedocs.org/projects/django-rest-framework-json-api/badge/?version=latest
    :alt: Read the docs
    :target: http://django-rest-framework-json-api.readthedocs.org/
-   
+
 .. image:: https://codeclimate.com/github/django-json-api/django-rest-framework-json-api/badges/gpa.svg
    :target: https://codeclimate.com/github/django-json-api/django-rest-framework-json-api
    :alt: Code Climate
-   
+
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
    :target: https://gitter.im/django-json-api/django-rest-framework-json-api
 
-   
+
 Documentation: http://django-rest-framework-json-api.readthedocs.org/
 
 Live demo (resets every hour): http://json-api.jerel.co/
@@ -126,19 +126,15 @@ Settings
 
 One can either add ``rest_framework_json_api.parsers.JSONParser`` and
 ``rest_framework_json_api.renderers.JSONRenderer`` to each ``ViewSet`` class, or
-override ``settings.REST_FRAMEWORK``::
+override ``settings.REST_FRAMEWORK``
 
+::
 
     REST_FRAMEWORK = {
-        'PAGINATE_BY': 10,
-        'PAGINATE_BY_PARAM': 'page_size',
-        'MAX_PAGINATE_BY': 100,
-        # DRF v3.1+
+        'PAGE_SIZE': 10,
+        'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
         'DEFAULT_PAGINATION_CLASS':
             'rest_framework_json_api.pagination.PageNumberPagination',
-        # older than DRF v3.1
-        'DEFAULT_PAGINATION_SERIALIZER_CLASS':
-            'rest_framework_json_api.pagination.PaginationSerializer',
         'DEFAULT_PARSER_CLASSES': (
             'rest_framework_json_api.parsers.JSONParser',
             'rest_framework.parsers.FormParser',
