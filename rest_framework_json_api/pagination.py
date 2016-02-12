@@ -5,7 +5,7 @@ from collections import OrderedDict
 from rest_framework import serializers
 from rest_framework.views import Response
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
-from rest_framework.templatetags.rest_framework import replace_query_param
+from rest_framework.utils.urls import remove_query_param, replace_query_param
 
 
 class PageNumberPagination(PageNumberPagination):
@@ -66,6 +66,10 @@ class LimitOffsetPagination(LimitOffsetPagination):
         url = replace_query_param(url, self.limit_query_param, self.limit)
 
         offset = self.count - self.limit
+
+        if offset <= 0:
+            return remove_query_param(url, self.offset_query_param)
+
         return replace_query_param(url, self.offset_query_param, offset)
 
     def get_first_link(self):
@@ -73,10 +77,7 @@ class LimitOffsetPagination(LimitOffsetPagination):
             return None
         
         url = self.request.build_absolute_uri()
-        url = replace_query_param(url, self.limit_query_param, self.limit)
-
-        offset = 0
-        return replace_query_param(url, self.offset_query_param, offset)
+        return remove_query_param(url, self.offset_query_param)
     
     def get_paginated_response(self, data):
         return Response({
