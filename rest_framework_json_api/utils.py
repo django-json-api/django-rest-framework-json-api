@@ -150,7 +150,7 @@ def format_relation_name(value, format_type=None):
 
 def parse_relation_name(value, format_type=None):
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_PARSE_RELATION_KEYS', False)
+        format_type = getattr(settings, 'JSON_API_PARSE_INCLUDE_KEYS', False)
 
     singularize = getattr(settings, 'JSON_API_SINGULARIZE_INCLUDE_TYPE', False)
 

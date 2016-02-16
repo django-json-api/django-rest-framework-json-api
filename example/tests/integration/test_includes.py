@@ -55,10 +55,10 @@ def test_reverse_included(single_entry, client):
     """Test the parsing of included names"""
     from django.conf import settings
 
-    parse_relation       = getattr(settings, 'JSON_API_PARSE_RELATION_KEYS', None)
+    parse_relation       = getattr(settings, 'JSON_API_PARSE_INCLUDE_KEYS', None)
     singularize_included = getattr(settings, 'JSON_API_SINGULARIZE_INCLUDE_TYPE', None)
 
-    settings.JSON_API_PARSE_RELATION_KEYS = 'underscore'
+    settings.JSON_API_PARSE_INCLUDE_KEYS = 'underscore'
     settings.JSON_API_SINGULARIZE_INCLUDE_TYPE = True
 
     response = client.get(reverse('entry-list') + '?include=blogs')
@@ -66,5 +66,5 @@ def test_reverse_included(single_entry, client):
 
     assert [x.get('type') for x in included] == ['blogs'], 'Related Blogs are incorrect'
 
-    settings.JSON_API_PARSE_RELATION_KEYS      = parse_relation
+    settings.JSON_API_PARSE_INCLUDE_KEYS      = parse_relation
     settings.JSON_API_SINGULARIZE_INCLUDE_TYPE = singularize_included
