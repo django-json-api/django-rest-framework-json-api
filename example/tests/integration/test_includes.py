@@ -50,3 +50,21 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
     assert 'included' in data
     assert len(data['included']) == 1
     assert data['included'][0]['attributes']['body'] == bio.body
+
+def test_reverse_included(single_entry, client):
+    """Test the parsing of included names"""
+    from django.conf import settings
+
+    parse_relation       = getattr(settings, 'JSON_API_PARSE_INCLUDE_KEYS', None)
+    singularize_included = getattr(settings, 'JSON_API_SINGULARIZE_INCLUDE_TYPE', None)
+
+    settings.JSON_API_PARSE_INCLUDE_KEYS = 'underscore'
+    settings.JSON_API_SINGULARIZE_INCLUDE_TYPE = True
+
+    response = client.get(reverse('entry-list') + '?include=blogs')
+    included = load_json(response.content).get('included')
+
+    assert [x.get('type') for x in included] == ['blogs'], 'Related Blogs are incorrect'
+
+    settings.JSON_API_PARSE_INCLUDE_KEYS      = parse_relation
+    settings.JSON_API_SINGULARIZE_INCLUDE_TYPE = singularize_included
