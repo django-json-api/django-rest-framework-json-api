@@ -360,6 +360,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @staticmethod
     def build_json_resource_obj(fields, resource, resource_instance, resource_name):
+        # Determine type from the instance if the underlying model is polymorphic
+        if isinstance(resource_instance, utils.POLYMORPHIC_ANCESTORS):
+            resource_name = utils.get_resource_type_from_instance(resource_instance)
         resource_data = [
             ('type', resource_name),
             ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),

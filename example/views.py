@@ -6,9 +6,10 @@ import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from rest_framework_json_api.views import RelationshipView
-from example.models import Blog, Entry, Author, Comment
+from example.models import Blog, Entry, Author, Comment, Company, Project
 from example.serializers import (
-    BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
+    BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer, CompanySerializer,
+    ProjectSerializer)
 
 from rest_framework_json_api.utils import format_drf_errors
 
@@ -70,6 +71,16 @@ class AuthorViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+
+class CompanyViewset(viewsets.ModelViewSet):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+
+
+class ProjectViewset(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
 
 class EntryRelationshipView(RelationshipView):
