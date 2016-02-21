@@ -22,6 +22,8 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda x: faker.name())
     email = factory.LazyAttribute(lambda x: faker.email())
 
+    bio = factory.RelatedFactory(b'example.factories.AuthorBioFactory', 'author')
+
 
 class AuthorBioFactory(factory.django.DjangoModelFactory):
     class Meta:
