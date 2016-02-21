@@ -26,6 +26,18 @@ try:
 except ImportError:
     HyperlinkedRouterField = type(None)
 
+POLYMORPHIC_ANCESTORS = ()
+try:
+    from polymorphic.models import PolymorphicModel
+    POLYMORPHIC_ANCESTORS += (PolymorphicModel,)
+except ImportError:
+    pass
+try:
+    from typedmodels.models import TypedModel
+    POLYMORPHIC_ANCESTORS += (TypedModel,)
+except ImportError:
+    pass
+
 
 def get_resource_name(context):
     """

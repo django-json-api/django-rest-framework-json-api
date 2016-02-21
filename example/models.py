@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from polymorphic.models import PolymorphicModel
 
 
 class BaseModel(models.Model):
@@ -72,3 +73,24 @@ class Comment(BaseModel):
     def __str__(self):
         return self.body
 
+
+class Project(PolymorphicModel):
+    topic = models.CharField(max_length=30)
+
+
+class ArtProject(Project):
+    artist = models.CharField(max_length=30)
+
+
+class ResearchProject(Project):
+    supervisor = models.CharField(max_length=30)
+
+
+@python_2_unicode_compatible
+class Company(models.Model):
+    name = models.CharField(max_length=100)
+    current_project = models.ForeignKey(Project, related_name='companies')
+    future_projects = models.ManyToManyField(Project)
+
+    def __str__(self):
+        return self.name
