@@ -84,7 +84,7 @@ class IncludedResourcesValidationMixin(object):
                     )
                 )
             if len(field_path) > 1:
-                new_included_field_path = field_path[-1:]
+                new_included_field_path = field_path[1:]
                 # We go down one level in the path
                 validate_path(this_included_serializer, new_included_field_path, path)
 

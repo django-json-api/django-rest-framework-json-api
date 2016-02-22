@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
 
 import factory
 from faker import Factory as FakerFactory
@@ -22,6 +21,7 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda x: faker.name())
     email = factory.LazyAttribute(lambda x: faker.email())
 
+    bio = factory.RelatedFactory('example.factories.AuthorBioFactory', 'author')
 
 class AuthorBioFactory(factory.django.DjangoModelFactory):
     class Meta:
