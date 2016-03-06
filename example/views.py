@@ -12,8 +12,10 @@ class BlogViewSet(viewsets.ModelViewSet):
 
 class EntryViewSet(viewsets.ModelViewSet):
     queryset = Entry.objects.all()
-    serializer_class = EntrySerializer
     resource_name = 'posts'
+
+    def get_serializer_class(self):
+        return EntrySerializer
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
