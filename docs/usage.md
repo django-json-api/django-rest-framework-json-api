@@ -423,6 +423,19 @@ field_name_mapping = {
 ```
 
 
+### Working with polymorphic resources
+
+This package can defer the resolution of the type of polymorphic models instances to get the appropriate type.
+However, most models are not polymorphic and for performance reasons this is only done if the underlying model is a subclass of a polymorphic model.
+
+Polymorphic ancestors must be defined on settings like this:
+
+```python
+JSON_API_POLYMORPHIC_ANCESTORS = (
+    'polymorphic.models.PolymorphicModel',
+)
+```
+
 ### Meta
 
 You may add metadata to the rendered json in two different ways: `meta_fields` and `get_root_meta`.
