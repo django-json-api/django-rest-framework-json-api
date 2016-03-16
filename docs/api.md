@@ -38,7 +38,7 @@ Gathers the data from serializer fields specified in `meta_fields` and adds it t
 
 #### extract_root_meta
 
-`extract_root_meta(serializer, resource, meta)`
+`extract_root_meta(serializer, resource)`
 
 Calls a `get_root_meta` function on a serializer, if it exists.
 
@@ -47,4 +47,3 @@ Calls a `get_root_meta` function on a serializer, if it exists.
 `build_json_resource_obj(fields, resource, resource_instance, resource_name)`
 
 Builds the resource object (type, id, attributes) and extracts relationships.
-

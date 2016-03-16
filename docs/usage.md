@@ -260,10 +260,17 @@ added to the `meta` object within the same `data` as the serializer.
 To add metadata to the top level `meta` object add:
 
 ``` python
-def get_root_meta(self, obj):
-    return {
-        'size': len(obj)
-    }
+def get_root_meta(self, resource, many):
+    if many:
+      # Dealing with a list request
+      return {
+          'size': len(resource)
+      }
+    else:
+      # Dealing with a detail request
+      return {
+        'foo': 'bar'
+      }
 ```
 to the serializer. It must return a dict and will be merged with the existing top level `meta`.
 
