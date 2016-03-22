@@ -443,8 +443,12 @@ class JSONRenderer(renderers.JSONRenderer):
                 # since queries without an 'order_by' may not return in the same order.  Match
                 # by pk instead.
                 if isinstance(resource_serializer.instance, QuerySet):
-                    pk = resource['id']
-                    resource_instance = filter(lambda item: item.pk == pk,
+                    id = resource['id']
+
+                    # If 'id' field is sourced from another field, use the source field in the lookup
+                    lookup_field = resource_serializer.child.fields['id'].source
+
+                    resource_instance = filter(lambda item: getattr(item, lookup_field) == id,
                                                list(resource_serializer.instance))[0]
                 else:
                     resource_instance = resource_serializer.instance[position]  # Get current instance
