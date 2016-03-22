@@ -5,6 +5,7 @@ import copy
 from collections import OrderedDict
 
 from django.utils import six, encoding
+from django.db.models.query import QuerySet
 
 from rest_framework import relations
 from rest_framework import renderers
@@ -436,7 +437,17 @@ class JSONRenderer(renderers.JSONRenderer):
             json_api_data = list()
             for position in range(len(serializer_data)):
                 resource = serializer_data[position]  # Get current resource
-                resource_instance = resource_serializer.instance[position]  # Get current instance
+
+                # If this is a queryset, ensure that the query is evaluated only once,
+                # and do not assume the ordering of the serializer_data is in the same order,
+                # since queries without an 'order_by' may not return in the same order.  Match
+                # by pk instead.
+                if isinstance(resource_serializer.instance, QuerySet):
+                    pk = resource['id']
+                    resource_instance = filter(lambda item: item.pk == pk,
+                                               list(resource_serializer.instance))[0]
+                else:
+                    resource_instance = resource_serializer.instance[position]  # Get current instance
 
                 json_resource_obj = self.build_json_resource_obj(fields, resource, resource_instance, resource_name)
                 meta = self.extract_meta(resource_serializer, resource)
