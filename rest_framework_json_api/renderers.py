@@ -248,7 +248,9 @@ class JSONRenderer(renderers.JSONRenderer):
                 included_resources.remove(field_name)
             except ValueError:
                 # Skip fields not in requested included resources
-                continue
+                # If no child field, directly continue with the next field
+                if field_name not in [node.split('.')[0] for node in included_resources]:
+                    continue
 
             try:
                 relation_instance_or_manager = getattr(resource_instance, field_name)

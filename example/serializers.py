@@ -32,6 +32,7 @@ class EntrySerializer(serializers.ModelSerializer):
         super(EntrySerializer, self).__init__(*args, **kwargs)
 
     included_serializers = {
+        'authors': 'example.serializers.AuthorSerializer',
         'comments': 'example.serializers.CommentSerializer',
         'suggested': 'example.serializers.EntrySerializer',
     }
@@ -73,6 +74,10 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'entry': EntrySerializer,
+        'author': AuthorSerializer
+    }
 
     class Meta:
         model = Comment
