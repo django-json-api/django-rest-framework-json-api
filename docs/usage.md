@@ -36,10 +36,15 @@ per request via the `PAGINATE_BY_PARAM` query parameter (`page_size` by default)
 
 ### Setting the resource_name
 
-You may manually set the `resource_name` property on views or serializers to
-specify the `type` key in the json output. It is automatically set for you as the
-plural of the view or model name except on resources that do not subclass
+You may manually set the `resource_name` property on views, serializers, or
+models to specify the `type` key in the json output. In the case of setting the
+`resource_name` property for models you must include the property inside a
+`JSONAPIMeta` class on the model. It is automatically set for you as the plural
+of the view or model name except on resources that do not subclass
 `rest_framework.viewsets.ModelViewSet`:
+
+
+Example - `resource_name` on View:
 ``` python
 class Me(generics.GenericAPIView):
     """
@@ -54,6 +59,23 @@ class Me(generics.GenericAPIView):
 ```
 If you set the `resource_name` property on the object to `False` the data
 will be returned without modification.
+
+
+Example - `resource_name` on Model:
+``` python
+class Me(models.Model):
+    """
+    A simple model
+    """
+    name = models.CharField(max_length=100)
+
+    class JSONAPIMeta:
+        resource_name = "users"
+```
+If you set the `resource_name` on a combination of model, serializer, or view
+in the same hierarchy, the name will be resolved as following: view >
+serializer > model. (Ex: A view `resource_name` will always override a
+`resource_name` specified on a serializer or model)
 
 
 ### Inflecting object and relation keys
