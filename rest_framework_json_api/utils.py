@@ -214,10 +214,10 @@ def get_resource_type_from_manager(manager):
 
 
 def get_resource_type_from_serializer(serializer):
-    return getattr(
-        serializer.Meta,
-        'resource_name',
-        get_resource_type_from_model(serializer.Meta.model))
+    if hasattr(serializer.Meta, 'resource_name'):
+        return serializer.Meta.resource_name
+    else:
+        return get_resource_type_from_model(serializer.Meta.model)
 
 
 def get_included_serializers(serializer):

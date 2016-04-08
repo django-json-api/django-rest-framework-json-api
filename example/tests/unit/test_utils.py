@@ -15,6 +15,11 @@ from rest_framework_json_api.utils import get_included_serializers
 pytestmark = pytest.mark.django_db
 
 
+class NonModelResourceSerializer(serializers.Serializer):
+    class Meta:
+        resource_name = 'users'
+
+
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('username',)
@@ -50,6 +55,11 @@ def test_get_resource_name():
 
     view.serializer_class.Meta.resource_name = 'rcustom'
     assert 'rcustom' == utils.get_resource_name(context), 'set on serializer'
+
+    view = GenericAPIView()
+    view.serializer_class = NonModelResourceSerializer
+    context = {'view': view}
+    assert 'users' == utils.get_resource_name(context), 'derived from non-model serializer'
 
 
 def test_format_keys():
