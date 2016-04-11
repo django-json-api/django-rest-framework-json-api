@@ -4,10 +4,20 @@ from example.models import Blog, Entry, Author, Comment
 from example.serializers import (
     BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
 
+from rest_framework_json_api.utils import format_drf_errors
+
 
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
+
+
+class BlogCustomViewSet(viewsets.ModelViewSet):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+    def handle_exception(self, exc):
+        return format_drf_errors(super(BlogCustomViewSet, self).handle_exception(exc), self.get_exception_handler_context(), exc)
 
 
 class EntryViewSet(viewsets.ModelViewSet):
