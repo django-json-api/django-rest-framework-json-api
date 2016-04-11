@@ -1,10 +1,10 @@
 """
 Parsers
 """
-from rest_framework import parsers
+from rest_framework import parsers, exceptions
 from rest_framework.exceptions import ParseError
 
-from . import utils, renderers, exceptions
+from . import utils, renderers
 
 
 class JSONParser(parsers.JSONParser):
@@ -30,6 +30,35 @@ class JSONParser(parsers.JSONParser):
     @staticmethod
     def parse_attributes(data):
         return utils.format_keys(data.get('attributes'), 'underscore') if data.get('attributes') else dict()
+
+    @staticmethod
+    def parse_nested_relationships(data, parser_context):
+        """ identify nested objects and return modified dict
+        so drf can use it """
+
+        # get nested data from serializer
+        nested_fields = []
+        serializer = parser_context.get('view').get_serializer()
+        for key, value in serializer.fields.iteritems():
+            if "Serializer" in value.__class__.__name__:
+                nested_fields.append(key)
+
+        # remove attribtues from data, so only nested stuff is left(?)
+        data.pop('attributes')
+
+        # go through data left and format dict
+        result = {}
+        for f in nested_fields:
+            if data.get(f) and data.get(f).get('data').get('attributes'):
+                attr = data.get(f).get('data').get('attributes')
+                attr = utils.format_keys(
+                    data.get(f).get('data').get('attributes'),
+                    'underscore')
+                result.update({
+                    f: attr
+                })
+
+        return result
 
     @staticmethod
     def parse_relationships(data):
@@ -85,6 +114,9 @@ class JSONParser(parsers.JSONParser):
             parsed_data = {'id': data.get('id')}
             parsed_data.update(self.parse_attributes(data))
             parsed_data.update(self.parse_relationships(data))
+            parsed_data.update(self.parse_nested_relationships(
+                data, parser_context)
+            )
             return parsed_data
 
         else:
