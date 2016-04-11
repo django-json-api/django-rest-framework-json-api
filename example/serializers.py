@@ -7,10 +7,10 @@ class BlogSerializer(serializers.ModelSerializer):
 
     copyright = serializers.SerializerMethodField()
 
-    def get_copyright(self, obj):
+    def get_copyright(self, resource):
         return datetime.now().year
 
-    def get_root_meta(self, obj):
+    def get_root_meta(self, resource, many):
         return {
           'api_docs': '/docs/api/blogs'
         }

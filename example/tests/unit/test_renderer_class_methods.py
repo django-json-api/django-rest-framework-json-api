@@ -61,38 +61,42 @@ def test_extract_meta():
     }
     assert JSONRenderer.extract_meta(serializer, serializer.data) == expected
 
-def test_extract_root_meta():
-    def get_root_meta(obj):
-        return {
-            'foo': 'meta-value'
-        }
 
-    serializer = ResourceSerializer()
-    serializer.get_root_meta = get_root_meta
+class ExtractRootMetaResourceSerializer(ResourceSerializer):
+    def get_root_meta(self, resource, many):
+        if many:
+            return {
+              'foo': 'meta-many-value'
+            }
+        else:
+            return {
+              'foo': 'meta-value'
+            }
+
+
+class InvalidExtractRootMetaResourceSerializer(ResourceSerializer):
+    def get_root_meta(self, resource, many):
+        return 'not a dict'
+
+
+def test_extract_root_meta():
+    serializer = ExtractRootMetaResourceSerializer()
     expected = {
         'foo': 'meta-value',
     }
-    assert JSONRenderer.extract_root_meta(serializer, {}, {}) == expected
+    assert JSONRenderer.extract_root_meta(serializer, {}) == expected
 
 def test_extract_root_meta_many():
-    def get_root_meta(obj):
-        return {
-          'foo': 'meta-value'
-        }
-
-    serializer = ResourceSerializer(many=True)
-    serializer.get_root_meta = get_root_meta
+    serializer = ExtractRootMetaResourceSerializer(many=True)
     expected = {
-      'foo': 'meta-value'
+      'foo': 'meta-many-value'
     }
-    assert JSONRenderer.extract_root_meta(serializer, {}, {}) == expected
+    assert JSONRenderer.extract_root_meta(serializer, {}) == expected
 
 def test_extract_root_meta_invalid_meta():
-    def get_root_meta(obj):
+    def get_root_meta(resource, many):
         return 'not a dict'
 
-    serializer = ResourceSerializer()
-    serializer.get_root_meta = get_root_meta
+    serializer = InvalidExtractRootMetaResourceSerializer()
     with pytest.raises(AssertionError) as e_info:
-        JSONRenderer.extract_root_meta(serializer, {}, {})
-
+        JSONRenderer.extract_root_meta(serializer, {})
