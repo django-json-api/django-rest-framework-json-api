@@ -1,3 +1,4 @@
+from rest_framework import exceptions
 from rest_framework import viewsets
 from rest_framework_json_api.views import RelationshipView
 from example.models import Blog, Entry, Author, Comment
@@ -5,6 +6,8 @@ from example.serializers import (
     BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
 
 from rest_framework_json_api.utils import format_drf_errors
+
+HTTP_422_UNPROCESSABLE_ENTITY = 422
 
 
 class BlogViewSet(viewsets.ModelViewSet):
@@ -17,6 +20,8 @@ class BlogCustomViewSet(viewsets.ModelViewSet):
     serializer_class = BlogSerializer
 
     def handle_exception(self, exc):
+        if isinstance(exc, exceptions.ValidationError):
+            exc.status_code = HTTP_422_UNPROCESSABLE_ENTITY
         return format_drf_errors(super(BlogCustomViewSet, self).handle_exception(exc), self.get_exception_handler_context(), exc)
 
 
