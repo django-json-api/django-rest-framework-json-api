@@ -38,10 +38,19 @@ class EntrySerializer(serializers.ModelSerializer):
     }
 
     body_format = serializers.SerializerMethodField()
+    blog = relations.ResourceRelatedField(
+        self_link_view_name='entry-relationships',
+        related_link_view_name='entry-related-object',
+        read_only=True
+    )
     comments = relations.ResourceRelatedField(
-            source='comment_set', many=True, read_only=True)
+        self_link_view_name='entry-relationships',
+        related_link_view_name='entry-related-object',
+        source='comment_set', many=True, read_only=True
+    )
     suggested = relations.SerializerMethodResourceRelatedField(
-            source='get_suggested', model=Entry, read_only=True)
+        source='get_suggested', model=Entry, read_only=True
+    )
 
     def get_suggested(self, obj):
         return Entry.objects.exclude(pk=obj.pk).first()

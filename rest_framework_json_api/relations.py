@@ -91,6 +91,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         return Hyperlink(url, name)
 
     def get_links(self, obj=None, lookup_field='pk'):
+
         request = self.context.get('request', None)
         view = self.context.get('view', None)
         return_data = OrderedDict()
@@ -102,6 +103,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         self_link = self.get_url('self', self.self_link_view_name, self_kwargs, request)
 
         related_kwargs = {self.related_link_url_kwarg: kwargs[self.related_link_lookup_field]}
+        related_kwargs.update({'related_field': self.field_name if self.field_name else self.parent.field_name})
         related_link = self.get_url('related', self.related_link_view_name, related_kwargs, request)
 
         if self_link:
