@@ -35,6 +35,9 @@ def test_pagination_with_single_entry(single_entry, client):
                     "comments": {
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "1"}]
+                    },
+                    "suggested": {
+                        "data": []
                     }
                 }
             }],

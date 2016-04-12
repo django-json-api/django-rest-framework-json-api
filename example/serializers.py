@@ -25,25 +25,33 @@ class EntrySerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         # to make testing more concise we'll only output the
-        # `suggested` field when it's requested via `include`
+        # `featured` field when it's requested via `include`
         request = kwargs.get('context', {}).get('request')
-        if request and 'suggested' not in request.query_params.get('include', []):
-            self.fields.pop('suggested')
+        if request and 'featured' not in request.query_params.get('include', []):
+            self.fields.pop('featured')
         super(EntrySerializer, self).__init__(*args, **kwargs)
 
     included_serializers = {
         'authors': 'example.serializers.AuthorSerializer',
         'comments': 'example.serializers.CommentSerializer',
-        'suggested': 'example.serializers.EntrySerializer',
+        'featured': 'example.serializers.EntrySerializer',
     }
 
     body_format = serializers.SerializerMethodField()
+    # many related from model
     comments = relations.ResourceRelatedField(
             source='comment_set', many=True, read_only=True)
+    # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
-            source='get_suggested', model=Entry, read_only=True)
+            source='get_suggested', model=Entry, many=True, read_only=True)
+    # single related from serializer
+    featured = relations.SerializerMethodResourceRelatedField(
+            source='get_featured', model=Entry, read_only=True)
 
     def get_suggested(self, obj):
+        return Entry.objects.exclude(pk=obj.pk)
+
+    def get_featured(self, obj):
         return Entry.objects.exclude(pk=obj.pk).first()
 
     def get_body_format(self, obj):
@@ -52,7 +60,7 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                  'authors', 'comments', 'suggested',)
+                  'authors', 'comments', 'featured', 'suggested',)
         meta_fields = ('body_format',)
 
 
