@@ -38,10 +38,18 @@ class EntrySerializer(serializers.ModelSerializer):
     }
 
     body_format = serializers.SerializerMethodField()
+    # many related from model
     comments = relations.ResourceRelatedField(
             source='comment_set', many=True, read_only=True)
+    # many related from serializer
+    suggested = relations.SerializerMethodResourceRelatedField(
+            source='get_suggested', model=Entry, many=True, read_only=True)
+    # single related from serializer
     featured = relations.SerializerMethodResourceRelatedField(
             source='get_featured', model=Entry, read_only=True)
+
+    def get_suggested(self, obj):
+        return Entry.objects.exclude(pk=obj.pk)
 
     def get_featured(self, obj):
         return Entry.objects.exclude(pk=obj.pk).first()
@@ -52,7 +60,7 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                  'authors', 'comments', 'featured',)
+                  'authors', 'comments', 'featured', 'suggested',)
         meta_fields = ('body_format',)
 
 
