@@ -22,7 +22,9 @@ class BlogCustomViewSet(viewsets.ModelViewSet):
     def handle_exception(self, exc):
         if isinstance(exc, exceptions.ValidationError):
             exc.status_code = HTTP_422_UNPROCESSABLE_ENTITY
-        return format_drf_errors(super(BlogCustomViewSet, self).handle_exception(exc), self.get_exception_handler_context(), exc)
+        response = super(BlogCustomViewSet, self).handle_exception(exc)
+        context = self.get_exception_handler_context()
+        return format_drf_errors(response, context, exc)
 
 
 class EntryViewSet(viewsets.ModelViewSet):
