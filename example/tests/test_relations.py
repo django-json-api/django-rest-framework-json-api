@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from . import TestBase
 from rest_framework_json_api.exceptions import Conflict
-from rest_framework_json_api.utils import format_relation_name
+from rest_framework_json_api.utils import format_resource_type
 from example.models import Blog, Entry, Comment, Author
 from example.serializers import CommentSerializer
 from rest_framework_json_api.relations import ResourceRelatedField
@@ -42,7 +42,7 @@ class TestResourceRelatedField(TestBase):
         serializer = BlogFKSerializer(instance={'blog': self.blog})
 
         expected_data = {
-            'type': format_relation_name('Blog'),
+            'type': format_resource_type('Blog'),
             'id': str(self.blog.id)
         }
 
@@ -54,7 +54,7 @@ class TestResourceRelatedField(TestBase):
         serializer = EntryFKSerializer(instance={'entry': self.entry})
 
         expected_data = {
-            'type': format_relation_name('Entry'),
+            'type': format_resource_type('Entry'),
             'id': str(self.entry.id)
         }
 
@@ -65,7 +65,7 @@ class TestResourceRelatedField(TestBase):
     def test_deserialize_primitive_data_blog(self):
         serializer = BlogFKSerializer(data={
             'blog': {
-                'type': format_relation_name('Blog'),
+                'type': format_resource_type('Blog'),
                 'id': str(self.blog.id)
             }
         }
@@ -90,7 +90,7 @@ class TestResourceRelatedField(TestBase):
     def test_serialize_many_to_many_relation(self):
         serializer = EntryModelSerializer(instance=self.entry)
 
-        type_string = format_relation_name('Author')
+        type_string = format_resource_type('Author')
         author_pks = Author.objects.values_list('pk', flat=True)
         expected_data = [{'type': type_string, 'id': str(pk)} for pk in author_pks]
 
@@ -100,7 +100,7 @@ class TestResourceRelatedField(TestBase):
         )
 
     def test_deserialize_many_to_many_relation(self):
-        type_string = format_relation_name('Author')
+        type_string = format_resource_type('Author')
         author_pks = Author.objects.values_list('pk', flat=True)
         authors = [{'type': type_string, 'id': pk} for pk in author_pks]
 

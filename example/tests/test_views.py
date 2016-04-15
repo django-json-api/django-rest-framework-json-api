@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from rest_framework.test import APITestCase
 
-from rest_framework_json_api.utils import format_relation_name
+from rest_framework_json_api.utils import format_resource_type
 from example.models import Blog, Entry, Comment, Author
 
 
@@ -44,7 +44,7 @@ class TestRelationshipView(APITestCase):
     def test_get_entry_relationship_blog(self):
         url = reverse('entry-relationships', kwargs={'pk': self.first_entry.id, 'related_field': 'blog'})
         response = self.client.get(url)
-        expected_data = {'type': format_relation_name('Blog'), 'id': str(self.first_entry.blog.id)}
+        expected_data = {'type': format_resource_type('Blog'), 'id': str(self.first_entry.blog.id)}
 
         assert response.data == expected_data
 
@@ -55,8 +55,8 @@ class TestRelationshipView(APITestCase):
 
     def test_get_blog_relationship_entry_set(self):
         response = self.client.get('/blogs/{}/relationships/entry_set'.format(self.blog.id))
-        expected_data = [{'type': format_relation_name('Entry'), 'id': str(self.first_entry.id)},
-                         {'type': format_relation_name('Entry'), 'id': str(self.second_entry.id)}]
+        expected_data = [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)},
+                         {'type': format_resource_type('Entry'), 'id': str(self.second_entry.id)}]
 
         assert response.data == expected_data
 
@@ -85,14 +85,14 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         expected_data = {
             'links': {'self': 'http://testserver/authors/1/relationships/comment_set'},
-            'data': [{'id': str(self.second_comment.id), 'type': format_relation_name('Comment')}]
+            'data': [{'id': str(self.second_comment.id), 'type': format_resource_type('Comment')}]
         }
         assert json.loads(response.content.decode('utf-8')) == expected_data
 
     def test_patch_to_one_relationship(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
-            'data': {'type': format_relation_name('Blog'), 'id': str(self.other_blog.id)}
+            'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
         response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
@@ -103,7 +103,7 @@ class TestRelationshipView(APITestCase):
     def test_patch_to_many_relationship(self):
         url = '/blogs/{}/relationships/entry_set'.format(self.first_entry.id)
         request_data = {
-            'data': [{'type': format_relation_name('Entry'), 'id': str(self.first_entry.id)}, ]
+            'data': [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)}, ]
         }
         response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
@@ -114,7 +114,7 @@ class TestRelationshipView(APITestCase):
     def test_post_to_one_relationship_should_fail(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
-            'data': {'type': format_relation_name('Blog'), 'id': str(self.other_blog.id)}
+            'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
         response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 405, response.content.decode()
@@ -122,7 +122,7 @@ class TestRelationshipView(APITestCase):
     def test_post_to_many_relationship_with_no_change(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
         request_data = {
-            'data': [{'type': format_relation_name('Comment'), 'id': str(self.first_comment.id)}, ]
+            'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
         response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 204, response.content.decode()
@@ -130,7 +130,7 @@ class TestRelationshipView(APITestCase):
     def test_post_to_many_relationship_with_change(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
         request_data = {
-            'data': [{'type': format_relation_name('Comment'), 'id': str(self.second_comment.id)}, ]
+            'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
         response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
@@ -140,7 +140,7 @@ class TestRelationshipView(APITestCase):
     def test_delete_to_one_relationship_should_fail(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
-            'data': {'type': format_relation_name('Blog'), 'id': str(self.other_blog.id)}
+            'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 405, response.content.decode()
@@ -164,7 +164,7 @@ class TestRelationshipView(APITestCase):
     def test_delete_to_many_relationship_with_no_change(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
         request_data = {
-            'data': [{'type': format_relation_name('Comment'), 'id': str(self.second_comment.id)}, ]
+            'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 204, response.content.decode()
@@ -172,7 +172,7 @@ class TestRelationshipView(APITestCase):
     def test_delete_one_to_many_relationship_with_not_null_constraint(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
         request_data = {
-            'data': [{'type': format_relation_name('Comment'), 'id': str(self.first_comment.id)}, ]
+            'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 409, response.content.decode()
@@ -180,7 +180,7 @@ class TestRelationshipView(APITestCase):
     def test_delete_to_many_relationship_with_change(self):
         url = '/authors/{}/relationships/comment_set'.format(self.author.id)
         request_data = {
-            'data': [{'type': format_relation_name('Comment'), 'id': str(self.second_comment.id)}, ]
+            'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
