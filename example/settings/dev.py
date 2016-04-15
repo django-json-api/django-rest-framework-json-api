@@ -37,7 +37,7 @@ PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
 MIDDLEWARE_CLASSES = ()
 
 JSON_API_FORMAT_KEYS = 'camelize'
-JSON_API_FORMAT_RELATION_KEYS = 'camelize'
+JSON_API_FORMAT_TYPES = 'camelize'
 REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',

@@ -208,7 +208,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, ModelSerializer):
                 relation_model = field.Meta.model
-                relation_type = utils.format_relation_name(relation_model.__name__)
+                relation_type = utils.format_type(relation_model.__name__)
 
                 data.update({
                     field_name: {
@@ -343,7 +343,7 @@ class JSONRenderer(renderers.JSONRenderer):
         if hasattr(serializer, 'child'):
             many = True
             serializer = serializer.child
-        
+
         data = {}
         if getattr(serializer, 'get_root_meta', None):
             json_api_meta = serializer.get_root_meta(resource, many)

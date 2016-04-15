@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from rest_framework_json_api.utils import format_relation_name
+from rest_framework_json_api.utils import format_resource_type
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 
 from example.models import Blog, Entry, Author
@@ -35,20 +35,20 @@ class TestResourceIdentifierObjectSerializer(TestCase):
     def test_data_in_correct_format_when_instantiated_with_blog_object(self):
         serializer = ResourceIdentifierObjectSerializer(instance=self.blog)
 
-        expected_data = {'type': format_relation_name('Blog'), 'id': str(self.blog.id)}
+        expected_data = {'type': format_resource_type('Blog'), 'id': str(self.blog.id)}
 
         assert serializer.data == expected_data
 
     def test_data_in_correct_format_when_instantiated_with_entry_object(self):
         serializer = ResourceIdentifierObjectSerializer(instance=self.entry)
 
-        expected_data = {'type': format_relation_name('Entry'), 'id': str(self.entry.id)}
+        expected_data = {'type': format_resource_type('Entry'), 'id': str(self.entry.id)}
 
         assert serializer.data == expected_data
 
     def test_deserialize_primitive_data_blog(self):
         initial_data = {
-            'type': format_relation_name('Blog'),
+            'type': format_resource_type('Blog'),
             'id': str(self.blog.id)
         }
         serializer = ResourceIdentifierObjectSerializer(data=initial_data, model_class=Blog)
@@ -60,14 +60,14 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         qs = Author.objects.all()
         serializer = ResourceIdentifierObjectSerializer(instance=qs, many=True)
 
-        type_string = format_relation_name('Author')
+        type_string = format_resource_type('Author')
         author_pks = Author.objects.values_list('pk', flat=True)
         expected_data = [{'type': type_string, 'id': str(pk)} for pk in author_pks]
 
         assert serializer.data == expected_data
 
     def test_deserialize_many(self):
-        type_string = format_relation_name('Author')
+        type_string = format_resource_type('Author')
         author_pks = Author.objects.values_list('pk', flat=True)
         initial_data = [{'type': type_string, 'id': str(pk)} for pk in author_pks]
 

@@ -2,6 +2,7 @@
 Utils.
 """
 import copy
+import warnings
 from collections import OrderedDict
 import inspect
 
@@ -62,7 +63,7 @@ def get_resource_name(context):
                 return resource_name
 
             # the name was calculated automatically from the view > pluralize and format
-            resource_name = format_relation_name(resource_name)
+            resource_name = format_resource_type(resource_name)
 
     return resource_name
 
@@ -140,10 +141,18 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
+    warnings.warn("The 'format_relation_name' function has been renamed 'format_resource_type' and the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
+        format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
+    pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
+    return format_resource_type(value, format_type, pluralize)
 
-    pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', False)
+def format_resource_type(value, format_type=None, pluralize=None):
+    if format_type is None:
+        format_type = getattr(settings, 'JSON_API_FORMAT_TYPES', False)
+
+    if pluralize is None:
+        pluralize = getattr(settings, 'JSON_API_PLURALIZE_TYPES', False)
 
     if format_type:
         # format_type will never be None here so we can use format_value
@@ -201,7 +210,7 @@ def get_resource_type_from_model(model):
     return getattr(
         json_api_meta,
         'resource_name',
-        format_relation_name(model.__name__))
+        format_resource_type(model.__name__))
 
 
 def get_resource_type_from_queryset(qs):
