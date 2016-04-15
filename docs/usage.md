@@ -87,7 +87,10 @@ class Me(models.Model):
 If you set the `resource_name` on a combination of model, serializer, or view
 in the same hierarchy, the name will be resolved as following: view >
 serializer > model. (Ex: A view `resource_name` will always override a
-`resource_name` specified on a serializer or model)
+`resource_name` specified on a serializer or model). Setting the `resource_name`
+on the view should be used sparingly as serializers and models are shared between
+multiple endpoints. Setting the `resource_name` on views may result in a different
+`type` being set depending on which endpoint the resource is fetched from.
 
 
 ### Inflecting object and relation keys
