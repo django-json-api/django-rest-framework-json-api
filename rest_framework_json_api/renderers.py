@@ -2,7 +2,7 @@
 Renderers
 """
 import copy
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
 
 from django.utils import six, encoding
 from django.db.models.query import QuerySet
@@ -284,12 +284,19 @@ class JSONRenderer(renderers.JSONRenderer):
                 # serializer_class = utils.get_serializer_from_instance_and_serializer()
                 # serializer_instance = serializer_class(relation_instance_or_manager.all(), many=True, context=context)
 
-                iterable = field.get_attribute(current_serializer.instance)
-
-
+                if isinstance(current_serializer.instance, Iterable):
+                    iterable = []
+                    for obj in current_serializer.instance:
+                        iterable += field.get_attribute(obj)
+                    # remove duplicates
+                    iterable = list(set(iterable))
+                else:
+                    iterable = field.get_attribute(current_serializer.instance)
 
                 for item in iterable:
-                    serializer_class = utils.get_serializer_from_instance_and_serializer(item, current_serializer, field_name)
+                    serializer_class = utils.get_serializer_from_instance_and_serializer(item,
+                                                                                         current_serializer,
+                                                                                         field_name)
                     serializer_instance = serializer_class(item, context=context)
                     serializer_instances.append(serializer_instance)
 
