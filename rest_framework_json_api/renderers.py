@@ -288,8 +288,6 @@ class JSONRenderer(renderers.JSONRenderer):
                     iterable = []
                     for obj in current_serializer.instance:
                         iterable += field.get_attribute(obj)
-                    # remove duplicates
-                    iterable = list(set(iterable))
                 else:
                     iterable = field.get_attribute(current_serializer.instance)
 
