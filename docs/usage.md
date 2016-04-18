@@ -413,6 +413,15 @@ model field `Order.line_items` on the Order with pk 3, the url would be
 `self_link_view_name` keyword argument, which should match the `name=`
 provided in the urlconf, and will use the name of the field for the
 `related_field` kwarg.
+Also we can override `related_field` in the url. Let's say we want the url to be:
+`/order/3/relationships/order_items` - all we need to do is just add `field_name_mapping`
+dict to the class:
+```python
+field_name_mapping = {
+        'line_items': 'order_items'
+    }
+```
+
 
 ### Meta
 
