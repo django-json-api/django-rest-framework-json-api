@@ -282,6 +282,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 serializer_class = included_serializers.get(field_name)
                 if relation_instance_or_manager is None:
                     continue
+
                 field = serializer_class(relation_instance_or_manager, context=context)
                 serializer_data = field.data
 
@@ -388,6 +389,7 @@ class JSONRenderer(renderers.JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         view = renderer_context.get("view", None)
         request = renderer_context.get("request", None)
+        data = data or {}
 
         from rest_framework_json_api.views import RelationshipView
         if isinstance(view, RelationshipView):
