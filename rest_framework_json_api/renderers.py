@@ -422,6 +422,7 @@ class JSONRenderer(renderers.JSONRenderer):
         else:
             serializer_data = data
 
+        # A serializer with many
         if hasattr(serializer_data, 'serializer') and getattr(serializer_data.serializer, 'many', False):
             # The below is not true for non-paginated responses
             # and isinstance(data, dict):
@@ -430,21 +431,27 @@ class JSONRenderer(renderers.JSONRenderer):
             # - http://jsonapi.org/format/#document-top-level
             # The `results` key may be missing if unpaginated or an OPTIONS request
             resource_name = self.check_resource_name(resource_name, serializer_data.serializer, view)
-            json_api_data = self.render_serializer(serializer_data.serializer, serializer_data, resource_name,
-                                                   included_resources, json_api_meta, json_api_included)
+            d_serializer = serializer_data.serializer.child if hasattr(serializer_data.serializer, 'child') else serializer_data.serializer
+
+            json_api_data = self.render_serializer_many(d_serializer, serializer_data, resource_name,
+                                                        included_resources, json_api_meta, json_api_included)
 
         else:
+            # A single item
             if hasattr(data, 'serializer'):
                 resource_name = self.check_resource_name(resource_name, data.serializer, view)
-                json_api_data = self.render_serializer_many(data.serializer, data, resource_name, included_resources,
-                                                            json_api_meta, json_api_included)
 
+                json_api_data = self.render_serializer(data.serializer, data, resource_name, included_resources,
+                                                       json_api_meta, json_api_included)
+
+            # A list of mixed items
             elif isinstance(serializer_data, (list, tuple)) and hasattr(serializer_data[0], 'serializer'):
                 json_api_data = list()
 
                 for r in serializer_data:
-                    resource_name = self.check_resource_name(resource_name, r.serializer.child, view)
-                    json_api_data.extend(self.render_serializer(r.serializer, r, resource_name, included_resources,
+                    resource_name = self.check_resource_name(resource_name, r.serializer, view)
+                    r_serializer = r.serializer.child if hasattr(r.serializer, 'child') else r.serializer
+                    json_api_data.append(self.render_serializer(r_serializer, r, resource_name, included_resources,
                                                                 json_api_meta, json_api_included))
 
             else:
@@ -492,7 +499,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return res_name
 
-    def render_serializer(self, serializer, data, resource_name, included_resources, json_api_meta, json_api_included):
+    def render_serializer_many(self, serializer, data, resource_name, included_resources, json_api_meta, json_api_included):
         fields = utils.get_serializer_fields(serializer)
         rendered_data = list()
 
@@ -505,7 +512,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return rendered_data
 
-    def render_serializer_many(self, serializer, data, resource_name, included_resources, json_api_meta, json_api_included):
+    def render_serializer(self, serializer, data, resource_name, included_resources, json_api_meta, json_api_included):
         fields = utils.get_serializer_fields(serializer)
         resource_instance = serializer.instance
         return self.render_resource(serializer, fields, data, resource_instance, resource_name, included_resources,
