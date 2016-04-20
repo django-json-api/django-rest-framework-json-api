@@ -44,6 +44,8 @@ class JSONParser(parsers.JSONParser):
                 parsed_relationships[field_name] = field_data['id']
             elif isinstance(field_data, list):
                 parsed_relationships[field_name] = list(relation['id'] for relation in field_data)
+            elif field_data == None:
+                parsed_relationships[field_name] = field_data
         return parsed_relationships
 
     def parse(self, stream, media_type=None, parser_context=None):
@@ -51,11 +53,12 @@ class JSONParser(parsers.JSONParser):
         Parses the incoming bytestream as JSON and returns the resulting data
         """
         result = super(JSONParser, self).parse(stream, media_type=media_type, parser_context=parser_context)
+
         data = result.get('data')
 
         if data:
             type = data.get('type')
-            # if type is defined, treat it like a full object, otherwise jsut pass through the data
+            # if type is defined, treat it like a full object, otherwise just pass through the data
             if type:
                 from rest_framework_json_api.views import RelationshipView
                 if isinstance(parser_context['view'], RelationshipView):
