@@ -451,8 +451,8 @@ class JSONRenderer(renderers.JSONRenderer):
                 json_api_data = list()
 
                 for r in serializer_data:
-                    resource_name = self.check_resource_name(resource_name, r.serializer, view)
                     r_serializer = r.serializer.child if hasattr(r.serializer, 'child') else r.serializer
+                    resource_name = self.check_resource_name(resource_name, r_serializer, view)
                     json_api_data.append(self.render_serializer(r_serializer, r, resource_name, included_resources,
                                                                 json_api_meta, json_api_included))
 
@@ -493,11 +493,8 @@ class JSONRenderer(renderers.JSONRenderer):
         )
 
     def check_resource_name(self, resource_name, serializer, view):
-        res_name = resource_name
-
-        if res_name == view.__class__.__name__:
-            resource_from_serializer = utils.get_resource_name_from_serializer_or_model(serializer, view)
-            res_name = resource_from_serializer or res_name
+        resource_from_serializer = utils.get_resource_name_from_serializer_or_model(serializer, view)
+        res_name = resource_from_serializer or resource_name
 
         return res_name
 
@@ -508,7 +505,7 @@ class JSONRenderer(renderers.JSONRenderer):
         for position in range(len(data)):
             resource = data[position]  # Get current resource
             resource_instance = serializer.instance[position]  # Get current instance
-
+            print serializer
             rendered_data.append(self.render_resource(serializer, fields, resource, resource_instance, resource_name,
                                                       included_resources, json_api_meta, json_api_included))
 
