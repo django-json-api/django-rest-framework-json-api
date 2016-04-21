@@ -292,9 +292,13 @@ class JSONRenderer(renderers.JSONRenderer):
                     for position in range(len(serializer_data)):
                         serializer_resource = serializer_data[position]
                         nested_resource_instance = relation_queryset[position]
+                        resource_type = (
+                            relation_type or
+                            utils.get_resource_type_from_instance(nested_resource_instance)
+                        )
                         included_data.append(
                             JSONRenderer.build_json_resource_obj(
-                                serializer_fields, serializer_resource, nested_resource_instance, relation_type
+                                serializer_fields, serializer_resource, nested_resource_instance, resource_type
                             )
                         )
                         included_data.extend(
