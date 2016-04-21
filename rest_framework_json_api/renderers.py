@@ -381,11 +381,8 @@ class JSONRenderer(renderers.JSONRenderer):
         )
 
     def render_errors(self, data, accepted_media_type=None, renderer_context=None):
-        # Get the resource name.
-        if len(data) > 1 and isinstance(data, list):
-            data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
         return super(JSONRenderer, self).render(
-            {'errors': data}, accepted_media_type, renderer_context
+            utils.format_errors(data), accepted_media_type, renderer_context
         )
 
     def render(self, data, accepted_media_type=None, renderer_context=None):

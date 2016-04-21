@@ -315,4 +315,11 @@ def format_drf_errors(response, context, exc):
 
     context['view'].resource_name = 'errors'
     response.data = errors
+
     return response
+
+
+def format_errors(data):
+    if len(data) > 1 and isinstance(data, list):
+        data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
+    return {'errors': data}
