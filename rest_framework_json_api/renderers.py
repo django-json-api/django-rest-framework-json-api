@@ -5,6 +5,7 @@ import copy
 from collections import OrderedDict
 
 from django.utils import six, encoding
+from django.conf import settings
 from rest_framework import relations
 from rest_framework import renderers
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
@@ -358,9 +359,10 @@ class JSONRenderer(renderers.JSONRenderer):
             ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
             ('attributes', JSONRenderer.extract_attributes(fields, resource)),
         ]
-        relationships = JSONRenderer.extract_relationships(fields, resource, resource_instance)
-        if relationships:
-            resource_data.append(('relationships', relationships))
+        if getattr(settings, 'JSON_API_IMPLICIT_RELATIONSHIPS', True):
+            relationships = JSONRenderer.extract_relationships(fields, resource, resource_instance)
+            if relationships:
+                resource_data.append(('relationships', relationships))
         # Add 'self' link if field is present and valid
         if api_settings.URL_FIELD_NAME in resource and \
                 isinstance(fields[api_settings.URL_FIELD_NAME], relations.RelatedField):

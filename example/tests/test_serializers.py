@@ -112,3 +112,24 @@ class TestModelSerializer(object):
         expected_json = dump_json(expected)
 
         assert actual == expected_json
+
+    def test_model_serializer_with_implicit_relationships_respecting_settings(self, comment, client, settings):
+        settings.JSON_API_IMPLICIT_RELATIONSHIPS = False
+        expected = {
+            "data": {
+                "type": "comments",
+                "id": str(comment.pk),
+                "attributes": {
+                    "body": comment.body
+                }
+            }
+        }
+
+        response = client.get(reverse("comment-detail", kwargs={'pk': comment.pk}))
+
+        assert response.status_code == 200
+
+        actual = redump_json(response.content)
+        expected_json = dump_json(expected)
+
+        assert actual == expected_json
