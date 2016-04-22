@@ -457,7 +457,8 @@ class JSONRenderer(renderers.JSONRenderer):
                                                                 json_api_meta, json_api_included))
 
             else:
-                json_api_data = data
+                data.pop('meta')
+                json_api_data = data['results'] if 'results' in data else data
 
         # Make sure we render data in a specific order
         render_data = OrderedDict()
