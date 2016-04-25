@@ -107,9 +107,14 @@ Browse to http://localhost:8000
 Running Tests
 ^^^^^^^^^^^^^
 
+It is recommended to create a virtualenv for testing. Assuming it is already 
+installed and activated:
+
 ::
 
-    $ python runtests.py
+    $ pip install -e .
+    $ pip install -r requirements-development.txt
+    $ py.test
 
 
 -----
