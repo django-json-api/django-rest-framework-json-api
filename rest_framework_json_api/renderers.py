@@ -447,7 +447,9 @@ class JSONRenderer(renderers.JSONRenderer):
                                                        json_api_meta, json_api_included)
 
             # A list of mixed items
-            elif isinstance(serializer_data, (list, tuple)) and hasattr(serializer_data[0], 'serializer'):
+            elif serializer_data \
+                    and isinstance(serializer_data, (list, tuple)) \
+                    and hasattr(serializer_data[0], 'serializer'):
                 json_api_data = list()
 
                 for r in serializer_data:
@@ -457,7 +459,9 @@ class JSONRenderer(renderers.JSONRenderer):
                                                                 json_api_meta, json_api_included))
 
             else:
-                data.pop('meta')
+                if 'meta' in data:
+                    data.pop('meta')
+
                 json_api_data = data['results'] if 'results' in data else data
 
         # Make sure we render data in a specific order
