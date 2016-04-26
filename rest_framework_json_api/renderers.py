@@ -5,6 +5,7 @@ import copy
 from collections import OrderedDict
 
 from django.utils import six, encoding
+from django.conf import settings
 from rest_framework import relations
 from rest_framework import renderers
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
@@ -259,10 +260,13 @@ class JSONRenderer(renderers.JSONRenderer):
                     # For ManyRelatedFields if `related_name` is not set we need to access `foo_set` from `source`
                     relation_instance_or_manager = getattr(resource_instance, field.child_relation.source)
                 except AttributeError:
-                    if not hasattr(current_serializer, field.source):
+                    if hasattr(current_serializer, field.source):
+                        serializer_method = getattr(current_serializer, field.source)
+                        relation_instance_or_manager = serializer_method(resource_instance)
+                    elif hasattr(current_serializer.instance, field.source):
+                        relation_instance_or_manager = getattr(current_serializer.instance, field.source)
+                    else:
                         continue
-                    serializer_method = getattr(current_serializer, field.source)
-                    relation_instance_or_manager = serializer_method(resource_instance)
 
             new_included_resources = [key.replace('%s.' % field_name, '', 1)
                                       for key in included_resources
@@ -358,9 +362,10 @@ class JSONRenderer(renderers.JSONRenderer):
             ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
             ('attributes', JSONRenderer.extract_attributes(fields, resource)),
         ]
-        relationships = JSONRenderer.extract_relationships(fields, resource, resource_instance)
-        if relationships:
-            resource_data.append(('relationships', relationships))
+        if getattr(settings, 'JSON_API_IMPLICIT_RELATIONSHIPS', True):
+            relationships = JSONRenderer.extract_relationships(fields, resource, resource_instance)
+            if relationships:
+                resource_data.append(('relationships', relationships))
         # Add 'self' link if field is present and valid
         if api_settings.URL_FIELD_NAME in resource and \
                 isinstance(fields[api_settings.URL_FIELD_NAME], relations.RelatedField):
