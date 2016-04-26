@@ -206,6 +206,10 @@ def get_resource_type_from_model(model):
 
 def get_default_serializer_from_model(model):
     json_api_meta = getattr(model, 'JSONAPIMeta', None)
+
+    if hasattr(json_api_meta, 'get_default_serializer'):
+        return json_api_meta.get_default_serializer()
+
     serializer_string = getattr(json_api_meta, 'default_serializer', None)
     if serializer_string is None:
         # return format_relation_name(model.__name__)
