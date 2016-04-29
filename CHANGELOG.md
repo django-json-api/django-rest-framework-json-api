@@ -1,6 +1,9 @@
 
 v2.0.0
 
+* Fixed bug where write_only fields still had their keys rendered
+* Exception handler can now easily be used on DRF-JA views alongside regular DRF views
+* Added `get_related_field_name` for views subclassing RelationshipView to override
 * Renamed `JSON_API_FORMAT_RELATION_KEYS` to `JSON_API_FORMAT_TYPES` to match what it was actually doing
 * Renamed `JSON_API_PLURALIZE_RELATION_TYPE` to `JSON_API_PLURALIZE_TYPES`
 * Documented ResourceRelatedField and RelationshipView
