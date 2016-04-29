@@ -500,7 +500,7 @@ class JSONRenderer(renderers.JSONRenderer):
     def check_resource_name(self, resource_name, serializer, view):
         resource_from_serializer = utils.get_resource_name_from_serializer_or_model(serializer, view)
         res_name = resource_from_serializer or resource_name
-
+        print res_name
         return res_name
 
     def render_serializer_many(self, serializer, data, resource_name, included_resources, json_api_meta, json_api_included):
@@ -510,7 +510,6 @@ class JSONRenderer(renderers.JSONRenderer):
         for position in range(len(data)):
             resource = data[position]  # Get current resource
             resource_instance = serializer.instance[position]  # Get current instance
-            print serializer
             rendered_data.append(self.render_resource(serializer, fields, resource, resource_instance, resource_name,
                                                       included_resources, json_api_meta, json_api_included))
 
