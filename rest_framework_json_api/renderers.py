@@ -43,6 +43,9 @@ class JSONRenderer(renderers.JSONRenderer):
             # ID is always provided in the root of JSON API so remove it from attributes
             if field_name == 'id':
                 continue
+            # don't output a key for write only fields
+            if fields[field_name].write_only:
+                continue
             # Skip fields with relations
             if isinstance(field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)):
                 continue
