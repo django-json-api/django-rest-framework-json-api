@@ -3,6 +3,7 @@ import json
 from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import *
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.query import QuerySet
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import Hyperlink, \
@@ -168,11 +169,50 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         ])
 
 
+
 class SerializerMethodResourceRelatedField(ResourceRelatedField):
+    """
+    Allows us to use serializer method RelatedFields
+    with return querysets
+    """
+    def __new__(cls, *args, **kwargs):
+        """
+        We override this because getting serializer methods
+        fails at the base class when many=True
+        """
+        if kwargs.pop('many', False):
+            return cls.many_init(*args, **kwargs)
+        return super(ResourceRelatedField, cls).__new__(cls, *args, **kwargs)
+
+    def __init__(self, child_relation=None, *args, **kwargs):
+        # DRF 3.1 doesn't expect the `many` kwarg
+        kwargs.pop('many', None)
+        model = kwargs.pop('model', None)
+        if model:
+            self.model = model
+        super(SerializerMethodResourceRelatedField, self).__init__(child_relation, *args, **kwargs)
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        for key in kwargs.keys():
+            if key in ('model',) + MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return SerializerMethodResourceRelatedField(**list_kwargs)
+
     def get_attribute(self, instance):
         # check for a source fn defined on the serializer instead of the model
         if self.source and hasattr(self.parent, self.source):
             serializer_method = getattr(self.parent, self.source)
             if hasattr(serializer_method, '__call__'):
                 return serializer_method(instance)
-        return super(ResourceRelatedField, self).get_attribute(instance)
+        return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
+
+    def to_representation(self, value):
+        if isinstance(value, QuerySet):
+            base = super(SerializerMethodResourceRelatedField, self)
+            return [base.to_representation(x) for x in value]
+        return super(SerializerMethodResourceRelatedField, self).to_representation(value)
+
+    def get_links(self, obj=None, lookup_field='pk'):
+        return OrderedDict()

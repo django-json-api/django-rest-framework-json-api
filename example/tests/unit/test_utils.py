@@ -15,6 +15,11 @@ from rest_framework_json_api.utils import get_included_serializers
 pytestmark = pytest.mark.django_db
 
 
+class NonModelResourceSerializer(serializers.Serializer):
+    class Meta:
+        resource_name = 'users'
+
+
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('username',)
@@ -24,11 +29,11 @@ class ResourceSerializer(serializers.ModelSerializer):
 def test_get_resource_name():
     view = APIView()
     context = {'view': view}
-    setattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
+    setattr(settings, 'JSON_API_FORMAT_TYPES', None)
     assert 'APIViews' == utils.get_resource_name(context), 'not formatted'
 
     context = {'view': view}
-    setattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', 'dasherize')
+    setattr(settings, 'JSON_API_FORMAT_TYPES', 'dasherize')
     assert 'api-views' == utils.get_resource_name(context), 'derived from view'
 
     view.model = get_user_model()
@@ -50,6 +55,11 @@ def test_get_resource_name():
 
     view.serializer_class.Meta.resource_name = 'rcustom'
     assert 'rcustom' == utils.get_resource_name(context), 'set on serializer'
+
+    view = GenericAPIView()
+    view.serializer_class = NonModelResourceSerializer
+    context = {'view': view}
+    assert 'users' == utils.get_resource_name(context), 'derived from non-model serializer'
 
 
 def test_format_keys():
@@ -81,9 +91,9 @@ def test_format_value():
     assert utils.format_value('first-name', 'underscore') == 'first_name'
 
 
-def test_format_relation_name():
-    assert utils.format_relation_name('first_name', 'capitalize') == 'FirstNames'
-    assert utils.format_relation_name('first_name', 'camelize') == 'firstNames'
+def test_format_resource_type():
+    assert utils.format_resource_type('first_name', 'capitalize') == 'FirstNames'
+    assert utils.format_resource_type('first_name', 'camelize') == 'firstNames'
 
 
 class SerializerWithIncludedSerializers(EntrySerializer):

@@ -84,7 +84,7 @@ class IncludedResourcesValidationMixin(object):
                     )
                 )
             if len(field_path) > 1:
-                new_included_field_path = field_path[-1:]
+                new_included_field_path = field_path[1:]
                 # We go down one level in the path
                 validate_path(this_included_serializer, new_included_field_path, path)
 
@@ -94,7 +94,7 @@ class IncludedResourcesValidationMixin(object):
                 included_resources = include_resources_param.split(',')
                 for included_field_name in included_resources:
                     included_field_path = included_field_name.split('.')
-                    this_serializer_class = view.serializer_class
+                    this_serializer_class = view.get_serializer_class()
                     # lets validate the current path
                     validate_path(this_serializer_class, included_field_path, included_field_name)
 

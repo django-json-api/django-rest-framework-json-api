@@ -103,6 +103,11 @@ class TestResourceNameConsistency:
 
         _check_relationship_and_included_comment_type_are_the_same(client, reverse("entry-list"))
 
+    def test_type_match_on_included_and_inline_without_serializer_resource_name(self, client):
+        serializers.CommentSerializer.Meta.resource_name = None
+
+        _check_relationship_and_included_comment_type_are_the_same(client, reverse("entry-list"))
+
     def test_type_match_on_included_and_inline_with_serializer_resource_name_and_JSONAPIMeta(self, client):
         models.Comment.__bases__ += (_PatchedModel,)
         serializers.CommentSerializer.Meta.resource_name = "resource_name_from_serializer"

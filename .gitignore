@@ -30,3 +30,6 @@ pip-delete-this-directory.txt
 
 # Tox
 .tox/
+
+# VirtualEnv
+.venv/

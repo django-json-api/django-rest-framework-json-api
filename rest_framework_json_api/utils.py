@@ -2,14 +2,18 @@
 Utils.
 """
 import copy
+import warnings
 from collections import OrderedDict
+import inspect
 
 import inflection
 from django.conf import settings
+from django.utils import encoding
 from django.utils import six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
+from rest_framework import exceptions
 
 try:
     from rest_framework.serializers import ManyRelatedField
@@ -59,7 +63,7 @@ def get_resource_name(context):
                 return resource_name
 
             # the name was calculated automatically from the view > pluralize and format
-            resource_name = format_relation_name(resource_name)
+            resource_name = format_resource_type(resource_name)
 
     return resource_name
 
@@ -137,10 +141,18 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
+    warnings.warn("The 'format_relation_name' function has been renamed 'format_resource_type' and the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', False)
+        format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
+    pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
+    return format_resource_type(value, format_type, pluralize)
 
-    pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', False)
+def format_resource_type(value, format_type=None, pluralize=None):
+    if format_type is None:
+        format_type = getattr(settings, 'JSON_API_FORMAT_TYPES', False)
+
+    if pluralize is None:
+        pluralize = getattr(settings, 'JSON_API_PLURALIZE_TYPES', False)
 
     if format_type:
         # format_type will never be None here so we can use format_value
@@ -198,7 +210,7 @@ def get_resource_type_from_model(model):
     return getattr(
         json_api_meta,
         'resource_name',
-        format_relation_name(model.__name__))
+        format_resource_type(model.__name__))
 
 
 def get_resource_type_from_queryset(qs):
@@ -214,10 +226,10 @@ def get_resource_type_from_manager(manager):
 
 
 def get_resource_type_from_serializer(serializer):
-    return getattr(
-        serializer.Meta,
-        'resource_name',
-        get_resource_type_from_model(serializer.Meta.model))
+    if hasattr(serializer.Meta, 'resource_name'):
+        return serializer.Meta.resource_name
+    else:
+        return get_resource_type_from_model(serializer.Meta.model)
 
 
 def get_included_serializers(serializer):
@@ -249,3 +261,65 @@ class Hyperlink(six.text_type):
         return ret
 
     is_hyperlink = True
+
+
+def format_drf_errors(response, context, exc):
+    errors = []
+    # handle generic errors. ValidationError('test') in a view for example
+    if isinstance(response.data, list):
+        for message in response.data:
+            errors.append({
+                'detail': message,
+                'source': {
+                    'pointer': '/data',
+                },
+                'status': encoding.force_text(response.status_code),
+            })
+    # handle all errors thrown from serializers
+    else:
+        for field, error in response.data.items():
+            field = format_value(field)
+            pointer = '/data/attributes/{}'.format(field)
+            # see if they passed a dictionary to ValidationError manually
+            if isinstance(error, dict):
+                errors.append(error)
+            elif isinstance(error, six.string_types):
+                classes = inspect.getmembers(exceptions, inspect.isclass)
+                # DRF sets the `field` to 'detail' for its own exceptions
+                if isinstance(exc, tuple(x[1] for x in classes)):
+                    pointer = '/data'
+                errors.append({
+                    'detail': error,
+                    'source': {
+                        'pointer': pointer,
+                    },
+                    'status': encoding.force_text(response.status_code),
+                })
+            elif isinstance(error, list):
+                for message in error:
+                    errors.append({
+                        'detail': message,
+                        'source': {
+                            'pointer': pointer,
+                        },
+                        'status': encoding.force_text(response.status_code),
+                    })
+            else:
+                errors.append({
+                    'detail': error,
+                    'source': {
+                        'pointer': pointer,
+                    },
+                    'status': encoding.force_text(response.status_code),
+                })
+
+    context['view'].resource_name = 'errors'
+    response.data = errors
+
+    return response
+
+
+def format_errors(data):
+    if len(data) > 1 and isinstance(data, list):
+        data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
+    return {'errors': data}

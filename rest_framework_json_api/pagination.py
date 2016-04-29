@@ -4,8 +4,8 @@ Pagination fields
 from collections import OrderedDict
 from rest_framework import serializers
 from rest_framework.views import Response
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.templatetags.rest_framework import replace_query_param
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.utils.urls import remove_query_param, replace_query_param
 
 
 class PageNumberPagination(PageNumberPagination):
@@ -45,5 +45,54 @@ class PageNumberPagination(PageNumberPagination):
                 ('last', self.build_link(self.page.paginator.num_pages)),
                 ('next', self.build_link(next)),
                 ('prev', self.build_link(previous))
+            ])
+        })
+
+
+class LimitOffsetPagination(LimitOffsetPagination):
+    """
+    A limit/offset based style. For example:
+    http://api.example.org/accounts/?page[limit]=100
+    http://api.example.org/accounts/?page[offset]=400&page[limit]=100
+    """
+    limit_query_param = 'page[limit]'
+    offset_query_param = 'page[offset]'
+
+    def get_last_link(self):
+        if self.count == 0:
+            return None
+
+        url = self.request.build_absolute_uri()
+        url = replace_query_param(url, self.limit_query_param, self.limit)
+
+        offset = self.count - self.limit
+
+        if offset <= 0:
+            return remove_query_param(url, self.offset_query_param)
+
+        return replace_query_param(url, self.offset_query_param, offset)
+
+    def get_first_link(self):
+        if self.count == 0:
+            return None
+        
+        url = self.request.build_absolute_uri()
+        return remove_query_param(url, self.offset_query_param)
+    
+    def get_paginated_response(self, data):
+        return Response({
+            'results': data,
+            'meta': {
+                'pagination': OrderedDict([
+                    ('count', self.count),
+                    ('limit', self.limit),
+                    ('offset', self.offset),
+                ])
+            },
+            'links': OrderedDict([
+                ('first', self.get_first_link()),
+                ('last', self.get_last_link()),
+                ('next', self.get_next_link()),
+                ('prev', self.get_previous_link())
             ])
         })

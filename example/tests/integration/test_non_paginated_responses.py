@@ -41,6 +41,9 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "comments": {
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "1"}]
+                    },
+                    "suggested": {
+                        "data": [{"type": "entries", "id": "2"}]
                     }
                 }
             },
@@ -69,6 +72,9 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                     "comments": {
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "2"}]
+                    },
+                    "suggested": {
+                        "data": [{"type": "entries", "id": "1"}]
                     }
                 }
             },
