@@ -1,4 +1,8 @@
 
+v2.0.1
+
+* Fixed naming error that caused ModelSerializer relationships to fail
+
 v2.0.0
 
 * Fixed bug where write_only fields still had their keys rendered
