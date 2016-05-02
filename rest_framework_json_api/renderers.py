@@ -211,7 +211,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, ModelSerializer):
                 relation_model = field.Meta.model
-                relation_type = utils.format_type(relation_model.__name__)
+                relation_type = utils.format_resource_type(relation_model.__name__)
 
                 data.update({
                     field_name: {
