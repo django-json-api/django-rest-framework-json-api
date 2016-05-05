@@ -60,9 +60,9 @@ if sys.argv[-1] == 'publish':
 
 
 setup(
-    name='djangorestframework-jsonapi',
+    name='ig-djangorestframework-jsonapi',
     version=get_version('rest_framework_json_api'),
-    url='https://github.com/django-json-api/django-rest-framework-json-api',
+    url='https://github.com/InvGate/django-rest-framework-json-api',
     license='MIT',
     description='A Django REST framework API adapter for the json-api spec.',
     long_description=read('README.rst'),
