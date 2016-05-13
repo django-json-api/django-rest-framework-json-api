@@ -231,7 +231,9 @@ def get_resource_type_from_manager(manager):
 
 
 def get_resource_type_from_serializer(serializer):
-    if hasattr(serializer.Meta, 'resource_name'):
+    if hasattr(serializer, 'polymorphic_serializers'):
+        return [get_resource_type_from_serializer(s['serializer']) for s in serializer.polymorphic_serializers]
+    elif hasattr(serializer.Meta, 'resource_name'):
         return serializer.Meta.resource_name
     else:
         return get_resource_type_from_model(serializer.Meta.model)

@@ -1,6 +1,7 @@
 """
 Parsers
 """
+import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
@@ -72,7 +73,11 @@ class JSONParser(parsers.JSONParser):
 
             # Check for inconsistencies
             resource_name = utils.get_resource_name(parser_context)
-            if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
+            if isinstance(resource_name, six.string_types):
+                doesnt_match = data.get('type') != resource_name
+            else:
+                doesnt_match = data.get('type') not in resource_name
+            if doesnt_match and request.method in ('PUT', 'POST', 'PATCH'):
                 raise exceptions.Conflict(
                     "The resource object's type ({data_type}) is not the type "
                     "that constitute the collection represented by the endpoint ({resource_type}).".format(
@@ -82,7 +87,7 @@ class JSONParser(parsers.JSONParser):
                 )
 
             # Construct the return data
-            parsed_data = {'id': data.get('id')}
+            parsed_data = {'id': data.get('id'), 'type': data.get('type')}
             parsed_data.update(self.parse_attributes(data))
             parsed_data.update(self.parse_relationships(data))
             return parsed_data
