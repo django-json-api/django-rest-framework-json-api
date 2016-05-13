@@ -242,6 +242,8 @@ def get_resource_type_from_manager(manager):
 def get_resource_type_from_serializer(serializer):
     json_api_meta = getattr(serializer, 'JSONAPIMeta', None)
     meta = getattr(serializer, 'Meta', None)
+    if hasattr(serializer, 'polymorphic_serializers'):
+        return [get_resource_type_from_serializer(s['serializer']) for s in serializer.polymorphic_serializers]
     if hasattr(json_api_meta, 'resource_name'):
         return json_api_meta.resource_name
     elif hasattr(meta, 'resource_name'):
