@@ -71,3 +71,21 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
     assert content["data"]["type"] == "artProjects"
     assert content['data']['attributes']['topic'] == test_topic
     assert content['data']['attributes']['artist'] == test_artist
+
+
+def test_polymorphism_relations_update(single_company, research_project_factory, client):
+    response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
+    content = load_json(response.content)
+    assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
+
+    research_project = research_project_factory()
+    content["data"]["relationships"]["currentProject"]["data"] = {
+        "type": "researchProjects",
+        "id": research_project.pk
+    }
+    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                          data=json.dumps(content), content_type='application/vnd.api+json')
+    assert response.status_code is 200
+    content = load_json(response.content)
+    assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "researchProjects"
+    assert int(content["data"]["relationships"]["currentProject"]["data"]["id"]) is research_project.pk

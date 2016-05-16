@@ -115,6 +115,9 @@ class ProjectSerializer(serializers.PolymorphicModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    current_project = relations.PolymorphicResourceRelatedField(ProjectSerializer, queryset=models.Project.objects.all())
+    future_projects = relations.PolymorphicResourceRelatedField(ProjectSerializer, queryset=models.Project.objects.all(), many=True)
+
     included_serializers = {
         'current_project': ProjectSerializer,
         'future_projects': ProjectSerializer,
