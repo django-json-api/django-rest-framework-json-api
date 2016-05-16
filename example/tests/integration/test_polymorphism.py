@@ -29,12 +29,13 @@ def test_polymorphism_on_included_relations(single_company, client):
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
     assert [rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]] == [
         "researchProjects", "artProjects"]
-    assert [x.get('type') for x in content.get('included')] == ['artProjects', 'artProjects', 'researchProjects'], \
-        'Detail included types are incorrect'
+    assert [x.get('type') for x in content.get('included')] == [
+        'artProjects', 'artProjects', 'researchProjects'], 'Detail included types are incorrect'
     # Ensure that the child fields are present.
     assert content.get('included')[0].get('attributes').get('artist') is not None
     assert content.get('included')[1].get('attributes').get('artist') is not None
     assert content.get('included')[2].get('attributes').get('supervisor') is not None
+
 
 def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, client):
     url = reverse("project-detail", kwargs={'pk': single_art_project.pk})
@@ -49,6 +50,7 @@ def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, clie
     assert new_content["data"]["type"] == "artProjects"
     assert new_content['data']['attributes']['topic'] == test_topic
     assert new_content['data']['attributes']['artist'] == test_artist
+
 
 def test_polymorphism_on_polymorphic_model_list_post(client):
     test_topic = 'New test topic {}'.format(random.randint(0, 999999))

@@ -92,6 +92,7 @@ def get_serializer_fields(serializer):
                 pass
         return fields
 
+
 def format_keys(obj, format_type=None):
     """
     Takes either a dict or list and returns it with camelized keys only if
@@ -147,11 +148,14 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
-    warnings.warn("The 'format_relation_name' function has been renamed 'format_resource_type' and the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
+    warnings.warn(
+        "The 'format_relation_name' function has been renamed 'format_resource_type' and "
+        "the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
     pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
     return format_resource_type(value, format_type, pluralize)
+
 
 def format_resource_type(value, format_type=None, pluralize=None):
     if format_type is None:
@@ -243,8 +247,8 @@ def get_resource_type_from_serializer(serializer):
     json_api_meta = getattr(serializer, 'JSONAPIMeta', None)
     meta = getattr(serializer, 'Meta', None)
     if hasattr(serializer, 'polymorphic_serializers'):
-        return [get_resource_type_from_serializer(s['serializer']) for s in serializer.polymorphic_serializers]
-    if hasattr(json_api_meta, 'resource_name'):
+        return [get_resource_type_from_serializer(s) for s in serializer.polymorphic_serializers]
+    elif hasattr(json_api_meta, 'resource_name'):
         return json_api_meta.resource_name
     elif hasattr(meta, 'resource_name'):
         return meta.resource_name
