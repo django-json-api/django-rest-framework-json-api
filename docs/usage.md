@@ -375,7 +375,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
-relationship views (see the 
+relationship views (see the
 [JSON API spec](http://jsonapi.org/format/#fetching-relationships)).
 The `self` link on a relationship object should point to the corresponding
 relationship view.
@@ -425,7 +425,9 @@ field_name_mapping = {
 
 ### Working with polymorphic resources
 
-This package can defer the resolution of the type of polymorphic models instances to get the appropriate type.
+#### Extraction of the polymorphic type
+
+This package can defer the resolution of the type of polymorphic models instances to retrieve the appropriate type.
 However, most models are not polymorphic and for performance reasons this is only done if the underlying model is a subclass of a polymorphic model.
 
 Polymorphic ancestors must be defined on settings like this:
@@ -435,6 +437,40 @@ JSON_API_POLYMORPHIC_ANCESTORS = (
     'polymorphic.models.PolymorphicModel',
 )
 ```
+
+#### Writing polymorphic resources
+
+A polymorphic endpoint can be setup if associated with a polymorphic serializer.
+A polymorphic serializer take care of (de)serializing the correct instances types and can be defined like this:
+
+```python
+class ProjectSerializer(serializers.PolymorphicModelSerializer):
+    polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
+
+    class Meta:
+        model = models.Project
+```
+
+It must inherit from `serializers.PolymorphicModelSerializer` and define the `polymorphic_serializers` list.
+This attribute defines the accepted resource types.
+
+
+Polymorphic relations can also be handled with `relations.PolymorphicResourceRelatedField` like this:
+
+```python
+class CompanySerializer(serializers.ModelSerializer):
+    current_project = relations.PolymorphicResourceRelatedField(
+        ProjectSerializer, queryset=models.Project.objects.all())
+    future_projects = relations.PolymorphicResourceRelatedField(
+        ProjectSerializer, queryset=models.Project.objects.all(), many=True)
+
+    class Meta:
+        model = models.Company
+```
+
+They must be explicitely declared with the `polymorphic_serializer` (first positional argument) correctly defined.
+It must be a subclass of `serializers.PolymorphicModelSerializer`.
+
 
 ### Meta
 
