@@ -471,6 +471,14 @@ class CompanySerializer(serializers.ModelSerializer):
 They must be explicitely declared with the `polymorphic_serializer` (first positional argument) correctly defined.
 It must be a subclass of `serializers.PolymorphicModelSerializer`.
 
+<div class="warning">
+    <strong>Note:</strong>
+    Polymorphic resources are not compatible with
+    <code class="docutils literal">
+        <span class="pre">resource_name</span>
+    </code>
+    defined on the view.
+</div>
 
 ### Meta
 
