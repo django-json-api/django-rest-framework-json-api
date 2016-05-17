@@ -22,7 +22,6 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
         'incorrect_type': _('Incorrect type. Expected resource identifier object, received {data_type}.'),
         'incorrect_relation_type': _('Incorrect relation type. Expected {relation_type}, received {received_type}.'),
-        # 'incorrect_poly_relation_type': _('Incorrect relation type. Expected one of {relation_type}, received {received_type}.'),
         'missing_type': _('Invalid resource identifier object: missing \'type\' attribute'),
         'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
         'no_match': _('Invalid hyperlink - No URL match.'),
@@ -185,7 +184,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
 
     _skip_polymorphic_optimization = False
     default_error_messages = dict(ResourceRelatedField.default_error_messages, **{
-        'incorrect_relation_type': _('Incorrect relation type. Expected one of {relation_type}, '
+        'incorrect_relation_type': _('Incorrect relation type. Expected one of [{relation_type}], '
                                      'received {received_type}.'),
     })
 
@@ -209,7 +208,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
         if 'id' not in data:
             self.fail('missing_id')
 
-        expected_relation_types = get_resource_type_from_serializer(self.polymorphic_serializer)
+        expected_relation_types = self.polymorphic_serializer.get_polymorphic_types()
 
         if data['type'] not in expected_relation_types:
             self.conflict('incorrect_relation_type', relation_type=", ".join(

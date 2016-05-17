@@ -187,11 +187,12 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
             serializer: serializer.Meta.model for serializer in polymorphic_serializers}
         model_to_serializer = {
             serializer.Meta.model: serializer for serializer in polymorphic_serializers}
-        type_to_model = {
-            get_resource_type_from_model(model): model for model in model_to_serializer.keys()}
+        type_to_serializer = {
+            get_resource_type_from_serializer(serializer): serializer for
+            serializer in polymorphic_serializers}
         setattr(new_class, '_poly_serializer_model_map', serializer_to_model)
         setattr(new_class, '_poly_model_serializer_map', model_to_serializer)
-        setattr(new_class, '_poly_type_model_map', type_to_model)
+        setattr(new_class, '_poly_type_serializer_map', type_to_serializer)
         return new_class
 
 
@@ -213,51 +214,62 @@ class PolymorphicModelSerializer(ModelSerializer):
                 raise Exception("Cannot get fields from a polymorphic serializer given a queryset")
         return super(PolymorphicModelSerializer, self).get_fields()
 
-    def get_polymorphic_serializer_for_instance(self, instance):
+    @classmethod
+    def get_polymorphic_serializer_for_instance(cls, instance):
         """
         Return the polymorphic serializer associated with the given instance/model.
         Raise `NotImplementedError` if no serializer is found for the given model. This usually
         means that a serializer is missing in the class's `polymorphic_serializers` attribute.
         """
         try:
-            return self._poly_model_serializer_map[instance._meta.model]
+            return cls._poly_model_serializer_map[instance._meta.model]
         except KeyError:
             raise NotImplementedError(
                 "No polymorphic serializer has been found for model {}".format(
                     instance._meta.model.__name__))
 
-    def get_polymorphic_model_for_serializer(self, serializer):
+    @classmethod
+    def get_polymorphic_model_for_serializer(cls, serializer):
         """
         Return the polymorphic model associated with the given serializer.
         Raise `NotImplementedError` if no model is found for the given serializer. This usually
         means that a serializer is missing in the class's `polymorphic_serializers` attribute.
         """
         try:
-            return self._poly_serializer_model_map[serializer]
+            return cls._poly_serializer_model_map[serializer]
         except KeyError:
             raise NotImplementedError(
                 "No polymorphic model has been found for serializer {}".format(serializer.__name__))
 
-    def get_polymorphic_model_for_type(self, obj_type):
-        """
-        Return the polymorphic model associated with the given type.
-        Raise `NotImplementedError` if no model is found for the given type. This usually
-        means that a serializer is missing in the class's `polymorphic_serializers` attribute.
-        """
-        try:
-            return self._poly_type_model_map[obj_type]
-        except KeyError:
-            raise NotImplementedError(
-                "No polymorphic model has been found for type {}".format(obj_type))
-
-    def get_polymorphic_serializer_for_type(self, obj_type):
+    @classmethod
+    def get_polymorphic_serializer_for_type(cls, obj_type):
         """
         Return the polymorphic serializer associated with the given type.
         Raise `NotImplementedError` if no serializer is found for the given type. This usually
         means that a serializer is missing in the class's `polymorphic_serializers` attribute.
         """
-        return self.get_polymorphic_serializer_for_instance(
-            self.get_polymorphic_model_for_type(obj_type))
+        try:
+            return cls._poly_type_serializer_map[obj_type]
+        except KeyError:
+            raise NotImplementedError(
+                "No polymorphic serializer has been found for type {}".format(obj_type))
+
+    @classmethod
+    def get_polymorphic_model_for_type(cls, obj_type):
+        """
+        Return the polymorphic model associated with the given type.
+        Raise `NotImplementedError` if no model is found for the given type. This usually
+        means that a serializer is missing in the class's `polymorphic_serializers` attribute.
+        """
+        return cls.get_polymorphic_model_for_serializer(
+            cls.get_polymorphic_serializer_for_type(obj_type))
+
+    @classmethod
+    def get_polymorphic_types(cls):
+        """
+        Return the list of accepted types.
+        """
+        return cls._poly_type_serializer_map.keys()
 
     def to_representation(self, instance):
         """
@@ -272,10 +284,10 @@ class PolymorphicModelSerializer(ModelSerializer):
         appropriate polymorphic serializer and use this to handle internal value.
         """
         received_type = data.get('type')
-        expected_types = self._poly_type_model_map.keys()
+        expected_types = self.get_polymorphic_types()
         if received_type not in expected_types:
             raise Conflict(
-                'Incorrect relation type. Expected on of {expected_types}, '
+                'Incorrect relation type. Expected on of [{expected_types}], '
                 'received {received_type}.'.format(
                     expected_types=', '.join(expected_types), received_type=received_type))
         serializer_class = self.get_polymorphic_serializer_for_type(received_type)

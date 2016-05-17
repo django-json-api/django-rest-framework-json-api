@@ -73,6 +73,29 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
     assert content['data']['attributes']['artist'] == test_artist
 
 
+def test_invalid_type_on_polymorphic_model(client):
+    test_topic = 'New test topic {}'.format(random.randint(0, 999999))
+    test_artist = 'test-{}'.format(random.randint(0, 999999))
+    url = reverse('project-list')
+    data = {
+        'data': {
+            'type': 'invalidProjects',
+            'attributes': {
+                'topic': test_topic,
+                'artist': test_artist
+            }
+        }
+    }
+    response = client.post(url, data=json.dumps(data), content_type='application/vnd.api+json')
+    assert response.status_code == 409
+    content = load_json(response.content)
+    assert len(content["errors"]) is 1
+    assert content["errors"][0]["status"] == "409"
+    assert content["errors"][0]["detail"] == \
+        "The resource object's type (invalidProjects) is not the type that constitute the " \
+        "collection represented by the endpoint (one of [researchProjects, artProjects])."
+
+
 def test_polymorphism_relations_update(single_company, research_project_factory, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
     content = load_json(response.content)
@@ -85,7 +108,29 @@ def test_polymorphism_relations_update(single_company, research_project_factory,
     }
     response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
                           data=json.dumps(content), content_type='application/vnd.api+json')
-    assert response.status_code is 200
+    assert response.status_code == 200
     content = load_json(response.content)
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "researchProjects"
-    assert int(content["data"]["relationships"]["currentProject"]["data"]["id"]) is research_project.pk
+    assert int(content["data"]["relationships"]["currentProject"]["data"]["id"]) == \
+        research_project.pk
+
+
+def test_invalid_type_on_polymorphic_relation(single_company, research_project_factory, client):
+    response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
+    content = load_json(response.content)
+    assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
+
+    research_project = research_project_factory()
+    content["data"]["relationships"]["currentProject"]["data"] = {
+        "type": "invalidProjects",
+        "id": research_project.pk
+    }
+    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                          data=json.dumps(content), content_type='application/vnd.api+json')
+    assert response.status_code == 409
+    content = load_json(response.content)
+    assert len(content["errors"]) is 1
+    assert content["errors"][0]["status"] == "409"
+    assert content["errors"][0]["detail"] == \
+        "Incorrect relation type. Expected one of [researchProjects, artProjects], " \
+        "received invalidProjects."

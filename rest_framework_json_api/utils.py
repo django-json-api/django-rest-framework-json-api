@@ -32,10 +32,11 @@ for ancestor in getattr(settings, 'JSON_API_POLYMORPHIC_ANCESTORS', ()):
     POLYMORPHIC_ANCESTORS += (ancestor_class,)
 
 
-def get_resource_name(context):
+def get_resource_name(context, expand_polymorphic_types=False):
     """
     Return the name of a resource.
     """
+    from . import serializers
     view = context.get('view')
 
     # Sanity check to make sure we have a view.
@@ -57,7 +58,11 @@ def get_resource_name(context):
     except AttributeError:
         try:
             serializer = view.get_serializer_class()
-            return get_resource_type_from_serializer(serializer)
+            if issubclass(serializer, serializers.PolymorphicModelSerializer) and \
+                    expand_polymorphic_types:
+                return serializer.get_polymorphic_types()
+            else:
+                return get_resource_type_from_serializer(serializer)
         except AttributeError:
             try:
                 resource_name = get_resource_type_from_model(view.model)
@@ -246,9 +251,7 @@ def get_resource_type_from_manager(manager):
 def get_resource_type_from_serializer(serializer):
     json_api_meta = getattr(serializer, 'JSONAPIMeta', None)
     meta = getattr(serializer, 'Meta', None)
-    if hasattr(serializer, 'polymorphic_serializers'):
-        return [get_resource_type_from_serializer(s) for s in serializer.polymorphic_serializers]
-    elif hasattr(json_api_meta, 'resource_name'):
+    if hasattr(json_api_meta, 'resource_name'):
         return json_api_meta.resource_name
     elif hasattr(meta, 'resource_name'):
         return meta.resource_name
