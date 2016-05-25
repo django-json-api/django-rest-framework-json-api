@@ -25,11 +25,17 @@ try:
 except ImportError:
     HyperlinkedRouterField = type(None)
 
+POLYMORPHIC_ANCESTORS = ()
+for ancestor in getattr(settings, 'JSON_API_POLYMORPHIC_ANCESTORS', ()):
+    ancestor_class = import_class_from_dotted_path(ancestor)
+    POLYMORPHIC_ANCESTORS += (ancestor_class,)
 
-def get_resource_name(context):
+
+def get_resource_name(context, expand_polymorphic_types=False):
     """
     Return the name of a resource.
     """
+    from . import serializers
     view = context.get('view')
 
     # Sanity check to make sure we have a view.
@@ -51,7 +57,11 @@ def get_resource_name(context):
     except AttributeError:
         try:
             serializer = view.get_serializer_class()
-            return get_resource_type_from_serializer(serializer)
+            if issubclass(serializer, serializers.PolymorphicModelSerializer) and \
+                    expand_polymorphic_types:
+                return serializer.get_polymorphic_types()
+            else:
+                return get_resource_type_from_serializer(serializer)
         except AttributeError:
             try:
                 resource_name = get_resource_type_from_model(view.model)
@@ -85,6 +95,7 @@ def get_serializer_fields(serializer):
             except KeyError:
                 pass
         return fields
+
 
 def format_keys(obj, format_type=None):
     """
@@ -141,11 +152,14 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
-    warnings.warn("The 'format_relation_name' function has been renamed 'format_resource_type' and the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
+    warnings.warn(
+        "The 'format_relation_name' function has been renamed 'format_resource_type' and "
+        "the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
     pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
     return format_resource_type(value, format_type, pluralize)
+
 
 def format_resource_type(value, format_type=None, pluralize=None):
     if format_type is None:

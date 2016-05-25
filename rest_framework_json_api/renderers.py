@@ -289,8 +289,6 @@ class JSONRenderer(renderers.JSONRenderer):
                 relation_type = utils.get_resource_type_from_serializer(serializer)
                 relation_queryset = list(relation_instance_or_manager.all())
 
-                # Get the serializer fields
-                serializer_fields = utils.get_serializer_fields(serializer)
                 if serializer_data:
                     for position in range(len(serializer_data)):
                         serializer_resource = serializer_data[position]
@@ -299,6 +297,7 @@ class JSONRenderer(renderers.JSONRenderer):
                             relation_type or
                             utils.get_resource_type_from_instance(nested_resource_instance)
                         )
+                        serializer_fields = utils.get_serializer_fields(serializer.__class__(nested_resource_instance, context=serializer.context))
                         included_data.append(
                             JSONRenderer.build_json_resource_obj(
                                 serializer_fields, serializer_resource, nested_resource_instance, resource_type
@@ -360,6 +359,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @staticmethod
     def build_json_resource_obj(fields, resource, resource_instance, resource_name):
+        # Determine type from the instance if the underlying model is polymorphic
+        if isinstance(resource_instance, utils.POLYMORPHIC_ANCESTORS):
+            resource_name = utils.get_resource_type_from_instance(resource_instance)
         resource_data = [
             ('type', resource_name),
             ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),

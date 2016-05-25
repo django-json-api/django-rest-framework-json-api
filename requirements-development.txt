@@ -3,4 +3,5 @@ pytest==2.8.2
 pytest-django
 pytest-factoryboy
 fake-factory
+django-polymorphic
 tox
