@@ -184,6 +184,25 @@ class ModelViewSetTests(TestBase):
 
         assert expected_dump == content_dump
 
+    def test_patch_requires_id(self):
+        """
+        Verify that 'id' is required to be passed in an update request.
+        """
+        data = {
+            'data': {
+                'type': 'users',
+                'attributes': {
+                    'first-name': 'DifferentName'
+                }
+            }
+        }
+
+        response = self.client.patch(self.detail_url,
+                                     content_type='application/vnd.api+json',
+                                     data=dump_json(data))
+
+        self.assertEqual(response.status_code, 400)
+
     def test_key_in_post(self):
         """
         Ensure a key is in the post.
