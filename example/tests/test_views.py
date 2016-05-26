@@ -101,6 +101,7 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
+        assert response.data == request_data['data']
 
         response = self.client.get(url)
         assert response.data == request_data['data']
@@ -112,6 +113,7 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
+        assert response.data == request_data['data']
 
         response = self.client.get(url)
         assert response.data == request_data['data']
