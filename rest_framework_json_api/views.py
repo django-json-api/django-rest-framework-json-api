@@ -16,17 +16,18 @@ from rest_framework.serializers import Serializer
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import get_resource_type_from_instance, OrderedDict, Hyperlink
+from rest_framework_json_api.utils import (
+    get_resource_type_from_instance,
+    OrderedDict,
+    Hyperlink,
+    get_included_resources,
+)
 
 
 class ModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        include_resources_param = self.request.query_params.get('include') if self.request else None
-        if include_resources_param:
-            included_resources = include_resources_param.split(',')
-        else:
-            included_resources = list()
+        included_resources = get_included_resources(self.request)
         for included in included_resources:
             if not hasattr(qs.model, included):
                 continue

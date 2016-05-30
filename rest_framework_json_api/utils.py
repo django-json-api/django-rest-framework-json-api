@@ -232,6 +232,15 @@ def get_resource_type_from_serializer(serializer):
         return get_resource_type_from_model(serializer.Meta.model)
 
 
+def get_included_resources(request):
+    included_args = list()
+    if request:
+        include_resources_param = request.query_params.get('include')
+        if include_resources_param:
+            included_args = include_resources_param.split(',')
+    return included_args
+
+
 def get_included_serializers(serializer):
     included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
 
