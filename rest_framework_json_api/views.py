@@ -4,7 +4,11 @@ from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
-from rest_framework import generics
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor,
+    ManyToManyDescriptor,
+)
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.reverse import reverse
@@ -13,6 +17,24 @@ from rest_framework.serializers import Serializer
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import get_resource_type_from_instance, OrderedDict, Hyperlink
+
+
+class ModelViewSet(viewsets.ModelViewSet):
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        include_resources_param = self.request.query_params.get('include') if self.request else None
+        if include_resources_param:
+            included_resources = include_resources_param.split(',')
+        else:
+            included_resources = list()
+        for included in included_resources:
+            if not hasattr(qs.model, included):
+                continue
+            if issubclass(getattr(qs.model, included).__class__, ForwardManyToOneDescriptor):
+                qs = qs.prefetch_related(included)
+            elif issubclass(getattr(qs.model, included).__class__, ManyToManyDescriptor):
+                qs = qs.prefetch_related(included)
+        return qs
 
 
 class RelationshipView(generics.GenericAPIView):
