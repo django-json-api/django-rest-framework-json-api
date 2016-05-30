@@ -28,13 +28,30 @@ class ModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
+
         for included in included_resources:
-            if not hasattr(qs.model, included):
-                continue
-            if issubclass(getattr(qs.model, included).__class__, ForwardManyToOneDescriptor):
-                qs = qs.prefetch_related(included)
-            elif issubclass(getattr(qs.model, included).__class__, ManyToManyDescriptor):
-                qs = qs.prefetch_related(included)
+            included_model = None
+            levels = included.split('.')
+            level_model = qs.model
+            for level in levels:
+                if not hasattr(level_model, level):
+                    break
+                field = getattr(level_model, level)
+                field_class = field.__class__
+                if not (
+                    issubclass(field_class, ForwardManyToOneDescriptor)
+                    or issubclass(field_class, ManyToManyDescriptor)
+                ):
+                    break
+
+                if level == levels[-1]:
+                    included_model = field
+                else:
+                    level_model = field.get_queryset().model
+
+            if included_model is not None:
+                qs = qs.prefetch_related(included.replace('.', '__'))
+
         return qs
 
 
