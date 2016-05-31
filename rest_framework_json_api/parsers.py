@@ -80,6 +80,8 @@ class JSONParser(parsers.JSONParser):
                         resource_type=resource_name
                     )
                 )
+            if not data.get('id') and request.method in ('PATCH', 'PUT'):
+                raise ParseError("The resource identifier object must contain an 'id' member")
 
             # Construct the return data
             parsed_data = {'id': data.get('id')}
