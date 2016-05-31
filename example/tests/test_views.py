@@ -155,6 +155,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {
                 'type': 'comments',
+                'id': self.second_comment.id,
                 'relationships': {
                     'author': {
                         'data': None
