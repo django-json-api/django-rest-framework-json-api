@@ -99,6 +99,7 @@ class RelationshipView(generics.GenericAPIView):
             serializer.is_valid(raise_exception=True)
             setattr(parent_obj, self.get_related_field_name(), serializer.validated_data)
             parent_obj.save()
+            related_instance_or_manager = self.get_related_instance()  # Refresh instance
         result_serializer = self._instantiate_serializer(related_instance_or_manager)
         return Response(result_serializer.data)
 
