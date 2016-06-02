@@ -182,8 +182,8 @@ class JSONRenderer(renderers.JSONRenderer):
                 relation_data = list()
                 for nested_resource_instance in relation_instance:
                     nested_resource_instance_type = (
+                        relation_type or
                         utils.get_resource_type_from_instance(nested_resource_instance)
-                        or relation_type
                     )
 
                     relation_data.append(OrderedDict([
@@ -209,8 +209,8 @@ class JSONRenderer(renderers.JSONRenderer):
                     for position in range(len(serializer_data)):
                         nested_resource_instance = resource_instance_queryset[position]
                         nested_resource_instance_type = (
+                            relation_type or
                             utils.get_resource_type_from_instance(nested_resource_instance)
-                            or relation_type
                         )
 
                         relation_data.append(OrderedDict([
