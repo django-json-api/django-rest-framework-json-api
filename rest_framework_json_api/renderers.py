@@ -180,11 +180,15 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
                 relation_data = list()
-                for related_object in relation_instance:
-                    related_object_type = utils.get_instance_or_manager_resource_type(related_object)
+                for nested_resource_instance in relation_instance:
+                    nested_resource_instance_type = (
+                        utils.get_resource_type_from_instance(nested_resource_instance)
+                        or relation_type
+                    )
+
                     relation_data.append(OrderedDict([
-                        ('type', related_object_type),
-                        ('id', encoding.force_text(related_object.pk))
+                        ('type', nested_resource_instance_type),
+                        ('id', encoding.force_text(nested_resource_instance.pk))
                     ]))
                 data.update({
                     field_name: {
@@ -196,7 +200,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-            if isinstance(field, ListSerializer):
+            if isinstance(field, ListSerializer) and relation_instance is not None:
                 relation_data = list()
 
                 serializer_data = resource.get(field_name)
@@ -204,7 +208,11 @@ class JSONRenderer(renderers.JSONRenderer):
                 if isinstance(serializer_data, list):
                     for position in range(len(serializer_data)):
                         nested_resource_instance = resource_instance_queryset[position]
-                        nested_resource_instance_type = utils.get_resource_type_from_instance(nested_resource_instance)
+                        nested_resource_instance_type = (
+                            utils.get_resource_type_from_instance(nested_resource_instance)
+                            or relation_type
+                        )
+
                         relation_data.append(OrderedDict([
                             ('type', nested_resource_instance_type),
                             ('id', encoding.force_text(nested_resource_instance.pk))
@@ -212,7 +220,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                     data.update({field_name: {'data': relation_data}})
                     continue
-                
+
             if isinstance(field, Serializer):
                 data.update({
                     field_name: {
@@ -316,11 +324,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, Serializer):
 
-                try:
-                    relation_type = utils.get_resource_type_from_serializer(field)
-                except AttributeError:
-                    print(type(field))
-                    raise
+                relation_type = utils.get_resource_type_from_serializer(field)
 
                 # Get the serializer fields
                 serializer_fields = utils.get_serializer_fields(field)

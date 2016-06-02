@@ -209,14 +209,6 @@ def get_related_resource_type(relation):
     return get_resource_type_from_model(relation_model)
 
 
-def get_instance_or_manager_resource_type(resource_instance_or_manager):
-    if hasattr(resource_instance_or_manager, 'model'):
-        return get_resource_type_from_manager(resource_instance_or_manager)
-    if hasattr(resource_instance_or_manager, '_meta'):
-        return get_resource_type_from_instance(resource_instance_or_manager)
-    pass
-
-
 def get_resource_type_from_model(model):
     json_api_meta = getattr(model, 'JSONAPIMeta', None)
     return getattr(
@@ -230,7 +222,8 @@ def get_resource_type_from_queryset(qs):
 
 
 def get_resource_type_from_instance(instance):
-    return get_resource_type_from_model(instance._meta.model)
+    if hasattr(instance, '_meta'):
+        return get_resource_type_from_model(instance._meta.model)
 
 
 def get_resource_type_from_manager(manager):
