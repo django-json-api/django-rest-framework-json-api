@@ -428,11 +428,11 @@ class JSONRenderer(renderers.JSONRenderer):
         serializer = getattr(serializer_data, 'serializer', None)
 
         # Build a list of included resources
-        included_resources = utils.get_default_included_resources_from_serializer(serializer)
         include_resources_param = request.query_params.get('include') if request else None
         if include_resources_param:
-            extra = filter(lambda r: r not in included_resources, include_resources_param.split(','))
-            included_resources.extend(extra)
+            included_resources = include_resources_param.split(',')
+        else:
+            included_resources = utils.get_default_included_resources_from_serializer(serializer)
 
         if serializer is not None:
 
