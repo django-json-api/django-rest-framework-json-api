@@ -232,6 +232,13 @@ def get_resource_type_from_serializer(serializer):
         return get_resource_type_from_model(serializer.Meta.model)
 
 
+def get_default_included_resources_from_serializer(serializer):
+    try:
+        return list(serializer.JSONAPIMeta.included_resources)
+    except AttributeError:
+        return []
+
+
 def get_included_serializers(serializer):
     included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
 
