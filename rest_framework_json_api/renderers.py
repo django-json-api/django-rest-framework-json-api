@@ -285,14 +285,14 @@ class JSONRenderer(renderers.JSONRenderer):
             serializer_data = resource.get(field_name)
 
             if isinstance(field, relations.ManyRelatedField):
-                serializer_class = included_serializers.get(field_name)
+                serializer_class = included_serializers[field_name]
                 field = serializer_class(relation_instance, many=True, context=context)
                 serializer_data = field.data
 
             if isinstance(field, relations.RelatedField):
-                serializer_class = included_serializers.get(field_name)
                 if relation_instance is None:
                     continue
+                serializer_class = included_serializers[field_name]
                 field = serializer_class(relation_instance, context=context)
                 serializer_data = field.data
 
