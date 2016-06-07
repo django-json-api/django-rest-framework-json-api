@@ -77,7 +77,7 @@ def get_serializer_fields(serializer):
         fields = getattr(serializer, 'fields')
         meta = getattr(serializer, 'Meta', None)
 
-    if fields:
+    if fields is not None:
         meta_fields = getattr(meta, 'meta_fields', {})
         for field in meta_fields:
             try:
