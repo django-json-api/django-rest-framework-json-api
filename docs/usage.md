@@ -449,9 +449,14 @@ def get_root_meta(self, resource, many):
 ```
 to the serializer. It must return a dict and will be merged with the existing top level `meta`.
 
+### Links
+
+Adding `url` to `fields` on a serializer will add a `self` link to the `links` key.
+
+Related links will be created automatically when using the Relationship View.
+
 <!--
 ### Relationships
-### Links
 ### Included
 ### Errors
 -->
