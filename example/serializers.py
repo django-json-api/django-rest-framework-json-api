@@ -17,7 +17,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ('name', )
+        fields = ('name', 'url',)
         meta_fields = ('copyright',)
 
 
