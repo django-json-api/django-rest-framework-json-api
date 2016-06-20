@@ -11,6 +11,7 @@ from rest_framework import relations
 from rest_framework import renderers
 from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
 from rest_framework.settings import api_settings
+from rest_framework.fields import get_attribute
 
 from . import utils
 
@@ -86,7 +87,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             source = field.source
             try:
-                relation_instance_or_manager = getattr(resource_instance, source)
+                relation_instance_or_manager = get_attribute(resource_instance, source.split('.'))
             except AttributeError:
                 # if the field is not defined on the model then we check the serializer
                 # and if no value is there we skip over the field completely
