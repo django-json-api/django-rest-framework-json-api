@@ -2,12 +2,19 @@ import pytest
 from django.core.urlresolvers import reverse
 
 from example.tests.utils import load_json
+import mock
 
 pytestmark = pytest.mark.django_db
 
 
-def test_included_data_on_list(multiple_entries, client):
-    response = client.get(reverse("entry-list") + '?include=comments&page_size=5')
+
+@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
+def test_default_included_data_on_list(multiple_entries, client):
+    return test_included_data_on_list(multiple_entries=multiple_entries, client=client, query='?page_size=5')
+
+
+def test_included_data_on_list(multiple_entries, client, query='?include=comments&page_size=5'):
+    response = client.get(reverse("entry-list") + query)
     included = load_json(response.content).get('included')
 
     assert len(load_json(response.content)['data']) == len(multiple_entries), 'Incorrect entry count'
@@ -18,8 +25,13 @@ def test_included_data_on_list(multiple_entries, client):
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
 
 
-def test_included_data_on_detail(single_entry, client):
-    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=comments')
+@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
+def test_default_included_data_on_detail(single_entry, client):
+    return test_included_data_on_detail(single_entry=single_entry, client=client, query='')
+
+
+def test_included_data_on_detail(single_entry, client, query='?include=comments'):
+    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + query)
     included = load_json(response.content).get('included')
 
     assert [x.get('type') for x in included] == ['comments'], 'Detail included types are incorrect'
