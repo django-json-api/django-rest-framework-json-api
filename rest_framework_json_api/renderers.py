@@ -415,12 +415,6 @@ class JSONRenderer(renderers.JSONRenderer):
         if resource_name == 'errors':
             return self.render_errors(data, accepted_media_type, renderer_context)
 
-        include_resources_param = request.query_params.get('include') if request else None
-        if include_resources_param:
-            included_resources = include_resources_param.split(',')
-        else:
-            included_resources = list()
-
         json_api_data = data
         json_api_included = list()
         # initialize json_api_meta with pagination meta or an empty dict
@@ -432,6 +426,13 @@ class JSONRenderer(renderers.JSONRenderer):
             serializer_data = data
 
         serializer = getattr(serializer_data, 'serializer', None)
+
+        # Build a list of included resources
+        include_resources_param = request.query_params.get('include') if request else None
+        if include_resources_param:
+            included_resources = include_resources_param.split(',')
+        else:
+            included_resources = utils.get_default_included_resources_from_serializer(serializer)
 
         if serializer is not None:
 
