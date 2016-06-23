@@ -191,7 +191,10 @@ def get_related_resource_type(relation):
                 # Django 1.7
                 relation_model = parent_model_relation.related.model
         elif hasattr(parent_model_relation, 'field'):
-            relation_model = parent_model_relation.field.related.model
+            try:
+                relation_model = parent_model_relation.field.remote_field.model
+            except AttributeError:
+                relation_model = parent_model_relation.field.related.model
         else:
             return get_related_resource_type(parent_model_relation)
     return get_resource_type_from_model(relation_model)
