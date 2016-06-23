@@ -262,15 +262,15 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             try:
-                relation_instance_or_manager = getattr(resource_instance, field_name)
+                relation_instance_or_manager = get_attribute(resource_instance, field.source.split('.'))
             except AttributeError:
                 try:
                     # For ManyRelatedFields if `related_name` is not set we need to access `foo_set` from `source`
-                    relation_instance_or_manager = getattr(resource_instance, field.child_relation.source)
+                    relation_instance_or_manager = get_attribute(resource_instance, field.child_relation.source.split('.'))
                 except AttributeError:
                     if not hasattr(current_serializer, field.source):
                         continue
-                    serializer_method = getattr(current_serializer, field.source)
+                    serializer_method = get_attribute(current_serializer, field.source.split('.'))
                     relation_instance_or_manager = serializer_method(resource_instance)
 
             new_included_resources = [key.replace('%s.' % field_name, '', 1)
