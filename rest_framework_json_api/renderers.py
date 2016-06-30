@@ -4,6 +4,7 @@ Renderers
 import copy
 from collections import OrderedDict
 
+import inflection
 from django.utils import six, encoding
 from rest_framework import relations
 from rest_framework import renderers
@@ -237,6 +238,7 @@ class JSONRenderer(renderers.JSONRenderer):
         context = current_serializer.context
         included_serializers = utils.get_included_serializers(current_serializer)
         included_resources = copy.copy(included_resources)
+        included_resources = [inflection.underscore(value) for value in included_resources]
 
         for field_name, field in six.iteritems(fields):
             # Skip URL field
