@@ -54,6 +54,20 @@ class JSONParser(parsers.JSONParser):
         else:
             return {}
 
+    def parse_included(self, included):
+        """
+        Parses items included in JSON and returns dictionary containing the included items
+        """
+        included_data = {}
+        for included_item in included:
+            type_ = utils.format_value(included_item['type'], 'underscore')
+            included_data.setdefault(type_, [])
+            parsed_item = {'id': included_item['id']}
+            parsed_item.update(self.parse_attributes(included_item))
+            parsed_item.update(self.parse_relationships(included_item))
+            included_data[type_].append(parsed_item)
+        return included_data
+
     def parse(self, stream, media_type=None, parser_context=None):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
@@ -96,7 +110,8 @@ class JSONParser(parsers.JSONParser):
             parsed_data.update(self.parse_attributes(data))
             parsed_data.update(self.parse_relationships(data))
             parsed_data.update(self.parse_metadata(result))
+            # save the included data under _included key in resulting dictionary
+            parsed_data['_included'] = self.parse_included(result.get('included', []))
             return parsed_data
-
         else:
             raise ParseError('Received document does not contain primary data')
