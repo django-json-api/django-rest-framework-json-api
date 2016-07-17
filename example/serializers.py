@@ -35,6 +35,7 @@ class EntrySerializer(serializers.ModelSerializer):
         'authors': 'example.serializers.AuthorSerializer',
         'comments': 'example.serializers.CommentSerializer',
         'featured': 'example.serializers.EntrySerializer',
+        'suggested': 'example.serializers.EntrySerializer',
     }
 
     body_format = serializers.SerializerMethodField()

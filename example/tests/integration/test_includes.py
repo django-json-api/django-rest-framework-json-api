@@ -50,6 +50,15 @@ def test_dynamic_related_data_is_included(single_entry, entry_factory, client):
     assert len(included) == 1, 'The dynamically included blog entries are of an incorrect count'
 
 
+def test_dynamic_many_related_data_is_included(single_entry, entry_factory, client):
+    entry_factory()
+    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=suggested')
+    included = load_json(response.content).get('included')
+
+    assert included
+    assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
+
+
 def test_missing_field_not_included(author_bio_factory, author_factory, client):
     # First author does not have a bio
     author = author_factory(bio=None)
