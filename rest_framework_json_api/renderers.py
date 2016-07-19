@@ -283,7 +283,12 @@ class JSONRenderer(renderers.JSONRenderer):
                 serializer_class = included_serializers.get(field_name)
                 if relation_instance_or_manager is None:
                     continue
-                field = serializer_class(relation_instance_or_manager, context=context)
+
+                many = field._kwargs.get('child_relation', None) is not None
+
+                field = serializer_class(relation_instance_or_manager,
+                                         many=many,
+                                         context=context)
                 serializer_data = field.data
 
             if isinstance(field, ListSerializer):
