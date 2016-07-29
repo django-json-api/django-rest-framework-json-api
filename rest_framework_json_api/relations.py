@@ -162,6 +162,18 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
                                for item in queryset
                                ])
 
+    def validate_empty_values(self, data):
+        if isinstance(data, dict) and 'id' in data and data['id'] is None:
+            return super(ResourceRelatedField, self).validate_empty_values(data['id'])
+
+        return super(ResourceRelatedField, self).validate_empty_values(data)
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict) and 'id' in data:
+            return super(ResourceRelatedField, self).to_internal_value(data['id'])
+
+        return super(ResourceRelatedField, self).to_internal_value(data)
+
 
 class SerializerMethodResourceRelatedField(ResourceRelatedField):
     def get_attribute(self, instance):
