@@ -4,3 +4,4 @@ pytest-django
 pytest-factoryboy
 fake-factory
 tox
+mock

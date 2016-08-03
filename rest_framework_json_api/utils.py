@@ -77,7 +77,7 @@ def get_serializer_fields(serializer):
         fields = getattr(serializer, 'fields')
         meta = getattr(serializer, 'Meta', None)
 
-    if fields:
+    if fields is not None:
         meta_fields = getattr(meta, 'meta_fields', {})
         for field in meta_fields:
             try:
@@ -199,7 +199,10 @@ def get_related_resource_type(relation):
                     # Django 1.7
                     relation_model = parent_model_relation.related.model
             elif hasattr(parent_model_relation, 'field'):
-                relation_model = parent_model_relation.field.related.model
+                try:
+                    relation_model = parent_model_relation.field.remote_field.model
+                except AttributeError:
+                    relation_model = parent_model_relation.field.related.model
             else:
                 return get_related_resource_type(parent_model_relation)
 
@@ -240,6 +243,13 @@ def get_resource_type_from_serializer(serializer):
     elif hasattr(meta, 'model'):
         return get_resource_type_from_model(meta.model)
     raise AttributeError()
+
+
+def get_default_included_resources_from_serializer(serializer):
+    try:
+        return list(serializer.JSONAPIMeta.included_resources)
+    except AttributeError:
+        return []
 
 
 def get_included_serializers(serializer):
