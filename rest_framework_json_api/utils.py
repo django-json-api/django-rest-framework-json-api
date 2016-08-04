@@ -235,7 +235,7 @@ def get_resource_type_from_serializer(serializer):
         return get_resource_type_from_model(serializer.Meta.model)
 
 
-def get_included_resources(request, serializer):
+def get_included_resources(request, serializer=None):
     """ Build a list of included resources. """
     include_resources_param = request.query_params.get('include') if request else None
     if include_resources_param:
