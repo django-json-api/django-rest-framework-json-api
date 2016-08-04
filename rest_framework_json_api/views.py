@@ -4,10 +4,16 @@ from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
-from django.db.models.fields.related_descriptors import (
-    ForwardManyToOneDescriptor,
-    ManyToManyDescriptor,
-)
+if django.VERSION < (1, 9):
+    from django.db.models.fields.related import (
+        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
+    )
+else:
+    from django.db.models.fields.related_descriptors import (
+        ForwardManyToOneDescriptor,
+        ManyToManyDescriptor,
+    )
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
