@@ -241,10 +241,14 @@ def get_included_resources(request, serializer=None):
     if include_resources_param:
         return include_resources_param.split(',')
     else:
-        try:
-            return list(serializer.JSONAPIMeta.included_resources)
-        except AttributeError:
-            return []
+        return get_default_included_resources_from_serializer(serializer)
+
+
+def get_default_included_resources_from_serializer(serializer):
+    try:
+        return list(serializer.JSONAPIMeta.included_resources)
+    except AttributeError:
+        return []
 
 
 def get_included_serializers(serializer):

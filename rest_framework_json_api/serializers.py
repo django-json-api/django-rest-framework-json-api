@@ -6,7 +6,7 @@ from rest_framework.serializers import *
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
     get_resource_type_from_model, get_resource_type_from_instance,
-    get_resource_type_from_serializer, get_included_serializers)
+    get_resource_type_from_serializer, get_included_serializers, get_included_resources)
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -90,7 +90,7 @@ class IncludedResourcesValidationMixin(object):
                 validate_path(this_included_serializer, new_included_field_path, path)
 
         if request and view:
-            included_resources = utils.get_included_resources(request)
+            included_resources = get_included_resources(request)
             for included_field_name in included_resources:
                 included_field_path = included_field_name.split('.')
                 this_serializer_class = view.get_serializer_class()
