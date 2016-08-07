@@ -301,9 +301,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, relations.RelatedField):
                 # serializer_class = include_config.get(field_name)
-                serializer_class = utils.get_serializer_from_instance_and_serializer(relation_instance_or_manager, current_serializer, field_name)
                 if relation_instance_or_manager is None:
                     continue
+
+                serializer_class = utils.get_serializer_from_instance_and_serializer(relation_instance_or_manager, current_serializer, field_name)
                 serializer_instance = serializer_class(relation_instance_or_manager, context=context)
                 serializer_instances.append(serializer_instance)
 
