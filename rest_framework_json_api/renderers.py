@@ -5,10 +5,11 @@ import copy
 from collections import OrderedDict
 
 import inflection
+from django.db.models import Manager, QuerySet
 from django.utils import six, encoding
 from rest_framework import relations
 from rest_framework import renderers
-from rest_framework.serializers import BaseSerializer, ListSerializer, ModelSerializer
+from rest_framework.serializers import BaseSerializer, Serializer, ListSerializer
 from rest_framework.settings import api_settings
 
 from . import utils
@@ -87,24 +88,18 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             source = field.source
-            serializer_method = getattr(field.parent, source, None)
             relation_type = utils.get_related_resource_type(field)
 
             if isinstance(field, relations.HyperlinkedIdentityField):
-                try:
-                    relation_instance_or_manager = getattr(resource_instance, source)
-                except AttributeError:
-                    if serializer_method and hasattr(serializer_method, '__call__'):
-                        relation_instance_or_manager = serializer_method(resource_instance)
-                    else:
-                        continue
-
+                resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
+                if not resolved:
+                    continue
                 # special case for HyperlinkedIdentityField
                 relation_data = list()
 
                 # Don't try to query an empty relation
-                relation_queryset = relation_instance_or_manager.all() \
-                    if relation_instance_or_manager is not None else list()
+                relation_queryset = relation_instance \
+                    if relation_instance is not None else list()
 
                 for related_object in relation_queryset:
                     relation_data.append(
@@ -122,13 +117,9 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             if isinstance(field, ResourceRelatedField):
-                try:
-                    relation_instance_or_manager = getattr(resource_instance, source)
-                except AttributeError:
-                    if serializer_method and hasattr(serializer_method, '__call__'):
-                        relation_instance_or_manager = serializer_method(resource_instance)
-                    else:
-                        continue
+                resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
+                if not resolved:
+                    continue
 
                 # special case for ResourceRelatedField
                 relation_data = {
@@ -144,14 +135,9 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             if isinstance(field, (relations.PrimaryKeyRelatedField, relations.HyperlinkedRelatedField)):
-                try:
-                    relation = getattr(resource_instance, '%s_id' % field.source)
-                except AttributeError:
-                    if serializer_method and hasattr(serializer_method, '__call__'):
-                        relation = serializer_method(resource_instance).pk
-                    else:
-                        continue
-
+                resolved, relation = utils.get_relation_instance(resource_instance, '%s_id' % source, field.parent)
+                if not resolved:
+                    continue
                 relation_id = relation if resource.get(field_name) else None
                 relation_data = {
                     'data': (
@@ -167,13 +153,9 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             if isinstance(field, relations.ManyRelatedField):
-                try:
-                    relation_instance_or_manager = getattr(resource_instance, source)
-                except AttributeError:
-                    if serializer_method and hasattr(serializer_method, '__call__'):
-                        relation_instance_or_manager = serializer_method(resource_instance)
-                    else:
-                        continue
+                resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
+                if not resolved:
+                    continue
 
                 if isinstance(field.child_relation, ResourceRelatedField):
                     # special case for ResourceRelatedField
@@ -197,11 +179,15 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
                 relation_data = list()
-                for related_object in relation_instance_or_manager.all():
-                    related_object_type = utils.get_instance_or_manager_resource_type(related_object)
+                for nested_resource_instance in relation_instance:
+                    nested_resource_instance_type = (
+                        relation_type or
+                        utils.get_resource_type_from_instance(nested_resource_instance)
+                    )
+
                     relation_data.append(OrderedDict([
-                        ('type', related_object_type),
-                        ('id', encoding.force_text(related_object.pk))
+                        ('type', nested_resource_instance_type),
+                        ('id', encoding.force_text(nested_resource_instance.pk))
                     ]))
                 data.update({
                     field_name: {
@@ -213,23 +199,23 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-            if isinstance(field, ListSerializer):
-                try:
-                    relation_instance_or_manager = getattr(resource_instance, source)
-                except AttributeError:
-                    if serializer_method and hasattr(serializer_method, '__call__'):
-                        relation_instance_or_manager = serializer_method(resource_instance)
-                    else:
-                        continue
+            if isinstance(field, ListSerializer) and relation_instance is not None:
+                resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
+                if not resolved:
+                    continue
 
                 relation_data = list()
 
                 serializer_data = resource.get(field_name)
-                resource_instance_queryset = list(relation_instance_or_manager.all())
+                resource_instance_queryset = list(relation_instance)
                 if isinstance(serializer_data, list):
                     for position in range(len(serializer_data)):
                         nested_resource_instance = resource_instance_queryset[position]
-                        nested_resource_instance_type = utils.get_resource_type_from_instance(nested_resource_instance)
+                        nested_resource_instance_type = (
+                            relation_type or
+                            utils.get_resource_type_from_instance(nested_resource_instance)
+                        )
+
                         relation_data.append(OrderedDict([
                             ('type', nested_resource_instance_type),
                             ('id', encoding.force_text(nested_resource_instance.pk))
@@ -238,24 +224,17 @@ class JSONRenderer(renderers.JSONRenderer):
                     data.update({field_name: {'data': relation_data}})
                     continue
 
-            if isinstance(field, ModelSerializer):
-                try:
-                    relation_instance_or_manager = getattr(resource_instance, source)
-                except AttributeError:
-                    if serializer_method and hasattr(serializer_method, '__call__'):
-                        relation_instance_or_manager = serializer_method(resource_instance)
-                    else:
-                        continue
-
-                relation_model = field.Meta.model
-                relation_type = utils.format_resource_type(relation_model.__name__)
+            if isinstance(field, Serializer):
+                resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
+                if not resolved:
+                    continue
 
                 data.update({
                     field_name: {
                         'data': (
                             OrderedDict([
                                 ('type', relation_type),
-                                ('id', encoding.force_text(relation_instance_or_manager.pk))
+                                ('id', encoding.force_text(relation_instance.pk))
                             ]) if resource.get(field_name) else None)
                     }
                 })
@@ -294,16 +273,19 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
             try:
-                relation_instance_or_manager = getattr(resource_instance, field_name)
+                relation_instance = getattr(resource_instance, field_name)
             except AttributeError:
                 try:
                     # For ManyRelatedFields if `related_name` is not set we need to access `foo_set` from `source`
-                    relation_instance_or_manager = getattr(resource_instance, field.child_relation.source)
+                    relation_instance = getattr(resource_instance, field.child_relation.source)
                 except AttributeError:
                     if not hasattr(current_serializer, field.source):
                         continue
                     serializer_method = getattr(current_serializer, field.source)
-                    relation_instance_or_manager = serializer_method(resource_instance)
+                    relation_instance = serializer_method(resource_instance)
+
+            if isinstance(relation_instance, Manager):
+                relation_instance = relation_instance.all()
 
             new_included_resources = [key.replace('%s.' % field_name, '', 1)
                                       for key in included_resources
@@ -311,21 +293,21 @@ class JSONRenderer(renderers.JSONRenderer):
             serializer_data = resource.get(field_name)
 
             if isinstance(field, relations.ManyRelatedField):
-                serializer_class = included_serializers.get(field_name)
-                field = serializer_class(relation_instance_or_manager.all(), many=True, context=context)
+                serializer_class = included_serializers[field_name]
+                field = serializer_class(relation_instance, many=True, context=context)
                 serializer_data = field.data
 
             if isinstance(field, relations.RelatedField):
-                serializer_class = included_serializers.get(field_name)
-                if relation_instance_or_manager is None:
+                if relation_instance is None:
                     continue
-                field = serializer_class(relation_instance_or_manager, context=context)
+                serializer_class = included_serializers[field_name]
+                field = serializer_class(relation_instance, context=context)
                 serializer_data = field.data
 
             if isinstance(field, ListSerializer):
                 serializer = field.child
                 relation_type = utils.get_resource_type_from_serializer(serializer)
-                relation_queryset = list(relation_instance_or_manager.all())
+                relation_queryset = list(relation_instance)
 
                 # Get the serializer fields
                 serializer_fields = utils.get_serializer_fields(serializer)
@@ -348,7 +330,7 @@ class JSONRenderer(renderers.JSONRenderer):
                             )
                         )
 
-            if isinstance(field, ModelSerializer):
+            if isinstance(field, Serializer):
 
                 relation_type = utils.get_resource_type_from_serializer(field)
 
@@ -358,11 +340,11 @@ class JSONRenderer(renderers.JSONRenderer):
                     included_data.append(
                         JSONRenderer.build_json_resource_obj(
                             serializer_fields, serializer_data,
-                            relation_instance_or_manager, relation_type)
+                            relation_instance, relation_type)
                     )
                     included_data.extend(
                         JSONRenderer.extract_included(
-                            serializer_fields, serializer_data, relation_instance_or_manager, new_included_resources
+                            serializer_fields, serializer_data, relation_instance, new_included_resources
                         )
                     )
 
