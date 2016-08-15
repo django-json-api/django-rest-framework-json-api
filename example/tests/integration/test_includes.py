@@ -2,10 +2,13 @@ import pytest
 from django.core.urlresolvers import reverse
 
 from example.tests.utils import load_json
-import mock
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 pytestmark = pytest.mark.django_db
-
 
 
 @mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
