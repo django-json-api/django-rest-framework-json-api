@@ -152,13 +152,15 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         resource_type = resource_type if resource_type else get_resource_type_from_instance(value)
         return OrderedDict([('type', resource_type), ('id', str(pk))])
 
-    @property
-    def choices(self):
+    def get_choices(self, cutoff=None):
         queryset = self.get_queryset()
         if queryset is None:
             # Ensure that field.choices returns something sensible
             # even when accessed with a read-only field.
             return {}
+
+        if cutoff is not None:
+            queryset = queryset[:cutoff]
 
         return OrderedDict([
             (
