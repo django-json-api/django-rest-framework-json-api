@@ -47,3 +47,14 @@ Calls a `get_root_meta` function on a serializer, if it exists.
 `build_json_resource_obj(fields, resource, resource_instance, resource_name)`
 
 Builds the resource object (type, id, attributes) and extracts relationships.
+
+## rest_framework_json_api.parsers.JSONParser
+
+Similar to `JSONRenderer`, the `JSONParser` you may override the following methods if you need
+highly custom parsing control.
+
+#### parse_metadata
+
+`parse_metadata(result)`
+
+Returns a dictionary which will be merged into parsed data of the request. By default, it reads the `meta` content in the request body and returns it in a dictionary with a `_meta` top level key.
