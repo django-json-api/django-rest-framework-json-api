@@ -12,6 +12,7 @@ from django.utils import encoding
 from django.utils import six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Manager
 from rest_framework.exceptions import APIException
 from rest_framework import exceptions
 
@@ -77,7 +78,7 @@ def get_serializer_fields(serializer):
         fields = getattr(serializer, 'fields')
         meta = getattr(serializer, 'Meta', None)
 
-    if fields:
+    if fields is not None:
         meta_fields = getattr(meta, 'meta_fields', {})
         for field in meta_fields:
             try:
@@ -162,6 +163,12 @@ def format_resource_type(value, format_type=None, pluralize=None):
 
 
 def get_related_resource_type(relation):
+    try:
+        return get_resource_type_from_serializer(relation)
+    except AttributeError:
+        pass
+
+    relation_model = None
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
     elif hasattr(relation, 'model'):
@@ -171,38 +178,39 @@ def get_related_resource_type(relation):
         relation_model = relation.get_queryset().model
     else:
         parent_serializer = relation.parent
+        parent_model = None
         if hasattr(parent_serializer, 'Meta'):
-            parent_model = parent_serializer.Meta.model
-        else:
-            parent_model = parent_serializer.parent.Meta.model
+            parent_model = getattr(parent_serializer.Meta, 'model', None)
+        elif hasattr(parent_serializer, 'parent') and hasattr(parent_serializer.parent, 'Meta'):
+            parent_model = getattr(parent_serializer.parent.Meta, 'model', None)
 
-        if relation.source:
-            if relation.source != '*':
-                parent_model_relation = getattr(parent_model, relation.source)
+        if parent_model is not  None:
+            if relation.source:
+                if relation.source != '*':
+                    parent_model_relation = getattr(parent_model, relation.source)
+                else:
+                    parent_model_relation = getattr(parent_model, relation.field_name)
             else:
-                parent_model_relation = getattr(parent_model, relation.field_name)
-        else:
-            parent_model_relation = getattr(parent_model, parent_serializer.field_name)
+                parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-        if hasattr(parent_model_relation, 'related'):
-            try:
-                relation_model = parent_model_relation.related.related_model
-            except AttributeError:
-                # Django 1.7
-                relation_model = parent_model_relation.related.model
-        elif hasattr(parent_model_relation, 'field'):
-            relation_model = parent_model_relation.field.related.model
-        else:
-            return get_related_resource_type(parent_model_relation)
+            if hasattr(parent_model_relation, 'related'):
+                try:
+                    relation_model = parent_model_relation.related.related_model
+                except AttributeError:
+                    # Django 1.7
+                    relation_model = parent_model_relation.related.model
+            elif hasattr(parent_model_relation, 'field'):
+                try:
+                    relation_model = parent_model_relation.field.remote_field.model
+                except AttributeError:
+                    relation_model = parent_model_relation.field.related.model
+            else:
+                return get_related_resource_type(parent_model_relation)
+
+    if relation_model is None:
+        raise APIException(_('Could not resolve resource type for relation %s' % relation))
+
     return get_resource_type_from_model(relation_model)
-
-
-def get_instance_or_manager_resource_type(resource_instance_or_manager):
-    if hasattr(resource_instance_or_manager, 'model'):
-        return get_resource_type_from_manager(resource_instance_or_manager)
-    if hasattr(resource_instance_or_manager, '_meta'):
-        return get_resource_type_from_instance(resource_instance_or_manager)
-    pass
 
 
 def get_resource_type_from_model(model):
@@ -218,7 +226,8 @@ def get_resource_type_from_queryset(qs):
 
 
 def get_resource_type_from_instance(instance):
-    return get_resource_type_from_model(instance._meta.model)
+    if hasattr(instance, '_meta'):
+        return get_resource_type_from_model(instance._meta.model)
 
 
 def get_resource_type_from_manager(manager):
@@ -226,10 +235,31 @@ def get_resource_type_from_manager(manager):
 
 
 def get_resource_type_from_serializer(serializer):
-    if hasattr(serializer.Meta, 'resource_name'):
-        return serializer.Meta.resource_name
+    json_api_meta = getattr(serializer, 'JSONAPIMeta', None)
+    meta = getattr(serializer, 'Meta', None)
+    if hasattr(json_api_meta, 'resource_name'):
+        return json_api_meta.resource_name
+    elif hasattr(meta, 'resource_name'):
+        return meta.resource_name
+    elif hasattr(meta, 'model'):
+        return get_resource_type_from_model(meta.model)
+    raise AttributeError()
+
+
+def get_included_resources(request, serializer=None):
+    """ Build a list of included resources. """
+    include_resources_param = request.query_params.get('include') if request else None
+    if include_resources_param:
+        return include_resources_param.split(',')
     else:
-        return get_resource_type_from_model(serializer.Meta.model)
+        return get_default_included_resources_from_serializer(serializer)
+
+
+def get_default_included_resources_from_serializer(serializer):
+    try:
+        return list(serializer.JSONAPIMeta.included_resources)
+    except AttributeError:
+        return []
 
 
 def get_included_serializers(serializer):
@@ -243,6 +273,24 @@ def get_included_serializers(serializer):
                 included_serializers[name] = import_class_from_dotted_path(value)
 
     return included_serializers
+
+
+def get_relation_instance(resource_instance, source, serializer):
+    try:
+        relation_instance = getattr(resource_instance, source)
+    except AttributeError:
+        # if the field is not defined on the model then we check the serializer
+        # and if no value is there we skip over the field completely
+        serializer_method = getattr(serializer, source, None)
+        if serializer_method and hasattr(serializer_method, '__call__'):
+            relation_instance = serializer_method(resource_instance)
+        else:
+            return (False, None)
+
+    if isinstance(relation_instance, Manager):
+        relation_instance = relation_instance.all()
+
+    return (True, relation_instance)
 
 
 class Hyperlink(six.text_type):

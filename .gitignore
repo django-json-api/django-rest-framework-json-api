@@ -28,6 +28,9 @@ pip-delete-this-directory.txt
 # Pycharm project files
 .idea/
 
+# PyTest cache
+.cache/
+
 # Tox
 .tox/
 

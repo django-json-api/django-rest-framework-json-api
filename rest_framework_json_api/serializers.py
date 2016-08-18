@@ -1,3 +1,4 @@
+import inflection
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *
@@ -5,7 +6,7 @@ from rest_framework.serializers import *
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
     get_resource_type_from_model, get_resource_type_from_instance,
-    get_resource_type_from_serializer, get_included_serializers)
+    get_resource_type_from_serializer, get_included_serializers, get_included_resources)
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -75,7 +76,7 @@ class IncludedResourcesValidationMixin(object):
             serializers = get_included_serializers(serializer_class)
             if serializers is None:
                 raise ParseError('This endpoint does not support the include parameter')
-            this_field_name = field_path[0]
+            this_field_name = inflection.underscore(field_path[0])
             this_included_serializer = serializers.get(this_field_name)
             if this_included_serializer is None:
                 raise ParseError(
@@ -89,14 +90,12 @@ class IncludedResourcesValidationMixin(object):
                 validate_path(this_included_serializer, new_included_field_path, path)
 
         if request and view:
-            include_resources_param = request.query_params.get('include') if request else None
-            if include_resources_param:
-                included_resources = include_resources_param.split(',')
-                for included_field_name in included_resources:
-                    included_field_path = included_field_name.split('.')
-                    this_serializer_class = view.get_serializer_class()
-                    # lets validate the current path
-                    validate_path(this_serializer_class, included_field_path, included_field_name)
+            included_resources = get_included_resources(request)
+            for included_field_name in included_resources:
+                included_field_path = included_field_name.split('.')
+                this_serializer_class = view.get_serializer_class()
+                # lets validate the current path
+                validate_path(this_serializer_class, included_field_path, included_field_name)
 
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 

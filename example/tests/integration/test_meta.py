@@ -16,6 +16,9 @@ def test_top_level_meta_for_list_view(blog, client):
             "attributes": {
                 "name": blog.name
             },
+            "links": {
+                "self": 'http://testserver/blogs/1'
+            },
             "meta": {
                 "copyright": datetime.now().year
             },
@@ -47,6 +50,9 @@ def test_top_level_meta_for_detail_view(blog, client):
             "id": "1",
             "attributes": {
                 "name": blog.name
+            },
+            "links": {
+                "self": "http://testserver/blogs/1"
             },
             "meta": {
                 "copyright": datetime.now().year

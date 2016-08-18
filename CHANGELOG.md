@@ -1,4 +1,22 @@
 
+v2.1.0
+
+* Parse `meta` in JSONParser
+* Added code coverage reporting and updated Django versions tested against
+* Fixed Django 1.10 compatibility
+* Added support for regular non-ModelSerializers
+* Added performance enhancements to reduce the number of queries in related payloads
+* Fixed bug where related `SerializerMethodRelatedField` fields were not included even if in `include`
+* Convert `include` field names back to snake_case
+* Documented built in `url` field for generating a `self` link in the `links` key
+* Fixed bug that prevented `fields = ()` in a serializer from being valid
+* Fixed stale data returned in PATCH to-one relation
+* Raise a `ParseError` if an `id` is not included in a PATCH request
+
+v2.0.1
+
+* Fixed naming error that caused ModelSerializer relationships to fail
+
 v2.0.0
 
 * Fixed bug where write_only fields still had their keys rendered

@@ -4,7 +4,17 @@ from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
-from rest_framework import generics
+if django.VERSION < (1, 9):
+    from django.db.models.fields.related import (
+        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
+    )
+else:
+    from django.db.models.fields.related_descriptors import (
+        ForwardManyToOneDescriptor,
+        ManyToManyDescriptor,
+    )
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.reverse import reverse
@@ -12,7 +22,43 @@ from rest_framework.serializers import Serializer
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import get_resource_type_from_instance, OrderedDict, Hyperlink
+from rest_framework_json_api.utils import (
+    get_resource_type_from_instance,
+    OrderedDict,
+    Hyperlink,
+    get_included_resources,
+)
+
+
+class ModelViewSet(viewsets.ModelViewSet):
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        included_resources = get_included_resources(self.request)
+
+        for included in included_resources:
+            included_model = None
+            levels = included.split('.')
+            level_model = qs.model
+            for level in levels:
+                if not hasattr(level_model, level):
+                    break
+                field = getattr(level_model, level)
+                field_class = field.__class__
+                if not (
+                    issubclass(field_class, ForwardManyToOneDescriptor)
+                    or issubclass(field_class, ManyToManyDescriptor)
+                ):
+                    break
+
+                if level == levels[-1]:
+                    included_model = field
+                else:
+                    level_model = field.get_queryset().model
+
+            if included_model is not None:
+                qs = qs.prefetch_related(included.replace('.', '__'))
+
+        return qs
 
 
 class RelationshipView(generics.GenericAPIView):
@@ -99,6 +145,7 @@ class RelationshipView(generics.GenericAPIView):
             serializer.is_valid(raise_exception=True)
             setattr(parent_obj, self.get_related_field_name(), serializer.validated_data)
             parent_obj.save()
+            related_instance_or_manager = self.get_related_instance()  # Refresh instance
         result_serializer = self._instantiate_serializer(related_instance_or_manager)
         return Response(result_serializer.data)
 

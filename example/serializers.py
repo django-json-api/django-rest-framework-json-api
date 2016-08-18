@@ -17,7 +17,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ('name', )
+        fields = ('name', 'url',)
         meta_fields = ('copyright',)
 
 
@@ -35,6 +35,7 @@ class EntrySerializer(serializers.ModelSerializer):
         'authors': 'example.serializers.AuthorSerializer',
         'comments': 'example.serializers.CommentSerializer',
         'featured': 'example.serializers.EntrySerializer',
+        'suggested': 'example.serializers.EntrySerializer',
     }
 
     body_format = serializers.SerializerMethodField()

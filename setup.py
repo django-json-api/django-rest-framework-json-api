@@ -1,11 +1,20 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from __future__ import print_function
 
-import re
 import os
+import re
 import sys
 
 from setuptools import setup
+
+needs_mock = sys.version_info < (3, 3)
+mock = ['mock'] if needs_mock else []
+needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+pytest_runner = ['pytest-runner'] if needs_pytest else []
+needs_sphinx = {'build_sphinx', 'upload_docs'}.intersection(sys.argv)
+sphinx = ['sphinx'] if needs_sphinx else []
+needs_wheel = {'bdist_wheel'}.intersection(sys.argv)
+wheel = ['wheel'] if needs_wheel else []
 
 
 def read(*paths):
@@ -58,7 +67,6 @@ if sys.argv[-1] == 'publish':
     print("  git push --tags")
     sys.exit()
 
-
 setup(
     name='djangorestframework-jsonapi',
     version=get_version('rest_framework_json_api'),
@@ -70,11 +78,6 @@ setup(
     author_email='',
     packages=get_packages('rest_framework_json_api'),
     package_data=get_package_data('rest_framework_json_api'),
-    install_requires=[
-        'django',
-        'djangorestframework>=3.1.0',
-        'inflection>=0.3.0'
-    ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
@@ -86,11 +89,23 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
-    ]
+    ],
+    install_requires=[
+        'inflection>=0.3.0',
+        'djangorestframework>=3.1.0',
+        'django',
+    ],
+    setup_requires=pytest_runner + sphinx + wheel,
+    tests_require=[
+        'pytest-factoryboy',
+        'pytest-django',
+        'pytest>=2.8',
+    ] + mock,
+    zip_safe=False,
 )

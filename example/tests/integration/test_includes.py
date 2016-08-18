@@ -3,11 +3,21 @@ from django.core.urlresolvers import reverse
 
 from example.tests.utils import load_json
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 pytestmark = pytest.mark.django_db
 
 
-def test_included_data_on_list(multiple_entries, client):
-    response = client.get(reverse("entry-list") + '?include=comments&page_size=5')
+@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
+def test_default_included_data_on_list(multiple_entries, client):
+    return test_included_data_on_list(multiple_entries=multiple_entries, client=client, query='?page_size=5')
+
+
+def test_included_data_on_list(multiple_entries, client, query='?include=comments&page_size=5'):
+    response = client.get(reverse("entry-list") + query)
     included = load_json(response.content).get('included')
 
     assert len(load_json(response.content)['data']) == len(multiple_entries), 'Incorrect entry count'
@@ -18,8 +28,13 @@ def test_included_data_on_list(multiple_entries, client):
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
 
 
-def test_included_data_on_detail(single_entry, client):
-    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=comments')
+@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
+def test_default_included_data_on_detail(single_entry, client):
+    return test_included_data_on_detail(single_entry=single_entry, client=client, query='')
+
+
+def test_included_data_on_detail(single_entry, client, query='?include=comments'):
+    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + query)
     included = load_json(response.content).get('included')
 
     assert [x.get('type') for x in included] == ['comments'], 'Detail included types are incorrect'
@@ -36,6 +51,15 @@ def test_dynamic_related_data_is_included(single_entry, entry_factory, client):
 
     assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
     assert len(included) == 1, 'The dynamically included blog entries are of an incorrect count'
+
+
+def test_dynamic_many_related_data_is_included(single_entry, entry_factory, client):
+    entry_factory()
+    response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=suggested')
+    included = load_json(response.content).get('included')
+
+    assert included
+    assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
 
 
 def test_missing_field_not_included(author_bio_factory, author_factory, client):

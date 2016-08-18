@@ -46,6 +46,14 @@ class JSONParser(parsers.JSONParser):
                 parsed_relationships[field_name] = list(relation for relation in field_data)
         return parsed_relationships
 
+    @staticmethod
+    def parse_metadata(result):
+        metadata = result.get('meta')
+        if metadata:
+            return {'_meta': metadata}
+        else:
+            return {}
+
     def parse(self, stream, media_type=None, parser_context=None):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
@@ -80,11 +88,14 @@ class JSONParser(parsers.JSONParser):
                         resource_type=resource_name
                     )
                 )
+            if not data.get('id') and request.method in ('PATCH', 'PUT'):
+                raise ParseError("The resource identifier object must contain an 'id' member")
 
             # Construct the return data
             parsed_data = {'id': data.get('id')}
             parsed_data.update(self.parse_attributes(data))
             parsed_data.update(self.parse_relationships(data))
+            parsed_data.update(self.parse_metadata(result))
             return parsed_data
 
         else:
