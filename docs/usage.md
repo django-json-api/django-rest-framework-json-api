@@ -375,7 +375,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
-relationship views (see the 
+relationship views (see the
 [JSON API spec](http://jsonapi.org/format/#fetching-relationships)).
 The `self` link on a relationship object should point to the corresponding
 relationship view.
@@ -448,6 +448,8 @@ def get_root_meta(self, resource, many):
       }
 ```
 to the serializer. It must return a dict and will be merged with the existing top level `meta`.
+
+To access metadata in incoming requests, the `JSONParser` will add the metadata under a top level `_meta` key in the parsed data dictionary. For instance, to access meta data from a `serializer` object, you may use `serializer.initial_data.get("_meta")`. To customize the `_meta` key, see [here](api.md).
 
 ### Links
 
