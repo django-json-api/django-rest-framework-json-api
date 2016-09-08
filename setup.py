@@ -54,22 +54,22 @@ if sys.argv[-1] == 'publish':
     os.system("python setup.py bdist_wheel upload")
     print("You probably want to also tag the version now:")
     print("  git tag -a {0} -m 'version {0}'".format(
-        get_version('rest_framework_json_api')))
+        get_version('drf_search_categories')))
     print("  git push --tags")
     sys.exit()
 
 
 setup(
-    name='ig-djangorestframework-jsonapi',
-    version=get_version('rest_framework_json_api'),
+    name='ig-drf-search-categories',
+    version=get_version('ig-drf-search-categories'),
     url='https://github.com/InvGate/django-rest-framework-json-api',
     license='MIT',
     description='A Django REST framework API adapter for the json-api spec.',
     long_description=read('README.rst'),
     author='Jerel Unruh',
     author_email='',
-    packages=get_packages('rest_framework_json_api'),
-    package_data=get_package_data('rest_framework_json_api'),
+    packages=get_packages('drf_search_categories'),
+    package_data=get_package_data('drf_search_categories'),
     install_requires=[
         'django',
         'djangorestframework>=3.1.0',

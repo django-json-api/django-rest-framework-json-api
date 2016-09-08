@@ -4,8 +4,8 @@ from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import *
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework_json_api.exceptions import Conflict
-from rest_framework_json_api.utils import Hyperlink, \
+from drf_search_categories.exceptions import Conflict
+from drf_search_categories.utils import Hyperlink, \
     get_resource_type_from_queryset, get_resource_type_from_instance, \
     get_included_serializers, get_resource_type_from_serializer
 

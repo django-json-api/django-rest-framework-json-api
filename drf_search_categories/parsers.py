@@ -54,7 +54,7 @@ class JSONParser(parsers.JSONParser):
         data = result.get('data')
 
         if data:
-            from rest_framework_json_api.views import RelationshipView
+            from drf_search_categories.views import RelationshipView
             if isinstance(parser_context['view'], RelationshipView):
                 # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular Resource Object
                 if isinstance(data, list):

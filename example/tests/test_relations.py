@@ -4,11 +4,11 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from . import TestBase
-from rest_framework_json_api.exceptions import Conflict
-from rest_framework_json_api.utils import format_relation_name
+from drf_search_categories.exceptions import Conflict
+from drf_search_categories.utils import format_relation_name
 from example.models import Blog, Entry, Comment, Author
 from example.serializers import CommentSerializer
-from rest_framework_json_api.relations import ResourceRelatedField
+from drf_search_categories.relations import ResourceRelatedField
 
 
 class TestResourceRelatedField(TestBase):

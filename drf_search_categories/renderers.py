@@ -65,7 +65,7 @@ class JSONRenderer(renderers.JSONRenderer):
     @staticmethod
     def extract_relationships(fields, resource, resource_instance):
         # Avoid circular deps
-        from rest_framework_json_api.relations import ResourceRelatedField
+        from drf_search_categories.relations import ResourceRelatedField
 
         data = OrderedDict()
 
@@ -391,7 +391,7 @@ class JSONRenderer(renderers.JSONRenderer):
         request = renderer_context.get("request", None)
         data = data or {}
 
-        from rest_framework_json_api.views import RelationshipView
+        from drf_search_categories.views import RelationshipView
         if isinstance(view, RelationshipView):
             return self.render_relationship_view(data, accepted_media_type, renderer_context)
 

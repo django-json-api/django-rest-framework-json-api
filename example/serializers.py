@@ -1,5 +1,5 @@
 from datetime import datetime
-from rest_framework_json_api import serializers, relations
+from drf_search_categories import serializers, relations
 from example.models import Blog, Entry, Author, AuthorBio, Comment
 
 

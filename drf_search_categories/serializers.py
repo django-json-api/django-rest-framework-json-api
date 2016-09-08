@@ -2,8 +2,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *
 
-from rest_framework_json_api.relations import ResourceRelatedField
-from rest_framework_json_api.utils import (
+from drf_search_categories.relations import ResourceRelatedField
+from drf_search_categories.utils import (
     get_resource_type_from_model, get_resource_type_from_instance,
     get_resource_type_from_serializer, get_included_serializers)
 

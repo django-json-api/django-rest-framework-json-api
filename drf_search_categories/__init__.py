@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__title__ = 'djangorestframework-jsonapi'
+__title__ = 'drf-search-categories'
 __version__ = '2.0.0-beta.2-8'
 __author__ = ''
 __license__ = 'MIT'

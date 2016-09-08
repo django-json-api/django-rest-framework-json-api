@@ -2,8 +2,8 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from rest_framework_json_api.utils import format_relation_name
-from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
+from drf_search_categories.utils import format_relation_name
+from drf_search_categories.serializers import ResourceIdentifierObjectSerializer
 
 from example.models import Blog, Entry, Author
 

@@ -9,8 +9,8 @@ from rest_framework.views import APIView
 
 from example.serializers import (EntrySerializer, BlogSerializer,
                                  AuthorSerializer, CommentSerializer)
-from rest_framework_json_api import utils
-from rest_framework_json_api.utils import get_included_serializers
+from drf_search_categories import utils
+from drf_search_categories.utils import get_included_serializers
 
 pytestmark = pytest.mark.django_db
 

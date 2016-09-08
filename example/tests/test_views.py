@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from rest_framework.test import APITestCase
 
-from rest_framework_json_api.utils import format_relation_name
+from drf_search_categories.utils import format_relation_name
 from example.models import Blog, Entry, Comment, Author
 
 

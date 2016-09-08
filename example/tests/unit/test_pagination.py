@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from rest_framework.utils.urls import replace_query_param
 
-from rest_framework_json_api.pagination import LimitOffsetPagination
+from drf_search_categories.pagination import LimitOffsetPagination
 
 
 factory = APIRequestFactory()
