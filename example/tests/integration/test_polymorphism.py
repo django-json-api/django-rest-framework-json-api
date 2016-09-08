@@ -18,8 +18,8 @@ def test_polymorphism_on_detail_relations(single_company, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
     content = load_json(response.content)
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
-    assert [rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]] == [
-        "researchProjects", "artProjects"]
+    assert set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) == set([
+        "researchProjects", "artProjects"])
 
 
 def test_polymorphism_on_included_relations(single_company, client):
@@ -27,10 +27,10 @@ def test_polymorphism_on_included_relations(single_company, client):
                           '?include=current_project,future_projects')
     content = load_json(response.content)
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
-    assert [rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]] == [
-        "researchProjects", "artProjects"]
-    assert [x.get('type') for x in content.get('included')] == [
-        'artProjects', 'artProjects', 'researchProjects'], 'Detail included types are incorrect'
+    assert set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) == set([
+        "researchProjects", "artProjects"])
+    assert set([x.get('type') for x in content.get('included')]) == set([
+        'artProjects', 'artProjects', 'researchProjects']), 'Detail included types are incorrect'
     # Ensure that the child fields are present.
     assert content.get('included')[0].get('attributes').get('artist') is not None
     assert content.get('included')[1].get('attributes').get('artist') is not None
@@ -47,7 +47,7 @@ def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, clie
     content['data']['attributes']['artist'] = test_artist
     response = client.patch(url, data=json.dumps(content), content_type='application/vnd.api+json')
     new_content = load_json(response.content)
-    assert new_content["data"]["type"] == "artProjects"
+    assert new_content['data']['type'] == "artProjects"
     assert new_content['data']['attributes']['topic'] == test_topic
     assert new_content['data']['attributes']['artist'] == test_artist
 
@@ -68,7 +68,7 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
     response = client.post(url, data=json.dumps(data), content_type='application/vnd.api+json')
     content = load_json(response.content)
     assert content['data']['id'] is not None
-    assert content["data"]["type"] == "artProjects"
+    assert content['data']['type'] == "artProjects"
     assert content['data']['attributes']['topic'] == test_topic
     assert content['data']['attributes']['artist'] == test_artist
 
@@ -91,9 +91,15 @@ def test_invalid_type_on_polymorphic_model(client):
     content = load_json(response.content)
     assert len(content["errors"]) is 1
     assert content["errors"][0]["status"] == "409"
-    assert content["errors"][0]["detail"] == \
-        "The resource object's type (invalidProjects) is not the type that constitute the " \
-        "collection represented by the endpoint (one of [researchProjects, artProjects])."
+    try:
+        assert content["errors"][0]["detail"] == \
+            "The resource object's type (invalidProjects) is not the type that constitute the " \
+            "collection represented by the endpoint (one of [researchProjects, artProjects])."
+    except AssertionError:
+        # Available type list order isn't enforced
+        assert content["errors"][0]["detail"] == \
+            "The resource object's type (invalidProjects) is not the type that constitute the " \
+            "collection represented by the endpoint (one of [artProjects, researchProjects])."
 
 
 def test_polymorphism_relations_update(single_company, research_project_factory, client):
@@ -131,6 +137,12 @@ def test_invalid_type_on_polymorphic_relation(single_company, research_project_f
     content = load_json(response.content)
     assert len(content["errors"]) is 1
     assert content["errors"][0]["status"] == "409"
-    assert content["errors"][0]["detail"] == \
-        "Incorrect relation type. Expected one of [researchProjects, artProjects], " \
-        "received invalidProjects."
+    try:
+        assert content["errors"][0]["detail"] == \
+            "Incorrect relation type. Expected one of [researchProjects, artProjects], " \
+            "received invalidProjects."
+    except AssertionError:
+        # Available type list order isn't enforced
+        assert content["errors"][0]["detail"] == \
+            "Incorrect relation type. Expected one of [artProjects, researchProjects], " \
+            "received invalidProjects."
