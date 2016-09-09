@@ -399,7 +399,7 @@ The urlconf would need to contain a route like the following:
 
 ```python
 url(
-    regex=r'^orders/(?P<pk>[^/.]+/relationships/(?P<related_field>[^/.]+)$',
+    regex=r'^orders/(?P<pk>[^/.]+)/relationships/(?P<related_field>[^/.]+)$',
     view=OrderRelationshipView.as_view(),
     name='order-relationships'
 )
