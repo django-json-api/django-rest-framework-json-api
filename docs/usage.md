@@ -318,7 +318,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     customer = ResourceRelatedField(
         queryset=Customer.objects,
-        related_link_view-name='order-customer-detail',
+        related_link_view_name='order-customer-detail',
         related_link_url_kwarg='order_pk',
         self_link_view_name='order-relationships'
     )
