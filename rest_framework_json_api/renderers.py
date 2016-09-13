@@ -199,7 +199,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-            if isinstance(field, ListSerializer) and relation_instance is not None:
+            if isinstance(field, ListSerializer):
                 resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
                 if not resolved:
                     continue
