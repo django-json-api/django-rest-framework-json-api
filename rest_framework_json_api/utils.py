@@ -2,19 +2,19 @@
 Utils.
 """
 import copy
+import inspect
 import warnings
 from collections import OrderedDict
-import inspect
 
 import inflection
+from rest_framework import exceptions
+from rest_framework.exceptions import APIException
+
 from django.conf import settings
-from django.utils import encoding
-from django.utils import six
+from django.db.models import Manager
+from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Manager
-from rest_framework.exceptions import APIException
-from rest_framework import exceptions
 
 try:
     from rest_framework.serializers import ManyRelatedField
@@ -87,6 +87,7 @@ def get_serializer_fields(serializer):
                 pass
         return fields
 
+
 def format_keys(obj, format_type=None):
     """
     Takes either a dict or list and returns it with camelized keys only if
@@ -148,6 +149,7 @@ def format_relation_name(value, format_type=None):
     pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
     return format_resource_type(value, format_type, pluralize)
 
+
 def format_resource_type(value, format_type=None, pluralize=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_TYPES', False)
@@ -184,7 +186,7 @@ def get_related_resource_type(relation):
         elif hasattr(parent_serializer, 'parent') and hasattr(parent_serializer.parent, 'Meta'):
             parent_model = getattr(parent_serializer.parent.Meta, 'model', None)
 
-        if parent_model is not  None:
+        if parent_model is not None:
             if relation.source:
                 if relation.source != '*':
                     parent_model_relation = getattr(parent_model, relation.source)
@@ -199,6 +201,8 @@ def get_related_resource_type(relation):
                 except AttributeError:
                     # Django 1.7
                     relation_model = parent_model_relation.related.model
+            elif hasattr(parent_model_relation, 'rel'):
+                relation_model = parent_model_relation.rel.related_model
             elif hasattr(parent_model_relation, 'field'):
                 try:
                     relation_model = parent_model_relation.field.remote_field.model
