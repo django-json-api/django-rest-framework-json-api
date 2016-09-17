@@ -105,7 +105,7 @@ setup(
     tests_require=[
         'pytest-factoryboy',
         'pytest-django',
-        'pytest>=2.8',
+        'pytest>=2.8,<3',
     ] + mock,
     zip_safe=False,
 )
