@@ -20,3 +20,12 @@ class GetRelatedResourceTests(TestBase):
         field = serializer.fields['comments']
 
         self.assertEqual(utils.get_related_resource_type(field), 'comments')
+
+    def test_m2m_relation(self):
+        """
+        Ensure m2ms have their types identified correctly.
+        """
+        serializer = EntrySerializer()
+        field = serializer.fields['authors']
+
+        self.assertEqual(utils.get_related_resource_type(field), 'authors')
