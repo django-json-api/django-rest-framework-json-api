@@ -10,6 +10,7 @@ import inflection
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
 
+import django
 from django.conf import settings
 from django.db.models import Manager
 from django.utils import encoding, six
@@ -25,6 +26,14 @@ try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
     HyperlinkedRouterField = type(None)
+
+if django.VERSION >= (1, 9):
+    from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
+    ReverseManyRelatedObjectsDescriptor = type(None)
+else:
+    from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 
 
 def get_resource_name(context):
@@ -169,7 +178,6 @@ def get_related_resource_type(relation):
         return get_resource_type_from_serializer(relation)
     except AttributeError:
         pass
-
     relation_model = None
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
@@ -195,19 +203,17 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            if hasattr(parent_model_relation, 'related'):
-                try:
+            if type(parent_model_relation) is ReverseManyToOneDescriptor:
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.related_model
+                elif django.VERSION >= (1, 8):
                     relation_model = parent_model_relation.related.related_model
-                except AttributeError:
-                    # Django 1.7
+                else:
                     relation_model = parent_model_relation.related.model
-            elif hasattr(parent_model_relation, 'rel'):
-                relation_model = parent_model_relation.rel.related_model
-            elif hasattr(parent_model_relation, 'field'):
-                try:
-                    relation_model = parent_model_relation.field.remote_field.model
-                except AttributeError:
-                    relation_model = parent_model_relation.field.related.model
+            elif type(parent_model_relation) is ManyToManyDescriptor:
+                relation_model = parent_model_relation.field.remote_field.model
+            elif type(parent_model_relation) is ReverseManyRelatedObjectsDescriptor:
+                relation_model = parent_model_relation.field.related.model
             else:
                 return get_related_resource_type(parent_model_relation)
 
