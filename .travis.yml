@@ -26,8 +26,9 @@ env:
 
   - DJANGO=">=1.10,<1.11" DRF=">=3.4,<3.5"
 before_install:
-  # Force an upgrade of py to avoid VersionConflict
+  # Force an upgrade of py & pytest to avoid VersionConflict
   - pip install --upgrade py
+  - pip install "pytest>=2.8,<3"
   - pip install codecov
 install:
   - pip install Django${DJANGO} djangorestframework${DRF}

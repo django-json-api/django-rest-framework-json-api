@@ -1,5 +1,5 @@
 -e .
-pytest==2.8.2
+pytest>=2.9.0,<3.0
 pytest-django
 pytest-factoryboy
 fake-factory

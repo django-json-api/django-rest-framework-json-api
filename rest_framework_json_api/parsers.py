@@ -92,7 +92,7 @@ class JSONParser(parsers.JSONParser):
                 raise ParseError("The resource identifier object must contain an 'id' member")
 
             # Construct the return data
-            parsed_data = {'id': data.get('id')}
+            parsed_data = {'id': data.get('id')} if 'id' in data else {}
             parsed_data.update(self.parse_attributes(data))
             parsed_data.update(self.parse_relationships(data))
             parsed_data.update(self.parse_metadata(result))

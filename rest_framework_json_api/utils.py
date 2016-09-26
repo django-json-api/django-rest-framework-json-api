@@ -2,19 +2,20 @@
 Utils.
 """
 import copy
+import inspect
 import warnings
 from collections import OrderedDict
-import inspect
 
 import inflection
+from rest_framework import exceptions
+from rest_framework.exceptions import APIException
+
+import django
 from django.conf import settings
-from django.utils import encoding
-from django.utils import six
+from django.db.models import Manager
+from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Manager
-from rest_framework.exceptions import APIException
-from rest_framework import exceptions
 
 try:
     from rest_framework.serializers import ManyRelatedField
@@ -25,6 +26,14 @@ try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
     HyperlinkedRouterField = type(None)
+
+if django.VERSION >= (1, 9):
+    from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
+    ReverseManyRelatedObjectsDescriptor = type(None)
+else:
+    from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 
 
 def get_resource_name(context):
@@ -87,6 +96,7 @@ def get_serializer_fields(serializer):
                 pass
         return fields
 
+
 def format_keys(obj, format_type=None):
     """
     Takes either a dict or list and returns it with camelized keys only if
@@ -148,6 +158,7 @@ def format_relation_name(value, format_type=None):
     pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
     return format_resource_type(value, format_type, pluralize)
 
+
 def format_resource_type(value, format_type=None, pluralize=None):
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_TYPES', False)
@@ -167,7 +178,6 @@ def get_related_resource_type(relation):
         return get_resource_type_from_serializer(relation)
     except AttributeError:
         pass
-
     relation_model = None
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
@@ -184,7 +194,7 @@ def get_related_resource_type(relation):
         elif hasattr(parent_serializer, 'parent') and hasattr(parent_serializer.parent, 'Meta'):
             parent_model = getattr(parent_serializer.parent.Meta, 'model', None)
 
-        if parent_model is not  None:
+        if parent_model is not None:
             if relation.source:
                 if relation.source != '*':
                     parent_model_relation = getattr(parent_model, relation.source)
@@ -193,17 +203,17 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            if hasattr(parent_model_relation, 'related'):
-                try:
+            if type(parent_model_relation) is ReverseManyToOneDescriptor:
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.related_model
+                elif django.VERSION >= (1, 8):
                     relation_model = parent_model_relation.related.related_model
-                except AttributeError:
-                    # Django 1.7
+                else:
                     relation_model = parent_model_relation.related.model
-            elif hasattr(parent_model_relation, 'field'):
-                try:
-                    relation_model = parent_model_relation.field.remote_field.model
-                except AttributeError:
-                    relation_model = parent_model_relation.field.related.model
+            elif type(parent_model_relation) is ManyToManyDescriptor:
+                relation_model = parent_model_relation.field.remote_field.model
+            elif type(parent_model_relation) is ReverseManyRelatedObjectsDescriptor:
+                relation_model = parent_model_relation.field.related.model
             else:
                 return get_related_resource_type(parent_model_relation)
 
