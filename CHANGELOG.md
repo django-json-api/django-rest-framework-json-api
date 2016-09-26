@@ -1,4 +1,12 @@
 
+v2.1.1
+
+* Avoid setting `id` to `None` in the parser simply because it's missing
+* Fixed out of scope `relation_instance` variable in renderer
+* Allow default DRF serializers to operate even when mixed with DRF-JA serializers
+* Fixed wrong resource type for reverse foreign keys
+* Fixed documentation typos
+
 v2.1.0
 
 * Parse `meta` in JSONParser
