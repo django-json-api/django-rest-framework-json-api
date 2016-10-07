@@ -37,3 +37,8 @@ pip-delete-this-directory.txt
 
 # VirtualEnv
 .venv/
+
+#python3 pyvenv
+bin/
+lib64
+pyvenv.cfg

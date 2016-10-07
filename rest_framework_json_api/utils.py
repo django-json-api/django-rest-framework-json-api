@@ -2,6 +2,7 @@
 Utils.
 """
 import copy
+import re
 import inspect
 import warnings
 from collections import OrderedDict
@@ -13,6 +14,7 @@ from rest_framework.exceptions import APIException
 import django
 from django.conf import settings
 from django.db.models import Manager
+from django.http import QueryDict
 from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
@@ -72,7 +74,8 @@ def get_resource_name(context):
                 # The resource name is not a string - return as is
                 return resource_name
 
-            # the name was calculated automatically from the view > pluralize and format
+            # the name was calculated automatically from the view > pluralize
+            # and format
             resource_name = format_resource_type(resource_name)
 
     return resource_name
@@ -182,7 +185,8 @@ def get_related_resource_type(relation):
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
     elif hasattr(relation, 'model'):
-        # the model type was explicitly passed as a kwarg to ResourceRelatedField
+        # the model type was explicitly passed as a kwarg to
+        # ResourceRelatedField
         relation_model = relation.model
     elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
@@ -192,16 +196,20 @@ def get_related_resource_type(relation):
         if hasattr(parent_serializer, 'Meta'):
             parent_model = getattr(parent_serializer.Meta, 'model', None)
         elif hasattr(parent_serializer, 'parent') and hasattr(parent_serializer.parent, 'Meta'):
-            parent_model = getattr(parent_serializer.parent.Meta, 'model', None)
+            parent_model = getattr(
+                parent_serializer.parent.Meta, 'model', None)
 
         if parent_model is not None:
             if relation.source:
                 if relation.source != '*':
-                    parent_model_relation = getattr(parent_model, relation.source)
+                    parent_model_relation = getattr(
+                        parent_model, relation.source)
                 else:
-                    parent_model_relation = getattr(parent_model, relation.field_name)
+                    parent_model_relation = getattr(
+                        parent_model, relation.field_name)
             else:
-                parent_model_relation = getattr(parent_model, parent_serializer.field_name)
+                parent_model_relation = getattr(
+                    parent_model, parent_serializer.field_name)
 
             if type(parent_model_relation) is ReverseManyToOneDescriptor:
                 if django.VERSION >= (1, 9):
@@ -218,7 +226,8 @@ def get_related_resource_type(relation):
                 return get_related_resource_type(parent_model_relation)
 
     if relation_model is None:
-        raise APIException(_('Could not resolve resource type for relation %s' % relation))
+        raise APIException(
+            _('Could not resolve resource type for relation %s' % relation))
 
     return get_resource_type_from_model(relation_model)
 
@@ -258,7 +267,8 @@ def get_resource_type_from_serializer(serializer):
 
 def get_included_resources(request, serializer=None):
     """ Build a list of included resources. """
-    include_resources_param = request.query_params.get('include') if request else None
+    include_resources_param = request.query_params.get(
+        'include') if request else None
     if include_resources_param:
         return include_resources_param.split(',')
     else:
@@ -273,14 +283,17 @@ def get_default_included_resources_from_serializer(serializer):
 
 
 def get_included_serializers(serializer):
-    included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
+    included_serializers = copy.copy(
+        getattr(serializer, 'included_serializers', dict()))
 
     for name, value in six.iteritems(included_serializers):
         if not isinstance(value, type):
             if value == 'self':
-                included_serializers[name] = serializer if isinstance(serializer, type) else serializer.__class__
+                included_serializers[name] = serializer if isinstance(
+                    serializer, type) else serializer.__class__
             else:
-                included_serializers[name] = import_class_from_dotted_path(value)
+                included_serializers[
+                    name] = import_class_from_dotted_path(value)
 
     return included_serializers
 
@@ -381,3 +394,19 @@ def format_errors(data):
     if len(data) > 1 and isinstance(data, list):
         data.sort(key=lambda x: x.get('source', {}).get('pointer', ''))
     return {'errors': data}
+
+
+def format_query_params(query_params):
+    new_query_params = QueryDict(mutable=True)
+    for query_field, query_value in query_params.lists():
+        keyword_pattern = getattr(settings, 'JSON_API_FILTER_KEYWORD',
+                                  'filter\[(?P<field>\w+)\]')
+        keyword = re.search(keyword_pattern, query_field)
+        if keyword:
+            new_field = keyword.group('field')
+        else:
+            new_field = query_field
+
+        [new_query_params.update({new_field: x}) for x in query_value]
+
+    return new_query_params

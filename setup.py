@@ -103,6 +103,7 @@ setup(
     ],
     setup_requires=pytest_runner + sphinx + wheel,
     tests_require=[
+        'django-filter',
         'pytest-factoryboy',
         'pytest-django',
         'pytest>=2.8,<3',
