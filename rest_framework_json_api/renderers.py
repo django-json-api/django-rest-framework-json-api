@@ -419,12 +419,16 @@ class JSONRenderer(renderers.JSONRenderer):
         view = renderer_context.get("view", None)
         request = renderer_context.get("request", None)
 
+        # Get the resource name.
+        resource_name = utils.get_resource_name(renderer_context)
+
+        # If this is an error response, skip the rest.
+        if resource_name == 'errors':
+            return self.render_errors(data, accepted_media_type, renderer_context)
+
         from rest_framework_json_api.views import RelationshipView
         if isinstance(view, RelationshipView):
             return self.render_relationship_view(data, accepted_media_type, renderer_context)
-
-        # Get the resource name.
-        resource_name = utils.get_resource_name(renderer_context)
 
         # If `resource_name` is set to None then render default as the dev
         # wants to build the output format manually.
@@ -432,10 +436,6 @@ class JSONRenderer(renderers.JSONRenderer):
             return super(JSONRenderer, self).render(
                 data, accepted_media_type, renderer_context
             )
-
-        # If this is an error response, skip the rest.
-        if resource_name == 'errors':
-            return self.render_errors(data, accepted_media_type, renderer_context)
 
         json_api_data = data
         json_api_included = list()
