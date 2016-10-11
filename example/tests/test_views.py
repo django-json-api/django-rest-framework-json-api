@@ -77,6 +77,18 @@ class TestRelationshipView(APITestCase):
                                      content_type='application/vnd.api+json')
         assert response.status_code == 400
 
+    def test_relationship_view_errors_format(self):
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
+        response = self.client.patch(url,
+                                     data=json.dumps({'data': {'invalid': ''}}),
+                                     content_type='application/vnd.api+json')
+        assert response.status_code == 400
+
+        result = json.loads(response.content.decode('utf-8'))
+
+        assert 'data' not in result
+        assert 'errors' in result
+
     def test_get_empty_to_one_relationship(self):
         url = '/comments/{}/relationships/author'.format(self.first_entry.id)
         response = self.client.get(url)
