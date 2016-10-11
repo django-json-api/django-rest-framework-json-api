@@ -203,7 +203,8 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            # Order matters (due to inheritance order)
+            # Order of comparison matters (due to inheritance order)
+            # ManyToManyDescriptor -> ReverseManyToOneDescriptor
             if isinstance(parent_model_relation, ManyToManyDescriptor):
                 relation_model = parent_model_relation.field.remote_field.model
             elif isinstance(parent_model_relation, ReverseManyRelatedObjectsDescriptor):
