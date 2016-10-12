@@ -171,7 +171,6 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         ])
 
 
-
 class SerializerMethodResourceRelatedField(ResourceRelatedField):
     """
     Allows us to use serializer method RelatedFields
@@ -211,7 +210,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
 
     def to_representation(self, value):
-        if isinstance(value, QuerySet):
+        if isinstance(value, list):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
