@@ -1,6 +1,7 @@
+import collections
 import json
 
-from rest_framework.fields import MISSING_ERROR_MESSAGE
+from rest_framework.fields import MISSING_ERROR_MESSAGE, SerializerMethodField
 from rest_framework.relations import *
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
@@ -9,6 +10,8 @@ from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import Hyperlink, \
     get_resource_type_from_queryset, get_resource_type_from_instance, \
     get_included_serializers, get_resource_type_from_serializer
+
+LINKS_PARAMS = ['self_link_view_name', 'related_link_view_name', 'related_link_lookup_field', 'related_link_url_kwarg']
 
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
@@ -189,17 +192,20 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         # DRF 3.1 doesn't expect the `many` kwarg
         kwargs.pop('many', None)
         model = kwargs.pop('model', None)
+        if child_relation is not None:
+            self.child_relation = child_relation
         if model:
             self.model = model
-        super(SerializerMethodResourceRelatedField, self).__init__(child_relation, *args, **kwargs)
+        super(SerializerMethodResourceRelatedField, self).__init__(*args, **kwargs)
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        list_kwargs = {k: kwargs.pop(k) for k in LINKS_PARAMS if k in kwargs}
+        list_kwargs['child_relation'] = cls(*args, **kwargs)
         for key in kwargs.keys():
             if key in ('model',) + MANY_RELATION_KWARGS:
                 list_kwargs[key] = kwargs[key]
-        return SerializerMethodResourceRelatedField(**list_kwargs)
+        return cls(**list_kwargs)
 
     def get_attribute(self, instance):
         # check for a source fn defined on the serializer instead of the model
@@ -210,10 +216,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
 
     def to_representation(self, value):
-        if isinstance(value, list):
+        if isinstance(value, collections.Iterable):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
-
-    def get_links(self, obj=None, lookup_field='pk'):
-        return OrderedDict()
