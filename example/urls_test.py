@@ -23,6 +23,10 @@ urlpatterns = [
         GenericIdentity.as_view(), name='user-default'),
 
 
+    url(r'^entries/(?P<entry_pk>[^/.]+)/suggested/',
+        EntryViewSet.as_view({'get': 'list'}),
+        name='entry-suggested'
+        ),
     url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         EntryRelationshipView.as_view(),
         name='entry-relationships'),

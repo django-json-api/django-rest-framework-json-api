@@ -43,7 +43,11 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                         "data": [{"type": "comments", "id": "1"}]
                     },
                     "suggested": {
-                        "data": [{"type": "entries", "id": "2"}]
+                        "data": [{"type": "entries", "id": "2"}],
+                        "links": {
+                            "related": "http://testserver/entries/1/suggested/",
+                            "self": "http://testserver/entries/1/relationships/suggested"
+                        }
                     }
                 }
             },
@@ -74,7 +78,11 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                         "data": [{"type": "comments", "id": "2"}]
                     },
                     "suggested": {
-                        "data": [{"type": "entries", "id": "1"}]
+                        "data": [{"type": "entries", "id": "1"}],
+                        "links": {
+                            "related": "http://testserver/entries/2/suggested/",
+                            "self": "http://testserver/entries/2/relationships/suggested"
+                        }
                     }
                 }
             },

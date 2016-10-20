@@ -37,7 +37,11 @@ def test_pagination_with_single_entry(single_entry, client):
                         "data": [{"type": "comments", "id": "1"}]
                     },
                     "suggested": {
-                        "data": []
+                        "data": [],
+                        "links": {
+                            "related": "http://testserver/entries/1/suggested/",
+                            "self": "http://testserver/entries/1/relationships/suggested"
+                        }
                     }
                 }
             }],
