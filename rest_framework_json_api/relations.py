@@ -200,7 +200,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         for key in kwargs.keys():
             if key in ('model',) + MANY_RELATION_KWARGS:
                 list_kwargs[key] = kwargs[key]
-        return SerializerMethodResourceRelatedField(**list_kwargs)
+        return cls(**list_kwargs)
 
     def get_attribute(self, instance):
         # check for a source fn defined on the serializer instead of the model
