@@ -44,7 +44,11 @@ class EntrySerializer(serializers.ModelSerializer):
             source='comment_set', many=True, read_only=True)
     # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
-            source='get_suggested', model=Entry, many=True, read_only=True)
+            source='get_suggested', model=Entry, many=True, read_only=True,
+            related_link_view_name='entry-suggested',
+            related_link_url_kwarg='entry_pk',
+            self_link_view_name='entry-relationships',
+    )
     # single related from serializer
     featured = relations.SerializerMethodResourceRelatedField(
             source='get_featured', model=Entry, read_only=True)
