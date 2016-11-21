@@ -38,8 +38,8 @@ class JSONRenderer(renderers.JSONRenderer):
     media_type = 'application/vnd.api+json'
     format = 'vnd.api+json'
 
-    @staticmethod
-    def extract_attributes(fields, resource):
+    @classmethod
+    def extract_attributes(cls, fields, resource):
         data = OrderedDict()
         for field_name, field in six.iteritems(fields):
             # ID is always provided in the root of JSON API so remove it from attributes
@@ -67,8 +67,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return utils.format_keys(data)
 
-    @staticmethod
-    def extract_relationships(fields, resource, resource_instance):
+    @classmethod
+    def extract_relationships(cls, fields, resource, resource_instance):
         # Avoid circular deps
         from rest_framework_json_api.relations import ResourceRelatedField
 
@@ -242,8 +242,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
         return utils.format_keys(data)
 
-    @staticmethod
-    def extract_included(fields, resource, resource_instance, included_resources):
+    @classmethod
+    def extract_included(cls, fields, resource, resource_instance, included_resources):
         # this function may be called with an empty record (example: Browsable Interface)
         if not resource_instance:
             return
@@ -322,12 +322,12 @@ class JSONRenderer(renderers.JSONRenderer):
                             utils.get_resource_type_from_instance(nested_resource_instance)
                         )
                         included_data.append(
-                            JSONRenderer.build_json_resource_obj(
+                            cls.build_json_resource_obj(
                                 serializer_fields, serializer_resource, nested_resource_instance, resource_type
                             )
                         )
                         included_data.extend(
-                            JSONRenderer.extract_included(
+                            cls.extract_included(
                                 serializer_fields, serializer_resource, nested_resource_instance, new_included_resources
                             )
                         )
@@ -340,20 +340,20 @@ class JSONRenderer(renderers.JSONRenderer):
                 serializer_fields = utils.get_serializer_fields(field)
                 if serializer_data:
                     included_data.append(
-                        JSONRenderer.build_json_resource_obj(
+                        cls.build_json_resource_obj(
                             serializer_fields, serializer_data,
                             relation_instance, relation_type)
                     )
                     included_data.extend(
-                        JSONRenderer.extract_included(
+                        cls.extract_included(
                             serializer_fields, serializer_data, relation_instance, new_included_resources
                         )
                     )
 
         return utils.format_keys(included_data)
 
-    @staticmethod
-    def extract_meta(serializer, resource):
+    @classmethod
+    def extract_meta(cls, serializer, resource):
         if hasattr(serializer, 'child'):
             meta = getattr(serializer.child, 'Meta', None)
         else:
@@ -366,8 +366,8 @@ class JSONRenderer(renderers.JSONRenderer):
             })
         return data
 
-    @staticmethod
-    def extract_root_meta(serializer, resource):
+    @classmethod
+    def extract_root_meta(cls, serializer, resource):
         many = False
         if hasattr(serializer, 'child'):
             many = True
@@ -380,14 +380,14 @@ class JSONRenderer(renderers.JSONRenderer):
             data.update(json_api_meta)
         return data
 
-    @staticmethod
-    def build_json_resource_obj(fields, resource, resource_instance, resource_name):
+    @classmethod
+    def build_json_resource_obj(cls, fields, resource, resource_instance, resource_name):
         resource_data = [
             ('type', resource_name),
             ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
-            ('attributes', JSONRenderer.extract_attributes(fields, resource)),
+            ('attributes', cls.extract_attributes(fields, resource)),
         ]
-        relationships = JSONRenderer.extract_relationships(fields, resource, resource_instance)
+        relationships = cls.extract_relationships(fields, resource, resource_instance)
         if relationships:
             resource_data.append(('relationships', relationships))
         # Add 'self' link if field is present and valid
