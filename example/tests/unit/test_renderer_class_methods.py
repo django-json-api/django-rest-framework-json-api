@@ -37,6 +37,45 @@ def test_build_json_resource_obj():
     assert JSONRenderer.build_json_resource_obj(
         serializer.fields, resource, resource_instance, 'user') == output
 
+def test_can_override_methods():
+    """
+    Make sure extract_attributes and extract_relationships can be overriden.
+    """
+    resource = {
+        'pk': 1,
+        'username': 'Alice',
+    }
+
+    serializer = ResourceSerializer(data={'username': 'Alice'})
+    serializer.is_valid()
+    resource_instance = serializer.save()
+
+    output = {
+        'type': 'user',
+        'id': '1',
+        'attributes': {
+            'username': 'Alice'
+        },
+    }
+
+    class CustomRenderer(JSONRenderer):
+        extract_attributes_was_overriden = False
+        extract_relationships_was_overriden = False
+
+        @classmethod
+        def extract_attributes(cls, fields, resource):
+            cls.extract_attributes_was_overriden = True
+            return super(CustomRenderer, cls).extract_attributes(fields, resource)
+
+        @classmethod
+        def extract_relationships(cls, fields, resource, resource_instance):
+            cls.extract_relationships_was_overriden = True
+            return super(CustomRenderer, cls).extract_relationships(fields, resource, resource_instance)
+
+    assert CustomRenderer.build_json_resource_obj(
+        serializer.fields, resource, resource_instance, 'user') == output
+    assert CustomRenderer.extract_attributes_was_overriden
+    assert CustomRenderer.extract_relationships_was_overriden
 
 def test_extract_attributes():
     fields = {
