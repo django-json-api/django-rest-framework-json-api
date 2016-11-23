@@ -1,7 +1,9 @@
 import json
+from io import BytesIO
 
 from django.test import TestCase
-from io import BytesIO
+from rest_framework.exceptions import ParseError
+
 from rest_framework_json_api.parsers import JSONParser
 
 
@@ -36,3 +38,13 @@ class TestJSONParser(TestCase):
         data = parser.parse(stream, None, self.parser_context)
 
         self.assertEqual(data['_meta'], {'random_key': 'random_value'})
+
+
+    def test_parse_include_metadata(self):
+        parser = JSONParser()
+
+        string = json.dumps([])
+        stream = BytesIO(string.encode('utf-8'))
+
+        with self.assertRaises(ParseError):
+            parser.parse(stream, None, self.parser_context)
