@@ -304,7 +304,7 @@ from rest_framework_json_api.relations import ResourceRelatedField
 from myapp.models import Order, LineItem, Customer
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Order
 
@@ -368,7 +368,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
         # unnested '/lineitems' route, the queryset should include all LineItems
         if 'order_pk' in self.kwargs:
             order_pk = self.kwargs['order_pk']
-            queryset = queryset.filter(order__pk=order_pk])
+            queryset = queryset.filter(order__pk=order_pk)
 
         return queryset
 ```
