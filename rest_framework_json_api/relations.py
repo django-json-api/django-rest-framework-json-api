@@ -126,8 +126,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
-        field_name = inflection.singularize(expected_relation_type)
-        serializer_resource_type = self.get_resource_type_from_serializer(field_name)
+        serializer_resource_type = self.get_resource_type_from_included_serializer(expected_relation_type)
 
         if serializer_resource_type is not None:
             expected_relation_type = serializer_resource_type
@@ -151,13 +150,13 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
 
         field_name = self.field_name if self.field_name else self.parent.field_name
 
-        resource_type = self.get_resource_type_from_serializer(field_name)
+        resource_type = self.get_resource_type_from_included_serializer(field_name)
         if resource_type is None:
             resource_type = get_resource_type_from_instance(value)
 
         return OrderedDict([('type', resource_type), ('id', str(pk))])
 
-    def get_resource_type_from_serializer(self, field_name):
+    def get_resource_type_from_included_serializer(self, field_name):
         """
         Given a field_name, check if the serializer has a
         corresponding included_serializer with a Meta.resource_name property
@@ -165,12 +164,31 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         Returns the resource name or None
         """
         root = getattr(self.parent, 'parent', self.parent) or self.parent
-        if getattr(root, 'included_serializers', None) is not None:
+        root = self.get_root_serializer()
+
+        if root is not None:
+            # accept both singular and plural versions of field_name
+            field_names = [
+                inflection.singularize(field_name),
+                inflection.pluralize(field_name)
+            ]
             includes = get_included_serializers(root)
-            if field_name in includes.keys():
-                return get_resource_type_from_serializer(includes[field_name])
+            for field in field_names:
+                if field in includes.keys():
+                    return get_resource_type_from_serializer(includes[field])
 
         return None
+
+    def get_root_serializer(self):
+        if hasattr(self.parent, 'parent') and self.is_serializer(self.parent.parent):
+            return self.parent.parent
+        elif self.is_serializer(self.parent):
+            return self.parent
+
+        return None
+
+    def is_serializer(self, candidate):
+        return hasattr(candidate, 'included_serializers')
 
     def get_choices(self, cutoff=None):
         queryset = self.get_queryset()
