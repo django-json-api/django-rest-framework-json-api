@@ -1,9 +1,10 @@
 import pytest
+from example import models, serializers, views
+from example.tests.utils import dump_json, load_json
+from rest_framework import status
+
 from django.core.urlresolvers import reverse
 
-from example.tests.utils import load_json
-
-from example import models, serializers, views
 pytestmark = pytest.mark.django_db
 
 
@@ -36,6 +37,24 @@ def _check_relationship_and_included_comment_type_are_the_same(django_client, ur
 
 @pytest.mark.usefixtures("single_entry")
 class TestModelResourceName:
+
+    create_data = {
+        'data': {
+            'type': 'resource_name_from_JSONAPIMeta',
+            'id': None,
+            'attributes': {
+                'body': 'example',
+            },
+            'relationships': {
+                'entry': {
+                    'data': {
+                        'type': 'resource_name_from_JSONAPIMeta',
+                        'id': 1
+                    }
+                }
+            }
+        }
+    }
 
     def test_model_resource_name_on_list(self, client):
         models.Comment.__bases__ += (_PatchedModel,)
@@ -74,10 +93,33 @@ class TestModelResourceName:
         assert (data.get('type') == 'resource_name_from_view'), (
             'resource_name from view incorrect on list')
 
+    def test_model_resource_name_create(self, client):
+        models.Comment.__bases__ += (_PatchedModel,)
+        models.Entry.__bases__ += (_PatchedModel,)
+        response = client.post(reverse("comment-list"),
+                               dump_json(self.create_data),
+                               content_type='application/vnd.api+json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_serializer_resource_name_create(self, client):
+        serializers.CommentSerializer.Meta.resource_name = "renamed_comments"
+        serializers.EntrySerializer.Meta.resource_name = "renamed_entries"
+        self.create_data['data']['type'] = 'renamed_comments'
+        self.create_data['data']['relationships']['entry']['data']['type'] = 'renamed_entries'
+
+        response = client.post(reverse("comment-list"),
+                               dump_json(self.create_data),
+                               content_type='application/vnd.api+json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+
     def teardown_method(self, method):
         models.Comment.__bases__ = (models.Comment.__bases__[0],)
+        models.Entry.__bases__ = (models.Entry.__bases__[0],)
         try:
             delattr(serializers.CommentSerializer.Meta, "resource_name")
+            delattr(serializers.EntrySerializer.Meta, "resource_name")
         except AttributeError:
             pass
         try:

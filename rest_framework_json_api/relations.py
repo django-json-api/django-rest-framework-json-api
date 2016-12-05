@@ -158,12 +158,9 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
 
     def get_resource_type_from_included_serializer(self, field_name):
         """
-        Given a field_name, check if the serializer has a
-        corresponding included_serializer with a Meta.resource_name property
-
-        Returns the resource name or None
+        Check to see it this resource has a different resource_name when
+        included and return that name, or None
         """
-        root = getattr(self.parent, 'parent', self.parent) or self.parent
         root = self.get_root_serializer()
 
         if root is not None:
