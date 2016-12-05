@@ -68,6 +68,9 @@ class EntrySerializer(serializers.ModelSerializer):
                   'authors', 'comments', 'featured', 'suggested',)
         meta_fields = ('body_format',)
 
+    class JSONAPIMeta:
+        included_resources = ['comments']
+
 
 class AuthorBioSerializer(serializers.ModelSerializer):
 

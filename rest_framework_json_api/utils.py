@@ -266,8 +266,11 @@ def get_included_resources(request, serializer=None):
 
 
 def get_default_included_resources_from_serializer(serializer):
+    meta = getattr(serializer, 'JSONAPIMeta', None)
+    if meta is None and getattr(serializer, 'many', False):
+        meta = getattr(serializer.child, 'JSONAPIMeta', None)
     try:
-        return list(serializer.JSONAPIMeta.included_resources)
+        return list(meta.included_resources)
     except AttributeError:
         return []
 
