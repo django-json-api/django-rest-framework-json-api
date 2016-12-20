@@ -8,7 +8,7 @@ from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializ
 from example.models import Blog, Entry, Author
 
 import pytest
-from example.tests.utils import dump_json, redump_json
+from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db
 
@@ -108,7 +108,6 @@ class TestModelSerializer(object):
 
         assert response.status_code == 200
 
-        actual = redump_json(response.content)
-        expected_json = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert actual == expected_json
+        assert expected == parsed_content
