@@ -2,6 +2,6 @@
 pytest>=2.9.0,<3.0
 pytest-django
 pytest-factoryboy
-fake-factory
+fake-factory==0.7.4
 tox
 mock

@@ -14,13 +14,14 @@ class PageNumberPagination(PageNumberPagination):
     """
 
     page_size_query_param = 'page_size'
+    page_query_param = 'page'
     max_page_size = 100
 
     def build_link(self, index):
         if not index:
             return None
         url = self.request and self.request.build_absolute_uri() or ''
-        return replace_query_param(url, 'page', index)
+        return replace_query_param(url, self.page_query_param, index)
 
     def get_paginated_response(self, data):
         next = None
