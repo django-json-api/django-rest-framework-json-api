@@ -44,7 +44,12 @@ def test_pagination_with_single_entry(single_entry, client):
                         }
                     },
                     "tags": {
-                        "data": []
+                        "data": [
+                            {
+                                "id": "1",
+                                "type": "taggedItems"
+                            }
+                        ]
                     }
                 }
             }],
