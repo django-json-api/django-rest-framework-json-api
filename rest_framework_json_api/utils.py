@@ -12,7 +12,6 @@ from rest_framework.exceptions import APIException
 
 import django
 from django.conf import settings
-from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
 from django.db.models import Manager
 from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
@@ -31,11 +30,14 @@ except ImportError:
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
     ReverseManyRelatedObjectsDescriptor = type(None)
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+    ReverseGenericRelatedObjectsDescriptor = type(None)
 else:
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
-
+    from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor
+    ReverseGenericManyToOneDescriptor = type(None)
 
 def get_resource_name(context):
     """
@@ -218,6 +220,8 @@ def get_related_resource_type(relation):
                 relation_model = parent_model_relation.field.related.model
             elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
                 relation_model = parent_model_relation.rel.model
+            elif parent_model_relation_type is ReverseGenericRelatedObjectsDescriptor:
+                relation_model = parent_model_relation.field.related_model
             else:
                 return get_related_resource_type(parent_model_relation)
 
