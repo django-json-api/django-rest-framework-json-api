@@ -48,6 +48,9 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                             "related": "http://testserver/entries/1/suggested/",
                             "self": "http://testserver/entries/1/relationships/suggested"
                         }
+                    },
+                    "tags": {
+                        "data": []
                     }
                 }
             },
@@ -83,6 +86,9 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
                             "related": "http://testserver/entries/2/suggested/",
                             "self": "http://testserver/entries/2/relationships/suggested"
                         }
+                    },
+                    "tags": {
+                        "data": []
                     }
                 }
             },
