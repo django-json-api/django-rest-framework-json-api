@@ -99,6 +99,7 @@ class LimitOffsetPagination(pagination.LimitOffsetPagination):
 class CursorPagination(pagination.CursorPagination):
     """
     Cursor paginator that adheres to the json-api spec.
+    (http://jsonapi.org/examples/#pagination)
     """
     def get_paginated_response(self, data):
         return Response({
