@@ -2,17 +2,15 @@
 Pagination fields
 """
 from collections import OrderedDict
-from rest_framework import serializers
+from rest_framework import pagination
 from rest_framework.views import Response
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from rest_framework.utils.urls import remove_query_param, replace_query_param
 
 
-class PageNumberPagination(PageNumberPagination):
+class PageNumberPagination(pagination.PageNumberPagination):
     """
     A json-api compatible pagination format
     """
-
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -49,7 +47,7 @@ class PageNumberPagination(PageNumberPagination):
         })
 
 
-class LimitOffsetPagination(LimitOffsetPagination):
+class LimitOffsetPagination(pagination.LimitOffsetPagination):
     """
     A limit/offset based style. For example:
     http://api.example.org/accounts/?page[limit]=100
@@ -75,10 +73,10 @@ class LimitOffsetPagination(LimitOffsetPagination):
     def get_first_link(self):
         if self.count == 0:
             return None
-        
+
         url = self.request.build_absolute_uri()
         return remove_query_param(url, self.offset_query_param)
-    
+
     def get_paginated_response(self, data):
         return Response({
             'results': data,
@@ -94,5 +92,19 @@ class LimitOffsetPagination(LimitOffsetPagination):
                 ('last', self.get_last_link()),
                 ('next', self.get_next_link()),
                 ('prev', self.get_previous_link())
+            ])
+        })
+
+
+class CursorPagination(pagination.CursorPagination):
+    """
+    Cursor paginator that adheres to the json-api spec.
+    """
+    def get_paginated_response(self, data):
+        return Response({
+            'results': data,
+            'links': OrderedDict([
+                ('next', self.get_next_link()),
+                ('previous', self.get_previous_link()),
             ])
         })
