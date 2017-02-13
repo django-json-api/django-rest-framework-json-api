@@ -186,6 +186,14 @@ def get_related_resource_type(relation):
         relation_model = relation.model
     elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
+    elif (
+            getattr(relation, 'many', False) and
+            hasattr(relation.child, 'Meta') and
+            hasattr(relation.child.Meta, 'model')):
+        # For ManyToMany relationships, get the model from the child
+        # serializer of the list serializer
+        # TODO Test coverage
+        relation_model = relation.child.Meta.model
     else:
         parent_serializer = relation.parent
         parent_model = None
