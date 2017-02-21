@@ -111,7 +111,8 @@ class JSONRenderer(renderers.JSONRenderer):
                     relation_data.append(
                         OrderedDict([
                             ('type', relation_type),
-                            ('id', encoding.force_text(related_object.pk))
+                            ('id', encoding.force_text(getattr(
+                                related_object.pk, field.lookup_field)))
                         ])
                     )
 
@@ -150,12 +151,17 @@ class JSONRenderer(renderers.JSONRenderer):
             if isinstance(
                     field, (relations.PrimaryKeyRelatedField, relations.HyperlinkedRelatedField)
             ):
-                resolved, relation = utils.get_relation_instance(
-                    resource_instance, '%s_id' % source, field.parent
-                )
-                if not resolved:
-                    continue
-                relation_id = relation if resource.get(field_name) else None
+                lookup_field = getattr(field, 'lookup_field', None)
+                if lookup_field:
+                    relation_id = getattr(
+                        getattr(resource_instance, source), lookup_field)
+                else:
+                    resolved, relation = utils.get_relation_instance(
+                        resource_instance, '%s_id' % source, field.parent
+                    )
+                    if not resolved:
+                        continue
+                    relation_id = relation if resource.get(field_name) else None
                 relation_data = {
                     'data': (
                         OrderedDict([
@@ -216,9 +222,15 @@ class JSONRenderer(renderers.JSONRenderer):
                         utils.get_resource_type_from_instance(nested_resource_instance)
                     )
 
+                    if hasattr(field.child_relation, 'lookup_field'):
+                        _id = getattr(nested_resource_instance,
+                                      field.child_relation.lookup_field)
+                    else:
+                        _id = nested_resource_instance.pk
+
                     relation_data.append(OrderedDict([
                         ('type', nested_resource_instance_type),
-                        ('id', encoding.force_text(nested_resource_instance.pk))
+                        ('id', encoding.force_text(_id))
                     ]))
                 data.update({
                     field_name: {
@@ -244,14 +256,23 @@ class JSONRenderer(renderers.JSONRenderer):
                 if isinstance(serializer_data, list):
                     for position in range(len(serializer_data)):
                         nested_resource_instance = resource_instance_queryset[position]
+                        nested_resource_data = serializer_data[position]
                         nested_resource_instance_type = (
                             relation_type or
                             utils.get_resource_type_from_instance(nested_resource_instance)
                         )
 
+                        instance_pk_name = (
+                            getattr(field, 'lookup_field', None) or
+                            nested_resource_instance._meta.pk.name)
+                        if instance_pk_name in nested_resource_data:
+                            pk = nested_resource_data[instance_pk_name]
+                        else:
+                            pk = nested_resource_instance.pk
+
                         relation_data.append(OrderedDict([
                             ('type', nested_resource_instance_type),
-                            ('id', encoding.force_text(nested_resource_instance.pk))
+                            ('id', encoding.force_text(pk))
                         ]))
 
                     data.update({field_name: {'data': relation_data}})
@@ -463,9 +484,19 @@ class JSONRenderer(renderers.JSONRenderer):
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)
+        if resource_instance is None:
+            pk = None
+        elif 'id' in fields:
+            pk = fields['id'].get_attribute(resource_instance)
+        elif 'url' in fields:
+            pk = getattr(resource_instance, fields['url'].lookup_field)
+        else:
+            # Check if the primary key exists in the resource by getting the
+            # primary keys attribute name.
+            pk = resource_instance.pk
         resource_data = [
             ('type', resource_name),
-            ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
+            ('id', encoding.force_text(pk)),
             ('attributes', cls.extract_attributes(fields, resource)),
         ]
         relationships = cls.extract_relationships(fields, resource, resource_instance)
