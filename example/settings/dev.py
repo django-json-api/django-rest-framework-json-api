@@ -61,6 +61,8 @@ MIDDLEWARE_CLASSES = ()
 
 JSON_API_FORMAT_KEYS = 'camelize'
 JSON_API_FORMAT_TYPES = 'camelize'
+JSON_API_FILTER_KEYWORD = 'filter\[(?P<field>\w+)\]'
+
 REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
@@ -76,4 +78,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_json_api.filters.JsonApiFilterBackend',
+    )
+
 }

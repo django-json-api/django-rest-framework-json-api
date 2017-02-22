@@ -9,6 +9,7 @@ from rest_framework_json_api.views import RelationshipView
 from example.models import Blog, Entry, Author, Comment
 from example.serializers import (
     BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
+from example.filters import CommentFilter
 
 from rest_framework_json_api.utils import format_drf_errors
 
@@ -70,6 +71,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    filter_class = CommentFilter
 
 
 class EntryRelationshipView(RelationshipView):

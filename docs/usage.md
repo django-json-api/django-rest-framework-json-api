@@ -1,8 +1,7 @@
 
 # Usage
 
-The DJA package implements a custom renderer, parser, exception handler, and
-pagination. To get started enable the pieces in `settings.py` that you want to use.
+The DJA package implements a custom renderer, parser, exception handler, pagination and filter backend. To get started enable the pieces in `settings.py` that you want to use.
 
 Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`.
 The easiest way to make use of those features is to import ModelSerializer variants
@@ -26,6 +25,10 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_json_api.filters.JsonApiFilterBackend',
+    )
+
 }
 ```
 
@@ -462,3 +465,27 @@ Related links will be created automatically when using the Relationship View.
 ### Included
 ### Errors
 -->
+
+### Filtering
+
+JSON API spefications is agnostic towards filtering. However, it instructs that the `filter` keyword should be reserved for querying filtered resources, nothing other than that. Although, the specs recommend the following pattern for filtering:
+
+```
+GET /comments?filter[post]=1 HTTP/1.1
+```
+
+DJA package implements its own filter backend (JsonApiFilterBackend) which can be enabled by configuring 'DEFAULT_FILTER_BACKENDS' (as included in the beginning). The backend depends on the DRF's own filtering which depends on [`django-filter`](https://github.com/carltongibson/django-filter). A substitute for `django-filter` is [`django-rest-framework-filters`](https://github.com/philipn/django-rest-framework-filters). The DJA provided filter backend can use both packages.
+
+The default filter format is set to match the above recommendation. This can be changed from the settings by modifying 'JSON_API_FILTER_KEYWORD' which is a simple regex. If for example, the square brackets need to be replaced by round parenthesis, the setting can be set to:
+```
+JSON_API_FILTER_KEYWORD = 'filter\((?P<field>\w+)\)'
+```
+
+Now the query should look like:
+```
+GET /comments?filter(post)=1 HTTP/1.1
+```
+
+The backend basically takes the request query paramters, which are formatted as the specs recommend, and reformats them in order to be used by DRF filtering.
+
+How the filtering actually works and how to deal with queries such as: `GET /comments?filter[post]=1,2,3 HTTP/1.1` is something user dependent and beyond the scope of DJA.
