@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.utils import encoding
 
 from example.tests import TestBase
-from example.tests.utils import dump_json, redump_json
+from example.tests.utils import load_json
 
 
 class FormatKeysSetTests(TestBase):
@@ -53,7 +52,6 @@ class FormatKeysSetTests(TestBase):
             }
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
