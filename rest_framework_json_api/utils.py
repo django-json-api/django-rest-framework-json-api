@@ -186,6 +186,13 @@ def get_related_resource_type(relation):
         relation_model = relation.model
     elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
+    elif (
+            getattr(relation, 'many', False) and
+            hasattr(relation.child, 'Meta') and
+            hasattr(relation.child.Meta, 'model')):
+        # For ManyToMany relationships, get the model from the child
+        # serializer of the list serializer
+        relation_model = relation.child.Meta.model
     else:
         parent_serializer = relation.parent
         parent_model = None
@@ -266,10 +273,10 @@ def get_included_resources(request, serializer=None):
 
 
 def get_default_included_resources_from_serializer(serializer):
-    try:
-        return list(serializer.JSONAPIMeta.included_resources)
-    except AttributeError:
-        return []
+    meta = getattr(serializer, 'JSONAPIMeta', None)
+    if meta is None and getattr(serializer, 'many', False):
+        meta = getattr(serializer.child, 'JSONAPIMeta', None)
+    return list(getattr(meta, 'included_resources', []))
 
 
 def get_included_serializers(serializer):

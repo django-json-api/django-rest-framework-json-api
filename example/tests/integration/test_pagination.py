@@ -1,11 +1,19 @@
 from django.core.urlresolvers import reverse
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import pytest
 from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db
 
-
+@mock.patch(
+    'rest_framework_json_api.utils'
+    '.get_default_included_resources_from_serializer',
+    new=lambda s: [])
 def test_pagination_with_single_entry(single_entry, client):
 
     expected = {

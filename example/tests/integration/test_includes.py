@@ -3,15 +3,9 @@ from django.core.urlresolvers import reverse
 
 from example.tests.utils import load_json
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 pytestmark = pytest.mark.django_db
 
 
-@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
 def test_default_included_data_on_list(multiple_entries, client):
     return test_included_data_on_list(multiple_entries=multiple_entries, client=client, query='?page_size=5')
 
@@ -28,7 +22,6 @@ def test_included_data_on_list(multiple_entries, client, query='?include=comment
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
 
 
-@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
 def test_default_included_data_on_detail(single_entry, client):
     return test_included_data_on_detail(single_entry=single_entry, client=client, query='')
 

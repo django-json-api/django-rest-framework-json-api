@@ -1,6 +1,11 @@
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import pytest
 
 from example.views import EntryViewSet
@@ -12,6 +17,10 @@ pytestmark = pytest.mark.django_db
 
 
 # rf == request_factory
+@mock.patch(
+    'rest_framework_json_api.utils'
+    '.get_default_included_resources_from_serializer',
+    new=lambda s: [])
 def test_multiple_entries_no_pagination(multiple_entries, rf):
 
     expected = {
