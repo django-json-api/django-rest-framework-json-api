@@ -192,7 +192,6 @@ def get_related_resource_type(relation):
             hasattr(relation.child.Meta, 'model')):
         # For ManyToMany relationships, get the model from the child
         # serializer of the list serializer
-        # TODO Test coverage
         relation_model = relation.child.Meta.model
     else:
         parent_serializer = relation.parent
