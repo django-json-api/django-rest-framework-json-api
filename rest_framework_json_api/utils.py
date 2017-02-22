@@ -210,17 +210,19 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            if type(parent_model_relation) is ReverseManyToOneDescriptor:
+            # Order of comparison matters (due to inheritance order)
+            # ManyToManyDescriptor -> ReverseManyToOneDescriptor
+            if isinstance(parent_model_relation, ManyToManyDescriptor):
+                relation_model = parent_model_relation.field.remote_field.model
+            elif isinstance(parent_model_relation, ReverseManyRelatedObjectsDescriptor):
+                relation_model = parent_model_relation.field.related.model
+            elif isinstance(parent_model_relation, ReverseManyToOneDescriptor):
                 if django.VERSION >= (1, 9):
                     relation_model = parent_model_relation.rel.related_model
                 elif django.VERSION >= (1, 8):
                     relation_model = parent_model_relation.related.related_model
                 else:
                     relation_model = parent_model_relation.related.model
-            elif type(parent_model_relation) is ManyToManyDescriptor:
-                relation_model = parent_model_relation.field.remote_field.model
-            elif type(parent_model_relation) is ReverseManyRelatedObjectsDescriptor:
-                relation_model = parent_model_relation.field.related.model
             else:
                 return get_related_resource_type(parent_model_relation)
 
