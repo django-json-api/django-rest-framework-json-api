@@ -277,7 +277,7 @@ def get_default_included_resources_from_serializer(serializer):
     if meta is None and getattr(serializer, 'many', False):
         meta = getattr(serializer.child, 'JSONAPIMeta', None)
     try:
-        return list(meta.included_resources)
+        return list(getattr(meta, 'included_resources', []))
     except AttributeError:
         return []
 
