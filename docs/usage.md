@@ -34,6 +34,7 @@ record count and a `links` object with the next, previous, first, and last links
 Pages can be selected with the `page` GET parameter. Page size can be controlled
 per request via the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
 
+
 ### Serializers
 
 It is recommended to import the base serializer classes from this package
@@ -45,6 +46,37 @@ from rest_framework_json_api import serializers
 class MyModelSerializer(serializers.ModelSerializers):
     # ...
 ```
+
+
+### Pagination
+
+This pacakge provides three paginators that correspond to the defaults
+provided by django-rest-framework: PageNumberPagination, LimitOffsetPagination,
+and CursorPagination.
+
+Each of these paginators will format the serialized data to conform to the
+json-api spec for pagination as defined
+[here](http://jsonapi.org/format/#fetching-pagination).
+
+To enable one of these paginators as the project default, you may add the
+the following to your settings file:
+
+```python
+REST_FRAMEWORK = {
+    ...
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework_json_api.pagination.PageNumberPagination',
+}
+```
+
+Alternatly you may define the paginator on the view itself as such:
+
+```python
+from rest_framework_json_api import pagination
+class FooViewSet(viewsets.ModelViewSet):
+    pagination_class = pagination.CursorPagination
+```
+
 
 ### Setting the resource_name
 

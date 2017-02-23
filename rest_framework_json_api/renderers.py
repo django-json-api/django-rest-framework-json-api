@@ -5,7 +5,7 @@ import copy
 from collections import OrderedDict
 
 import inflection
-from django.db.models import Manager, QuerySet
+from django.db.models import Manager
 from django.utils import six, encoding
 from rest_framework import relations
 from rest_framework import renderers
@@ -396,7 +396,7 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_data.append(('links', {'self': resource[api_settings.URL_FIELD_NAME]}))
         return OrderedDict(resource_data)
 
-    def render_relationship_view(self, data, accepted_media_type=None, renderer_context=None):
+    def render_relationship_view(self, data, accepted_media_type=None, renderer_context={}):
         # Special case for RelationshipView
         view = renderer_context.get("view", None)
         render_data = OrderedDict([
@@ -409,12 +409,12 @@ class JSONRenderer(renderers.JSONRenderer):
             render_data, accepted_media_type, renderer_context
         )
 
-    def render_errors(self, data, accepted_media_type=None, renderer_context=None):
+    def render_errors(self, data, accepted_media_type=None, renderer_context={}):
         return super(JSONRenderer, self).render(
             utils.format_errors(data), accepted_media_type, renderer_context
         )
 
-    def render(self, data, accepted_media_type=None, renderer_context=None):
+    def render(self, data, accepted_media_type=None, renderer_context={}):
 
         view = renderer_context.get("view", None)
         request = renderer_context.get("request", None)
