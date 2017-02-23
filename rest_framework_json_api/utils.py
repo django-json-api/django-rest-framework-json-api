@@ -30,10 +30,12 @@ except ImportError:
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
     ReverseManyRelatedObjectsDescriptor = type(None)
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
 else:
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+    from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
 
 
 def get_resource_name(context):
@@ -210,17 +212,23 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            if type(parent_model_relation) is ReverseManyToOneDescriptor:
+            parent_model_relation_type = type(parent_model_relation)
+            if parent_model_relation_type is ReverseManyToOneDescriptor:
                 if django.VERSION >= (1, 9):
                     relation_model = parent_model_relation.rel.related_model
                 elif django.VERSION >= (1, 8):
                     relation_model = parent_model_relation.related.related_model
                 else:
                     relation_model = parent_model_relation.related.model
-            elif type(parent_model_relation) is ManyToManyDescriptor:
+            elif parent_model_relation_type is ManyToManyDescriptor:
                 relation_model = parent_model_relation.field.remote_field.model
-            elif type(parent_model_relation) is ReverseManyRelatedObjectsDescriptor:
+            elif parent_model_relation_type is ReverseManyRelatedObjectsDescriptor:
                 relation_model = parent_model_relation.field.related.model
+            elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.model
+                else:
+                    relation_model = parent_model_relation.field.related_model
             else:
                 return get_related_resource_type(parent_model_relation)
 

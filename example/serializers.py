@@ -1,11 +1,23 @@
 from datetime import datetime
 from rest_framework_json_api import serializers, relations
-from example.models import Blog, Entry, Author, AuthorBio, Comment
+from example.models import Blog, Entry, Author, AuthorBio, Comment, TaggedItem
+
+
+class TaggedItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TaggedItem
+        fields = ('tag', )
 
 
 class BlogSerializer(serializers.ModelSerializer):
 
     copyright = serializers.SerializerMethodField()
+    tags = TaggedItemSerializer(many=True, read_only=True)
+
+    include_serializers = {
+        'tags': 'example.serializers.TaggedItemSerializer',
+    }
 
     def get_copyright(self, resource):
         return datetime.now().year
@@ -17,7 +29,8 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ('name', 'url',)
+        fields = ('name', 'url', 'tags')
+        read_only_fields = ('tags', )
         meta_fields = ('copyright',)
 
 
@@ -36,6 +49,7 @@ class EntrySerializer(serializers.ModelSerializer):
         'comments': 'example.serializers.CommentSerializer',
         'featured': 'example.serializers.EntrySerializer',
         'suggested': 'example.serializers.EntrySerializer',
+        'tags': 'example.serializers.TaggedItemSerializer',
     }
 
     body_format = serializers.SerializerMethodField()
@@ -52,6 +66,7 @@ class EntrySerializer(serializers.ModelSerializer):
     # single related from serializer
     featured = relations.SerializerMethodResourceRelatedField(
             source='get_featured', model=Entry, read_only=True)
+    tags = TaggedItemSerializer(many=True, read_only=True)
 
     def get_suggested(self, obj):
         return Entry.objects.exclude(pk=obj.pk)
@@ -65,7 +80,8 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                  'authors', 'comments', 'featured', 'suggested',)
+                  'authors', 'comments', 'featured', 'suggested', 'tags')
+        read_only_fields = ('tags', )
         meta_fields = ('body_format',)
 
     class JSONAPIMeta:

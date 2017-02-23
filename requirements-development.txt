@@ -2,7 +2,7 @@
 pytest>=2.9.0,<3.0
 pytest-django
 pytest-factoryboy
-fake-factory
+Faker
 recommonmark
 Sphinx
 sphinx_rtd_theme
