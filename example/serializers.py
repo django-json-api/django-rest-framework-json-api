@@ -84,6 +84,9 @@ class EntrySerializer(serializers.ModelSerializer):
         read_only_fields = ('tags', )
         meta_fields = ('body_format',)
 
+    class JSONAPIMeta:
+        included_resources = ['comments']
+
 
 class AuthorBioSerializer(serializers.ModelSerializer):
 
