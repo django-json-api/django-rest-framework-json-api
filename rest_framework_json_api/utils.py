@@ -31,13 +31,12 @@ if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
     ReverseManyRelatedObjectsDescriptor = type(None)
     from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
-    ReverseGenericRelatedObjectsDescriptor = type(None)
 else:
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
-    from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor
-    ReverseGenericManyToOneDescriptor = type(None)
+    from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
+
 
 def get_resource_name(context):
     """
@@ -226,9 +225,10 @@ def get_related_resource_type(relation):
             elif parent_model_relation_type is ReverseManyRelatedObjectsDescriptor:
                 relation_model = parent_model_relation.field.related.model
             elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
-                relation_model = parent_model_relation.rel.model
-            elif parent_model_relation_type is ReverseGenericRelatedObjectsDescriptor:
-                relation_model = parent_model_relation.field.related_model
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.model
+                else:
+                    relation_model = parent_model_relation.field.related_model
             else:
                 return get_related_resource_type(parent_model_relation)
 

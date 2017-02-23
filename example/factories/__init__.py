@@ -59,7 +59,7 @@ class CommentFactory(factory.django.DjangoModelFactory):
     author = factory.SubFactory(AuthorFactory)
 
 
-class EntryTaggedItemFactory(factory.django.DjangoModelFactory):
+class TaggedItemFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = TaggedItem

@@ -2,22 +2,22 @@ import pytest
 from pytest_factoryboy import register
 
 from example.factories import BlogFactory, AuthorFactory, AuthorBioFactory, EntryFactory, CommentFactory, \
-    EntryTaggedItemFactory
+    TaggedItemFactory
 
 register(BlogFactory)
 register(AuthorFactory)
 register(AuthorBioFactory)
 register(EntryFactory)
 register(CommentFactory)
-register(EntryTaggedItemFactory)
+register(TaggedItemFactory)
 
 
 @pytest.fixture
-def single_entry(blog, author, entry_factory, comment_factory, entry_tagged_item_factory):
+def single_entry(blog, author, entry_factory, comment_factory, tagged_item_factory):
 
     entry = entry_factory(blog=blog, authors=(author,))
     comment_factory(entry=entry)
-    entry_tagged_item_factory(content_object=entry)
+    tagged_item_factory(content_object=entry)
     return entry
 
 
