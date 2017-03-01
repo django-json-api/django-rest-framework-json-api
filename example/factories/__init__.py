@@ -2,7 +2,7 @@
 
 import factory
 from faker import Factory as FakerFactory
-from example.models import Blog, Author, AuthorBio, Entry, Comment
+from example.models import Blog, Author, AuthorBio, Entry, Comment, TaggedItem
 
 faker = FakerFactory.create()
 faker.seed(983843)
@@ -58,3 +58,11 @@ class CommentFactory(factory.django.DjangoModelFactory):
     body = factory.LazyAttribute(lambda x: faker.text())
     author = factory.SubFactory(AuthorFactory)
 
+
+class TaggedItemFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = TaggedItem
+
+    content_object = factory.SubFactory(EntryFactory)
+    tag = factory.LazyAttribute(lambda x: faker.word())
