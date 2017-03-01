@@ -20,7 +20,7 @@ class PageNumberPagination(PageNumberPagination):
         if not index:
             return None
         url = self.request and self.request.build_absolute_uri() or ''
-        return replace_query_param(url, 'page', index)
+        return replace_query_param(url, self.page_query_param, index)
 
     def get_paginated_response(self, data):
         next = None
@@ -75,10 +75,10 @@ class LimitOffsetPagination(LimitOffsetPagination):
     def get_first_link(self):
         if self.count == 0:
             return None
-        
+
         url = self.request.build_absolute_uri()
         return remove_query_param(url, self.offset_query_param)
-    
+
     def get_paginated_response(self, data):
         return Response({
             'results': data,

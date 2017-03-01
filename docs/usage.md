@@ -31,8 +31,10 @@ REST_FRAMEWORK = {
 
 If `PAGE_SIZE` is set the renderer will return a `meta` object with
 record count and a `links` object with the next, previous, first, and last links.
-Pages can be selected with the `page` GET parameter. Page size can be controlled
-per request via the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
+Pages can be selected with the `page` GET parameter. The query parameter used to
+retrieve the page can be customized by subclassing `PageNumberPagination` and
+overriding the `page_query_param`.  Page size can be controlled per request via
+the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
 
 ### Serializers
 
