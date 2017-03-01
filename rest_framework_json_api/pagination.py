@@ -14,7 +14,6 @@ class PageNumberPagination(PageNumberPagination):
     """
 
     page_size_query_param = 'page_size'
-    page_query_param = 'page'
     max_page_size = 100
 
     def build_link(self, index):
@@ -76,10 +75,10 @@ class LimitOffsetPagination(LimitOffsetPagination):
     def get_first_link(self):
         if self.count == 0:
             return None
-        
+
         url = self.request.build_absolute_uri()
         return remove_query_param(url, self.offset_query_param)
-    
+
     def get_paginated_response(self, data):
         return Response({
             'results': data,
