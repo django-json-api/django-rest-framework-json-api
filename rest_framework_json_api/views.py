@@ -134,7 +134,8 @@ class RelationshipView(generics.GenericAPIView):
             serializer.is_valid(raise_exception=True)
             related_instance_or_manager.all().delete()
             # have to set bulk to False since data isn't saved yet
-            if django.VERSION >= (1, 9):
+            class_name = related_instance_or_manager.__class__.__name__
+            if django.VERSION >= (1, 9) and class_name != 'ManyRelatedManager':
                 related_instance_or_manager.add(*serializer.validated_data,
                                                 bulk=False)
             else:

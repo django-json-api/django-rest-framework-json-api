@@ -118,12 +118,31 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
-    def test_patch_to_many_relationship(self):
+    def test_patch_one_to_many_relationship(self):
         url = '/blogs/{}/relationships/entry_set'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)}, ]
         }
         response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        assert response.status_code == 200, response.content.decode()
+        assert response.data == request_data['data']
+
+        response = self.client.get(url)
+        assert response.data == request_data['data']
+
+    def test_patch_many_to_many_relationship(self):
+        url = '/entries/{}/relationships/authors'.format(self.first_entry.id)
+        request_data = {
+            'data': [
+                {
+                    'type': format_resource_type('Author'),
+                    'id': str(self.author.id)
+                },
+            ]
+        }
+        response = self.client.patch(url,
+                                     data=json.dumps(request_data),
+                                     content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
