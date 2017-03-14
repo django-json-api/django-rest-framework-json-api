@@ -6,13 +6,17 @@ from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
 if django.VERSION < (1, 9):
     from django.db.models.fields.related import (
-        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor,
         ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
+        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        SingleRelatedObjectDescriptor as ReverseOneToOneDescriptor,
     )
 else:
     from django.db.models.fields.related_descriptors import (
         ForwardManyToOneDescriptor,
         ManyToManyDescriptor,
+        ReverseManyToOneDescriptor,
+        ReverseOneToOneDescriptor,
     )
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
@@ -44,16 +48,25 @@ class ModelViewSet(viewsets.ModelViewSet):
                     break
                 field = getattr(level_model, level)
                 field_class = field.__class__
-                if not (
+
+                is_forward_relation = (
                     issubclass(field_class, ForwardManyToOneDescriptor)
                     or issubclass(field_class, ManyToManyDescriptor)
-                ):
+                )
+                is_reverse_relation = (
+                    issubclass(field_class, ReverseManyToOneDescriptor)
+                    or issubclass(field_class, ReverseOneToOneDescriptor)
+                )
+                if not (is_forward_relation or is_reverse_relation):
                     break
 
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    level_model = field.field.related_model
+                    if is_forward_relation:
+                        level_model = field.field.related_model
+                    else:
+                        level_model = field.field.model
 
             if included_model is not None:
                 qs = qs.prefetch_related(included.replace('.', '__'))
