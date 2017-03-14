@@ -63,10 +63,16 @@ class ModelViewSet(viewsets.ModelViewSet):
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    if is_forward_relation:
-                        level_model = field.field.related_model
+                    # patch for older versions of django
+                    if hasattr(field, 'field'):
+                        model_field = field.field
                     else:
-                        level_model = field.field.model
+                        model_field = field.related
+
+                    if is_forward_relation:
+                        level_model = model_field.related_model
+                    else:
+                        level_model = model_field.model
 
             if included_model is not None:
                 qs = qs.prefetch_related(included.replace('.', '__'))
