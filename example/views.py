@@ -5,7 +5,7 @@ import rest_framework.renderers
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
-from rest_framework_json_api.views import RelationshipView
+from rest_framework_json_api.views import ModelViewSet, RelationshipView
 from example.models import Blog, Entry, Author, Comment
 from example.serializers import (
     BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
@@ -15,12 +15,12 @@ from rest_framework_json_api.utils import format_drf_errors
 HTTP_422_UNPROCESSABLE_ENTITY = 422
 
 
-class BlogViewSet(viewsets.ModelViewSet):
+class BlogViewSet(ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
 
 
-class JsonApiViewSet(viewsets.ModelViewSet):
+class JsonApiViewSet(ModelViewSet):
     """
     This is an example on how to configure DRF-jsonapi from
     within a class. It allows using DRF-jsonapi alongside
@@ -54,7 +54,7 @@ class BlogCustomViewSet(JsonApiViewSet):
     serializer_class = BlogSerializer
 
 
-class EntryViewSet(viewsets.ModelViewSet):
+class EntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
     resource_name = 'posts'
 
@@ -62,12 +62,12 @@ class EntryViewSet(viewsets.ModelViewSet):
         return EntrySerializer
 
 
-class AuthorViewSet(viewsets.ModelViewSet):
+class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
