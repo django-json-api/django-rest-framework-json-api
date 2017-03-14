@@ -36,7 +36,7 @@ from rest_framework_json_api.utils import (
 
 class ModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
+        qs = super(ModelViewSet, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
