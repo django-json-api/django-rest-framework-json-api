@@ -63,11 +63,10 @@ class ModelViewSet(viewsets.ModelViewSet):
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    # patch for older versions of django
-                    if hasattr(field, 'field'):
-                        model_field = field.field
-                    else:
+                    if django.VERSION < (1, 9):
                         model_field = field.related
+                    else:
+                        model_field = field.field
 
                     if is_forward_relation:
                         level_model = model_field.related_model
