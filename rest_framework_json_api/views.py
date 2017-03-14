@@ -53,7 +53,7 @@ class ModelViewSet(viewsets.ModelViewSet):
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    level_model = field.get_queryset().model
+                    level_model = field.field.related_model
 
             if included_model is not None:
                 qs = qs.prefetch_related(included.replace('.', '__'))
