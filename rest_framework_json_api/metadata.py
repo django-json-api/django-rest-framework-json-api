@@ -128,8 +128,8 @@ class JSONAPIMetadata(SimpleMetadata):
             field_info['children'] = self.get_serializer_info(field)
 
         if (not field_info.get('read_only')
-            and hasattr(field, 'choices')
-            and not field_info.get('relationship_resource')):
+            and not field_info.get('relationship_resource')
+            and hasattr(field, 'choices')):
             field_info['choices'] = [
                 {
                     'value': choice_value,
