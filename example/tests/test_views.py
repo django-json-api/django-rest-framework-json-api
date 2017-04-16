@@ -164,6 +164,7 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 204, response.content.decode()
+        assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_post_to_many_relationship_with_change(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
@@ -207,6 +208,7 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 204, response.content.decode()
+        assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_delete_one_to_many_relationship_with_not_null_constraint(self):
         url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
@@ -253,3 +255,15 @@ class TestValidationErrorResponses(TestBase):
         user = self.create_user('user', 'pass')
         force_authenticate(request, user)
         return view(request)
+
+
+class TestModelViewSet(TestBase):
+    def setUp(self):
+        self.author = Author.objects.create(name='Super powerful superhero', email='i.am@lost.com')
+        self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+
+    def test_no_content_response(self):
+        url = '/blogs/{}'.format(self.blog.pk)
+        response = self.client.delete(url)
+        assert response.status_code == 204, response.rendered_content.decode()
+        assert len(response.rendered_content) == 0, response.rendered_content.decode()
