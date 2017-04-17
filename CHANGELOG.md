@@ -1,3 +1,6 @@
+v2.2.0
+
+* Add support for Django 1.11
 
 v2.1.1
 

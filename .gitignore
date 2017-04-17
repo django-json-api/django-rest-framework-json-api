@@ -37,3 +37,5 @@ pip-delete-this-directory.txt
 
 # VirtualEnv
 .venv/
+
+*.sw*
