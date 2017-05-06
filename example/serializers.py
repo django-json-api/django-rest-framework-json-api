@@ -55,7 +55,7 @@ class EntrySerializer(serializers.ModelSerializer):
     body_format = serializers.SerializerMethodField()
     # many related from model
     comments = relations.ResourceRelatedField(
-            source='comment_set', many=True, read_only=True)
+            many=True, read_only=True)
     # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
             source='get_suggested', model=Entry, many=True, read_only=True,

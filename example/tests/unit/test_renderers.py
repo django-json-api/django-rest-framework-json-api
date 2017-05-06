@@ -16,7 +16,7 @@ class DummyTestSerializer(serializers.ModelSerializer):
     a single embedded relation
     '''
     related_models = RelatedModelSerializer(
-        source='comment_set', many=True, read_only=True)
+        source='comments', many=True, read_only=True)
 
     class Meta:
         model = Entry

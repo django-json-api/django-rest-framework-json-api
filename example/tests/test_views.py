@@ -158,7 +158,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 405, response.content.decode()
 
     def test_post_to_many_relationship_with_no_change(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
@@ -167,7 +167,7 @@ class TestRelationshipView(APITestCase):
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_post_to_many_relationship_with_change(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -202,7 +202,7 @@ class TestRelationshipView(APITestCase):
         assert response.data['author'] == None
 
     def test_delete_to_many_relationship_with_no_change(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -211,7 +211,7 @@ class TestRelationshipView(APITestCase):
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_delete_one_to_many_relationship_with_not_null_constraint(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }

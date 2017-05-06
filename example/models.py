@@ -76,7 +76,7 @@ class Entry(BaseModel):
 
 @python_2_unicode_compatible
 class Comment(BaseModel):
-    entry = models.ForeignKey(Entry)
+    entry = models.ForeignKey(Entry, related_name='comments')
     body = models.TextField()
     author = models.ForeignKey(
         Author,
