@@ -1,3 +1,8 @@
+v2.2.0
+
+* Add support for Django REST Framework 3.5 and 3.6
+* Add support for Django 1.11
+* Add support for Python 3.6
 
 v2.1.1
 

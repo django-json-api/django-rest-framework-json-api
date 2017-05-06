@@ -18,11 +18,15 @@ JSON API and Django Rest Framework
    :target: https://gitter.im/django-json-api/django-rest-framework-json-api
 
 
-Documentation: http://django-rest-framework-json-api.readthedocs.org/
+--------
+Overview
+--------
 
-Live demo (resets every hour): http://json-api.jerel.co/
+**JSON API support for Django REST Framework**
 
-Format specification: http://jsonapi.org/format/
+* Documentation: http://django-rest-framework-json-api.readthedocs.org/
+* Live demo (resets every hour): http://json-api.jerel.co/
+* Format specification: http://jsonapi.org/format/
 
 
 By default, Django REST Framework will produce a response like::
@@ -68,8 +72,9 @@ like the following::
 Requirements
 ------------
 
-1. Django
-2. Django REST Framework
+1. Python (2.7, 3.3, 3.4, 3.5, 3.6)
+2. Django (1.8, 1.9, 1.10, 1.11)
+3. Django REST Framework (3.1, 3.2, 3.3, 3.4, 3.5, 3.6)
 
 ------------
 Installation

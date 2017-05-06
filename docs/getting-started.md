@@ -51,15 +51,15 @@ like the following:
 
 ## Requirements
 
-1. Python >= 2.7
-2. Django
-3. Django REST Framework >= 3.1
+1. Python (2.7, 3.3, 3.4, 3.5, 3.6)
+2. Django (1.8, 1.9, 1.10, 1.11)
+3. Django REST Framework (3.1, 3.2, 3.3, 3.4, 3.5, 3.6)
 
 ## Installation
 
 From PyPI
 
-    pip install djangorestframework-jsonapi==2.0.0-beta.1
+    pip install djangorestframework-jsonapi
 
 From Source
 
