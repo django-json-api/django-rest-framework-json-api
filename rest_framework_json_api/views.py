@@ -1,6 +1,9 @@
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import NoReverseMatch
+if django.VERSION >= (1, 10):
+    from django.urls import NoReverseMatch
+else:
+    from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
