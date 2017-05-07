@@ -20,21 +20,28 @@ from django.utils.translation import ugettext_lazy as _
 try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
-    ManyRelatedField = type(None)
+    ManyRelatedField = object()
 
 try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
-    HyperlinkedRouterField = type(None)
+    HyperlinkedRouterField = object()
 
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
-    ReverseManyRelatedObjectsDescriptor = type(None)
-    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+    ReverseManyRelatedObjectsDescriptor = object()
 else:
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+
+# Generic relation descriptor from django.contrib.contenttypes.
+if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
+    # Target application does not use contenttypes. Importing would cause errors.
+    ReverseGenericManyToOneDescriptor = object()
+elif django.VERSION >= (1, 9):
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+else:
     from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
 
 
