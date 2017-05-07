@@ -3,6 +3,7 @@ v2.3.0
 * When `JSON_API_FORMAT_KEYS` is False (the default) do not translate request
   attributes and relations to snake\_case format. This conversion was unexpected
   and there was no way to turn it off.
+* Fix for apps that don't use `django.contrib.contenttypes`.
 
 v2.2.0
 
