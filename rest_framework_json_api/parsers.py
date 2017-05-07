@@ -4,6 +4,8 @@ Parsers
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
+from django.conf import settings
+
 from . import utils, renderers, exceptions
 
 
@@ -29,12 +31,27 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_attributes(data):
-        return utils.format_keys(data.get('attributes'), 'underscore') if data.get('attributes') else dict()
+        attributes = data.get('attributes')
+        uses_format_translation = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+
+        if not attributes:
+            return dict()
+        elif uses_format_translation:
+            # convert back to python/rest_framework's preferred underscore format
+            return utils.format_keys(attributes, 'underscore')
+        else:
+            return attributes
 
     @staticmethod
     def parse_relationships(data):
-        relationships = (utils.format_keys(data.get('relationships'), 'underscore')
-                         if data.get('relationships') else dict())
+        uses_format_translation = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+        relationships = data.get('relationships')
+
+        if not relationships:
+            relationships = dict()
+        elif uses_format_translation:
+            # convert back to python/rest_framework's preferred underscore format
+            relationships = utils.format_keys(relationships, 'underscore')
 
         # Parse the relationships
         parsed_relationships = dict()

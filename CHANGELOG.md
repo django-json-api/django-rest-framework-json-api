@@ -1,3 +1,9 @@
+v2.3.0
+
+* When `JSON_API_FORMAT_KEYS` is False (the default) do not translate request
+  attributes and relations to snake\_case format. This conversion was unexpected
+  and there was no way to turn it off.
+
 v2.2.0
 
 * Add support for Django REST Framework 3.5 and 3.6
