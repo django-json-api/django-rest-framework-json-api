@@ -1,4 +1,5 @@
 import collections
+import inflection
 import json
 
 from rest_framework.fields import MISSING_ERROR_MESSAGE, SerializerMethodField
@@ -123,7 +124,13 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
                 self.fail('incorrect_type', data_type=type(data).__name__)
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
+
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        field_name = inflection.singularize(expected_relation_type)
+        serializer_resource_type = self.get_resource_type_from_serializer(field_name)
+
+        if serializer_resource_type is not None:
+            expected_relation_type = serializer_resource_type
 
         if 'type' not in data:
             self.fail('missing_type')
@@ -142,18 +149,28 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         else:
             pk = value.pk
 
-        # check to see if this resource has a different resource_name when
-        # included and use that name
-        resource_type = None
-        root = getattr(self.parent, 'parent', self.parent)
         field_name = self.field_name if self.field_name else self.parent.field_name
+
+        resource_type = self.get_resource_type_from_serializer(field_name)
+        if resource_type is None:
+            resource_type = get_resource_type_from_instance(value)
+
+        return OrderedDict([('type', resource_type), ('id', str(pk))])
+
+    def get_resource_type_from_serializer(self, field_name):
+        """
+        Given a field_name, check if the serializer has a
+        corresponding included_serializer with a Meta.resource_name property
+
+        Returns the resource name or None
+        """
+        root = getattr(self.parent, 'parent', self.parent) or self.parent
         if getattr(root, 'included_serializers', None) is not None:
             includes = get_included_serializers(root)
             if field_name in includes.keys():
-                resource_type = get_resource_type_from_serializer(includes[field_name])
+                return get_resource_type_from_serializer(includes[field_name])
 
-        resource_type = resource_type if resource_type else get_resource_type_from_instance(value)
-        return OrderedDict([('type', resource_type), ('id', str(pk))])
+        return None
 
     def get_choices(self, cutoff=None):
         queryset = self.get_queryset()
