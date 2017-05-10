@@ -4,6 +4,7 @@ v2.3.0
   attributes and relations to snake\_case format. This conversion was unexpected
   and there was no way to turn it off.
 * Fix for apps that don't use `django.contrib.contenttypes`.
+* Fix `resource_name` support for POST requests and nested serializers
 
 v2.2.0
 

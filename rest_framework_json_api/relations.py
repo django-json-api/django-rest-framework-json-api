@@ -1,8 +1,10 @@
 import collections
+import inflection
 import json
 
 from rest_framework.fields import MISSING_ERROR_MESSAGE, SerializerMethodField
 from rest_framework.relations import *
+from rest_framework.serializers import Serializer
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
 
@@ -123,7 +125,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
                 self.fail('incorrect_type', data_type=type(data).__name__)
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
+
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        serializer_resource_type = self.get_resource_type_from_included_serializer()
+
+        if serializer_resource_type is not None:
+            expected_relation_type = serializer_resource_type
 
         if 'type' not in data:
             self.fail('missing_type')
@@ -142,18 +149,43 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         else:
             pk = value.pk
 
-        # check to see if this resource has a different resource_name when
-        # included and use that name
-        resource_type = None
-        root = getattr(self.parent, 'parent', self.parent)
-        field_name = self.field_name if self.field_name else self.parent.field_name
-        if getattr(root, 'included_serializers', None) is not None:
-            includes = get_included_serializers(root)
-            if field_name in includes.keys():
-                resource_type = get_resource_type_from_serializer(includes[field_name])
+        resource_type = self.get_resource_type_from_included_serializer()
+        if resource_type is None:
+            resource_type = get_resource_type_from_instance(value)
 
-        resource_type = resource_type if resource_type else get_resource_type_from_instance(value)
         return OrderedDict([('type', resource_type), ('id', str(pk))])
+
+    def get_resource_type_from_included_serializer(self):
+        """
+        Check to see it this resource has a different resource_name when
+        included and return that name, or None
+        """
+        field_name = self.field_name or self.parent.field_name
+        parent = self.get_parent_serializer()
+
+        if parent is not None:
+            # accept both singular and plural versions of field_name
+            field_names = [
+                inflection.singularize(field_name),
+                inflection.pluralize(field_name)
+            ]
+            includes = get_included_serializers(parent)
+            for field in field_names:
+                if field in includes.keys():
+                    return get_resource_type_from_serializer(includes[field])
+
+        return None
+
+    def get_parent_serializer(self):
+        if hasattr(self.parent, 'parent') and self.is_serializer(self.parent.parent):
+            return self.parent.parent
+        elif self.is_serializer(self.parent):
+            return self.parent
+
+        return None
+
+    def is_serializer(self, candidate):
+        return isinstance(candidate, Serializer)
 
     def get_choices(self, cutoff=None):
         queryset = self.get_queryset()

@@ -1,9 +1,11 @@
 import pytest
+from copy import deepcopy
+from example import models, serializers, views
+from example.tests.utils import dump_json, load_json
+from rest_framework import status
+
 from django.core.urlresolvers import reverse
 
-from example.tests.utils import load_json
-
-from example import models, serializers, views
 pytestmark = pytest.mark.django_db
 
 
@@ -37,6 +39,24 @@ def _check_relationship_and_included_comment_type_are_the_same(django_client, ur
 @pytest.mark.usefixtures("single_entry")
 class TestModelResourceName:
 
+    create_data = {
+        'data': {
+            'type': 'resource_name_from_JSONAPIMeta',
+            'id': None,
+            'attributes': {
+                'body': 'example',
+            },
+            'relationships': {
+                'entry': {
+                    'data': {
+                        'type': 'resource_name_from_JSONAPIMeta',
+                        'id': 1
+                    }
+                }
+            }
+        }
+    }
+
     def test_model_resource_name_on_list(self, client):
         models.Comment.__bases__ += (_PatchedModel,)
         response = client.get(reverse("comment-list"))
@@ -46,7 +66,7 @@ class TestModelResourceName:
             'resource_name from model incorrect on list')
 
     # Precedence tests
-    def test_resource_name_precendence(self, client):
+    def test_resource_name_precendence(self, client, monkeypatch):
         # default
         response = client.get(reverse("comment-list"))
         data = load_json(response.content)['data'][0]
@@ -61,29 +81,44 @@ class TestModelResourceName:
             'resource_name from model incorrect on list')
 
         # serializer > model
-        serializers.CommentSerializer.Meta.resource_name = "resource_name_from_serializer"
+        monkeypatch.setattr(serializers.CommentSerializer.Meta, 'resource_name', 'resource_name_from_serializer', False)
         response = client.get(reverse("comment-list"))
         data = load_json(response.content)['data'][0]
         assert (data.get('type') == 'resource_name_from_serializer'), (
             'resource_name from serializer incorrect on list')
 
         # view > serializer > model
-        views.CommentViewSet.resource_name = 'resource_name_from_view'
+        monkeypatch.setattr(views.CommentViewSet, 'resource_name', 'resource_name_from_view', False)
         response = client.get(reverse("comment-list"))
         data = load_json(response.content)['data'][0]
         assert (data.get('type') == 'resource_name_from_view'), (
             'resource_name from view incorrect on list')
 
+    def test_model_resource_name_create(self, client):
+        models.Comment.__bases__ += (_PatchedModel,)
+        models.Entry.__bases__ += (_PatchedModel,)
+        response = client.post(reverse("comment-list"),
+                               dump_json(self.create_data),
+                               content_type='application/vnd.api+json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_serializer_resource_name_create(self, client, monkeypatch):
+        monkeypatch.setattr(serializers.CommentSerializer.Meta, 'resource_name', 'renamed_comments', False)
+        monkeypatch.setattr(serializers.EntrySerializer.Meta, 'resource_name', 'renamed_entries', False)
+        create_data = deepcopy(self.create_data)
+        create_data['data']['type'] = 'renamed_comments'
+        create_data['data']['relationships']['entry']['data']['type'] = 'renamed_entries'
+
+        response = client.post(reverse("comment-list"),
+                               dump_json(create_data),
+                               content_type='application/vnd.api+json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+
     def teardown_method(self, method):
         models.Comment.__bases__ = (models.Comment.__bases__[0],)
-        try:
-            delattr(serializers.CommentSerializer.Meta, "resource_name")
-        except AttributeError:
-            pass
-        try:
-            delattr(views.CommentViewSet, "resource_name")
-        except AttributeError:
-            pass
+        models.Entry.__bases__ = (models.Entry.__bases__[0],)
 
 
 @pytest.mark.usefixtures("single_entry")
