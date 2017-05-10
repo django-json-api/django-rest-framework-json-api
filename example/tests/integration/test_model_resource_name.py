@@ -1,4 +1,5 @@
 import pytest
+from copy import deepcopy
 from example import models, serializers, views
 from example.tests.utils import dump_json, load_json
 from rest_framework import status
@@ -105,11 +106,12 @@ class TestModelResourceName:
     def test_serializer_resource_name_create(self, client, monkeypatch):
         monkeypatch.setattr(serializers.CommentSerializer.Meta, 'resource_name', 'renamed_comments', False)
         monkeypatch.setattr(serializers.EntrySerializer.Meta, 'resource_name', 'renamed_entries', False)
-        self.create_data['data']['type'] = 'renamed_comments'
-        self.create_data['data']['relationships']['entry']['data']['type'] = 'renamed_entries'
+        create_data = deepcopy(self.create_data)
+        create_data['data']['type'] = 'renamed_comments'
+        create_data['data']['relationships']['entry']['data']['type'] = 'renamed_entries'
 
         response = client.post(reverse("comment-list"),
-                               dump_json(self.create_data),
+                               dump_json(create_data),
                                content_type='application/vnd.api+json')
 
         assert response.status_code == status.HTTP_201_CREATED

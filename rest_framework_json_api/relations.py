@@ -4,6 +4,7 @@ import json
 
 from rest_framework.fields import MISSING_ERROR_MESSAGE, SerializerMethodField
 from rest_framework.relations import *
+from rest_framework.serializers import Serializer
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
 
@@ -160,22 +161,22 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         included and return that name, or None
         """
         field_name = self.field_name or self.parent.field_name
-        root = self.get_root_serializer()
+        parent = self.get_parent_serializer()
 
-        if root is not None:
+        if parent is not None:
             # accept both singular and plural versions of field_name
             field_names = [
                 inflection.singularize(field_name),
                 inflection.pluralize(field_name)
             ]
-            includes = get_included_serializers(root)
+            includes = get_included_serializers(parent)
             for field in field_names:
                 if field in includes.keys():
                     return get_resource_type_from_serializer(includes[field])
 
         return None
 
-    def get_root_serializer(self):
+    def get_parent_serializer(self):
         if hasattr(self.parent, 'parent') and self.is_serializer(self.parent.parent):
             return self.parent.parent
         elif self.is_serializer(self.parent):
@@ -184,7 +185,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         return None
 
     def is_serializer(self, candidate):
-        return hasattr(candidate, 'included_serializers')
+        return isinstance(candidate, Serializer)
 
     def get_choices(self, cutoff=None):
         queryset = self.get_queryset()
