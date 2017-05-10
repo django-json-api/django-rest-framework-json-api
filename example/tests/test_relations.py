@@ -104,7 +104,7 @@ class TestResourceRelatedField(TestBase):
         author_pks = Author.objects.values_list('pk', flat=True)
         authors = [{'type': type_string, 'id': pk} for pk in author_pks]
 
-        serializer = EntryModelSerializer(data={'authors': authors, 'comment_set': []})
+        serializer = EntryModelSerializer(data={'authors': authors, 'comments': []})
 
         self.assertTrue(serializer.is_valid())
         self.assertEqual(len(serializer.validated_data['authors']), Author.objects.count())
@@ -112,9 +112,9 @@ class TestResourceRelatedField(TestBase):
             self.assertIsInstance(author, Author)
 
     def test_read_only(self):
-        serializer = EntryModelSerializer(data={'authors': [], 'comment_set': [{'type': 'Comments', 'id': 2}]})
+        serializer = EntryModelSerializer(data={'authors': [], 'comments': [{'type': 'Comments', 'id': 2}]})
         serializer.is_valid(raise_exception=True)
-        self.assertNotIn('comment_set', serializer.validated_data)
+        self.assertNotIn('comments', serializer.validated_data)
 
     def test_invalid_resource_id_object(self):
         comment = {'body': 'testing 123', 'entry': {'type': 'entry'}, 'author': {'id': '5'}}
@@ -136,8 +136,8 @@ class EntryFKSerializer(serializers.Serializer):
 
 class EntryModelSerializer(serializers.ModelSerializer):
     authors = ResourceRelatedField(many=True, queryset=Author.objects)
-    comment_set = ResourceRelatedField(many=True, read_only=True)
+    comments = ResourceRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Entry
-        fields = ('authors', 'comment_set')
+        fields = ('authors', 'comments')

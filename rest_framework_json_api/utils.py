@@ -20,20 +20,29 @@ from django.utils.translation import ugettext_lazy as _
 try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
-    ManyRelatedField = type(None)
+    ManyRelatedField = object()
 
 try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
-    HyperlinkedRouterField = type(None)
+    HyperlinkedRouterField = object()
 
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
-    ReverseManyRelatedObjectsDescriptor = type(None)
+    ReverseManyRelatedObjectsDescriptor = object()
 else:
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+
+# Generic relation descriptor from django.contrib.contenttypes.
+if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
+    # Target application does not use contenttypes. Importing would cause errors.
+    ReverseGenericManyToOneDescriptor = object()
+elif django.VERSION >= (1, 9):
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+else:
+    from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
 
 
 def get_resource_name(context):
@@ -186,6 +195,13 @@ def get_related_resource_type(relation):
         relation_model = relation.model
     elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
+    elif (
+            getattr(relation, 'many', False) and
+            hasattr(relation.child, 'Meta') and
+            hasattr(relation.child.Meta, 'model')):
+        # For ManyToMany relationships, get the model from the child
+        # serializer of the list serializer
+        relation_model = relation.child.Meta.model
     else:
         parent_serializer = relation.parent
         parent_model = None
@@ -203,17 +219,23 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            if type(parent_model_relation) is ReverseManyToOneDescriptor:
+            parent_model_relation_type = type(parent_model_relation)
+            if parent_model_relation_type is ReverseManyToOneDescriptor:
                 if django.VERSION >= (1, 9):
                     relation_model = parent_model_relation.rel.related_model
                 elif django.VERSION >= (1, 8):
                     relation_model = parent_model_relation.related.related_model
                 else:
                     relation_model = parent_model_relation.related.model
-            elif type(parent_model_relation) is ManyToManyDescriptor:
+            elif parent_model_relation_type is ManyToManyDescriptor:
                 relation_model = parent_model_relation.field.remote_field.model
-            elif type(parent_model_relation) is ReverseManyRelatedObjectsDescriptor:
+            elif parent_model_relation_type is ReverseManyRelatedObjectsDescriptor:
                 relation_model = parent_model_relation.field.related.model
+            elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.model
+                else:
+                    relation_model = parent_model_relation.field.related_model
             else:
                 return get_related_resource_type(parent_model_relation)
 
@@ -266,10 +288,10 @@ def get_included_resources(request, serializer=None):
 
 
 def get_default_included_resources_from_serializer(serializer):
-    try:
-        return list(serializer.JSONAPIMeta.included_resources)
-    except AttributeError:
-        return []
+    meta = getattr(serializer, 'JSONAPIMeta', None)
+    if meta is None and getattr(serializer, 'many', False):
+        meta = getattr(serializer.child, 'JSONAPIMeta', None)
+    return list(getattr(meta, 'included_resources', []))
 
 
 def get_included_serializers(serializer):

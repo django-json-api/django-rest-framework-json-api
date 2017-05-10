@@ -1,11 +1,19 @@
 from django.core.urlresolvers import reverse
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import pytest
-from example.tests.utils import dump_json, redump_json
+from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db
 
-
+@mock.patch(
+    'rest_framework_json_api.utils'
+    '.get_default_included_resources_from_serializer',
+    new=lambda s: [])
 def test_pagination_with_single_entry(single_entry, client):
 
     expected = {
@@ -42,6 +50,14 @@ def test_pagination_with_single_entry(single_entry, client):
                             "related": "http://testserver/entries/1/suggested/",
                             "self": "http://testserver/entries/1/relationships/suggested"
                         }
+                    },
+                    "tags": {
+                        "data": [
+                            {
+                                "id": "1",
+                                "type": "taggedItems"
+                            }
+                        ]
                     }
                 }
             }],
@@ -63,7 +79,6 @@ def test_pagination_with_single_entry(single_entry, client):
     }
 
     response = client.get(reverse("entry-list"))
-    content_dump = redump_json(response.content)
-    expected_dump = dump_json(expected)
+    parsed_content = load_json(response.content)
 
-    assert content_dump == expected_dump
+    assert expected == parsed_content

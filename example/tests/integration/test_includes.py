@@ -3,15 +3,9 @@ from django.core.urlresolvers import reverse
 
 from example.tests.utils import load_json
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 pytestmark = pytest.mark.django_db
 
 
-@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
 def test_default_included_data_on_list(multiple_entries, client):
     return test_included_data_on_list(multiple_entries=multiple_entries, client=client, query='?page_size=5')
 
@@ -24,11 +18,10 @@ def test_included_data_on_list(multiple_entries, client, query='?include=comment
     assert [x.get('type') for x in included] == ['comments', 'comments'], 'List included types are incorrect'
 
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
-    expected_comment_count = sum([entry.comment_set.count() for entry in multiple_entries])
+    expected_comment_count = sum([entry.comments.count() for entry in multiple_entries])
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
 
 
-@mock.patch('rest_framework_json_api.utils.get_default_included_resources_from_serializer', new=lambda s: ['comments'])
 def test_default_included_data_on_detail(single_entry, client):
     return test_included_data_on_detail(single_entry=single_entry, client=client, query='')
 
@@ -40,7 +33,7 @@ def test_included_data_on_detail(single_entry, client, query='?include=comments'
     assert [x.get('type') for x in included] == ['comments'], 'Detail included types are incorrect'
 
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
-    expected_comment_count = single_entry.comment_set.count()
+    expected_comment_count = single_entry.comments.count()
     assert comment_count == expected_comment_count, 'Detail comment count is incorrect'
 
 
@@ -88,16 +81,16 @@ def test_deep_included_data_on_list(multiple_entries, client):
     ], 'List included types are incorrect'
 
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
-    expected_comment_count = sum([entry.comment_set.count() for entry in multiple_entries])
+    expected_comment_count = sum([entry.comments.count() for entry in multiple_entries])
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
 
     author_count = len([resource for resource in included if resource["type"] == "authors"])
     expected_author_count = sum(
-        [entry.comment_set.filter(author__isnull=False).count() for entry in multiple_entries])
+        [entry.comments.filter(author__isnull=False).count() for entry in multiple_entries])
     assert author_count == expected_author_count, 'List author count is incorrect'
 
     author_bio_count = len([resource for resource in included if resource["type"] == "authorBios"])
-    expected_author_bio_count = sum([entry.comment_set.filter(
+    expected_author_bio_count = sum([entry.comments.filter(
         author__bio__isnull=False).count() for entry in multiple_entries])
     assert author_bio_count == expected_author_bio_count, 'List author bio count is incorrect'
 
@@ -114,7 +107,7 @@ def test_deep_included_data_on_list(multiple_entries, client):
     author_count = len([resource for resource in included if resource["type"] == "authors"])
     expected_author_count = sum(
         [entry.authors.count() for entry in multiple_entries] +
-        [entry.comment_set.filter(author__isnull=False).count() for entry in multiple_entries])
+        [entry.comments.filter(author__isnull=False).count() for entry in multiple_entries])
     assert author_count == expected_author_count, 'List author count is incorrect'
 
 
@@ -129,9 +122,9 @@ def test_deep_included_data_on_detail(single_entry, client):
         'Detail included types are incorrect'
 
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
-    expected_comment_count = single_entry.comment_set.count()
+    expected_comment_count = single_entry.comments.count()
     assert comment_count == expected_comment_count, 'Detail comment count is incorrect'
 
     author_bio_count = len([resource for resource in included if resource["type"] == "authorBios"])
-    expected_author_bio_count = single_entry.comment_set.filter(author__bio__isnull=False).count()
+    expected_author_bio_count = single_entry.comments.filter(author__bio__isnull=False).count()
     assert author_bio_count == expected_author_bio_count, 'Detail author bio count is incorrect'

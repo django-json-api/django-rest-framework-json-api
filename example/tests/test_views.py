@@ -118,12 +118,31 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
-    def test_patch_to_many_relationship(self):
+    def test_patch_one_to_many_relationship(self):
         url = '/blogs/{}/relationships/entry_set'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)}, ]
         }
         response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        assert response.status_code == 200, response.content.decode()
+        assert response.data == request_data['data']
+
+        response = self.client.get(url)
+        assert response.data == request_data['data']
+
+    def test_patch_many_to_many_relationship(self):
+        url = '/entries/{}/relationships/authors'.format(self.first_entry.id)
+        request_data = {
+            'data': [
+                {
+                    'type': format_resource_type('Author'),
+                    'id': str(self.author.id)
+                },
+            ]
+        }
+        response = self.client.patch(url,
+                                     data=json.dumps(request_data),
+                                     content_type='application/vnd.api+json')
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
@@ -139,15 +158,16 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 405, response.content.decode()
 
     def test_post_to_many_relationship_with_no_change(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
         response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 204, response.content.decode()
+        assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_post_to_many_relationship_with_change(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -182,15 +202,16 @@ class TestRelationshipView(APITestCase):
         assert response.data['author'] == None
 
     def test_delete_to_many_relationship_with_no_change(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
         response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
         assert response.status_code == 204, response.content.decode()
+        assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_delete_one_to_many_relationship_with_not_null_constraint(self):
-        url = '/entries/{}/relationships/comment_set'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
@@ -234,3 +255,15 @@ class TestValidationErrorResponses(TestBase):
         user = self.create_user('user', 'pass')
         force_authenticate(request, user)
         return view(request)
+
+
+class TestModelViewSet(TestBase):
+    def setUp(self):
+        self.author = Author.objects.create(name='Super powerful superhero', email='i.am@lost.com')
+        self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+
+    def test_no_content_response(self):
+        url = '/blogs/{}'.format(self.blog.pk)
+        response = self.client.delete(url)
+        assert response.status_code == 204, response.rendered_content.decode()
+        assert len(response.rendered_content) == 0, response.rendered_content.decode()

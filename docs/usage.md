@@ -31,8 +31,10 @@ REST_FRAMEWORK = {
 
 If `PAGE_SIZE` is set the renderer will return a `meta` object with
 record count and a `links` object with the next, previous, first, and last links.
-Pages can be selected with the `page` GET parameter. Page size can be controlled
-per request via the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
+Pages can be selected with the `page` GET parameter. The query parameter used to
+retrieve the page can be customized by subclassing `PageNumberPagination` and
+overriding the `page_query_param`.  Page size can be controlled per request via
+the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
 
 ### Serializers
 
@@ -457,8 +459,53 @@ Adding `url` to `fields` on a serializer will add a `self` link to the `links` k
 
 Related links will be created automatically when using the Relationship View.
 
+### Included
+
+JSON API can include additional resources in a single network request.
+The specification refers to this feature as
+[Compound Documents](http://jsonapi.org/format/#document-compound-documents).
+Compound Documents can reduce the number of network requests
+which can lead to a better performing web application.
+To accomplish this,
+the specification permits a top level `included` key.
+The list of content within this key are the extra resources
+that are related to the primary resource.
+
+To make a Compound Document,
+you need to modify your `ModelSerializer`.
+The two required additions are `included_resources`
+and `included_serializers`.
+
+For example,
+suppose you are making an app to go on quests,
+and you would like to fetch your chosen knight
+along with the quest.
+You could accomplish that with:
+
+```python
+class KnightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Knight
+        fields = ('id', 'name', 'strength', 'dexterity', 'charisma')
+
+
+class QuestSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'knight': KnightSerializer,
+    }
+
+    class Meta:
+        model = Quest
+        fields = ('id', 'title', 'reward', 'knight')
+
+    class JSONAPIMeta:
+        included_resources = ['knight']
+```
+
+`included_resources` informs DJA of **what** you would like to include.
+`included_serializers` tells DJA **how** you want to include it.
+
 <!--
 ### Relationships
-### Included
 ### Errors
 -->

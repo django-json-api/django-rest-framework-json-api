@@ -426,6 +426,14 @@ class JSONRenderer(renderers.JSONRenderer):
         if resource_name == 'errors':
             return self.render_errors(data, accepted_media_type, renderer_context)
 
+        # if response.status_code is 204 then the data to be rendered must
+        # be None
+        response = renderer_context.get('response', None)
+        if response is not None and response.status_code == 204:
+            return super(JSONRenderer, self).render(
+                None, accepted_media_type, renderer_context
+            )
+
         from rest_framework_json_api.views import RelationshipView
         if isinstance(view, RelationshipView):
             return self.render_relationship_view(data, accepted_media_type, renderer_context)

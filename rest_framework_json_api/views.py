@@ -1,18 +1,25 @@
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import NoReverseMatch
+if django.VERSION >= (1, 10):
+    from django.urls import NoReverseMatch
+else:
+    from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
 if django.VERSION < (1, 9):
     from django.db.models.fields.related import (
-        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor,
         ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
+        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        SingleRelatedObjectDescriptor as ReverseOneToOneDescriptor,
     )
 else:
     from django.db.models.fields.related_descriptors import (
         ForwardManyToOneDescriptor,
         ManyToManyDescriptor,
+        ReverseManyToOneDescriptor,
+        ReverseOneToOneDescriptor,
     )
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
@@ -32,7 +39,7 @@ from rest_framework_json_api.utils import (
 
 class ModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
+        qs = super(ModelViewSet, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
@@ -44,16 +51,30 @@ class ModelViewSet(viewsets.ModelViewSet):
                     break
                 field = getattr(level_model, level)
                 field_class = field.__class__
-                if not (
+
+                is_forward_relation = (
                     issubclass(field_class, ForwardManyToOneDescriptor)
                     or issubclass(field_class, ManyToManyDescriptor)
-                ):
+                )
+                is_reverse_relation = (
+                    issubclass(field_class, ReverseManyToOneDescriptor)
+                    or issubclass(field_class, ReverseOneToOneDescriptor)
+                )
+                if not (is_forward_relation or is_reverse_relation):
                     break
 
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    level_model = field.get_queryset().model
+                    if django.VERSION < (1, 9):
+                        model_field = field.related
+                    else:
+                        model_field = field.field
+
+                    if is_forward_relation:
+                        level_model = model_field.related_model
+                    else:
+                        level_model = model_field.model
 
             if included_model is not None:
                 qs = qs.prefetch_related(included.replace('.', '__'))
@@ -134,7 +155,8 @@ class RelationshipView(generics.GenericAPIView):
             serializer.is_valid(raise_exception=True)
             related_instance_or_manager.all().delete()
             # have to set bulk to False since data isn't saved yet
-            if django.VERSION >= (1, 9):
+            class_name = related_instance_or_manager.__class__.__name__
+            if django.VERSION >= (1, 9) and class_name != 'ManyRelatedManager':
                 related_instance_or_manager.add(*serializer.validated_data,
                                                 bulk=False)
             else:
