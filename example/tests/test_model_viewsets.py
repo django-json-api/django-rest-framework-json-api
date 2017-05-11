@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth import get_user_model
 from django.utils import encoding
 from django.core.urlresolvers import reverse
@@ -79,14 +77,14 @@ class ModelViewSetTests(TestBase):
         expected = {
             'data': [
                 {
-                'type': 'users',
-                'id': encoding.force_text(user.pk),
-                'attributes': {
-                    'first-name': user.first_name,
-                    'last-name': user.last_name,
-                    'email': user.email
-                },
-            }
+                    'type': 'users',
+                    'id': encoding.force_text(user.pk),
+                    'attributes': {
+                        'first-name': user.first_name,
+                        'last-name': user.last_name,
+                        'email': user.email
+                    },
+                }
             ],
             'links': {
                 'first': 'http://testserver/identities?page=1',

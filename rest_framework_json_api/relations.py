@@ -2,18 +2,22 @@ import collections
 import inflection
 import json
 
-from rest_framework.fields import MISSING_ERROR_MESSAGE, SerializerMethodField
-from rest_framework.relations import *
+from rest_framework.fields import MISSING_ERROR_MESSAGE
+from rest_framework.relations import *  # noqa: F403
 from rest_framework.serializers import Serializer
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.query import QuerySet
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import Hyperlink, \
     get_resource_type_from_queryset, get_resource_type_from_instance, \
     get_included_serializers, get_resource_type_from_serializer
 
-LINKS_PARAMS = ['self_link_view_name', 'related_link_view_name', 'related_link_lookup_field', 'related_link_url_kwarg']
+LINKS_PARAMS = [
+    'self_link_view_name',
+    'related_link_view_name',
+    'related_link_lookup_field',
+    'related_link_url_kwarg'
+]
 
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
@@ -24,8 +28,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
     default_error_messages = {
         'required': _('This field is required.'),
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
-        'incorrect_type': _('Incorrect type. Expected resource identifier object, received {data_type}.'),
-        'incorrect_relation_type': _('Incorrect relation type. Expected {relation_type}, received {received_type}.'),
+        'incorrect_type': _(
+            'Incorrect type. Expected resource identifier object, received {data_type}.'
+        ),
+        'incorrect_relation_type': _(
+            'Incorrect relation type. Expected {relation_type}, received {received_type}.'
+        ),
         'missing_type': _('Invalid resource identifier object: missing \'type\' attribute'),
         'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
         'no_match': _('Invalid hyperlink - No URL match.'),
@@ -37,8 +45,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         if related_link_view_name is not None:
             self.related_link_view_name = related_link_view_name
 
-        self.related_link_lookup_field = kwargs.pop('related_link_lookup_field', self.related_link_lookup_field)
-        self.related_link_url_kwarg = kwargs.pop('related_link_url_kwarg', self.related_link_lookup_field)
+        self.related_link_lookup_field = kwargs.pop(
+            'related_link_lookup_field', self.related_link_lookup_field
+        )
+        self.related_link_url_kwarg = kwargs.pop(
+            'related_link_url_kwarg', self.related_link_lookup_field
+        )
 
         # check for a model class that was passed in for the relation type
         model = kwargs.pop('model', None)
@@ -104,7 +116,9 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         kwargs = {lookup_field: getattr(obj, lookup_field) if obj else view.kwargs[lookup_field]}
 
         self_kwargs = kwargs.copy()
-        self_kwargs.update({'related_field': self.field_name if self.field_name else self.parent.field_name})
+        self_kwargs.update({
+            'related_field': self.field_name if self.field_name else self.parent.field_name
+        })
         self_link = self.get_url('self', self.self_link_view_name, self_kwargs, request)
 
         related_kwargs = {self.related_link_url_kwarg: kwargs[self.related_link_lookup_field]}
@@ -139,7 +153,11 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             self.fail('missing_id')
 
         if data['type'] != expected_relation_type:
-            self.conflict('incorrect_relation_type', relation_type=expected_relation_type, received_type=data['type'])
+            self.conflict(
+                'incorrect_relation_type',
+                relation_type=expected_relation_type,
+                received_type=data['type']
+            )
 
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
 

@@ -39,7 +39,9 @@ class TestRelationshipView(APITestCase):
             n_pingbacks=0,
             rating=1
         )
-        self.first_comment = Comment.objects.create(entry=self.first_entry, body="This entry is cool", author=None)
+        self.first_comment = Comment.objects.create(
+            entry=self.first_entry, body="This entry is cool", author=None
+        )
         self.second_comment = Comment.objects.create(
             entry=self.second_entry,
             body="This entry is not cool",
@@ -47,14 +49,18 @@ class TestRelationshipView(APITestCase):
         )
 
     def test_get_entry_relationship_blog(self):
-        url = reverse('entry-relationships', kwargs={'pk': self.first_entry.id, 'related_field': 'blog'})
+        url = reverse(
+            'entry-relationships', kwargs={'pk': self.first_entry.id, 'related_field': 'blog'}
+        )
         response = self.client.get(url)
         expected_data = {'type': format_resource_type('Blog'), 'id': str(self.first_entry.blog.id)}
 
         assert response.data == expected_data
 
     def test_get_entry_relationship_invalid_field(self):
-        response = self.client.get('/entries/{}/relationships/invalid_field'.format(self.first_entry.id))
+        response = self.client.get(
+            '/entries/{}/relationships/invalid_field'.format(self.first_entry.id)
+        )
 
         assert response.status_code == 404
 
@@ -111,7 +117,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
-        response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.patch(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
@@ -123,7 +131,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)}, ]
         }
-        response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.patch(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
@@ -154,7 +164,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
-        response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.post(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 405, response.content.decode()
 
     def test_post_to_many_relationship_with_no_change(self):
@@ -162,7 +174,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
-        response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.post(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 204, response.content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
@@ -171,7 +185,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
-        response = self.client.post(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.post(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 200, response.content.decode()
 
         assert request_data['data'][0] in response.data
@@ -181,7 +197,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
-        response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.delete(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 405, response.content.decode()
 
     def test_delete_relationship_overriding_with_none(self):
@@ -197,16 +215,20 @@ class TestRelationshipView(APITestCase):
                 }
             }
         }
-        response = self.client.patch(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.patch(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 200, response.content.decode()
-        assert response.data['author'] == None
+        assert response.data['author'] is None
 
     def test_delete_to_many_relationship_with_no_change(self):
         url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
-        response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.delete(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 204, response.content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
@@ -215,7 +237,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
-        response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.delete(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 409, response.content.decode()
 
     def test_delete_to_many_relationship_with_change(self):
@@ -223,7 +247,9 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
-        response = self.client.delete(url, data=json.dumps(request_data), content_type='application/vnd.api+json')
+        response = self.client.delete(
+            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
+        )
         assert response.status_code == 200, response.content.decode()
 
 
@@ -232,21 +258,36 @@ class TestValidationErrorResponses(TestBase):
         view = views.BlogViewSet.as_view({'post': 'create'})
         response = self._get_create_response("{}", view)
         self.assertEqual(400, response.status_code)
-        expected = [{'detail': 'Received document does not contain primary data', 'status': '400', 'source': {'pointer': '/data'}}]
+        expected = [{
+            'detail': 'Received document does not contain primary data',
+            'status': '400',
+            'source': {'pointer': '/data'}
+        }]
         self.assertEqual(expected, response.data)
 
     def test_if_returns_error_on_missing_form_data_post(self):
         view = views.BlogViewSet.as_view({'post': 'create'})
         response = self._get_create_response('{"data":{"attributes":{},"type":"blogs"}}', view)
         self.assertEqual(400, response.status_code)
-        expected = [{'status': '400', 'detail': 'This field is required.', 'source': {'pointer': '/data/attributes/name'}}]
+        expected = [{
+            'status': '400',
+            'detail': 'This field is required.',
+            'source': {'pointer': '/data/attributes/name'}
+        }]
         self.assertEqual(expected, response.data)
 
     def test_if_returns_error_on_bad_endpoint_name(self):
         view = views.BlogViewSet.as_view({'post': 'create'})
         response = self._get_create_response('{"data":{"attributes":{},"type":"bad"}}', view)
         self.assertEqual(409, response.status_code)
-        expected = [{'detail': "The resource object's type (bad) is not the type that constitute the collection represented by the endpoint (blogs).", 'source': {'pointer': '/data'}, 'status': '409'}]
+        expected = [{
+            'detail': (
+                "The resource object's type (bad) is not the type that constitute the collection "
+                "represented by the endpoint (blogs)."
+            ),
+            'source': {'pointer': '/data'},
+            'status': '409'
+        }]
         self.assertEqual(expected, response.data)
 
     def _get_create_response(self, data, view):

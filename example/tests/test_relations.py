@@ -26,7 +26,7 @@ class TestResourceRelatedField(TestBase):
             n_pingbacks=0,
             rating=3
         )
-        for i in range(1,6):
+        for i in range(1, 6):
             name = 'some_author{}'.format(i)
             self.entry.authors.add(
                 Author.objects.create(name=name, email='{}@example.org'.format(name))
@@ -82,7 +82,7 @@ class TestResourceRelatedField(TestBase):
                     'id': str(self.blog.id)
                 }
             }
-                                          )
+            )
             serializer.is_valid()
         the_exception = cm.exception
         self.assertEqual(the_exception.status_code, 409)
@@ -112,7 +112,9 @@ class TestResourceRelatedField(TestBase):
             self.assertIsInstance(author, Author)
 
     def test_read_only(self):
-        serializer = EntryModelSerializer(data={'authors': [], 'comments': [{'type': 'Comments', 'id': 2}]})
+        serializer = EntryModelSerializer(
+            data={'authors': [], 'comments': [{'type': 'Comments', 'id': 2}]}
+        )
         serializer.is_valid(raise_exception=True)
         self.assertNotIn('comments', serializer.validated_data)
 

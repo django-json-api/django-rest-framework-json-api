@@ -5,7 +5,6 @@ import json
 
 from django.core.urlresolvers import reverse
 from django.utils import encoding
-from django.conf import settings
 
 from example.tests import TestBase
 

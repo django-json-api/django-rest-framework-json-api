@@ -26,7 +26,7 @@ class TestResourceIdentifierObjectSerializer(TestCase):
             n_pingbacks=0,
             rating=3
         )
-        for i in range(1,6):
+        for i in range(1, 6):
             name = 'some_author{}'.format(i)
             self.entry.authors.add(
                 Author.objects.create(name=name, email='{}@example.org'.format(name))
@@ -71,7 +71,9 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         author_pks = Author.objects.values_list('pk', flat=True)
         initial_data = [{'type': type_string, 'id': str(pk)} for pk in author_pks]
 
-        serializer = ResourceIdentifierObjectSerializer(data=initial_data, model_class=Author, many=True)
+        serializer = ResourceIdentifierObjectSerializer(
+            data=initial_data, model_class=Author, many=True
+        )
 
         self.assertTrue(serializer.is_valid(), msg=serializer.errors)
 

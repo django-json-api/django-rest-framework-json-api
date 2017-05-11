@@ -1,8 +1,10 @@
 import pytest
 from pytest_factoryboy import register
 
-from example.factories import BlogFactory, AuthorFactory, AuthorBioFactory, EntryFactory, CommentFactory, \
+from example.factories import (
+    BlogFactory, AuthorFactory, AuthorBioFactory, EntryFactory, CommentFactory,
     TaggedItemFactory
+)
 
 register(BlogFactory)
 register(AuthorFactory)
@@ -31,4 +33,3 @@ def multiple_entries(blog_factory, author_factory, entry_factory, comment_factor
     comment_factory(entry=entries[0])
     comment_factory(entry=entries[1])
     return entries
-

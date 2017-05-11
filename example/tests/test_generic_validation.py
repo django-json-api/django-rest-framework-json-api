@@ -1,9 +1,5 @@
-import json
-
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
-from rest_framework.serializers import ValidationError
 
 from example.tests import TestBase
 from example.tests.utils import load_json
@@ -13,6 +9,7 @@ class GenericValidationTest(TestBase):
     """
     Test that a non serializer specific validation can be thrown and formatted
     """
+
     def setUp(self):
         super(GenericValidationTest, self).setUp()
         self.url = reverse('user-validation', kwargs={'pk': self.miles.pk})

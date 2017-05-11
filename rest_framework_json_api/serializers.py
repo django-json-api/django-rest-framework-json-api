@@ -1,7 +1,7 @@
 import inflection
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
-from rest_framework.serializers import *
+from rest_framework.serializers import *  # noqa: F403
 
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
@@ -11,7 +11,9 @@ from rest_framework_json_api.utils import (
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
     default_error_messages = {
-        'incorrect_model_type': _('Incorrect model type. Expected {model_type}, received {received_type}.'),
+        'incorrect_model_type': _(
+            'Incorrect model type. Expected {model_type}, received {received_type}.'
+        ),
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
         'incorrect_type': _('Incorrect type. Expected pk value, received {data_type}.'),
     }
@@ -21,7 +23,9 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
     def __init__(self, *args, **kwargs):
         self.model_class = kwargs.pop('model_class', self.model_class)
         if 'instance' not in kwargs and not self.model_class:
-            raise RuntimeError('ResourceIdentifierObjectsSerializer must be initialized with a model class.')
+            raise RuntimeError(
+                'ResourceIdentifierObjectsSerializer must be initialized with a model class.'
+            )
         super(ResourceIdentifierObjectSerializer, self).__init__(*args, **kwargs)
 
     def to_representation(self, instance):
@@ -32,7 +36,9 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
 
     def to_internal_value(self, data):
         if data['type'] != get_resource_type_from_model(self.model_class):
-            self.fail('incorrect_model_type', model_type=self.model_class, received_type=data['type'])
+            self.fail(
+                'incorrect_model_type', model_type=self.model_class, received_type=data['type']
+            )
         pk = data['id']
         try:
             return self.model_class.objects.get(pk=pk)
@@ -48,15 +54,20 @@ class SparseFieldsetsMixin(object):
         request = context.get('request') if context else None
 
         if request:
-            sparse_fieldset_query_param = 'fields[{}]'.format(get_resource_type_from_serializer(self))
+            sparse_fieldset_query_param = 'fields[{}]'.format(
+                get_resource_type_from_serializer(self)
+            )
             try:
-                param_name = next(key for key in request.query_params if sparse_fieldset_query_param in key)
+                param_name = next(
+                    key for key in request.query_params if sparse_fieldset_query_param in key
+                )
             except StopIteration:
                 pass
             else:
                 fieldset = request.query_params.get(param_name).split(',')
-                # iterate over a *copy* of self.fields' underlying OrderedDict, because we may modify the
-                # original during the iteration. self.fields is a `rest_framework.utils.serializer_helpers.BindingDict`
+                # iterate over a *copy* of self.fields' underlying OrderedDict, because we may
+                # modify the original during the iteration.
+                # self.fields is a `rest_framework.utils.serializer_helpers.BindingDict`
                 for field_name, field in self.fields.fields.copy().items():
                     if field_name == api_settings.URL_FIELD_NAME:  # leave self link there
                         continue
@@ -100,7 +111,9 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
-class HyperlinkedModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, HyperlinkedModelSerializer):
+class HyperlinkedModelSerializer(
+        IncludedResourcesValidationMixin, SparseFieldsetsMixin, HyperlinkedModelSerializer
+):
     """
     A type of `ModelSerializer` that uses hyperlinked relationships instead
     of primary key relationships. Specifically:

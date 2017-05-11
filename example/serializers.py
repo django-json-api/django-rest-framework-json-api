@@ -24,7 +24,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     def get_root_meta(self, resource, many):
         return {
-          'api_docs': '/docs/api/blogs'
+            'api_docs': '/docs/api/blogs'
         }
 
     class Meta:
@@ -55,17 +55,17 @@ class EntrySerializer(serializers.ModelSerializer):
     body_format = serializers.SerializerMethodField()
     # many related from model
     comments = relations.ResourceRelatedField(
-            many=True, read_only=True)
+        many=True, read_only=True)
     # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
-            source='get_suggested', model=Entry, many=True, read_only=True,
-            related_link_view_name='entry-suggested',
-            related_link_url_kwarg='entry_pk',
-            self_link_view_name='entry-relationships',
+        source='get_suggested', model=Entry, many=True, read_only=True,
+        related_link_view_name='entry-suggested',
+        related_link_url_kwarg='entry_pk',
+        self_link_view_name='entry-relationships',
     )
     # single related from serializer
     featured = relations.SerializerMethodResourceRelatedField(
-            source='get_featured', model=Entry, read_only=True)
+        source='get_featured', model=Entry, read_only=True)
     tags = TaggedItemSerializer(many=True, read_only=True)
 
     def get_suggested(self, obj):
