@@ -1,4 +1,4 @@
-from .dev import *
+from .dev import *  # noqa
 
 DATABASES = {
     'default': {

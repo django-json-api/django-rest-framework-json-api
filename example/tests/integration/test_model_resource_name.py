@@ -22,7 +22,9 @@ def _check_resource_and_relationship_comment_type_match(django_client):
     comment_relationship_type = load_json(entry_response.content).get(
         'data')[0].get('relationships').get('comments').get('data')[0].get('type')
 
-    assert comment_resource_type == comment_relationship_type, "The resource type seen in the relationships and head resource do not match"
+    assert comment_resource_type == comment_relationship_type, (
+        "The resource type seen in the relationships and head resource do not match"
+    )
 
 
 def _check_relationship_and_included_comment_type_are_the_same(django_client, url):
@@ -33,7 +35,9 @@ def _check_relationship_and_included_comment_type_are_the_same(django_client, ur
     comment_relationship_type = data.get('relationships').get('comments').get('data')[0].get('type')
     comment_included_type = comment.get('type')
 
-    assert comment_relationship_type == comment_included_type, "The resource type seen in the relationships and included do not match"
+    assert comment_relationship_type == comment_included_type, (
+        "The resource type seen in the relationships and included do not match"
+    )
 
 
 @pytest.mark.usefixtures("single_entry")
@@ -81,7 +85,12 @@ class TestModelResourceName:
             'resource_name from model incorrect on list')
 
         # serializer > model
-        monkeypatch.setattr(serializers.CommentSerializer.Meta, 'resource_name', 'resource_name_from_serializer', False)
+        monkeypatch.setattr(
+            serializers.CommentSerializer.Meta,
+            'resource_name',
+            'resource_name_from_serializer',
+            False
+        )
         response = client.get(reverse("comment-list"))
         data = load_json(response.content)['data'][0]
         assert (data.get('type') == 'resource_name_from_serializer'), (
@@ -104,8 +113,18 @@ class TestModelResourceName:
         assert response.status_code == status.HTTP_201_CREATED
 
     def test_serializer_resource_name_create(self, client, monkeypatch):
-        monkeypatch.setattr(serializers.CommentSerializer.Meta, 'resource_name', 'renamed_comments', False)
-        monkeypatch.setattr(serializers.EntrySerializer.Meta, 'resource_name', 'renamed_entries', False)
+        monkeypatch.setattr(
+            serializers.CommentSerializer.Meta,
+            'resource_name',
+            'renamed_comments',
+            False
+        )
+        monkeypatch.setattr(
+            serializers.EntrySerializer.Meta,
+            'resource_name',
+            'renamed_entries',
+            False
+        )
         create_data = deepcopy(self.create_data)
         create_data['data']['type'] = 'renamed_comments'
         create_data['data']['relationships']['entry']['data']['type'] = 'renamed_entries'
@@ -143,7 +162,9 @@ class TestResourceNameConsistency:
 
         _check_relationship_and_included_comment_type_are_the_same(client, reverse("entry-list"))
 
-    def test_type_match_on_included_and_inline_with_serializer_resource_name_and_JSONAPIMeta(self, client):
+    def test_type_match_on_included_and_inline_with_serializer_resource_name_and_JSONAPIMeta(
+            self, client
+    ):
         models.Comment.__bases__ += (_PatchedModel,)
         serializers.CommentSerializer.Meta.resource_name = "resource_name_from_serializer"
 
@@ -163,7 +184,9 @@ class TestResourceNameConsistency:
 
         _check_resource_and_relationship_comment_type_match(client)
 
-    def test_resource_and_relationship_type_match_with_serializer_resource_name_and_JSONAPIMeta(self, client):
+    def test_resource_and_relationship_type_match_with_serializer_resource_name_and_JSONAPIMeta(
+            self, client
+    ):
         models.Comment.__bases__ += (_PatchedModel,)
         serializers.CommentSerializer.Meta.resource_name = "resource_name_from_serializer"
 

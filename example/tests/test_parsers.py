@@ -39,8 +39,7 @@ class TestJSONParser(TestCase):
 
         self.assertEqual(data['_meta'], {'random_key': 'random_value'})
 
-
-    def test_parse_include_metadata(self):
+    def test_parse_invalid_data(self):
         parser = JSONParser()
 
         string = json.dumps([])

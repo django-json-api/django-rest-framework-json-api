@@ -1,5 +1,3 @@
-import json
-
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -41,7 +39,6 @@ class GenericViewSet(TestBase):
         parsed_content = load_json(response.content)
 
         assert expected == parsed_content
-
 
     def test_ember_expected_renderer(self):
         """

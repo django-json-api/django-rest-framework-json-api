@@ -75,7 +75,9 @@ class JSONParser(parsers.JSONParser):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
         """
-        result = super(JSONParser, self).parse(stream, media_type=media_type, parser_context=parser_context)
+        result = super(JSONParser, self).parse(
+            stream, media_type=media_type, parser_context=parser_context
+        )
 
         if not isinstance(result, dict) or 'data' not in result:
             raise ParseError('Received document does not contain primary data')
@@ -84,12 +86,17 @@ class JSONParser(parsers.JSONParser):
 
         from rest_framework_json_api.views import RelationshipView
         if isinstance(parser_context['view'], RelationshipView):
-            # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular Resource Object
+            # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular
+            # Resource Object
             if isinstance(data, list):
                 for resource_identifier_object in data:
-                    if not (resource_identifier_object.get('id') and resource_identifier_object.get('type')):
+                    if not (
+                        resource_identifier_object.get('id') and
+                        resource_identifier_object.get('type')
+                    ):
                         raise ParseError(
-                            'Received data contains one or more malformed JSONAPI Resource Identifier Object(s)'
+                            'Received data contains one or more malformed JSONAPI '
+                            'Resource Identifier Object(s)'
                         )
             elif not (data.get('id') and data.get('type')):
                 raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
@@ -103,7 +110,8 @@ class JSONParser(parsers.JSONParser):
         if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
             raise exceptions.Conflict(
                 "The resource object's type ({data_type}) is not the type "
-                "that constitute the collection represented by the endpoint ({resource_type}).".format(
+                "that constitute the collection represented by the endpoint "
+                "({resource_type}).".format(
                     data_type=data.get('type'),
                     resource_type=resource_name
                 )

@@ -1,5 +1,4 @@
 from rest_framework import exceptions
-from rest_framework import viewsets
 import rest_framework.parsers
 import rest_framework.renderers
 import rest_framework_json_api.metadata

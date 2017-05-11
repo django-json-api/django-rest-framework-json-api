@@ -5,6 +5,7 @@ v2.3.0
   and there was no way to turn it off.
 * Fix for apps that don't use `django.contrib.contenttypes`.
 * Fix `resource_name` support for POST requests and nested serializers
+* Enforcing flake8 linting
 
 v2.2.0
 

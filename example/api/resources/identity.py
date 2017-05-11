@@ -59,7 +59,6 @@ class GenericIdentity(generics.GenericAPIView):
     renderer_classes = (renderers.JSONRenderer, )
     parser_classes = (parsers.JSONParser, )
 
-
     def get_queryset(self):
         return auth_models.User.objects.all()
 

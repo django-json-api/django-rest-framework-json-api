@@ -1,9 +1,7 @@
 import json
 from example.tests import TestBase
 from django.utils import encoding
-from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 
 class MultipleIDMixin(TestBase):
@@ -73,10 +71,10 @@ class MultipleIDMixin(TestBase):
         self.assertEquals(meta.get('count', 0), 2)
         self.assertEqual(
             sorted(
-                'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2'\
+                'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2'
                 .split('?')[1].split('&')
             ),
             sorted(
                 links.get("next").split('?')[1].split('&'))
-            )
+        )
         self.assertEqual(meta.get("page"), 1)

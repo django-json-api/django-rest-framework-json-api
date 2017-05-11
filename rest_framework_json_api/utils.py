@@ -28,11 +28,15 @@ except ImportError:
     HyperlinkedRouterField = object()
 
 if django.VERSION >= (1, 9):
-    from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
+    from django.db.models.fields.related_descriptors import (
+        ManyToManyDescriptor, ReverseManyToOneDescriptor
+    )
     ReverseManyRelatedObjectsDescriptor = object()
 else:
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
-    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
+    from django.db.models.fields.related import (
+        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
+    )
     from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 
 # Generic relation descriptor from django.contrib.contenttypes.
@@ -42,7 +46,9 @@ if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no c
 elif django.VERSION >= (1, 9):
     from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
 else:
-    from django.contrib.contenttypes.fields import ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
+    from django.contrib.contenttypes.fields import (
+        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
+    )
 
 
 def get_resource_name(context):
@@ -161,7 +167,10 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
-    warnings.warn("The 'format_relation_name' function has been renamed 'format_resource_type' and the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
+    warnings.warn(
+        "The 'format_relation_name' function has been renamed 'format_resource_type' and the "
+        "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'"
+    )
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
     pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
@@ -300,7 +309,9 @@ def get_included_serializers(serializer):
     for name, value in six.iteritems(included_serializers):
         if not isinstance(value, type):
             if value == 'self':
-                included_serializers[name] = serializer if isinstance(serializer, type) else serializer.__class__
+                included_serializers[name] = (
+                    serializer if isinstance(serializer, type) else serializer.__class__
+                )
             else:
                 included_serializers[name] = import_class_from_dotted_path(value)
 

@@ -7,6 +7,7 @@ class TestBase(APITestCase):
     """
     Test base class to setup a couple users.
     """
+
     def setUp(self):
         """
         Create those users
@@ -15,7 +16,7 @@ class TestBase(APITestCase):
         self.create_users()
 
     def create_user(self, username, email, password="pw",
-                     first_name='', last_name=''):
+                    first_name='', last_name=''):
         """
         Helper method to create a user
         """
@@ -39,4 +40,3 @@ class TestBase(APITestCase):
         self.miles = self.create_user(
             'miles', 'miles@example.com',
             first_name="Miles", last_name="Davis")
-

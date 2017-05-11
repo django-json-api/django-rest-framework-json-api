@@ -7,6 +7,7 @@ from example.models import Blog, Author, AuthorBio, Entry, Comment, TaggedItem
 faker = FakerFactory.create()
 faker.seed(983843)
 
+
 class BlogFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Blog
@@ -22,6 +23,7 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     email = factory.LazyAttribute(lambda x: faker.email())
 
     bio = factory.RelatedFactory('example.factories.AuthorBioFactory', 'author')
+
 
 class AuthorBioFactory(factory.django.DjangoModelFactory):
     class Meta:
