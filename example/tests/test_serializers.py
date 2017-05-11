@@ -102,6 +102,12 @@ class TestModelSerializer(object):
                             "id": str(comment.author.pk)
                         }
                     },
+                    "writer": {
+                        "data": {
+                            "type": "writers",
+                            "id": str(comment.author.pk)
+                        }
+                    },
                 }
             }
         }
