@@ -44,7 +44,7 @@ rather than from vanilla DRF. For example,
 ```python
 from rest_framework_json_api import serializers
 
-class MyModelSerializer(serializers.ModelSerializers):
+class MyModelSerializer(serializers.ModelSerializer):
     # ...
 ```
 
