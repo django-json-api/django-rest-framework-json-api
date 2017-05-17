@@ -12,6 +12,13 @@ from rest_framework_json_api.utils import Hyperlink, \
     get_resource_type_from_queryset, get_resource_type_from_instance, \
     get_included_serializers, get_resource_type_from_serializer
 
+LINKS_PARAMS = [
+    'self_link_view_name',
+    'related_link_view_name',
+    'related_link_lookup_field',
+    'related_link_url_kwarg'
+]
+
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
     _skip_polymorphic_optimization = True
