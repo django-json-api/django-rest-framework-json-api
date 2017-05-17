@@ -1,6 +1,8 @@
 """
 Parsers
 """
+from django.conf import settings
+from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
@@ -127,7 +129,8 @@ class JSONParser(parsers.JSONParser):
                 raise ParseError("The resource identifier object must contain an 'id' member")
 
         # Construct the return data
-        parsed_data = {'id': data.get('id'), 'type': data.get('type')} if 'id' in data else {'type': data.get('type')}
+        parsed_data = {'id': data.get('id')} if 'id' in data else {}
+        parsed_data['type'] = data.get('type')
         parsed_data.update(self.parse_attributes(data))
         parsed_data.update(self.parse_relationships(data))
         parsed_data.update(self.parse_metadata(result))

@@ -2,7 +2,9 @@
 
 import factory
 from faker import Factory as FakerFactory
-from example.models import Blog, Author, AuthorBio, Entry, Comment, TaggedItem, ArtProject, ResearchProject, Company
+from example.models import (
+    Blog, Author, AuthorBio, Entry, Comment, TaggedItem, ArtProject, ResearchProject, Company
+)
 
 faker = FakerFactory.create()
 faker.seed(983843)

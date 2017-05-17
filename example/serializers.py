@@ -1,6 +1,9 @@
 from datetime import datetime
 from rest_framework_json_api import serializers, relations
-from example.models import Blog, Entry, Author, AuthorBio, Comment, TaggedItemm, Project, ArtProject, ResearchProject, Company
+from example.models import (
+    Blog, Entry, Author, AuthorBio, Comment, TaggedItem, Project, ArtProject, ResearchProject,
+    Company,
+)
 
 
 class TaggedItemSerializer(serializers.ModelSerializer):

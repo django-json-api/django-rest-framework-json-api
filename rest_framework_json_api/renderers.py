@@ -352,7 +352,11 @@ class JSONRenderer(renderers.JSONRenderer):
                             relation_type or
                             utils.get_resource_type_from_instance(nested_resource_instance)
                         )
-                        serializer_fields = utils.get_serializer_fields(serializer.__class__(nested_resource_instance, context=serializer.context))
+                        serializer_fields = utils.get_serializer_fields(
+                            serializer.__class__(
+                                nested_resource_instance, context=serializer.context
+                            )
+                        )
                         included_data.append(
                             cls.build_json_resource_obj(
                                 serializer_fields,

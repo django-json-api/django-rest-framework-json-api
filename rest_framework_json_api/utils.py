@@ -17,6 +17,8 @@ from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
 
+from rest_framework_json_api.serializers import PolymorphicModelSerializer
+
 try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
@@ -29,25 +31,26 @@ except ImportError:
 
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import (
-        ManyToManyDescriptor, ReverseManyToOneDescriptor
+        ManyToManyDescriptor, ReverseManyToOneDescriptor  # noqa: F401
     )
     ReverseManyRelatedObjectsDescriptor = object()
 else:
+    # noqa: F401
     from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
     from django.db.models.fields.related import (
         ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     )
-    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor  # noqa: F401
 
 # Generic relation descriptor from django.contrib.contenttypes.
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
     # Target application does not use contenttypes. Importing would cause errors.
     ReverseGenericManyToOneDescriptor = object()
 elif django.VERSION >= (1, 9):
-    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor  # noqa: F401
 else:
     from django.contrib.contenttypes.fields import (
-        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
+        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor  # noqa: F401
     )
 
 POLYMORPHIC_ANCESTORS = ()
@@ -81,8 +84,7 @@ def get_resource_name(context, expand_polymorphic_types=False):
     except AttributeError:
         try:
             serializer = view.get_serializer_class()
-            if issubclass(serializer, serializers.PolymorphicModelSerializer) and \
-                    expand_polymorphic_types:
+            if issubclass(serializer, PolymorphicModelSerializer) and expand_polymorphic_types:
                 return serializer.get_polymorphic_types()
             else:
                 return get_resource_type_from_serializer(serializer)
