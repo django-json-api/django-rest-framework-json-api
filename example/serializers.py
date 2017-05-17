@@ -42,7 +42,7 @@ class EntrySerializer(serializers.ModelSerializer):
         # `featured` field when it's requested via `include`
         request = kwargs.get('context', {}).get('request')
         if request and 'featured' not in request.query_params.get('include', []):
-            self.fields.pop('featured')
+            self.fields.pop('featured', None)
 
     included_serializers = {
         'authors': 'example.serializers.AuthorSerializer',
