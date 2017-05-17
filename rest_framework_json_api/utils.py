@@ -17,7 +17,7 @@ from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework_json_api.serializers import PolymorphicModelSerializer
+from rest_framework_json_api import serializers
 
 try:
     from rest_framework.serializers import ManyRelatedField
@@ -85,7 +85,8 @@ def get_resource_name(context, expand_polymorphic_types=False):
     except AttributeError:
         try:
             serializer = view.get_serializer_class()
-            if issubclass(serializer, PolymorphicModelSerializer) and expand_polymorphic_types:
+            if issubclass(serializer, serializers.PolymorphicModelSerializer) and \
+                    expand_polymorphic_types:
                 return serializer.get_polymorphic_types()
             else:
                 return get_resource_type_from_serializer(serializer)
