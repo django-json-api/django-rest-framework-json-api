@@ -12,7 +12,7 @@ from rest_framework import renderers
 from rest_framework.serializers import BaseSerializer, Serializer, ListSerializer
 from rest_framework.settings import api_settings
 
-from . import utils
+import rest_framework_json_api.utils as utils
 
 
 class JSONRenderer(renderers.JSONRenderer):
