@@ -18,8 +18,10 @@ def test_polymorphism_on_detail_relations(single_company, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
     content = load_json(response.content)
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
-    assert (set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]])
-        == set(["researchProjects", "artProjects"]))
+    assert (
+        set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) ==
+        set(["researchProjects", "artProjects"])
+    )
 
 
 def test_polymorphism_on_included_relations(single_company, client):
@@ -27,8 +29,10 @@ def test_polymorphism_on_included_relations(single_company, client):
                           '?include=current_project,future_projects')
     content = load_json(response.content)
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
-    assert (set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]])
-        == set(["researchProjects", "artProjects"]))
+    assert (
+        set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) ==
+        set(["researchProjects", "artProjects"])
+    )
     assert set([x.get('type') for x in content.get('included')]) == set([
         'artProjects', 'artProjects', 'researchProjects']), 'Detail included types are incorrect'
     # Ensure that the child fields are present.

@@ -35,8 +35,9 @@ if django.VERSION >= (1, 9):
     )
     ReverseManyRelatedObjectsDescriptor = object()
 else:
-    # noqa: F401
-    from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    from django.db.models.fields.related import (  # noqa: F401
+        ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    )
     from django.db.models.fields.related import (
         ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     )
@@ -49,7 +50,7 @@ if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no c
 elif django.VERSION >= (1, 9):
     from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor  # noqa: F401
 else:
-    from django.contrib.contenttypes.fields import (
+    from django.contrib.contenttypes.fields import (  # noqa: F401
         ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor  # noqa: F401
     )
 
