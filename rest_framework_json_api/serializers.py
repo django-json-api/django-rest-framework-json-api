@@ -50,6 +50,7 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
 
 class SparseFieldsetsMixin(object):
     def __init__(self, *args, **kwargs):
+        super(SparseFieldsetsMixin, self).__init__(*args, **kwargs)
         context = kwargs.get('context')
         request = context.get('request') if context else None
 
@@ -73,8 +74,6 @@ class SparseFieldsetsMixin(object):
                         continue
                     if field_name not in fieldset:
                         self.fields.pop(field_name)
-
-        super(SparseFieldsetsMixin, self).__init__(*args, **kwargs)
 
 
 class IncludedResourcesValidationMixin(object):

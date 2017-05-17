@@ -37,12 +37,12 @@ class BlogSerializer(serializers.ModelSerializer):
 class EntrySerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
+        super(EntrySerializer, self).__init__(*args, **kwargs)
         # to make testing more concise we'll only output the
         # `featured` field when it's requested via `include`
         request = kwargs.get('context', {}).get('request')
         if request and 'featured' not in request.query_params.get('include', []):
-            self.fields.pop('featured')
-        super(EntrySerializer, self).__init__(*args, **kwargs)
+            self.fields.pop('featured', None)
 
     included_serializers = {
         'authors': 'example.serializers.AuthorSerializer',
