@@ -1,12 +1,14 @@
+import collections
+import inflection
 import json
 
 from rest_framework.fields import MISSING_ERROR_MESSAGE
-from rest_framework.relations import *
+from rest_framework.relations import *  # noqa: F403
+from rest_framework.serializers import Serializer
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.query import QuerySet
 
 from rest_framework_json_api.exceptions import Conflict
-from rest_framework_json_api.utils import POLYMORPHIC_ANCESTORS, Hyperlink, \
+from rest_framework_json_api.utils import Hyperlink, \
     get_resource_type_from_queryset, get_resource_type_from_instance, \
     get_included_serializers, get_resource_type_from_serializer
 
@@ -20,8 +22,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
     default_error_messages = {
         'required': _('This field is required.'),
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
-        'incorrect_type': _('Incorrect type. Expected resource identifier object, received {data_type}.'),
-        'incorrect_relation_type': _('Incorrect relation type. Expected {relation_type}, received {received_type}.'),
+        'incorrect_type': _(
+            'Incorrect type. Expected resource identifier object, received {data_type}.'
+        ),
+        'incorrect_relation_type': _(
+            'Incorrect relation type. Expected {relation_type}, received {received_type}.'
+        ),
         'missing_type': _('Invalid resource identifier object: missing \'type\' attribute'),
         'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
         'no_match': _('Invalid hyperlink - No URL match.'),
@@ -33,8 +39,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         if related_link_view_name is not None:
             self.related_link_view_name = related_link_view_name
 
-        self.related_link_lookup_field = kwargs.pop('related_link_lookup_field', self.related_link_lookup_field)
-        self.related_link_url_kwarg = kwargs.pop('related_link_url_kwarg', self.related_link_lookup_field)
+        self.related_link_lookup_field = kwargs.pop(
+            'related_link_lookup_field', self.related_link_lookup_field
+        )
+        self.related_link_url_kwarg = kwargs.pop(
+            'related_link_url_kwarg', self.related_link_lookup_field
+        )
 
         # check for a model class that was passed in for the relation type
         model = kwargs.pop('model', None)
@@ -47,12 +57,6 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         self.reverse = reverse
 
         super(ResourceRelatedField, self).__init__(**kwargs)
-
-        # Determine if relation is polymorphic
-        self.is_polymorphic = False
-        model = model or getattr(self.get_queryset(), 'model', None)
-        if model and issubclass(model, POLYMORPHIC_ANCESTORS):
-            self.is_polymorphic = True
 
     def use_pk_only_optimization(self):
         # We need the real object to determine its type...
@@ -106,7 +110,9 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         kwargs = {lookup_field: getattr(obj, lookup_field) if obj else view.kwargs[lookup_field]}
 
         self_kwargs = kwargs.copy()
-        self_kwargs.update({'related_field': self.field_name if self.field_name else self.parent.field_name})
+        self_kwargs.update({
+            'related_field': self.field_name if self.field_name else self.parent.field_name
+        })
         self_link = self.get_url('self', self.self_link_view_name, self_kwargs, request)
 
         related_kwargs = {self.related_link_url_kwarg: kwargs[self.related_link_lookup_field]}
@@ -127,7 +133,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
                 self.fail('incorrect_type', data_type=type(data).__name__)
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
+
         expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        serializer_resource_type = self.get_resource_type_from_included_serializer()
+
+        if serializer_resource_type is not None:
+            expected_relation_type = serializer_resource_type
 
         if 'type' not in data:
             self.fail('missing_type')
@@ -136,8 +147,11 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             self.fail('missing_id')
 
         if data['type'] != expected_relation_type:
-            self.conflict('incorrect_relation_type', relation_type=expected_relation_type,
-                          received_type=data['type'])
+            self.conflict(
+                'incorrect_relation_type',
+                relation_type=expected_relation_type,
+                received_type=data['type']
+            )
 
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
 
@@ -147,19 +161,43 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         else:
             pk = value.pk
 
-        # check to see if this resource has a different resource_name when
-        # included and use that name
-        resource_type = None
-        root = getattr(self.parent, 'parent', self.parent)
-        field_name = self.field_name if self.field_name else self.parent.field_name
-        if getattr(root, 'included_serializers', None) is not None and \
-                self._skip_polymorphic_optimization:
-            includes = get_included_serializers(root)
-            if field_name in includes.keys():
-                resource_type = get_resource_type_from_serializer(includes[field_name])
+        resource_type = self.get_resource_type_from_included_serializer()
+        if resource_type is None and self._skip_polymorphic_optimization:
+            resource_type = get_resource_type_from_instance(value)
 
-        resource_type = resource_type if resource_type else get_resource_type_from_instance(value)
         return OrderedDict([('type', resource_type), ('id', str(pk))])
+
+    def get_resource_type_from_included_serializer(self):
+        """
+        Check to see it this resource has a different resource_name when
+        included and return that name, or None
+        """
+        field_name = self.field_name or self.parent.field_name
+        parent = self.get_parent_serializer()
+
+        if parent is not None:
+            # accept both singular and plural versions of field_name
+            field_names = [
+                inflection.singularize(field_name),
+                inflection.pluralize(field_name)
+            ]
+            includes = get_included_serializers(parent)
+            for field in field_names:
+                if field in includes.keys():
+                    return get_resource_type_from_serializer(includes[field])
+
+        return None
+
+    def get_parent_serializer(self):
+        if hasattr(self.parent, 'parent') and self.is_serializer(self.parent.parent):
+            return self.parent.parent
+        elif self.is_serializer(self.parent):
+            return self.parent
+
+        return None
+
+    def is_serializer(self, candidate):
+        return isinstance(candidate, Serializer)
 
     def get_choices(self, cutoff=None):
         queryset = self.get_queryset()
@@ -235,17 +273,20 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         # DRF 3.1 doesn't expect the `many` kwarg
         kwargs.pop('many', None)
         model = kwargs.pop('model', None)
+        if child_relation is not None:
+            self.child_relation = child_relation
         if model:
             self.model = model
-        super(SerializerMethodResourceRelatedField, self).__init__(child_relation, *args, **kwargs)
+        super(SerializerMethodResourceRelatedField, self).__init__(*args, **kwargs)
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        list_kwargs = {k: kwargs.pop(k) for k in LINKS_PARAMS if k in kwargs}
+        list_kwargs['child_relation'] = cls(*args, **kwargs)
         for key in kwargs.keys():
             if key in ('model',) + MANY_RELATION_KWARGS:
                 list_kwargs[key] = kwargs[key]
-        return SerializerMethodResourceRelatedField(**list_kwargs)
+        return cls(**list_kwargs)
 
     def get_attribute(self, instance):
         # check for a source fn defined on the serializer instead of the model
@@ -256,10 +297,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
 
     def to_representation(self, value):
-        if isinstance(value, QuerySet):
+        if isinstance(value, collections.Iterable):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
-
-    def get_links(self, obj=None, lookup_field='pk'):
-        return OrderedDict()

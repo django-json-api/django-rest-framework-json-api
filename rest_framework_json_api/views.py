@@ -1,19 +1,8 @@
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import NoReverseMatch
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
-if django.VERSION < (1, 9):
-    from django.db.models.fields.related import (
-        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
-        ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
-    )
-else:
-    from django.db.models.fields.related_descriptors import (
-        ForwardManyToOneDescriptor,
-        ManyToManyDescriptor,
-    )
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, MethodNotAllowed
@@ -29,10 +18,30 @@ from rest_framework_json_api.utils import (
     get_included_resources,
 )
 
+if django.VERSION >= (1, 10):
+    from django.urls import NoReverseMatch
+else:
+    from django.core.urlresolvers import NoReverseMatch
+
+if django.VERSION < (1, 9):
+    from django.db.models.fields.related import (
+        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor,
+        ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
+        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
+        SingleRelatedObjectDescriptor as ReverseOneToOneDescriptor,
+    )
+else:
+    from django.db.models.fields.related_descriptors import (
+        ForwardManyToOneDescriptor,
+        ManyToManyDescriptor,
+        ReverseManyToOneDescriptor,
+        ReverseOneToOneDescriptor,
+    )
+
 
 class ModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
+        qs = super(ModelViewSet, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
@@ -44,16 +53,30 @@ class ModelViewSet(viewsets.ModelViewSet):
                     break
                 field = getattr(level_model, level)
                 field_class = field.__class__
-                if not (
-                    issubclass(field_class, ForwardManyToOneDescriptor)
-                    or issubclass(field_class, ManyToManyDescriptor)
-                ):
+
+                is_forward_relation = (
+                    issubclass(field_class, ForwardManyToOneDescriptor) or
+                    issubclass(field_class, ManyToManyDescriptor)
+                )
+                is_reverse_relation = (
+                    issubclass(field_class, ReverseManyToOneDescriptor) or
+                    issubclass(field_class, ReverseOneToOneDescriptor)
+                )
+                if not (is_forward_relation or is_reverse_relation):
                     break
 
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    level_model = field.get_queryset().model
+                    if django.VERSION < (1, 9):
+                        model_field = field.related
+                    else:
+                        model_field = field.field
+
+                    if is_forward_relation:
+                        level_model = model_field.related_model
+                    else:
+                        level_model = model_field.model
 
             if included_model is not None:
                 qs = qs.prefetch_related(included.replace('.', '__'))
@@ -112,7 +135,9 @@ class RelationshipView(generics.GenericAPIView):
         return_data = OrderedDict()
         self_link = self.get_url('self', self.self_link_view_name, self.kwargs, self.request)
         related_kwargs = {self.lookup_field: self.kwargs.get(self.lookup_field)}
-        related_link = self.get_url('related', self.related_link_view_name, related_kwargs, self.request)
+        related_link = self.get_url(
+            'related', self.related_link_view_name, related_kwargs, self.request
+        )
         if self_link:
             return_data.update({'self': self_link})
         if related_link:
@@ -130,11 +155,14 @@ class RelationshipView(generics.GenericAPIView):
 
         if isinstance(related_instance_or_manager, Manager):
             related_model_class = related_instance_or_manager.model
-            serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
+            serializer = self.get_serializer(
+                data=request.data, model_class=related_model_class, many=True
+            )
             serializer.is_valid(raise_exception=True)
             related_instance_or_manager.all().delete()
             # have to set bulk to False since data isn't saved yet
-            if django.VERSION >= (1, 9):
+            class_name = related_instance_or_manager.__class__.__name__
+            if django.VERSION >= (1, 9) and class_name != 'ManyRelatedManager':
                 related_instance_or_manager.add(*serializer.validated_data,
                                                 bulk=False)
             else:
@@ -154,7 +182,9 @@ class RelationshipView(generics.GenericAPIView):
 
         if isinstance(related_instance_or_manager, Manager):
             related_model_class = related_instance_or_manager.model
-            serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
+            serializer = self.get_serializer(
+                data=request.data, model_class=related_model_class, many=True
+            )
             serializer.is_valid(raise_exception=True)
             if frozenset(serializer.validated_data) <= frozenset(related_instance_or_manager.all()):
                 return Response(status=204)
@@ -169,15 +199,19 @@ class RelationshipView(generics.GenericAPIView):
 
         if isinstance(related_instance_or_manager, Manager):
             related_model_class = related_instance_or_manager.model
-            serializer = self.get_serializer(data=request.data, model_class=related_model_class, many=True)
+            serializer = self.get_serializer(
+                data=request.data, model_class=related_model_class, many=True
+            )
             serializer.is_valid(raise_exception=True)
-            if frozenset(serializer.validated_data).isdisjoint(frozenset(related_instance_or_manager.all())):
+            objects = related_instance_or_manager.all()
+            if frozenset(serializer.validated_data).isdisjoint(frozenset(objects)):
                 return Response(status=204)
             try:
                 related_instance_or_manager.remove(*serializer.validated_data)
             except AttributeError:
                 raise Conflict(
-                    'This object cannot be removed from this relationship without being added to another'
+                    'This object cannot be removed from this relationship without being '
+                    'added to another'
                 )
         else:
             raise MethodNotAllowed('DELETE')

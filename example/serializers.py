@@ -1,11 +1,23 @@
 from datetime import datetime
 from rest_framework_json_api import serializers, relations
-from example import models
+from example.models import Blog, Entry, Author, AuthorBio, Comment, TaggedItemm, Project, ArtProject, ResearchProject, Company
+
+
+class TaggedItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TaggedItem
+        fields = ('tag', )
 
 
 class BlogSerializer(serializers.ModelSerializer):
 
     copyright = serializers.SerializerMethodField()
+    tags = TaggedItemSerializer(many=True, read_only=True)
+
+    include_serializers = {
+        'tags': 'example.serializers.TaggedItemSerializer',
+    }
 
     def get_copyright(self, resource):
         return datetime.now().year
@@ -16,8 +28,9 @@ class BlogSerializer(serializers.ModelSerializer):
         }
 
     class Meta:
-        model = models.Blog
-        fields = ('name', 'url',)
+        model = Blog
+        fields = ('name', 'url', 'tags')
+        read_only_fields = ('tags', )
         meta_fields = ('copyright',)
 
 
@@ -36,39 +49,49 @@ class EntrySerializer(serializers.ModelSerializer):
         'comments': 'example.serializers.CommentSerializer',
         'featured': 'example.serializers.EntrySerializer',
         'suggested': 'example.serializers.EntrySerializer',
+        'tags': 'example.serializers.TaggedItemSerializer',
     }
 
     body_format = serializers.SerializerMethodField()
-    # Many related from model
+    # many related from model
     comments = relations.ResourceRelatedField(
-        source='comment_set', many=True, read_only=True)
-    # Many related from serializer
+        many=True, read_only=True)
+    # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
-        source='get_suggested', model=models.Entry, many=True, read_only=True)
-    # Single related from serializer
+        source='get_suggested', model=Entry, many=True, read_only=True,
+        related_link_view_name='entry-suggested',
+        related_link_url_kwarg='entry_pk',
+        self_link_view_name='entry-relationships',
+    )
+    # single related from serializer
     featured = relations.SerializerMethodResourceRelatedField(
-        source='get_featured', model=models.Entry, read_only=True)
+        source='get_featured', model=Entry, read_only=True)
+    tags = TaggedItemSerializer(many=True, read_only=True)
 
     def get_suggested(self, obj):
-        return models.Entry.objects.exclude(pk=obj.pk)
+        return Entry.objects.exclude(pk=obj.pk)
 
     def get_featured(self, obj):
-        return models.Entry.objects.exclude(pk=obj.pk).first()
+        return Entry.objects.exclude(pk=obj.pk).first()
 
     def get_body_format(self, obj):
         return 'text'
 
     class Meta:
-        model = models.Entry
+        model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                  'authors', 'comments', 'featured', 'suggested',)
+                  'authors', 'comments', 'featured', 'suggested', 'tags')
+        read_only_fields = ('tags', )
         meta_fields = ('body_format',)
+
+    class JSONAPIMeta:
+        included_resources = ['comments']
 
 
 class AuthorBioSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = models.AuthorBio
+        model = AuthorBio
         fields = ('author', 'body',)
 
 
@@ -78,7 +101,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     }
 
     class Meta:
-        model = models.Author
+        model = Author
         fields = ('name', 'email', 'bio')
 
 
@@ -89,20 +112,20 @@ class CommentSerializer(serializers.ModelSerializer):
     }
 
     class Meta:
-        model = models.Comment
+        model = Comment
         exclude = ('created_at', 'modified_at',)
         # fields = ('entry', 'body', 'author',)
 
 
 class ArtProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.ArtProject
+        model = ArtProject
         exclude = ('polymorphic_ctype',)
 
 
 class ResearchProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.ResearchProject
+        model = ResearchProject
         exclude = ('polymorphic_ctype',)
 
 
@@ -110,15 +133,15 @@ class ProjectSerializer(serializers.PolymorphicModelSerializer):
     polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
 
     class Meta:
-        model = models.Project
+        model = Project
         exclude = ('polymorphic_ctype',)
 
 
 class CompanySerializer(serializers.ModelSerializer):
     current_project = relations.PolymorphicResourceRelatedField(
-        ProjectSerializer, queryset=models.Project.objects.all())
+        ProjectSerializer, queryset=Project.objects.all())
     future_projects = relations.PolymorphicResourceRelatedField(
-        ProjectSerializer, queryset=models.Project.objects.all(), many=True)
+        ProjectSerializer, queryset=Project.objects.all(), many=True)
 
     included_serializers = {
         'current_project': ProjectSerializer,
@@ -126,4 +149,4 @@ class CompanySerializer(serializers.ModelSerializer):
     }
 
     class Meta:
-        model = models.Company
+        model = Company

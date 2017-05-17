@@ -2,8 +2,10 @@ from django.conf.urls import include, url
 from rest_framework import routers
 
 from example.views import (
-    BlogViewSet, EntryViewSet, AuthorViewSet, CommentViewSet, CompanyViewset, ProjectViewset,
-    EntryRelationshipView, BlogRelationshipView, CommentRelationshipView, AuthorRelationshipView)
+    BlogViewSet, EntryViewSet, AuthorViewSet, CommentViewSet, EntryRelationshipView,
+    BlogRelationshipView, CommentRelationshipView, AuthorRelationshipView,
+    CompanyViewset, ProjectViewset,
+)
 from .api.resources.identity import Identity, GenericIdentity
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -26,6 +28,10 @@ urlpatterns = [
         GenericIdentity.as_view(), name='user-default'),
 
 
+    url(r'^entries/(?P<entry_pk>[^/.]+)/suggested/',
+        EntryViewSet.as_view({'get': 'list'}),
+        name='entry-suggested'
+        ),
     url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         EntryRelationshipView.as_view(),
         name='entry-relationships'),

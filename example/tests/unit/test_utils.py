@@ -115,8 +115,9 @@ def test_get_included_serializers_against_class():
         'comments': CommentSerializer,
         'self': klass
     }
-    assert (six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers),
-            'the keys must be preserved')
+    assert six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers), (
+        'the keys must be preserved'
+    )
 
     assert included_serializers == expected_included_serializers
 
@@ -131,7 +132,8 @@ def test_get_included_serializers_against_instance():
         'comments': CommentSerializer,
         'self': klass
     }
-    assert (six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers),
-            'the keys must be preserved')
+    assert six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers), (
+        'the keys must be preserved'
+    )
 
     assert included_serializers == expected_included_serializers

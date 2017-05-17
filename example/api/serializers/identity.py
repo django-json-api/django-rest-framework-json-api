@@ -6,10 +6,11 @@ class IdentitySerializer(serializers.ModelSerializer):
     """
     Identity Serializer
     """
+
     def validate_first_name(self, data):
         if len(data) > 10:
             raise serializers.ValidationError(
-                    'There\'s a problem with first name')
+                'There\'s a problem with first name')
         return data
 
     def validate_last_name(self, data):

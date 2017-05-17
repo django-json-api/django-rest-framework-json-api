@@ -1,7 +1,6 @@
 """
 Parsers
 """
-import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
@@ -30,13 +29,27 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_attributes(data):
-        return utils.format_keys(
-            data.get('attributes'), 'underscore') if data.get('attributes') else dict()
+        attributes = data.get('attributes')
+        uses_format_translation = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+
+        if not attributes:
+            return dict()
+        elif uses_format_translation:
+            # convert back to python/rest_framework's preferred underscore format
+            return utils.format_keys(attributes, 'underscore')
+        else:
+            return attributes
 
     @staticmethod
     def parse_relationships(data):
-        relationships = (utils.format_keys(data.get('relationships'), 'underscore')
-                         if data.get('relationships') else dict())
+        uses_format_translation = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+        relationships = data.get('relationships')
+
+        if not relationships:
+            relationships = dict()
+        elif uses_format_translation:
+            # convert back to python/rest_framework's preferred underscore format
+            relationships = utils.format_keys(relationships, 'underscore')
 
         # Parse the relationships
         parsed_relationships = dict()
@@ -61,23 +74,30 @@ class JSONParser(parsers.JSONParser):
         Parses the incoming bytestream as JSON and returns the resulting data
         """
         result = super(JSONParser, self).parse(
-            stream, media_type=media_type, parser_context=parser_context)
+            stream, media_type=media_type, parser_context=parser_context
+        )
+
+        if not isinstance(result, dict) or 'data' not in result:
+            raise ParseError('Received document does not contain primary data')
+
         data = result.get('data')
 
-        if data:
-            from rest_framework_json_api.views import RelationshipView
-            if isinstance(parser_context['view'], RelationshipView):
-                # We skip parsing the object as JSONAPI Resource Identifier Object is not a
-                # regular Resource Object
-                if isinstance(data, list):
-                    for resource_identifier_object in data:
-                        if not (resource_identifier_object.get('id') and
-                                resource_identifier_object.get('type')):
-                            raise ParseError('Received data contains one or more malformed '
-                                             'JSONAPI Resource Identifier Object(s)')
-                elif not (data.get('id') and data.get('type')):
-                    raise ParseError('Received data is not a valid '
-                                     'JSONAPI Resource Identifier Object')
+        from rest_framework_json_api.views import RelationshipView
+        if isinstance(parser_context['view'], RelationshipView):
+            # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular
+            # Resource Object
+            if isinstance(data, list):
+                for resource_identifier_object in data:
+                    if not (
+                        resource_identifier_object.get('id') and
+                        resource_identifier_object.get('type')
+                    ):
+                        raise ParseError(
+                            'Received data contains one or more malformed JSONAPI '
+                            'Resource Identifier Object(s)'
+                        )
+            elif not (data.get('id') and data.get('type')):
+                raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
 
                 return data
 
@@ -106,12 +126,9 @@ class JSONParser(parsers.JSONParser):
             if not data.get('id') and request.method in ('PATCH', 'PUT'):
                 raise ParseError("The resource identifier object must contain an 'id' member")
 
-            # Construct the return data
-            parsed_data = {'id': data.get('id'), 'type': data.get('type')}
-            parsed_data.update(self.parse_attributes(data))
-            parsed_data.update(self.parse_relationships(data))
-            parsed_data.update(self.parse_metadata(result))
-            return parsed_data
-
-        else:
-            raise ParseError('Received document does not contain primary data')
+        # Construct the return data
+        parsed_data = {'id': data.get('id'), 'type': data.get('type')} if 'id' in data else {'type': data.get('type')}
+        parsed_data.update(self.parse_attributes(data))
+        parsed_data.update(self.parse_relationships(data))
+        parsed_data.update(self.parse_metadata(result))
+        return parsed_data

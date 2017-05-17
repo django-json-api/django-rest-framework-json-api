@@ -1,10 +1,8 @@
-import json
-
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from example.tests import TestBase
-from example.tests.utils import dump_json, redump_json
+from example.tests.utils import load_json
 
 
 class GenericViewSet(TestBase):
@@ -38,11 +36,9 @@ class GenericViewSet(TestBase):
             'email': 'miles@example.com'
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
-
+        assert expected == parsed_content
 
     def test_ember_expected_renderer(self):
         """
@@ -66,10 +62,9 @@ class GenericViewSet(TestBase):
             }
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
 
     def test_default_validation_exceptions(self):
         """
@@ -96,10 +91,9 @@ class GenericViewSet(TestBase):
         response = self.client.post('/identities', {
             'email': 'bar', 'first_name': 'alajflajaljalajlfjafljalj'})
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
 
     def test_custom_validation_exceptions(self):
         """
@@ -124,7 +118,6 @@ class GenericViewSet(TestBase):
         response = self.client.post('/identities', {
             'email': 'bar', 'last_name': 'alajflajaljalajlfjafljalj'})
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content

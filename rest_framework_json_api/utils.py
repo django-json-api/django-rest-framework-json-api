@@ -2,29 +2,53 @@
 Utils.
 """
 import copy
+import inspect
 import warnings
 from collections import OrderedDict
-import inspect
 
 import inflection
+from rest_framework import exceptions
+from rest_framework.exceptions import APIException
+
+import django
 from django.conf import settings
-from django.utils import encoding
-from django.utils import six
+from django.db.models import Manager
+from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Manager
-from rest_framework.exceptions import APIException
-from rest_framework import exceptions
 
 try:
     from rest_framework.serializers import ManyRelatedField
 except ImportError:
-    ManyRelatedField = type(None)
+    ManyRelatedField = object()
 
 try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
-    HyperlinkedRouterField = type(None)
+    HyperlinkedRouterField = object()
+
+if django.VERSION >= (1, 9):
+    from django.db.models.fields.related_descriptors import (
+        ManyToManyDescriptor, ReverseManyToOneDescriptor
+    )
+    ReverseManyRelatedObjectsDescriptor = object()
+else:
+    from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    from django.db.models.fields.related import (
+        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
+    )
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+
+# Generic relation descriptor from django.contrib.contenttypes.
+if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
+    # Target application does not use contenttypes. Importing would cause errors.
+    ReverseGenericManyToOneDescriptor = object()
+elif django.VERSION >= (1, 9):
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+else:
+    from django.contrib.contenttypes.fields import (
+        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
+    )
 
 POLYMORPHIC_ANCESTORS = ()
 for ancestor in getattr(settings, 'JSON_API_POLYMORPHIC_ANCESTORS', ()):
@@ -36,7 +60,6 @@ def get_resource_name(context, expand_polymorphic_types=False):
     """
     Return the name of a resource.
     """
-    from . import serializers
     view = context.get('view')
 
     # Sanity check to make sure we have a view.
@@ -154,8 +177,9 @@ def format_value(value, format_type=None):
 
 def format_relation_name(value, format_type=None):
     warnings.warn(
-        "The 'format_relation_name' function has been renamed 'format_resource_type' and "
-        "the settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'")
+        "The 'format_relation_name' function has been renamed 'format_resource_type' and the "
+        "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'"
+    )
     if format_type is None:
         format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
     pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
@@ -181,7 +205,6 @@ def get_related_resource_type(relation):
         return get_resource_type_from_serializer(relation)
     except AttributeError:
         pass
-
     relation_model = None
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
@@ -190,6 +213,13 @@ def get_related_resource_type(relation):
         relation_model = relation.model
     elif hasattr(relation, 'get_queryset') and relation.get_queryset() is not None:
         relation_model = relation.get_queryset().model
+    elif (
+            getattr(relation, 'many', False) and
+            hasattr(relation.child, 'Meta') and
+            hasattr(relation.child.Meta, 'model')):
+        # For ManyToMany relationships, get the model from the child
+        # serializer of the list serializer
+        relation_model = relation.child.Meta.model
     else:
         parent_serializer = relation.parent
         parent_model = None
@@ -198,7 +228,7 @@ def get_related_resource_type(relation):
         elif hasattr(parent_serializer, 'parent') and hasattr(parent_serializer.parent, 'Meta'):
             parent_model = getattr(parent_serializer.parent.Meta, 'model', None)
 
-        if parent_model is not  None:
+        if parent_model is not None:
             if relation.source:
                 if relation.source != '*':
                     parent_model_relation = getattr(parent_model, relation.source)
@@ -207,11 +237,13 @@ def get_related_resource_type(relation):
             else:
                 parent_model_relation = getattr(parent_model, parent_serializer.field_name)
 
-            if hasattr(parent_model_relation, 'related'):
-                try:
+            parent_model_relation_type = type(parent_model_relation)
+            if parent_model_relation_type is ReverseManyToOneDescriptor:
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.related_model
+                elif django.VERSION >= (1, 8):
                     relation_model = parent_model_relation.related.related_model
-                except AttributeError:
-                    # Django 1.7
+                else:
                     relation_model = parent_model_relation.related.model
             elif hasattr(parent_model_relation, 'field'):
                 try:
@@ -270,10 +302,10 @@ def get_included_resources(request, serializer=None):
 
 
 def get_default_included_resources_from_serializer(serializer):
-    try:
-        return list(serializer.JSONAPIMeta.included_resources)
-    except AttributeError:
-        return []
+    meta = getattr(serializer, 'JSONAPIMeta', None)
+    if meta is None and getattr(serializer, 'many', False):
+        meta = getattr(serializer.child, 'JSONAPIMeta', None)
+    return list(getattr(meta, 'included_resources', []))
 
 
 def get_included_serializers(serializer):
@@ -282,7 +314,9 @@ def get_included_serializers(serializer):
     for name, value in six.iteritems(included_serializers):
         if not isinstance(value, type):
             if value == 'self':
-                included_serializers[name] = serializer if isinstance(serializer, type) else serializer.__class__
+                included_serializers[name] = (
+                    serializer if isinstance(serializer, type) else serializer.__class__
+                )
             else:
                 included_serializers[name] = import_class_from_dotted_path(value)
 

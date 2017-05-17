@@ -2,8 +2,7 @@
 
 import factory
 from faker import Factory as FakerFactory
-from example import models
-
+from example.models import Blog, Author, AuthorBio, Entry, Comment, TaggedItem, ArtProject, ResearchProject, Company
 
 faker = FakerFactory.create()
 faker.seed(983843)
@@ -11,23 +10,24 @@ faker.seed(983843)
 
 class BlogFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Blog
+        model = Blog
 
     name = factory.LazyAttribute(lambda x: faker.name())
 
 
 class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Author
+        model = Author
 
     name = factory.LazyAttribute(lambda x: faker.name())
     email = factory.LazyAttribute(lambda x: faker.email())
 
     bio = factory.RelatedFactory('example.factories.AuthorBioFactory', 'author')
 
+
 class AuthorBioFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.AuthorBio
+        model = AuthorBio
 
     author = factory.SubFactory(AuthorFactory)
     body = factory.LazyAttribute(lambda x: faker.text())
@@ -35,7 +35,7 @@ class AuthorBioFactory(factory.django.DjangoModelFactory):
 
 class EntryFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Entry
+        model = Entry
 
     headline = factory.LazyAttribute(lambda x: faker.sentence(nb_words=4))
     body_text = factory.LazyAttribute(lambda x: faker.text())
@@ -54,16 +54,25 @@ class EntryFactory(factory.django.DjangoModelFactory):
 
 class CommentFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Comment
+        model = Comment
 
     entry = factory.SubFactory(EntryFactory)
     body = factory.LazyAttribute(lambda x: faker.text())
     author = factory.SubFactory(AuthorFactory)
 
 
+class TaggedItemFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = TaggedItem
+
+    content_object = factory.SubFactory(EntryFactory)
+    tag = factory.LazyAttribute(lambda x: faker.word())
+
+
 class ArtProjectFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.ArtProject
+        model = ArtProject
 
     topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
     artist = factory.LazyAttribute(lambda x: faker.name())
@@ -71,7 +80,7 @@ class ArtProjectFactory(factory.django.DjangoModelFactory):
 
 class ResearchProjectFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.ResearchProject
+        model = ResearchProject
 
     topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
     supervisor = factory.LazyAttribute(lambda x: faker.name())
@@ -79,7 +88,7 @@ class ResearchProjectFactory(factory.django.DjangoModelFactory):
 
 class CompanyFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Company
+        model = Company
 
     name = factory.LazyAttribute(lambda x: faker.company())
     current_project = factory.SubFactory(ArtProjectFactory)

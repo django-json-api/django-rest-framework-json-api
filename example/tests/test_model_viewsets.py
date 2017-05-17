@@ -1,12 +1,10 @@
-import json
-
 from django.contrib.auth import get_user_model
 from django.utils import encoding
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from example.tests import TestBase
-from example.tests.utils import dump_json, redump_json
+from example.tests.utils import dump_json, load_json
 
 
 class ModelViewSetTests(TestBase):
@@ -64,10 +62,9 @@ class ModelViewSetTests(TestBase):
             }
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
 
     def test_page_two_in_list_result(self):
         """
@@ -80,14 +77,14 @@ class ModelViewSetTests(TestBase):
         expected = {
             'data': [
                 {
-                'type': 'users',
-                'id': encoding.force_text(user.pk),
-                'attributes': {
-                    'first-name': user.first_name,
-                    'last-name': user.last_name,
-                    'email': user.email
-                },
-            }
+                    'type': 'users',
+                    'id': encoding.force_text(user.pk),
+                    'attributes': {
+                        'first-name': user.first_name,
+                        'last-name': user.last_name,
+                        'email': user.email
+                    },
+                }
             ],
             'links': {
                 'first': 'http://testserver/identities?page=1',
@@ -104,10 +101,9 @@ class ModelViewSetTests(TestBase):
             }
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
 
     def test_page_range_in_list_result(self):
         """
@@ -155,10 +151,9 @@ class ModelViewSetTests(TestBase):
             }
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
 
     def test_key_in_detail_result(self):
         """
@@ -179,10 +174,9 @@ class ModelViewSetTests(TestBase):
             }
         }
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(expected)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert expected == parsed_content
 
     def test_patch_requires_id(self):
         """
@@ -224,10 +218,9 @@ class ModelViewSetTests(TestBase):
                                    content_type='application/vnd.api+json',
                                    data=dump_json(data))
 
-        content_dump = redump_json(response.content)
-        expected_dump = dump_json(data)
+        parsed_content = load_json(response.content)
 
-        assert expected_dump == content_dump
+        assert data == parsed_content
 
         # is it updated?
         self.assertEqual(

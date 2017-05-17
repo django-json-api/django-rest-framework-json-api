@@ -1,3 +1,25 @@
+v2.3.0
+
+* When `JSON_API_FORMAT_KEYS` is False (the default) do not translate request
+  attributes and relations to snake\_case format. This conversion was unexpected
+  and there was no way to turn it off.
+* Fix for apps that don't use `django.contrib.contenttypes`.
+* Fix `resource_name` support for POST requests and nested serializers
+* Enforcing flake8 linting
+
+v2.2.0
+
+* Add support for Django REST Framework 3.5 and 3.6
+* Add support for Django 1.11
+* Add support for Python 3.6
+
+v2.1.1
+
+* Avoid setting `id` to `None` in the parser simply because it's missing
+* Fixed out of scope `relation_instance` variable in renderer
+* Allow default DRF serializers to operate even when mixed with DRF-JA serializers
+* Fixed wrong resource type for reverse foreign keys
+* Fixed documentation typos
 
 v2.1.0
 

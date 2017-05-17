@@ -1,6 +1,9 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from polymorphic.models import PolymorphicModel
@@ -17,10 +20,21 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class TaggedItem(BaseModel):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return self.tag
+
+
 @python_2_unicode_compatible
 class Blog(BaseModel):
     name = models.CharField(max_length=100)
     tagline = models.TextField()
+    tags = GenericRelation(TaggedItem)
 
     def __str__(self):
         return self.name
@@ -55,6 +69,7 @@ class Entry(BaseModel):
     n_comments = models.IntegerField(default=0)
     n_pingbacks = models.IntegerField(default=0)
     rating = models.IntegerField(default=0)
+    tags = GenericRelation(TaggedItem)
 
     def __str__(self):
         return self.headline
@@ -62,7 +77,7 @@ class Entry(BaseModel):
 
 @python_2_unicode_compatible
 class Comment(BaseModel):
-    entry = models.ForeignKey(Entry)
+    entry = models.ForeignKey(Entry, related_name='comments')
     body = models.TextField()
     author = models.ForeignKey(
         Author,

@@ -82,9 +82,10 @@ class JSONAPIMetadata(SimpleMetadata):
         # Remove the URL field if present
         serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
-        return OrderedDict(
-            [(field_name, self.get_field_info(field)) for field_name, field in serializer.fields.items()]
-        )
+        return OrderedDict([
+            (field_name, self.get_field_info(field))
+            for field_name, field in serializer.fields.items()
+        ])
 
     def get_field_info(self, field):
         """
@@ -101,7 +102,9 @@ class JSONAPIMetadata(SimpleMetadata):
 
         try:
             serializer_model = getattr(serializer.Meta, 'model')
-            field_info['relationship_type'] = self.relation_type_lookup[getattr(serializer_model, field.field_name)]
+            field_info['relationship_type'] = self.relation_type_lookup[
+                getattr(serializer_model, field.field_name)
+            ]
         except KeyError:
             pass
         except AttributeError:
@@ -127,9 +130,11 @@ class JSONAPIMetadata(SimpleMetadata):
         elif getattr(field, 'fields', None):
             field_info['children'] = self.get_serializer_info(field)
 
-        if (not field_info.get('read_only')
-            and hasattr(field, 'choices')
-            and not field_info.get('relationship_resource')):
+        if (
+            not field_info.get('read_only') and
+            not field_info.get('relationship_resource') and
+            hasattr(field, 'choices')
+        ):
             field_info['choices'] = [
                 {
                     'value': choice_value,
