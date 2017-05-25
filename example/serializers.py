@@ -1,4 +1,7 @@
 from datetime import datetime
+from packaging import version
+
+import rest_framework
 from rest_framework_json_api import serializers, relations
 from example.models import (
     Blog, Entry, Author, AuthorBio, Comment, TaggedItem, Project, ArtProject, ResearchProject,
@@ -40,12 +43,12 @@ class BlogSerializer(serializers.ModelSerializer):
 class EntrySerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
+        super(EntrySerializer, self).__init__(*args, **kwargs)
         # to make testing more concise we'll only output the
         # `featured` field when it's requested via `include`
         request = kwargs.get('context', {}).get('request')
         if request and 'featured' not in request.query_params.get('include', []):
-            self.fields.pop('featured')
-        super(EntrySerializer, self).__init__(*args, **kwargs)
+            self.fields.pop('featured', None)
 
     included_serializers = {
         'authors': 'example.serializers.AuthorSerializer',
@@ -153,4 +156,5 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = '__all__'
+        if version.parse(rest_framework.VERSION) >= version.parse('3.3'):
+            fields = '__all__'
