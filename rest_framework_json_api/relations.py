@@ -169,7 +169,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             pk = value.pk
 
         resource_type = self.get_resource_type_from_included_serializer()
-        if resource_type is None and self._skip_polymorphic_optimization:
+        if resource_type is None or not self._skip_polymorphic_optimization:
             resource_type = get_resource_type_from_instance(value)
 
         return OrderedDict([('type', resource_type), ('id', str(pk))])
