@@ -15,6 +15,3 @@ JSON_API_PLURALIZE_TYPES = True
 REST_FRAMEWORK.update({
     'PAGE_SIZE': 1,
 })
-JSON_API_POLYMORPHIC_ANCESTORS = (
-    'polymorphic.models.PolymorphicModel',
-)

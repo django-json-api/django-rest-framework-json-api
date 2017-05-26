@@ -198,6 +198,12 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
         setattr(new_class, '_poly_serializer_model_map', serializer_to_model)
         setattr(new_class, '_poly_model_serializer_map', model_to_serializer)
         setattr(new_class, '_poly_type_serializer_map', type_to_serializer)
+        setattr(new_class, '_poly_force_type_resolution', True)
+
+        # Flag each linked polymorphic serializer to force type resolution based on instance
+        for serializer in polymorphic_serializers:
+            setattr(serializer, '_poly_force_type_resolution', True)
+
         return new_class
 
 

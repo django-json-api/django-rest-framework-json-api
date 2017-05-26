@@ -362,7 +362,8 @@ class JSONRenderer(renderers.JSONRenderer):
                                 serializer_fields,
                                 serializer_resource,
                                 nested_resource_instance,
-                                resource_type
+                                resource_type,
+                                getattr(serializer, '_poly_force_type_resolution', False)
                             )
                         )
                         included_data.extend(
@@ -384,7 +385,8 @@ class JSONRenderer(renderers.JSONRenderer):
                     included_data.append(
                         cls.build_json_resource_obj(
                             serializer_fields, serializer_data,
-                            relation_instance, relation_type)
+                            relation_instance, relation_type,
+                            getattr(field, '_poly_force_type_resolution', False))
                     )
                     included_data.extend(
                         cls.extract_included(
@@ -426,9 +428,10 @@ class JSONRenderer(renderers.JSONRenderer):
         return data
 
     @classmethod
-    def build_json_resource_obj(cls, fields, resource, resource_instance, resource_name):
+    def build_json_resource_obj(cls, fields, resource, resource_instance, resource_name,
+                                force_type_resolution=False):
         # Determine type from the instance if the underlying model is polymorphic
-        if isinstance(resource_instance, utils.POLYMORPHIC_ANCESTORS):
+        if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)
         resource_data = [
             ('type', resource_name),
@@ -512,6 +515,9 @@ class JSONRenderer(renderers.JSONRenderer):
             # Get the serializer fields
             fields = utils.get_serializer_fields(serializer)
 
+            # Determine if resource name must be resolved on each instance (polymorphic serializer)
+            force_type_resolution = getattr(serializer, '_poly_force_type_resolution', False)
+
             # Extract root meta for any type of serializer
             json_api_meta.update(self.extract_root_meta(serializer, serializer_data))
 
@@ -523,7 +529,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     resource_instance = serializer.instance[position]  # Get current instance
 
                     json_resource_obj = self.build_json_resource_obj(
-                        fields, resource, resource_instance, resource_name
+                        fields, resource, resource_instance, resource_name, force_type_resolution
                     )
                     meta = self.extract_meta(serializer, resource)
                     if meta:
@@ -538,7 +544,7 @@ class JSONRenderer(renderers.JSONRenderer):
             else:
                 resource_instance = serializer.instance
                 json_api_data = self.build_json_resource_obj(
-                    fields, serializer_data, resource_instance, resource_name
+                    fields, serializer_data, resource_instance, resource_name, force_type_resolution
                 )
 
                 meta = self.extract_meta(serializer, serializer_data)

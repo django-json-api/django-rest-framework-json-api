@@ -52,11 +52,6 @@ else:
         ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor  # noqa: F401
     )
 
-POLYMORPHIC_ANCESTORS = ()
-for ancestor in getattr(settings, 'JSON_API_POLYMORPHIC_ANCESTORS', ()):
-    ancestor_class = import_class_from_dotted_path(ancestor)
-    POLYMORPHIC_ANCESTORS += (ancestor_class,)
-
 
 def get_resource_name(context, expand_polymorphic_types=False):
     """

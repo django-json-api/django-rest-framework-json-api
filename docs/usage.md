@@ -427,19 +427,6 @@ field_name_mapping = {
 
 ### Working with polymorphic resources
 
-#### Extraction of the polymorphic type
-
-This package can defer the resolution of the type of polymorphic models instances to retrieve the appropriate type.
-However, most models are not polymorphic and for performance reasons this is only done if the underlying model is a subclass of a polymorphic model.
-
-Polymorphic ancestors must be defined on settings like this:
-
-```python
-JSON_API_POLYMORPHIC_ANCESTORS = (
-    'polymorphic.models.PolymorphicModel',
-)
-```
-
 #### Writing polymorphic resources
 
 A polymorphic endpoint can be setup if associated with a polymorphic serializer.
