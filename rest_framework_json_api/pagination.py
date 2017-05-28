@@ -64,7 +64,7 @@ class LimitOffsetPagination(LimitOffsetPagination):
         url = self.request.build_absolute_uri()
         url = replace_query_param(url, self.limit_query_param, self.limit)
 
-        offset = self.count - self.limit
+        offset = (self.count // self.limit) * self.limit
 
         if offset <= 0:
             return remove_query_param(url, self.offset_query_param)
