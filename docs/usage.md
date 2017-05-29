@@ -429,8 +429,8 @@ field_name_mapping = {
 
 #### Writing polymorphic resources
 
-A polymorphic endpoint can be setup if associated with a polymorphic serializer.
-A polymorphic serializer take care of (de)serializing the correct instances types and can be defined like this:
+A polymorphic endpoint can be set up if associated with a polymorphic serializer.
+A polymorphic serializer takes care of (de)serializing the correct instances types and can be defined like this:
 
 ```python
 class ProjectSerializer(serializers.PolymorphicModelSerializer):
@@ -457,7 +457,7 @@ class CompanySerializer(serializers.ModelSerializer):
         model = models.Company
 ```
 
-They must be explicitely declared with the `polymorphic_serializer` (first positional argument) correctly defined.
+They must be explicitly declared with the `polymorphic_serializer` (first positional argument) correctly defined.
 It must be a subclass of `serializers.PolymorphicModelSerializer`.
 
 <div class="warning">

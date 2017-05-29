@@ -1,8 +1,8 @@
 from datetime import datetime
-from packaging import version
 
 import rest_framework
 from rest_framework_json_api import serializers, relations
+from packaging import version
 from example.models import (
     Blog, Entry, Author, AuthorBio, Comment, TaggedItem, Project, ArtProject, ResearchProject,
     Company,

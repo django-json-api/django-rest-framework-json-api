@@ -79,8 +79,7 @@ def get_resource_name(context, expand_polymorphic_types=False):
     except AttributeError:
         try:
             serializer = view.get_serializer_class()
-            if issubclass(serializer, PolymorphicModelSerializer) and \
-                    expand_polymorphic_types:
+            if expand_polymorphic_types and issubclass(serializer, PolymorphicModelSerializer):
                 return serializer.get_polymorphic_types()
             else:
                 return get_resource_type_from_serializer(serializer)
