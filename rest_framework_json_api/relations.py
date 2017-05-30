@@ -228,7 +228,8 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
 class PolymorphicResourceRelatedField(ResourceRelatedField):
     """
     Inform DRF that the relation must be considered polymorphic.
-    Takes a `polymorphic_serializer` as the first positional argument to retrieve then validate the accepted types set.
+    Takes a `polymorphic_serializer` as the first positional argument to
+    retrieve then validate the accepted types set.
     """
 
     _skip_polymorphic_optimization = False
