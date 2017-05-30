@@ -238,6 +238,9 @@ def get_related_resource_type(relation):
                     relation_model = parent_model_relation.related.model
             elif parent_model_relation_type is ManyToManyDescriptor:
                 relation_model = parent_model_relation.field.remote_field.model
+                # In case we are in a reverse relation case
+                if relation_model == parent_model:
+                    relation_model = parent_model_relation.field.model
             elif parent_model_relation_type is ReverseManyRelatedObjectsDescriptor:
                 relation_model = parent_model_relation.field.related.model
             elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
