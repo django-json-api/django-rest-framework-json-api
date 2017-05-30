@@ -242,6 +242,15 @@ def get_related_resource_type(relation):
                     relation_model = parent_model_relation.related.related_model
                 else:
                     relation_model = parent_model_relation.related.model
+            elif parent_model_relation_type is ManyToManyDescriptor:
+                relation_model = parent_model_relation.field.remote_field.model
+            elif parent_model_relation_type is ReverseManyRelatedObjectsDescriptor:
+                relation_model = parent_model_relation.field.related.model
+            elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
+                if django.VERSION >= (1, 9):
+                    relation_model = parent_model_relation.rel.model
+                else:
+                    relation_model = parent_model_relation.field.related_model
             elif hasattr(parent_model_relation, 'field'):
                 try:
                     relation_model = parent_model_relation.field.remote_field.model
