@@ -41,7 +41,7 @@ class TestLimitOffset:
         offset = 10
         limit = 5
         count = len(self.queryset)
-        last_offset = count - limit
+        last_offset = (count // limit) * limit
         next_offset = 15
         prev_offset = 5
 
