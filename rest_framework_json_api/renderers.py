@@ -274,6 +274,12 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @classmethod
     def extract_relation_instance(cls, field_name, field, resource_instance, serializer):
+        """
+        Determines what instance represents given relation and extracts it.
+
+        Relation instance is determined by given field_name or source configured on
+        field. As fallback is a serializer method called with name of field's source.
+        """
         relation_instance = None
 
         try:
