@@ -3,7 +3,7 @@ Test rest_framework_json_api's utils functions.
 """
 from rest_framework_json_api import utils
 
-from ..serializers import EntrySerializer
+from ..serializers import EntrySerializer, AuthorSerializer
 from ..tests import TestBase
 
 
@@ -29,3 +29,12 @@ class GetRelatedResourceTests(TestBase):
         field = serializer.fields['authors']
 
         self.assertEqual(utils.get_related_resource_type(field), 'authors')
+
+    def test_m2m_reverse_relation(self):
+        """
+        Ensure reverse m2ms have their types identified correctly.
+        """
+        serializer = AuthorSerializer()
+        field = serializer.fields['entries']
+
+        self.assertEqual(utils.get_related_resource_type(field), 'entries')
