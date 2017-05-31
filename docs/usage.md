@@ -427,6 +427,12 @@ field_name_mapping = {
 
 ### Working with polymorphic resources
 
+Polymorphic resources (as backed by [django-polymorphic](https://django-polymorphic.readthedocs.io/en/stable/))
+allow you to easily use specialized subclasses without have to have special
+endpoints to expose the specialized versions. For example, if you had a
+`Project` that could be either an `ArtProject` or a `ResearchProject`, you can
+have both kinds at the same URL.
+
 #### Writing polymorphic resources
 
 A polymorphic endpoint can be set up if associated with a polymorphic serializer.
