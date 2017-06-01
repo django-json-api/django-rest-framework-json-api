@@ -427,11 +427,14 @@ field_name_mapping = {
 
 ### Working with polymorphic resources
 
-Polymorphic resources (as backed by [django-polymorphic](https://django-polymorphic.readthedocs.io/en/stable/))
-allow you to easily use specialized subclasses without have to have special
-endpoints to expose the specialized versions. For example, if you had a
+Polymorphic resources allow you to use specialized subclasses without requiring
+special endpoints to expose the specialized versions. For example, if you had a
 `Project` that could be either an `ArtProject` or a `ResearchProject`, you can
 have both kinds at the same URL.
+
+DJA tests its polymorphic support against [django-polymorphic](https://django-polymorphic.readthedocs.io/en/stable/).
+The polymorphic feature should also work with other popular libraries like
+django-polymodels or django-typed-models.
 
 #### Writing polymorphic resources
 
