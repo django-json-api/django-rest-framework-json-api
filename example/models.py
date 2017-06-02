@@ -64,7 +64,7 @@ class Entry(BaseModel):
     body_text = models.TextField(null=True)
     pub_date = models.DateField(null=True)
     mod_date = models.DateField(null=True)
-    authors = models.ManyToManyField(Author)
+    authors = models.ManyToManyField(Author, related_name='entries')
     n_comments = models.IntegerField(default=0)
     n_pingbacks = models.IntegerField(default=0)
     rating = models.IntegerField(default=0)

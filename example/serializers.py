@@ -92,7 +92,7 @@ class AuthorBioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AuthorBio
-        fields = ('author', 'body',)
+        fields = ('author', 'body')
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -102,7 +102,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('name', 'email', 'bio')
+        fields = ('name', 'email', 'bio', 'entries')
 
 
 class CommentSerializer(serializers.ModelSerializer):
