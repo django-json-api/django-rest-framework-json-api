@@ -107,6 +107,8 @@ setup(
         'pytest-factoryboy',
         'pytest-django',
         'pytest>=2.8,<3',
+        'django-polymorphic',
+        'packaging',
     ] + mock,
     zip_safe=False,
 )

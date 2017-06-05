@@ -3,7 +3,8 @@ from rest_framework import routers
 
 from example.views import (
     BlogViewSet, EntryViewSet, AuthorViewSet, CommentViewSet, EntryRelationshipView,
-    BlogRelationshipView, CommentRelationshipView, AuthorRelationshipView
+    BlogRelationshipView, CommentRelationshipView, AuthorRelationshipView,
+    CompanyViewset, ProjectViewset,
 )
 from .api.resources.identity import Identity, GenericIdentity
 
@@ -13,6 +14,8 @@ router.register(r'blogs', BlogViewSet)
 router.register(r'entries', EntryViewSet)
 router.register(r'authors', AuthorViewSet)
 router.register(r'comments', CommentViewSet)
+router.register(r'companies', CompanyViewset)
+router.register(r'projects', ProjectViewset)
 
 # for the old tests
 router.register(r'identities', Identity)

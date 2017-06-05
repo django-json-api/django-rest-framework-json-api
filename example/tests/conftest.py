@@ -3,7 +3,7 @@ from pytest_factoryboy import register
 
 from example.factories import (
     BlogFactory, AuthorFactory, AuthorBioFactory, EntryFactory, CommentFactory,
-    TaggedItemFactory
+    TaggedItemFactory, ArtProjectFactory, ResearchProjectFactory, CompanyFactory,
 )
 
 register(BlogFactory)
@@ -12,6 +12,9 @@ register(AuthorBioFactory)
 register(EntryFactory)
 register(CommentFactory)
 register(TaggedItemFactory)
+register(ArtProjectFactory)
+register(ResearchProjectFactory)
+register(CompanyFactory)
 
 
 @pytest.fixture
@@ -33,3 +36,14 @@ def multiple_entries(blog_factory, author_factory, entry_factory, comment_factor
     comment_factory(entry=entries[0])
     comment_factory(entry=entries[1])
     return entries
+
+
+@pytest.fixture
+def single_company(art_project_factory, research_project_factory, company_factory):
+    company = company_factory(future_projects=(research_project_factory(), art_project_factory()))
+    return company
+
+
+@pytest.fixture
+def single_art_project(art_project_factory):
+    return art_project_factory()

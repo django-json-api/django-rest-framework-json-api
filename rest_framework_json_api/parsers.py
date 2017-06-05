@@ -1,10 +1,10 @@
 """
 Parsers
 """
+from django.conf import settings
+from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
-
-from django.conf import settings
 
 from . import utils, renderers, exceptions
 
@@ -106,21 +106,31 @@ class JSONParser(parsers.JSONParser):
         request = parser_context.get('request')
 
         # Check for inconsistencies
-        resource_name = utils.get_resource_name(parser_context)
-        if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
-            raise exceptions.Conflict(
-                "The resource object's type ({data_type}) is not the type "
-                "that constitute the collection represented by the endpoint "
-                "({resource_type}).".format(
-                    data_type=data.get('type'),
-                    resource_type=resource_name
-                )
-            )
+        if request.method in ('PUT', 'POST', 'PATCH'):
+            resource_name = utils.get_resource_name(
+                parser_context, expand_polymorphic_types=True)
+            if isinstance(resource_name, six.string_types):
+                if data.get('type') != resource_name:
+                    raise exceptions.Conflict(
+                        "The resource object's type ({data_type}) is not the type that "
+                        "constitute the collection represented by the endpoint "
+                        "({resource_type}).".format(
+                            data_type=data.get('type'),
+                            resource_type=resource_name))
+            else:
+                if data.get('type') not in resource_name:
+                    raise exceptions.Conflict(
+                        "The resource object's type ({data_type}) is not the type that "
+                        "constitute the collection represented by the endpoint "
+                        "(one of [{resource_types}]).".format(
+                            data_type=data.get('type'),
+                            resource_types=", ".join(resource_name)))
         if not data.get('id') and request.method in ('PATCH', 'PUT'):
             raise ParseError("The resource identifier object must contain an 'id' member")
 
         # Construct the return data
         parsed_data = {'id': data.get('id')} if 'id' in data else {}
+        parsed_data['type'] = data.get('type')
         parsed_data.update(self.parse_attributes(data))
         parsed_data.update(self.parse_relationships(data))
         parsed_data.update(self.parse_metadata(result))

@@ -1,9 +1,13 @@
 import inflection
+
+from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
+from django.utils import six
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *  # noqa: F403
 
 from rest_framework_json_api.relations import ResourceRelatedField
+from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import (
     get_resource_type_from_model, get_resource_type_from_instance,
     get_resource_type_from_serializer, get_included_serializers, get_included_resources)
@@ -163,3 +167,140 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
                 declared[field_name] = field
         fields = super(ModelSerializer, self).get_field_names(declared, info)
         return list(fields) + list(getattr(self.Meta, 'meta_fields', list()))
+
+
+class PolymorphicSerializerMetaclass(SerializerMetaclass):
+    """
+    This metaclass ensures that the `polymorphic_serializers` is correctly defined on a
+    `PolymorphicSerializer` class and make a cache of model/serializer/type mappings.
+    """
+
+    def __new__(cls, name, bases, attrs):
+        new_class = super(PolymorphicSerializerMetaclass, cls).__new__(cls, name, bases, attrs)
+
+        # Ensure initialization is only performed for subclasses of PolymorphicModelSerializer
+        # (excluding PolymorphicModelSerializer class itself).
+        parents = [b for b in bases if isinstance(b, PolymorphicSerializerMetaclass)]
+        if not parents:
+            return new_class
+
+        polymorphic_serializers = getattr(new_class, 'polymorphic_serializers', None)
+        if not polymorphic_serializers:
+            raise NotImplementedError(
+                "A PolymorphicModelSerializer must define a `polymorphic_serializers` attribute.")
+        serializer_to_model = {
+            serializer: serializer.Meta.model for serializer in polymorphic_serializers}
+        model_to_serializer = {
+            serializer.Meta.model: serializer for serializer in polymorphic_serializers}
+        type_to_serializer = {
+            get_resource_type_from_serializer(serializer): serializer for
+            serializer in polymorphic_serializers}
+        new_class._poly_serializer_model_map = serializer_to_model
+        new_class._poly_model_serializer_map = model_to_serializer
+        new_class._poly_type_serializer_map = type_to_serializer
+        new_class._poly_force_type_resolution = True
+
+        # Flag each linked polymorphic serializer to force type resolution based on instance
+        for serializer in polymorphic_serializers:
+            serializer._poly_force_type_resolution = True
+
+        return new_class
+
+
+@six.add_metaclass(PolymorphicSerializerMetaclass)
+class PolymorphicModelSerializer(ModelSerializer):
+    """
+    A serializer for polymorphic models.
+    Useful for "lazy" parent models. Leaves should be represented with a regular serializer.
+    """
+    def get_fields(self):
+        """
+        Return an exhaustive list of the polymorphic serializer fields.
+        """
+        if self.instance is not None:
+            if not isinstance(self.instance, QuerySet):
+                serializer_class = self.get_polymorphic_serializer_for_instance(self.instance)
+                return serializer_class(self.instance, context=self.context).get_fields()
+            else:
+                raise Exception("Cannot get fields from a polymorphic serializer given a queryset")
+        return super(PolymorphicModelSerializer, self).get_fields()
+
+    @classmethod
+    def get_polymorphic_serializer_for_instance(cls, instance):
+        """
+        Return the polymorphic serializer associated with the given instance/model.
+        Raise `NotImplementedError` if no serializer is found for the given model. This usually
+        means that a serializer is missing in the class's `polymorphic_serializers` attribute.
+        """
+        try:
+            return cls._poly_model_serializer_map[instance._meta.model]
+        except KeyError:
+            raise NotImplementedError(
+                "No polymorphic serializer has been found for model {}".format(
+                    instance._meta.model.__name__))
+
+    @classmethod
+    def get_polymorphic_model_for_serializer(cls, serializer):
+        """
+        Return the polymorphic model associated with the given serializer.
+        Raise `NotImplementedError` if no model is found for the given serializer. This usually
+        means that a serializer is missing in the class's `polymorphic_serializers` attribute.
+        """
+        try:
+            return cls._poly_serializer_model_map[serializer]
+        except KeyError:
+            raise NotImplementedError(
+                "No polymorphic model has been found for serializer {}".format(serializer.__name__))
+
+    @classmethod
+    def get_polymorphic_serializer_for_type(cls, obj_type):
+        """
+        Return the polymorphic serializer associated with the given type.
+        Raise `NotImplementedError` if no serializer is found for the given type. This usually
+        means that a serializer is missing in the class's `polymorphic_serializers` attribute.
+        """
+        try:
+            return cls._poly_type_serializer_map[obj_type]
+        except KeyError:
+            raise NotImplementedError(
+                "No polymorphic serializer has been found for type {}".format(obj_type))
+
+    @classmethod
+    def get_polymorphic_model_for_type(cls, obj_type):
+        """
+        Return the polymorphic model associated with the given type.
+        Raise `NotImplementedError` if no model is found for the given type. This usually
+        means that a serializer is missing in the class's `polymorphic_serializers` attribute.
+        """
+        return cls.get_polymorphic_model_for_serializer(
+            cls.get_polymorphic_serializer_for_type(obj_type))
+
+    @classmethod
+    def get_polymorphic_types(cls):
+        """
+        Return the list of accepted types.
+        """
+        return cls._poly_type_serializer_map.keys()
+
+    def to_representation(self, instance):
+        """
+        Retrieve the appropriate polymorphic serializer and use this to handle representation.
+        """
+        serializer_class = self.get_polymorphic_serializer_for_instance(instance)
+        return serializer_class(instance, context=self.context).to_representation(instance)
+
+    def to_internal_value(self, data):
+        """
+        Ensure that the given type is one of the expected polymorphic types, then retrieve the
+        appropriate polymorphic serializer and use this to handle internal value.
+        """
+        received_type = data.get('type')
+        expected_types = self.get_polymorphic_types()
+        if received_type not in expected_types:
+            raise Conflict(
+                'Incorrect relation type. Expected on of [{expected_types}], '
+                'received {received_type}.'.format(
+                    expected_types=', '.join(expected_types), received_type=received_type))
+        serializer_class = self.get_polymorphic_serializer_for_type(received_type)
+        self.__class__ = serializer_class
+        return serializer_class(data, context=self.context).to_internal_value(data)

@@ -425,6 +425,59 @@ field_name_mapping = {
 ```
 
 
+### Working with polymorphic resources
+
+Polymorphic resources allow you to use specialized subclasses without requiring
+special endpoints to expose the specialized versions. For example, if you had a
+`Project` that could be either an `ArtProject` or a `ResearchProject`, you can
+have both kinds at the same URL.
+
+DJA tests its polymorphic support against [django-polymorphic](https://django-polymorphic.readthedocs.io/en/stable/).
+The polymorphic feature should also work with other popular libraries like
+django-polymodels or django-typed-models.
+
+#### Writing polymorphic resources
+
+A polymorphic endpoint can be set up if associated with a polymorphic serializer.
+A polymorphic serializer takes care of (de)serializing the correct instances types and can be defined like this:
+
+```python
+class ProjectSerializer(serializers.PolymorphicModelSerializer):
+    polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
+
+    class Meta:
+        model = models.Project
+```
+
+It must inherit from `serializers.PolymorphicModelSerializer` and define the `polymorphic_serializers` list.
+This attribute defines the accepted resource types.
+
+
+Polymorphic relations can also be handled with `relations.PolymorphicResourceRelatedField` like this:
+
+```python
+class CompanySerializer(serializers.ModelSerializer):
+    current_project = relations.PolymorphicResourceRelatedField(
+        ProjectSerializer, queryset=models.Project.objects.all())
+    future_projects = relations.PolymorphicResourceRelatedField(
+        ProjectSerializer, queryset=models.Project.objects.all(), many=True)
+
+    class Meta:
+        model = models.Company
+```
+
+They must be explicitly declared with the `polymorphic_serializer` (first positional argument) correctly defined.
+It must be a subclass of `serializers.PolymorphicModelSerializer`.
+
+<div class="warning">
+    <strong>Note:</strong>
+    Polymorphic resources are not compatible with
+    <code class="docutils literal">
+        <span class="pre">resource_name</span>
+    </code>
+    defined on the view.
+</div>
+
 ### Meta
 
 You may add metadata to the rendered json in two different ways: `meta_fields` and `get_root_meta`.

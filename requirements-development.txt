@@ -6,5 +6,6 @@ Faker
 recommonmark
 Sphinx
 sphinx_rtd_theme
+django-polymorphic
 tox
 mock

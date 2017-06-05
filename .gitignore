@@ -34,6 +34,8 @@ pip-delete-this-directory.txt
 
 # Tox
 .tox/
+.cache/
+.python-version
 
 # VirtualEnv
 .venv/

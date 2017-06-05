@@ -1,6 +1,12 @@
 from datetime import datetime
+
+import rest_framework
 from rest_framework_json_api import serializers, relations
-from example.models import Blog, Entry, Author, AuthorBio, Comment, TaggedItem
+from packaging import version
+from example.models import (
+    Blog, Entry, Author, AuthorBio, Comment, TaggedItem, Project, ArtProject, ResearchProject,
+    Company,
+)
 
 
 class TaggedItemSerializer(serializers.ModelSerializer):
@@ -115,3 +121,40 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         exclude = ('created_at', 'modified_at',)
         # fields = ('entry', 'body', 'author',)
+
+
+class ArtProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArtProject
+        exclude = ('polymorphic_ctype',)
+
+
+class ResearchProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResearchProject
+        exclude = ('polymorphic_ctype',)
+
+
+class ProjectSerializer(serializers.PolymorphicModelSerializer):
+    polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
+
+    class Meta:
+        model = Project
+        exclude = ('polymorphic_ctype',)
+
+
+class CompanySerializer(serializers.ModelSerializer):
+    current_project = relations.PolymorphicResourceRelatedField(
+        ProjectSerializer, queryset=Project.objects.all())
+    future_projects = relations.PolymorphicResourceRelatedField(
+        ProjectSerializer, queryset=Project.objects.all(), many=True)
+
+    included_serializers = {
+        'current_project': ProjectSerializer,
+        'future_projects': ProjectSerializer,
+    }
+
+    class Meta:
+        model = Company
+        if version.parse(rest_framework.VERSION) >= version.parse('3.3'):
+            fields = '__all__'

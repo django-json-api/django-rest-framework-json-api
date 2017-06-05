@@ -29,32 +29,35 @@ except ImportError:
 
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related_descriptors import (
-        ManyToManyDescriptor, ReverseManyToOneDescriptor
+        ManyToManyDescriptor, ReverseManyToOneDescriptor  # noqa: F401
     )
     ReverseManyRelatedObjectsDescriptor = object()
 else:
-    from django.db.models.fields.related import ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    from django.db.models.fields.related import (  # noqa: F401
+        ManyRelatedObjectsDescriptor as ManyToManyDescriptor
+    )
     from django.db.models.fields.related import (
         ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
     )
-    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor  # noqa: F401
 
 # Generic relation descriptor from django.contrib.contenttypes.
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
     # Target application does not use contenttypes. Importing would cause errors.
     ReverseGenericManyToOneDescriptor = object()
 elif django.VERSION >= (1, 9):
-    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor  # noqa: F401
 else:
-    from django.contrib.contenttypes.fields import (
-        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor
+    from django.contrib.contenttypes.fields import (  # noqa: F401
+        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor  # noqa: F401
     )
 
 
-def get_resource_name(context):
+def get_resource_name(context, expand_polymorphic_types=False):
     """
     Return the name of a resource.
     """
+    from rest_framework_json_api.serializers import PolymorphicModelSerializer
     view = context.get('view')
 
     # Sanity check to make sure we have a view.
@@ -76,7 +79,10 @@ def get_resource_name(context):
     except AttributeError:
         try:
             serializer = view.get_serializer_class()
-            return get_resource_type_from_serializer(serializer)
+            if expand_polymorphic_types and issubclass(serializer, PolymorphicModelSerializer):
+                return serializer.get_polymorphic_types()
+            else:
+                return get_resource_type_from_serializer(serializer)
         except AttributeError:
             try:
                 resource_name = get_resource_type_from_model(view.model)
@@ -254,6 +260,11 @@ def get_related_resource_type(relation):
                     relation_model = parent_model_relation.rel.model
                 else:
                     relation_model = parent_model_relation.field.related_model
+            elif hasattr(parent_model_relation, 'field'):
+                try:
+                    relation_model = parent_model_relation.field.remote_field.model
+                except AttributeError:
+                    relation_model = parent_model_relation.field.related.model
             else:
                 return get_related_resource_type(parent_model_relation)
 

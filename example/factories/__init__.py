@@ -2,7 +2,9 @@
 
 import factory
 from faker import Factory as FakerFactory
-from example.models import Blog, Author, AuthorBio, Entry, Comment, TaggedItem
+from example.models import (
+    Blog, Author, AuthorBio, Entry, Comment, TaggedItem, ArtProject, ResearchProject, Company
+)
 
 faker = FakerFactory.create()
 faker.seed(983843)
@@ -68,3 +70,35 @@ class TaggedItemFactory(factory.django.DjangoModelFactory):
 
     content_object = factory.SubFactory(EntryFactory)
     tag = factory.LazyAttribute(lambda x: faker.word())
+
+
+class ArtProjectFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ArtProject
+
+    topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
+    artist = factory.LazyAttribute(lambda x: faker.name())
+
+
+class ResearchProjectFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ResearchProject
+
+    topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
+    supervisor = factory.LazyAttribute(lambda x: faker.name())
+
+
+class CompanyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Company
+
+    name = factory.LazyAttribute(lambda x: faker.company())
+    current_project = factory.SubFactory(ArtProjectFactory)
+
+    @factory.post_generation
+    def future_projects(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for project in extracted:
+                self.future_projects.add(project)

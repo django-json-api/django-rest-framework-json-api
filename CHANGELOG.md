@@ -1,5 +1,6 @@
 v2.3.0
 
+* Added support for polymorphic models
 * When `JSON_API_FORMAT_KEYS` is False (the default) do not translate request
   attributes and relations to snake\_case format. This conversion was unexpected
   and there was no way to turn it off.
