@@ -82,14 +82,15 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
 
 def test_deep_included_data_on_list(multiple_entries, client):
     response = client.get(reverse("entry-list") + '?include=comments,comments.author,'
-                          'comments.author.bio&page_size=5')
+                          'comments.author.bio,comments.writer&page_size=5')
     included = load_json(response.content).get('included')
 
     assert len(load_json(response.content)['data']) == len(multiple_entries), (
         'Incorrect entry count'
     )
     assert [x.get('type') for x in included] == [
-        'authorBios', 'authorBios', 'authors', 'authors', 'comments', 'comments'
+        'authorBios', 'authorBios', 'authors', 'authors',
+        'comments', 'comments', 'writers', 'writers'
     ], 'List included types are incorrect'
 
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
@@ -105,6 +106,13 @@ def test_deep_included_data_on_list(multiple_entries, client):
     expected_author_bio_count = sum([entry.comments.filter(
         author__bio__isnull=False).count() for entry in multiple_entries])
     assert author_bio_count == expected_author_bio_count, 'List author bio count is incorrect'
+
+    writer_count = len(
+        [resource for resource in included if resource["type"] == "writers"]
+    )
+    expected_writer_count = sum(
+        [entry.comments.filter(author__isnull=False).count() for entry in multiple_entries])
+    assert writer_count == expected_writer_count, 'List writer count is incorrect'
 
     # Also include entry authors
     response = client.get(reverse("entry-list") + '?include=authors,comments,comments.author,'

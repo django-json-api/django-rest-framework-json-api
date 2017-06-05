@@ -7,6 +7,7 @@ v2.3.0
 * Fix for apps that don't use `django.contrib.contenttypes`.
 * Fix `resource_name` support for POST requests and nested serializers
 * Enforcing flake8 linting
+* Added nested included serializer support for remapped relations
 
 v2.2.0
 

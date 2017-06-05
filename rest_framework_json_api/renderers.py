@@ -273,6 +273,36 @@ class JSONRenderer(renderers.JSONRenderer):
         return utils.format_keys(data)
 
     @classmethod
+    def extract_relation_instance(cls, field_name, field, resource_instance, serializer):
+        """
+        Determines what instance represents given relation and extracts it.
+
+        Relation instance is determined by given field_name or source configured on
+        field. As fallback is a serializer method called with name of field's source.
+        """
+        relation_instance = None
+
+        try:
+            relation_instance = getattr(resource_instance, field_name)
+        except AttributeError:
+            try:
+                # For ManyRelatedFields if `related_name` is not set
+                # we need to access `foo_set` from `source`
+                relation_instance = getattr(resource_instance, field.child_relation.source)
+            except AttributeError:
+                if hasattr(serializer, field.source):
+                    serializer_method = getattr(serializer, field.source)
+                    relation_instance = serializer_method(resource_instance)
+                else:
+                    # case when source is a simple remap on resource_instance
+                    try:
+                        relation_instance = getattr(resource_instance, field.source)
+                    except AttributeError:
+                        pass
+
+        return relation_instance
+
+    @classmethod
     def extract_included(cls, fields, resource, resource_instance, included_resources):
         # this function may be called with an empty record (example: Browsable Interface)
         if not resource_instance:
@@ -304,19 +334,9 @@ class JSONRenderer(renderers.JSONRenderer):
                 if field_name not in [node.split('.')[0] for node in included_resources]:
                     continue
 
-            try:
-                relation_instance = getattr(resource_instance, field_name)
-            except AttributeError:
-                try:
-                    # For ManyRelatedFields if `related_name` is not set we need to access `foo_set`
-                    # from `source`
-                    relation_instance = getattr(resource_instance, field.child_relation.source)
-                except AttributeError:
-                    if not hasattr(current_serializer, field.source):
-                        continue
-                    serializer_method = getattr(current_serializer, field.source)
-                    relation_instance = serializer_method(resource_instance)
-
+            relation_instance = cls.extract_relation_instance(
+                field_name, field, resource_instance, current_serializer
+            )
             if isinstance(relation_instance, Manager):
                 relation_instance = relation_instance.all()
 

@@ -111,10 +111,25 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = ('name', 'email', 'bio', 'entries')
 
 
+class WriterSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'bio': AuthorBioSerializer
+    }
+
+    class Meta:
+        model = Author
+        fields = ('name', 'email', 'bio')
+        resource_name = 'writers'
+
+
 class CommentSerializer(serializers.ModelSerializer):
+    # testing remapping of related name
+    writer = relations.ResourceRelatedField(source='author', read_only=True)
+
     included_serializers = {
         'entry': EntrySerializer,
-        'author': AuthorSerializer
+        'author': AuthorSerializer,
+        'writer': WriterSerializer
     }
 
     class Meta:
