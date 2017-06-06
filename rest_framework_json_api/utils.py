@@ -202,6 +202,10 @@ def get_related_resource_type(relation):
         return get_resource_type_from_serializer(relation)
     except AttributeError:
         pass
+
+    if hasattr(relation, 'child_relation'):
+        return get_related_resource_type(relation.child_relation)
+    
     relation_model = None
     if hasattr(relation, '_meta'):
         relation_model = relation._meta.model
