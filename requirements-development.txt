@@ -1,11 +1,12 @@
 -e .
+django-polymorphic
+Faker
+isort
+mock
 pytest>=2.9.0,<3.0
 pytest-django
 pytest-factoryboy
-Faker
 recommonmark
 Sphinx
 sphinx_rtd_theme
-django-polymorphic
 tox
-mock

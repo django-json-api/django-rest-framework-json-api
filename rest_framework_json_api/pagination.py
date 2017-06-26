@@ -2,9 +2,10 @@
 Pagination fields
 """
 from collections import OrderedDict
-from rest_framework.views import Response
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.utils.urls import remove_query_param, replace_query_param
+from rest_framework.views import Response
 
 
 class PageNumberPagination(PageNumberPagination):

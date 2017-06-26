@@ -6,7 +6,7 @@ from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
-from . import utils, renderers, exceptions
+from . import exceptions, renderers, utils
 
 
 class JSONParser(parsers.JSONParser):

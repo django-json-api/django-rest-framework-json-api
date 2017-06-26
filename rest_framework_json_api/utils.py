@@ -6,16 +6,15 @@ import inspect
 import warnings
 from collections import OrderedDict
 
-import inflection
-from rest_framework import exceptions
-from rest_framework.exceptions import APIException
-
 import django
+import inflection
 from django.conf import settings
 from django.db.models import Manager
 from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import exceptions
+from rest_framework.exceptions import APIException
 
 try:
     from rest_framework.serializers import ManyRelatedField

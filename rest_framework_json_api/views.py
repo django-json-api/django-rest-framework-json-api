@@ -1,21 +1,21 @@
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
-from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
+from django.db.models.query import QuerySet
 from rest_framework import generics, viewsets
+from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import (
-    get_resource_type_from_instance,
-    OrderedDict,
     Hyperlink,
+    OrderedDict,
     get_included_resources,
+    get_resource_type_from_instance
 )
 
 if django.VERSION >= (1, 10):
