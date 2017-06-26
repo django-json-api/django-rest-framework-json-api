@@ -1,6 +1,7 @@
-from example.models import Entry, Comment
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
+
+from example.models import Comment, Entry
 
 
 # serializers

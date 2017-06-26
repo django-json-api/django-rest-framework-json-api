@@ -7,10 +7,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from example.serializers import (EntrySerializer, BlogSerializer,
-                                 AuthorSerializer, CommentSerializer)
 from rest_framework_json_api import utils
 from rest_framework_json_api.utils import get_included_serializers
+
+from example.serializers import AuthorSerializer, BlogSerializer, CommentSerializer, EntrySerializer
 
 pytestmark = pytest.mark.django_db
 

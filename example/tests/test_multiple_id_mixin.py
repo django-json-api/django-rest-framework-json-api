@@ -1,7 +1,9 @@
 import json
-from example.tests import TestBase
-from django.utils import encoding
+
 from django.core.urlresolvers import reverse
+from django.utils import encoding
+
+from example.tests import TestBase
 
 
 class MultipleIDMixin(TestBase):

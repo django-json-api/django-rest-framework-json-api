@@ -1,7 +1,8 @@
 from datetime import datetime
-from django.core.urlresolvers import reverse
 
 import pytest
+from django.core.urlresolvers import reverse
+
 from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db

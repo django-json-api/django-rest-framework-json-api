@@ -1,12 +1,13 @@
+import pytest
 from django.core.urlresolvers import reverse
+
+from example.tests.utils import load_json
 
 try:
     from unittest import mock
 except ImportError:
     import mock
 
-import pytest
-from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db
 
