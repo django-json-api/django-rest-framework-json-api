@@ -11,9 +11,6 @@ try:
 except ImportError:
     import mock
 
-
-
-
 pytestmark = pytest.mark.django_db
 
 
