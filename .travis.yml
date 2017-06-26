@@ -40,12 +40,13 @@ before_install:
   # Force an upgrade of py & pytest to avoid VersionConflict
   - pip install --upgrade py
   - pip install "pytest>=2.8,<3"
-  - pip install codecov flake8
+  - pip install codecov flake8 isort
 install:
   - pip install Django${DJANGO} djangorestframework${DRF}
   - python setup.py install
 script:
   - flake8
+  - isort --check-only --verbose rest_framework_json_api/**/*.py example/**/*.py
   - coverage run setup.py -v test
 after_success:
   - codecov
