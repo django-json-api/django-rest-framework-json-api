@@ -46,7 +46,7 @@ install:
   - python setup.py install
 script:
   - flake8
-  - isort --check-only --verbose rest_framework_json_api/**/*.py example/**/*.py
+  - isort --check-only --verbose --recursive rest_framework_json_api example
   - coverage run setup.py -v test
 after_success:
   - codecov
