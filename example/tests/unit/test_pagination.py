@@ -6,7 +6,6 @@ from rest_framework.utils.urls import replace_query_param
 
 from rest_framework_json_api.pagination import LimitOffsetPagination
 
-
 factory = APIRequestFactory()
 
 

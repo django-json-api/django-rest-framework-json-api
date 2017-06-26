@@ -1,10 +1,11 @@
 from django.contrib.auth import models as auth_models
 from django.utils import encoding
-
-from rest_framework import viewsets, generics, renderers, parsers, serializers
-from rest_framework.decorators import list_route, detail_route
+from rest_framework import generics, parsers, renderers, serializers, viewsets
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
+
 from rest_framework_json_api import mixins, utils
+
 from ..serializers.identity import IdentitySerializer
 from ..serializers.post import PostSerializer
 

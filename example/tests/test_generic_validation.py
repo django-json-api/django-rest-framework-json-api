@@ -1,6 +1,5 @@
 from django.core.urlresolvers import reverse
 
-
 from example.tests import TestBase
 from example.tests.utils import load_json
 

@@ -2,7 +2,13 @@ from django.conf.urls import include, url
 from rest_framework import routers
 
 from example.views import (
-    BlogViewSet, EntryViewSet, AuthorViewSet, CommentViewSet, CompanyViewset, ProjectViewset)
+    AuthorViewSet,
+    BlogViewSet,
+    CommentViewSet,
+    CompanyViewset,
+    EntryViewSet,
+    ProjectViewset
+)
 
 router = routers.DefaultRouter(trailing_slash=False)
 

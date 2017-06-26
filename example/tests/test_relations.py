@@ -3,12 +3,13 @@ from __future__ import absolute_import
 from django.utils import timezone
 from rest_framework import serializers
 
-from . import TestBase
 from rest_framework_json_api.exceptions import Conflict
-from rest_framework_json_api.utils import format_resource_type
-from example.models import Blog, Entry, Comment, Author
-from example.serializers import CommentSerializer
 from rest_framework_json_api.relations import ResourceRelatedField
+from rest_framework_json_api.utils import format_resource_type
+
+from . import TestBase
+from example.models import Author, Blog, Comment, Entry
+from example.serializers import CommentSerializer
 
 
 class TestResourceRelatedField(TestBase):

@@ -1,11 +1,21 @@
 from datetime import datetime
 
 import rest_framework
-from rest_framework_json_api import serializers, relations
+
 from packaging import version
+from rest_framework_json_api import relations, serializers
+
 from example.models import (
-    Blog, Entry, Author, AuthorBio, Comment, TaggedItem, Project, ArtProject, ResearchProject,
+    ArtProject,
+    Author,
+    AuthorBio,
+    Blog,
+    Comment,
     Company,
+    Entry,
+    Project,
+    ResearchProject,
+    TaggedItem
 )
 
 

@@ -1,6 +1,7 @@
-import pytest
-import random
 import json
+import random
+
+import pytest
 from django.core.urlresolvers import reverse
 
 from example.tests.utils import load_json

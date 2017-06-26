@@ -1,7 +1,7 @@
 import pytest
 
-from example.models import Blog
 from example.factories import BlogFactory
+from example.models import Blog
 
 pytestmark = pytest.mark.django_db
 

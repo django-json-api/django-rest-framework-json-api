@@ -40,12 +40,16 @@ before_install:
   # Force an upgrade of py & pytest to avoid VersionConflict
   - pip install --upgrade py
   - pip install "pytest>=2.8,<3"
-  - pip install codecov flake8
+  - pip install codecov flake8 isort
 install:
   - pip install Django${DJANGO} djangorestframework${DRF}
   - python setup.py install
 script:
   - flake8
+  - isort --check-only --verbose --recursive --diff rest_framework_json_api
+  # example has extra dependencies that are installed in a dev environment
+  # but are not installed in CI. Explicitly set those packages.
+  - isort --check-only --verbose --recursive --diff --thirdparty pytest --thirdparty polymorphic --thirdparty pytest_factoryboy example
   - coverage run setup.py -v test
 after_success:
   - codecov

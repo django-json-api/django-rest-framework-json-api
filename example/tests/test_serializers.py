@@ -1,13 +1,12 @@
+import pytest
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from rest_framework_json_api.utils import format_resource_type
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
+from rest_framework_json_api.utils import format_resource_type
 
-from example.models import Blog, Entry, Author
-
-import pytest
+from example.models import Author, Blog, Entry
 from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db

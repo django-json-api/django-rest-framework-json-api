@@ -1,7 +1,7 @@
-from django.contrib.auth import get_user_model
-from django.utils import encoding
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
+from django.utils import encoding
 
 from example.tests import TestBase
 from example.tests.utils import dump_json, load_json

@@ -1,16 +1,19 @@
 import inflection
-
 from django.db.models.query import QuerySet
-from django.utils.translation import ugettext_lazy as _
 from django.utils import six
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *  # noqa: F403
 
-from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.exceptions import Conflict
+from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
-    get_resource_type_from_model, get_resource_type_from_instance,
-    get_resource_type_from_serializer, get_included_serializers, get_included_resources)
+    get_included_resources,
+    get_included_serializers,
+    get_resource_type_from_instance,
+    get_resource_type_from_model,
+    get_resource_type_from_serializer
+)
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):

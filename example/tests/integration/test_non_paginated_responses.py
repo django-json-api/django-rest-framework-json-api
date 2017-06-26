@@ -1,16 +1,15 @@
+import pytest
 from django.core.urlresolvers import reverse
+
+from rest_framework_json_api.pagination import PageNumberPagination
+
+from example.tests.utils import load_json
+from example.views import EntryViewSet
 
 try:
     from unittest import mock
 except ImportError:
     import mock
-
-import pytest
-
-from example.views import EntryViewSet
-from rest_framework_json_api.pagination import PageNumberPagination
-
-from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db
 

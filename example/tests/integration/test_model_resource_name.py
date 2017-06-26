@@ -1,10 +1,11 @@
-import pytest
 from copy import deepcopy
-from example import models, serializers, views
-from example.tests.utils import dump_json, load_json
+
+import pytest
+from django.core.urlresolvers import reverse
 from rest_framework import status
 
-from django.core.urlresolvers import reverse
+from example import models, serializers, views
+from example.tests.utils import dump_json, load_json
 
 pytestmark = pytest.mark.django_db
 

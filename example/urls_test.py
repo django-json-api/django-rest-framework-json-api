@@ -1,12 +1,19 @@
 from django.conf.urls import include, url
 from rest_framework import routers
 
+from .api.resources.identity import GenericIdentity, Identity
 from example.views import (
-    BlogViewSet, EntryViewSet, AuthorViewSet, CommentViewSet, EntryRelationshipView,
-    BlogRelationshipView, CommentRelationshipView, AuthorRelationshipView,
-    CompanyViewset, ProjectViewset,
+    AuthorRelationshipView,
+    AuthorViewSet,
+    BlogRelationshipView,
+    BlogViewSet,
+    CommentRelationshipView,
+    CommentViewSet,
+    CompanyViewset,
+    EntryRelationshipView,
+    EntryViewSet,
+    ProjectViewset
 )
-from .api.resources.identity import Identity, GenericIdentity
 
 router = routers.DefaultRouter(trailing_slash=False)
 

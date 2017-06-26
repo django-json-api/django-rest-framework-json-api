@@ -3,15 +3,13 @@ import json
 from django.test import RequestFactory
 from django.utils import timezone
 from rest_framework.reverse import reverse
-
-from rest_framework.test import APITestCase
-from rest_framework.test import force_authenticate
+from rest_framework.test import APITestCase, force_authenticate
 
 from rest_framework_json_api.utils import format_resource_type
-from example.models import Blog, Entry, Comment, Author
 
-from .. import views
 from . import TestBase
+from .. import views
+from example.models import Author, Blog, Comment, Entry
 
 
 class TestRelationshipView(APITestCase):

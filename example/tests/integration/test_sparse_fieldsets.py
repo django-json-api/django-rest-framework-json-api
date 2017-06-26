@@ -1,7 +1,5 @@
-from django.core.urlresolvers import reverse
-
 import pytest
-
+from django.core.urlresolvers import reverse
 
 pytestmark = pytest.mark.django_db
 

@@ -2,8 +2,15 @@ import pytest
 from pytest_factoryboy import register
 
 from example.factories import (
-    BlogFactory, AuthorFactory, AuthorBioFactory, EntryFactory, CommentFactory,
-    TaggedItemFactory, ArtProjectFactory, ResearchProjectFactory, CompanyFactory,
+    ArtProjectFactory,
+    AuthorBioFactory,
+    AuthorFactory,
+    BlogFactory,
+    CommentFactory,
+    CompanyFactory,
+    EntryFactory,
+    ResearchProjectFactory,
+    TaggedItemFactory
 )
 
 register(BlogFactory)
