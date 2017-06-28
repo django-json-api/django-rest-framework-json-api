@@ -189,7 +189,10 @@ class JSONRenderer(renderers.JSONRenderer):
                         'data': resource.get(field_name)
                     }
 
-                    field_links = field.child_relation.get_links(resource_instance)
+                    field_links = field.child_relation.get_links(
+                        resource_instance,
+                        field.child_relation.related_link_lookup_field
+                    )
                     relation_data.update(
                         {'links': field_links}
                         if field_links else dict()
