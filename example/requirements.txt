@@ -1,0 +1,2 @@
+# Requirements specifically for the example app
+packaging
