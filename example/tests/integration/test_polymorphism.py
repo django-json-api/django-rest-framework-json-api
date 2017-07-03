@@ -78,6 +78,30 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
     assert content['data']['attributes']['artist'] == test_artist
 
 
+def test_polymorphic_model_without_any_instance(client):
+    expected = {
+        "links": {
+            "first": "http://testserver/projects?page=1",
+            "last": "http://testserver/projects?page=1",
+            "next": None,
+            "prev": None
+        },
+        "data": [],
+        "meta": {
+            "pagination": {
+                "page": 1,
+                "pages": 1,
+                "count": 0
+            }
+        }
+    }
+
+    response = client.get(reverse('project-list'))
+    assert response.status_code == 200
+    content = load_json(response.content)
+    assert expected == content
+
+
 def test_invalid_type_on_polymorphic_model(client):
     test_topic = 'New test topic {}'.format(random.randint(0, 999999))
     test_artist = 'test-{}'.format(random.randint(0, 999999))
