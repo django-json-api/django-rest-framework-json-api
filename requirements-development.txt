@@ -10,3 +10,4 @@ recommonmark
 Sphinx
 sphinx_rtd_theme
 tox
+packaging==16.8
