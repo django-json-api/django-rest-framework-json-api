@@ -10,3 +10,5 @@ recommonmark
 Sphinx
 sphinx_rtd_theme
 tox
+mock
+django-debug-toolbar
