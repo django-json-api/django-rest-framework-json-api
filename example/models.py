@@ -28,6 +28,9 @@ class TaggedItem(BaseModel):
     def __str__(self):
         return self.tag
 
+    class Meta:
+        ordering = ('id',)
+
 
 @python_2_unicode_compatible
 class Blog(BaseModel):
@@ -38,6 +41,9 @@ class Blog(BaseModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ('id',)
+
 
 @python_2_unicode_compatible
 class Author(BaseModel):
@@ -47,6 +53,9 @@ class Author(BaseModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ('id',)
+
 
 @python_2_unicode_compatible
 class AuthorBio(BaseModel):
@@ -55,6 +64,9 @@ class AuthorBio(BaseModel):
 
     def __str__(self):
         return self.author.name
+
+    class Meta:
+        ordering = ('id',)
 
 
 @python_2_unicode_compatible
@@ -73,6 +85,9 @@ class Entry(BaseModel):
     def __str__(self):
         return self.headline
 
+    class Meta:
+        ordering = ('id',)
+
 
 @python_2_unicode_compatible
 class Comment(BaseModel):
@@ -86,6 +101,9 @@ class Comment(BaseModel):
 
     def __str__(self):
         return self.body
+
+    class Meta:
+        ordering = ('id',)
 
 
 class Project(PolymorphicModel):
