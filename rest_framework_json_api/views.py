@@ -8,7 +8,6 @@ from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
-
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import (
@@ -39,9 +38,40 @@ else:
     )
 
 
-class ModelViewSet(viewsets.ModelViewSet):
+class PrefetchForIncludesHelperMixin(object):
+    def get_queryset(self):
+        """ This viewset provides a helper attribute to prefetch related models
+        based on the include specified in the URL.
+
+        __all__ can be used to specify a prefetch which should be done regardless of the include
+
+        @example
+        # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+        class MyViewSet(viewsets.ModelViewSet):
+            queryset = Book.objects.all()
+            prefetch_for_includes = {
+                '__all__': [],
+                'author': ['author', 'author__authorbio']
+                'category.section': ['category']
+            }
+        """
+        qs = super(PrefetchForIncludesHelperMixin, self).get_queryset()
+        if not hasattr(self, 'prefetch_for_includes'):
+            return qs
+
+        includes = self.request.GET.get('include', '').split(',')
+        for inc in includes + ['__all__']:
+            prefetches = self.prefetch_for_includes.get(inc)
+            if prefetches:
+                qs = qs.prefetch_related(*prefetches)
+
+        return qs
+
+
+class AutoPrefetchMixin(object):
     def get_queryset(self, *args, **kwargs):
-        qs = super(ModelViewSet, self).get_queryset(*args, **kwargs)
+        """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
+        qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
@@ -82,6 +112,10 @@ class ModelViewSet(viewsets.ModelViewSet):
                 qs = qs.prefetch_related(included.replace('.', '__'))
 
         return qs
+
+
+class ModelViewSet(AutoPrefetchMixin, PrefetchForIncludesHelperMixin, viewsets.ModelViewSet):
+    pass
 
 
 class RelationshipView(generics.GenericAPIView):
