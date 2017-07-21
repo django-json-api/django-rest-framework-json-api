@@ -12,3 +12,4 @@ sphinx_rtd_theme
 tox
 mock
 django-debug-toolbar
+packaging==16.8
