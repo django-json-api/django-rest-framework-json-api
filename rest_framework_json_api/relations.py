@@ -2,9 +2,8 @@ import collections
 import json
 from collections import OrderedDict
 
-import six
-
 import inflection
+import six
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
@@ -12,6 +11,7 @@ from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
+
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import (
     Hyperlink,
