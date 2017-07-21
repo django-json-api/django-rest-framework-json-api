@@ -36,7 +36,8 @@ class PerformanceTestCase(APITestCase):
     def test_query_count_no_includes(self):
         """ We expect a simple list view to issue only two queries.
 
-        1. The number of results in the set (e.g. a COUNT query), only necessary because we're using PageNumberPagination
+        1. The number of results in the set (e.g. a COUNT query),
+           only necessary because we're using PageNumberPagination
         2. The SELECT query for the set
         """
         with self.assertNumQueries(2):
