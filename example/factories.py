@@ -2,8 +2,17 @@
 
 import factory
 from faker import Factory as FakerFactory
+
 from example.models import (
-    Blog, Author, AuthorBio, Entry, Comment, TaggedItem, ArtProject, ResearchProject, Company
+    ArtProject,
+    Author,
+    AuthorBio,
+    Blog,
+    Comment,
+    Company,
+    Entry,
+    ResearchProject,
+    TaggedItem
 )
 
 faker = FakerFactory.create()
@@ -64,7 +73,6 @@ class CommentFactory(factory.django.DjangoModelFactory):
 
 
 class TaggedItemFactory(factory.django.DjangoModelFactory):
-
     class Meta:
         model = TaggedItem
 
