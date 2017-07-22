@@ -109,6 +109,7 @@ setup(
         'pytest>=2.8,<3',
         'django-polymorphic',
         'packaging',
+        'django-debug-toolbar'
     ] + mock,
     zip_safe=False,
 )

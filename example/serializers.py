@@ -1,8 +1,8 @@
 from datetime import datetime
 
 import rest_framework
-
 from packaging import version
+
 from rest_framework_json_api import relations, serializers
 
 from example.models import (
@@ -20,14 +20,12 @@ from example.models import (
 
 
 class TaggedItemSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = TaggedItem
-        fields = ('tag', )
+        fields = ('tag',)
 
 
 class BlogSerializer(serializers.ModelSerializer):
-
     copyright = serializers.SerializerMethodField()
     tags = TaggedItemSerializer(many=True, read_only=True)
 
@@ -46,12 +44,11 @@ class BlogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
         fields = ('name', 'url', 'tags')
-        read_only_fields = ('tags', )
+        read_only_fields = ('tags',)
         meta_fields = ('copyright',)
 
 
 class EntrySerializer(serializers.ModelSerializer):
-
     def __init__(self, *args, **kwargs):
         super(EntrySerializer, self).__init__(*args, **kwargs)
         # to make testing more concise we'll only output the
@@ -97,7 +94,7 @@ class EntrySerializer(serializers.ModelSerializer):
         model = Entry
         fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
                   'authors', 'comments', 'featured', 'suggested', 'tags')
-        read_only_fields = ('tags', )
+        read_only_fields = ('tags',)
         meta_fields = ('body_format',)
 
     class JSONAPIMeta:
@@ -105,7 +102,6 @@ class EntrySerializer(serializers.ModelSerializer):
 
 
 class AuthorBioSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = AuthorBio
         fields = ('author', 'body')

@@ -1,6 +1,5 @@
 import inflection
 from django.db.models.query import QuerySet
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *  # noqa: F403

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'polymorphic',
     'example',
+    'debug_toolbar',
 ]
 
 TEMPLATES = [
@@ -58,7 +59,11 @@ SECRET_KEY = 'abc123'
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
 
-MIDDLEWARE_CLASSES = ()
+MIDDLEWARE_CLASSES = (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
+
+INTERNAL_IPS = ('127.0.0.1', )
 
 JSON_API_FORMAT_KEYS = 'camelize'
 JSON_API_FORMAT_TYPES = 'camelize'
@@ -74,6 +79,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
+
+        # If you're performance testing, you will want to use the browseable API
+        # without forms, as the forms can generate their own queries.
+        # If performance testing, enable:
+        # 'example.utils.BrowsableAPIRendererWithoutForms',
+        # Otherwise, to play around with the browseable API, enable:
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',

@@ -49,7 +49,7 @@ script:
   - isort --check-only --verbose --recursive --diff rest_framework_json_api
   # example has extra dependencies that are installed in a dev environment
   # but are not installed in CI. Explicitly set those packages.
-  - isort --check-only --verbose --recursive --diff --thirdparty pytest --thirdparty polymorphic --thirdparty pytest_factoryboy example
+  - isort --check-only --verbose --recursive --diff --thirdparty pytest --thirdparty polymorphic --thirdparty pytest_factoryboy --thirdparty packaging  example
   - coverage run setup.py -v test
 after_success:
   - codecov
