@@ -23,7 +23,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        # If you're performance testing, you will want to use the browseable API
+        # without forms, as the forms can generate their own queries.
+        # If performance testing, enable:
+        # 'example.utils.BrowsableAPIRendererWithoutForms',
+        # Otherwise, to play around with the browseable API, enable:
+        'rest_framework.renderers.BrowsableAPIRenderer'
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
 }
@@ -35,6 +40,12 @@ Pages can be selected with the `page` GET parameter. The query parameter used to
 retrieve the page can be customized by subclassing `PageNumberPagination` and
 overriding the `page_query_param`.  Page size can be controlled per request via
 the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
+
+#### Performance Testing
+
+If you are trying to see if your viewsets are configured properly to optimize performance,
+it is preferable to use `example.utils.BrowsableAPIRendererWithoutForms` instead of the default `BrowsableAPIRenderer`
+to remove queries introduced by the forms themselves.
 
 ### Serializers
 
@@ -557,6 +568,39 @@ class QuestSerializer(serializers.ModelSerializer):
 
 `included_resources` informs DJA of **what** you would like to include.
 `included_serializers` tells DJA **how** you want to include it.
+
+#### Performance improvements
+
+Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m*(n+1) queries.
+
+A viewset helper was designed to allow for greater flexibility and it is automatically available when subclassing
+`views.ModelViewSet`
+```
+ # When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
+ class MyViewSet(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    prefetch_for_includes = {
+    '__all__': [],
+    'author': ['author', 'author__bio']
+    'category.section': ['category']
+}
+```
+
+The special keyword `__all__` can be used to specify a prefetch which should be done regardless of the include, similar to making the prefetch yourself on the QuerySet.
+
+Using the helper instead of prefetching/selecting everything manually will prevent django from trying to load what could be a significant amount of data in memory for every single request.
+
+> If you have a single model, e.g. Book, which has four relations e.g. Author, Publisher, CopyrightHolder, Category.
+>
+> To display 25 books in DRF without any includes, I would need a single query: SELECT * FROM book.
+>
+> To display 25 books DRF-JSONAPI without any includes, I would need either:
+> a) 1 query ala SELECT * FROM books LEFT JOIN author LEFT JOIN publisher LEFT JOIN CopyrightHolder LEFT JOIN Category
+> b) 4 queries with prefetches.
+>
+> Let's say I have 1M books, 50k authors, 10k categories, 10k copyrightholders. In the select_related scenario, you've just created a in-memory table with 1e18 rows ... do this a few times per second and you have melted your database. All to display 25 rows, with no included relationships. So select_related is only going to work if you have a small dataset or a small volume of traffic.
+>
+> -- <cite> Aidan Lister  in issue [#337](https://github.com/django-json-api/django-rest-framework-json-api/issues/337#issuecomment-297335342)</cite>
 
 <!--
 ### Relationships
