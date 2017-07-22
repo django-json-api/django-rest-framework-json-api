@@ -588,20 +588,24 @@ A viewset helper was designed to allow for greater flexibility and it is automat
 
 The special keyword `__all__` can be used to specify a prefetch which should be done regardless of the include, similar to making the prefetch yourself on the QuerySet.
 
-Using the helper instead of prefetching/selecting everything manually will prevent django from trying to load what could be a significant amount of data in memory for every single request.
+Using the helper to prefetch, rather than attempting to minimise queries via select_related might give you better performance depending on the characteristics of your data and database.
 
-> If you have a single model, e.g. Book, which has four relations e.g. Author, Publisher, CopyrightHolder, Category.
->
-> To display 25 books in DRF without any includes, I would need a single query: SELECT * FROM book.
->
-> To display 25 books DRF-JSONAPI without any includes, I would need either:
-> a) 1 query ala SELECT * FROM books LEFT JOIN author LEFT JOIN publisher LEFT JOIN CopyrightHolder LEFT JOIN Category
-> b) 4 queries with prefetches.
->
-> Let's say I have 1M books, 50k authors, 10k categories, 10k copyrightholders. In the select_related scenario, you've just created a in-memory table with 1e18 rows ... do this a few times per second and you have melted your database. All to display 25 rows, with no included relationships. So select_related is only going to work if you have a small dataset or a small volume of traffic.
->
-> -- <cite> Aidan Lister  in issue [#337](https://github.com/django-json-api/django-rest-framework-json-api/issues/337#issuecomment-297335342)</cite>
+For example:
 
+If you have a single model, e.g. Book, which has four relations e.g. Author, Publisher, CopyrightHolder, Category.
+
+To display 25 books and related models, you would need to either do:
+
+a) 1 query via selected_related, e.g. SELECT * FROM books LEFT JOIN author LEFT JOIN publisher LEFT JOIN CopyrightHolder LEFT JOIN Category
+
+b) 4 small queries via prefetch_related.
+
+If you have 1M books, 50k authors, 10k categories, 10k copyrightholders
+in the select_related scenario, you've just created a in-memory table
+with 1e18 rows which will likely exhaust any available memory and
+slow your database to crawl.
+
+The prefetch_related case will issue 4 queries, but they will be small and fast queries.
 <!--
 ### Relationships
 ### Errors
