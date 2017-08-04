@@ -142,6 +142,14 @@ class JSONRenderer(renderers.JSONRenderer):
                     {'links': field_links}
                     if field_links else dict()
                 )
+                relation_data.update(
+                    {
+                        'meta': {
+                            'count': len(resource.get(field_name))
+                        }
+                    }
+                )
+                data.update({field_name: relation_data})
                 data.update({field_name: relation_data})
                 continue
 
