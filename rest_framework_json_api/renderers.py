@@ -150,7 +150,6 @@ class JSONRenderer(renderers.JSONRenderer):
                     }
                 )
                 data.update({field_name: relation_data})
-                data.update({field_name: relation_data})
                 continue
 
             if isinstance(
