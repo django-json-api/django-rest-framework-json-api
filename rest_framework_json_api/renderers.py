@@ -552,10 +552,12 @@ class JSONRenderer(renderers.JSONRenderer):
                 for position in range(len(serializer_data)):
                     resource = serializer_data[position]  # Get current resource
                     resource_instance = serializer.instance[position]  # Get current instance
-                    resource_serializer_class = serializer.child.get_polymorphic_serializer_for_instance(resource_instance)
+                    resource_serializer_class = serializer.child.\
+                        get_polymorphic_serializer_for_instance(resource_instance)
                     resource_serializer = resource_serializer_class(resource_instance)
                     fields = utils.get_serializer_fields(resource_serializer)
-                    force_type_resolution = getattr(resource_serializer, '_poly_force_type_resolution', False)
+                    force_type_resolution = getattr(resource_serializer, 
+                                                    '_poly_force_type_resolution', False)
                     
                     json_resource_obj = self.build_json_resource_obj(
                         fields, resource, resource_instance, resource_name, force_type_resolution
