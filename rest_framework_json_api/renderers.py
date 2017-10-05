@@ -154,7 +154,8 @@ class JSONRenderer(renderers.JSONRenderer):
                 lookup_field = getattr(field, 'lookup_field', None)
                 if lookup_field:
                     relation_id = getattr(
-                        getattr(resource_instance, source), lookup_field)
+                        getattr(resource_instance, source),
+                        lookup_field, None)
                 else:
                     resolved, relation = utils.get_relation_instance(
                         resource_instance, '%s_id' % source, field.parent
