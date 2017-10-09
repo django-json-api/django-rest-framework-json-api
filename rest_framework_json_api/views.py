@@ -102,7 +102,11 @@ class AutoPrefetchMixin(object):
                     if django.VERSION < (1, 9):
                         model_field = field.related
                     else:
-                        model_field = field.field
+                        # Fix for ReverseOneToOneDescriptor
+                        if issubclass(field_class, ReverseOneToOneDescriptor):
+                            model_field = field.related.field
+                        else:
+                            model_field = field.field
 
                     if is_forward_relation:
                         level_model = model_field.related_model
