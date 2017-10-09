@@ -127,7 +127,8 @@ class JSONRenderer(renderers.JSONRenderer):
             if isinstance(field, ResourceRelatedField):
                 relation_instance_id = getattr(resource_instance, source + "_id", None)
                 if not relation_instance_id:
-                    resolved, relation_instance = utils.get_relation_instance(resource_instance, source, field.parent)
+                    resolved, relation_instance = utils.get_relation_instance(resource_instance,
+                                                                              source, field.parent)
                     if not resolved:
                         continue
 
