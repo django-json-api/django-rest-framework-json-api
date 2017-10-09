@@ -76,7 +76,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
 
     def use_pk_only_optimization(self):
         # We need the real object to determine its type...
-        return False
+        return self.get_resource_type_from_included_serializer() is not None
 
     def conflict(self, key, **kwargs):
         """
@@ -250,6 +250,9 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
     def __init__(self, polymorphic_serializer, *args, **kwargs):
         self.polymorphic_serializer = polymorphic_serializer
         super(PolymorphicResourceRelatedField, self).__init__(*args, **kwargs)
+
+    def use_pk_only_optimization(self):
+        return False
 
     def to_internal_value(self, data):
         if isinstance(data, six.text_type):
