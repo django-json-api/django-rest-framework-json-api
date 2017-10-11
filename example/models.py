@@ -46,9 +46,21 @@ class Blog(BaseModel):
 
 
 @python_2_unicode_compatible
+class AuthorType(BaseModel):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('id',)
+
+
+@python_2_unicode_compatible
 class Author(BaseModel):
     name = models.CharField(max_length=50)
     email = models.EmailField()
+    type = models.ForeignKey(AuthorType, null=True)
 
     def __str__(self):
         return self.name

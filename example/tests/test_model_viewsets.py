@@ -1,3 +1,4 @@
+import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
@@ -226,3 +227,31 @@ class ModelViewSetTests(TestBase):
         self.assertEqual(
             get_user_model().objects.get(pk=self.miles.pk).email,
             'miles@trumpet.org')
+
+
+@pytest.mark.django_db
+def test_patch_allow_field_type(author, author_type_factory, client):
+    """
+    Verify that type field may be updated.
+    """
+    author_type = author_type_factory()
+    url = reverse('author-detail', args=[author.id])
+
+    data = {
+        'data': {
+            'id': author.id,
+            'type': 'authors',
+            'relationships': {
+                'data': {
+                    'id': author_type.id,
+                    'type': 'author-type'
+                }
+            }
+        }
+    }
+
+    response = client.patch(url,
+                            content_type='application/vnd.api+json',
+                            data=dump_json(data))
+
+    assert response.status_code == 200
