@@ -187,7 +187,8 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
                         continue
                     resource_type = get_resource_type_from_instance(field)
                     if resource_type:
-                        ret[field.field_name] = OrderedDict([("type", resource_type), ("id", attribute)])
+                        ret[field.field_name] = OrderedDict([("type", resource_type),
+                                                             ("id", attribute)])
                         continue
 
                 attribute = field.get_attribute(instance)
