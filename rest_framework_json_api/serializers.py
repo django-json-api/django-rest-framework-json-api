@@ -219,7 +219,7 @@ class PolymorphicModelSerializer(ModelSerializer):
         """
         Return an exhaustive list of the polymorphic serializer fields.
         """
-        if self.instance is not None:
+        if self.instance not in (None, []):
             if not isinstance(self.instance, QuerySet):
                 serializer_class = self.get_polymorphic_serializer_for_instance(self.instance)
                 return serializer_class(self.instance, context=self.context).get_fields()
