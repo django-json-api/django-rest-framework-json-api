@@ -69,7 +69,9 @@ From Source
 ## Running the example app
 
     git clone https://github.com/django-json-api/django-rest-framework-json-api.git
-    cd django-rest-framework-json-api && pip install -e .
+    cd django-rest-framework-json-api
+    pip install -e .
+    pip install -r example/requirements.txt
     django-admin.py runserver
 
 Browse to http://localhost:8000
