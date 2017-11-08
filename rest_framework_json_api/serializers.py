@@ -175,9 +175,12 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
         Object instance -> Dict of primitive datatypes.
         """
         ret = OrderedDict()
-        fields = self._readable_fields
+        readable_fields = [
+            field for field in self.fields.values()
+            if not field.write_only
+        ]
 
-        for field in fields:
+        for field in readable_fields:
             try:
 
                 if isinstance(field, ModelSerializer) and hasattr(field, field.source + "_id"):
