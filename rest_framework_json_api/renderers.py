@@ -265,7 +265,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     if not resolved:
                         continue
 
-                    if relation_instance is None:
+                    if relation_instance is not None:
                         relation_instance_id = relation_instance.pk
 
                 data.update({
