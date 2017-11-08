@@ -262,10 +262,11 @@ class JSONRenderer(renderers.JSONRenderer):
                     resolved, relation_instance = utils.get_relation_instance(
                         resource_instance, source, field.parent
                     )
-                    if not resolved or relation_instance is None:
+                    if not resolved:
                         continue
 
-                    relation_instance_id = relation_instance.pk
+                    if relation_instance is None:
+                        relation_instance_id = relation_instance.pk
 
                 data.update({
                     field_name: {
