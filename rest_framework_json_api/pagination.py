@@ -38,14 +38,14 @@ class PageNumberPagination(PageNumberPagination):
                     ('page', self.page.number),
                     ('pages', self.page.paginator.num_pages),
                     ('count', self.page.paginator.count),
+                ]),
+                'links': OrderedDict([
+                    ('first', self.build_link(1)),
+                    ('last', self.build_link(self.page.paginator.num_pages)),
+                    ('next', self.build_link(next)),
+                    ('prev', self.build_link(previous))
                 ])
-            },
-            'links': OrderedDict([
-                ('first', self.build_link(1)),
-                ('last', self.build_link(self.page.paginator.num_pages)),
-                ('next', self.build_link(next)),
-                ('prev', self.build_link(previous))
-            ])
+            }
         })
 
 
@@ -87,12 +87,12 @@ class LimitOffsetPagination(LimitOffsetPagination):
                     ('count', self.count),
                     ('limit', self.limit),
                     ('offset', self.offset),
+                ]),
+                'links': OrderedDict([
+                    ('first', self.get_first_link()),
+                    ('last', self.get_last_link()),
+                    ('next', self.get_next_link()),
+                    ('prev', self.get_previous_link())
                 ])
-            },
-            'links': OrderedDict([
-                ('first', self.get_first_link()),
-                ('last', self.get_last_link()),
-                ('next', self.get_next_link()),
-                ('prev', self.get_previous_link())
-            ])
+            }
         })
