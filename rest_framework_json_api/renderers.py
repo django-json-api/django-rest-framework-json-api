@@ -168,7 +168,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         OrderedDict([
                             ('type', relation_type), ('id', encoding.force_text(relation_id))
                         ])
-                        if relation_id is not None else None)
+                        if relation_id is not None else {'data': None})
                 }
 
                 if (
