@@ -5,6 +5,7 @@ from example.factories import (
     ArtProjectFactory,
     AuthorBioFactory,
     AuthorFactory,
+    AuthorTypeFactory,
     BlogFactory,
     CommentFactory,
     CompanyFactory,
@@ -16,6 +17,7 @@ from example.factories import (
 register(BlogFactory)
 register(AuthorFactory)
 register(AuthorBioFactory)
+register(AuthorTypeFactory)
 register(EntryFactory)
 register(CommentFactory)
 register(TaggedItemFactory)

@@ -78,7 +78,7 @@ class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     prefetch_for_includes = {
         '__all__': [],
-        'author': ['author', 'author__bio', 'author__entries'],
+        'author': ['author', 'author__bio', 'author__entries', 'author__type'],
         'entry': ['author', 'author__bio', 'author__entries']
     }
 
