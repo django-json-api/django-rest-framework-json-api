@@ -1,4 +1,4 @@
-v2.3.0
+v2.3.0 - Released November 28, 2017
 
 * Added support for polymorphic models
 * When `JSON_API_FORMAT_KEYS` is False (the default) do not translate request
