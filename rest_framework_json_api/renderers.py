@@ -14,6 +14,7 @@ from rest_framework.settings import api_settings
 from rest_framework_json_api import utils
 from rest_framework_json_api.serializers import PolymorphicModelSerializer
 
+
 class JSONRenderer(renderers.JSONRenderer):
     """
     Render a JSON response per the JSON API spec:
