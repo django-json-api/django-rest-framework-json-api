@@ -563,7 +563,8 @@ class JSONRenderer(renderers.JSONRenderer):
                     force_type_resolution = getattr(
                         resource_serializer_class, '_poly_force_type_resolution',
                         False
- 
+                    )
+
                     json_resource_obj = self.build_json_resource_obj(
                         fields, resource, resource_instance, resource_name, force_type_resolution
                     )
