@@ -7,6 +7,7 @@ from example.models import (
     ArtProject,
     Author,
     AuthorBio,
+    AuthorType,
     Blog,
     Comment,
     Company,
@@ -26,6 +27,13 @@ class BlogFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda x: faker.name())
 
 
+class AuthorTypeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AuthorType
+
+    name = factory.LazyAttribute(lambda x: faker.name())
+
+
 class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Author
@@ -34,6 +42,7 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     email = factory.LazyAttribute(lambda x: faker.email())
 
     bio = factory.RelatedFactory('example.factories.AuthorBioFactory', 'author')
+    type = factory.SubFactory(AuthorTypeFactory)
 
 
 class AuthorBioFactory(factory.django.DjangoModelFactory):

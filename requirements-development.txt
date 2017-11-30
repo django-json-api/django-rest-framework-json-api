@@ -5,11 +5,12 @@ isort
 mock
 pytest>=2.9.0,<3.0
 pytest-django
+# factory_boy is currently broken at 2.9 and above. See: https://github.com/pytest-dev/pytest-factoryboy/issues/47
+factory-boy<2.9.0
 pytest-factoryboy
 recommonmark
 Sphinx
 sphinx_rtd_theme
 tox
-mock
 django-debug-toolbar
 packaging==16.8

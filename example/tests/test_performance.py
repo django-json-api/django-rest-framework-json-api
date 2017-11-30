@@ -50,8 +50,9 @@ class PerformanceTestCase(APITestCase):
         1. Primary resource COUNT query
         2. Primary resource SELECT
         3. Authors prefetched
-        3. Entries prefetched
+        4. Author types prefetched
+        5. Entries prefetched
         """
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             response = self.client.get('/comments?include=author&page_size=25')
             self.assertEqual(len(response.data['results']), 25)
