@@ -11,8 +11,7 @@ from rest_framework import relations, renderers
 from rest_framework.serializers import BaseSerializer, ListSerializer, Serializer
 from rest_framework.settings import api_settings
 
-from rest_framework_json_api import utils
-from rest_framework_json_api.serializers import PolymorphicModelSerializer
+from rest_framework_json_api import serializers, utils
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -545,8 +544,8 @@ class JSONRenderer(renderers.JSONRenderer):
                 for position in range(len(serializer_data)):
                     resource = serializer_data[position]  # Get current resource
                     resource_instance = serializer.instance[position]  # Get current instance
-                    
-                    if isinstance(serializer.child, PolymorphicModelSerializer):
+
+                    if isinstance(serializer.child, serializers.PolymorphicModelSerializer):
                         resource_serializer_class = serializer.child.\
                             get_polymorphic_serializer_for_instance(resource_instance)()
                     else:
