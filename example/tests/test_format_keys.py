@@ -1,9 +1,14 @@
+import django
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
 from django.utils import encoding
 
 from example.tests import TestBase
 from example.tests.utils import load_json
+
+if django.VERSION >= (1, 10):
+    from django.urls import reverse
+else:
+    from django.core.urlresolvers import reverse
 
 
 class FormatKeysSetTests(TestBase):

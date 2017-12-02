@@ -1,4 +1,8 @@
-from django.core.urlresolvers import reverse
+import django
+if django.VERSION >= (1, 10):
+    from django.urls import reverse
+else:
+    from django.core.urlresolvers import reverse
 
 from example.tests import TestBase
 from example.tests.utils import load_json

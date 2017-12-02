@@ -1,7 +1,13 @@
 from copy import deepcopy
 
 import pytest
-from django.core.urlresolvers import reverse
+import django
+
+if django.VERSION >= (1, 10):
+    from django.urls import reverse
+else:
+    from django.core.urlresolvers import reverse
+
 from rest_framework import status
 
 from example import models, serializers, views
