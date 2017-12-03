@@ -4,7 +4,7 @@ from django.db.models.fields.related_descriptors import (
     ForwardManyToOneDescriptor,
     ManyToManyDescriptor,
     ReverseManyToOneDescriptor,
-    ReverseOneToOneDescriptor,
+    ReverseOneToOneDescriptor
 )
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
