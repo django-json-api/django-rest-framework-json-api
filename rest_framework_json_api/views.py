@@ -182,6 +182,8 @@ class RelationshipView(generics.GenericAPIView):
             class_name = related_instance_or_manager.__class__.__name__
             if class_name != 'ManyRelatedManager':
                 related_instance_or_manager.add(*serializer.validated_data, bulk=False)
+            else:
+                related_instance_or_manager.add(*serializer.validated_data)
         else:
             related_model_class = related_instance_or_manager.__class__
             serializer = self.get_serializer(data=request.data, model_class=related_model_class)
