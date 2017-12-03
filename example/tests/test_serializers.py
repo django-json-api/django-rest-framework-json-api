@@ -1,7 +1,12 @@
 import pytest
-from django.core.urlresolvers import reverse
+import django
 from django.test import TestCase
 from django.utils import timezone
+
+if django.VERSION >= (1, 10):
+    from django.urls import reverse
+else:
+    from django.core.urlresolvers import reverse
 
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import format_resource_type

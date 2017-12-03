@@ -1,7 +1,12 @@
 import json
 
-from django.core.urlresolvers import reverse
+import django
 from django.utils import encoding
+
+if django.VERSION >= (1, 10):
+    from django.urls import reverse
+else:
+    from django.core.urlresolvers import reverse
 
 from example.tests import TestBase
 
