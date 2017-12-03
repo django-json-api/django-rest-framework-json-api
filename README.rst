@@ -9,14 +9,9 @@ JSON API and Django Rest Framework
    :alt: Read the docs
    :target: http://django-rest-framework-json-api.readthedocs.org/
 
-.. image:: https://codeclimate.com/github/django-json-api/django-rest-framework-json-api/badges/gpa.svg
-   :target: https://codeclimate.com/github/django-json-api/django-rest-framework-json-api
-   :alt: Code Climate
-
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
    :target: https://gitter.im/django-json-api/django-rest-framework-json-api
-
 
 --------
 Overview
@@ -72,9 +67,9 @@ like the following::
 Requirements
 ------------
 
-1. Python (2.7, 3.3, 3.4, 3.5, 3.6)
-2. Django (1.8, 1.9, 1.10, 1.11)
-3. Django REST Framework (3.1, 3.2, 3.3, 3.4, 3.5, 3.6)
+1. Python (2.7, 3.4, 3.5, 3.6)
+2. Django (1.11)
+3. Django REST Framework (3.6)
 
 ------------
 Installation
@@ -94,7 +89,8 @@ From Source
 ::
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
-    $ cd django-rest-framework-json-api && pip install -e .
+    $ cd django-rest-framework-json-api
+    $ pip install -e .
 
 
 Running the example app
@@ -103,7 +99,8 @@ Running the example app
 ::
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
-    $ cd django-rest-framework-json-api && pip install -e .
+    $ cd django-rest-framework-json-api
+    $ pip install -e .
     $ django-admin.py runserver --settings=example.settings
 
 Browse to http://localhost:8000
@@ -112,7 +109,7 @@ Browse to http://localhost:8000
 Running Tests
 ^^^^^^^^^^^^^
 
-It is recommended to create a virtualenv for testing. Assuming it is already 
+It is recommended to create a virtualenv for testing. Assuming it is already
 installed and activated:
 
 ::
