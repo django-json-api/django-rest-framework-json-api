@@ -8,7 +8,8 @@ import inflection
 from django.conf import settings
 from django.db.models import Manager
 from django.db.models.fields.related_descriptors import (
-    ManyToManyDescriptor, ReverseManyToOneDescriptor
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor
 )
 from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
