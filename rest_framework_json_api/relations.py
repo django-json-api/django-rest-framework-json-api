@@ -291,8 +291,6 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(ResourceRelatedField, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, child_relation=None, *args, **kwargs):
-        # DRF 3.1 doesn't expect the `many` kwarg
-        kwargs.pop('many', None)
         model = kwargs.pop('model', None)
         if child_relation is not None:
             self.child_relation = child_relation
