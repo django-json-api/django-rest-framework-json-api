@@ -1,11 +1,11 @@
 import collections
+import django
 import json
 from collections import OrderedDict
 
 import inflection
 import six
 from django.core.exceptions import ImproperlyConfigured
-import django
 if django.VERSION >= (1, 10):
     from django.urls import NoReverseMatch
 else:
