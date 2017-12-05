@@ -5,11 +5,6 @@ import json
 import six
 
 from collections import OrderedDict
-from django.core.exceptions import ImproperlyConfigured
-if django.VERSION >= (1, 10):
-    from django.urls import NoReverseMatch
-else:
-    from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField
@@ -24,6 +19,12 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_queryset,
     get_resource_type_from_serializer
 )
+
+from django.core.exceptions import ImproperlyConfigured
+if django.VERSION >= (1, 10):
+    from django.urls import NoReverseMatch
+else:
+    from django.core.urlresolvers import NoReverseMatch
 
 LINKS_PARAMS = [
     'self_link_view_name',
