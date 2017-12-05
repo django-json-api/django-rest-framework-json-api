@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions, status
-
 from rest_framework_json_api import renderers, utils
 
 
