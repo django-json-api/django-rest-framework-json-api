@@ -3,6 +3,7 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
 from rest_framework.serializers import *  # noqa: F403
+
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
