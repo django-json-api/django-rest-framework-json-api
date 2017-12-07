@@ -3,6 +3,7 @@ Utils.
 """
 import copy
 import inspect
+import operator
 import warnings
 from collections import OrderedDict
 
@@ -339,7 +340,7 @@ def get_included_serializers(serializer):
 
 def get_relation_instance(resource_instance, source, serializer):
     try:
-        relation_instance = getattr(resource_instance, source)
+        relation_instance = operator.attrgetter(source)(resource_instance)
     except AttributeError:
         # if the field is not defined on the model then we check the serializer
         # and if no value is there we skip over the field completely

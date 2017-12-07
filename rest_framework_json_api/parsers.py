@@ -6,7 +6,7 @@ from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
-from . import exceptions, renderers, utils
+from . import exceptions, renderers, serializers, utils
 
 
 class JSONParser(parsers.JSONParser):
@@ -83,9 +83,10 @@ class JSONParser(parsers.JSONParser):
             raise ParseError('Received document does not contain primary data')
 
         data = result.get('data')
+        view = parser_context['view']
 
         from rest_framework_json_api.views import RelationshipView
-        if isinstance(parser_context['view'], RelationshipView):
+        if isinstance(view, RelationshipView):
             # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular
             # Resource Object
             if isinstance(data, list):
@@ -129,8 +130,12 @@ class JSONParser(parsers.JSONParser):
             raise ParseError("The resource identifier object must contain an 'id' member")
 
         # Construct the return data
+        serializer_class = getattr(view, 'serializer_class', None)
         parsed_data = {'id': data.get('id')} if 'id' in data else {}
-        parsed_data['type'] = data.get('type')
+        # `type` field needs to be allowed in none polymorphic serializers
+        if serializer_class is not None:
+            if issubclass(serializer_class, serializers.PolymorphicModelSerializer):
+                parsed_data['type'] = data.get('type')
         parsed_data.update(self.parse_attributes(data))
         parsed_data.update(self.parse_relationships(data))
         parsed_data.update(self.parse_metadata(result))

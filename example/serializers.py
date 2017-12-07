@@ -9,6 +9,7 @@ from example.models import (
     ArtProject,
     Author,
     AuthorBio,
+    AuthorType,
     Blog,
     Comment,
     Company,
@@ -101,6 +102,12 @@ class EntrySerializer(serializers.ModelSerializer):
         included_resources = ['comments']
 
 
+class AuthorTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuthorType
+        fields = ('name', )
+
+
 class AuthorBioSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthorBio
@@ -109,12 +116,13 @@ class AuthorBioSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     included_serializers = {
-        'bio': AuthorBioSerializer
+        'bio': AuthorBioSerializer,
+        'type': AuthorTypeSerializer
     }
 
     class Meta:
         model = Author
-        fields = ('name', 'email', 'bio', 'entries')
+        fields = ('name', 'email', 'bio', 'entries', 'type')
 
 
 class WriterSerializer(serializers.ModelSerializer):

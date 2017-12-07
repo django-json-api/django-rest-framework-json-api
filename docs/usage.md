@@ -350,7 +350,7 @@ can be filtered to show only those objects related to the 'parent'.
 In this example, `reverse('order-lineitems-list', kwargs={'order_pk': 3}`
 should resolve to something like `/orders/3/lineitems`, and that route
 should instantiate a view or viewset for `LineItem` objects that accepts
-a keword argument `order_pk`. The
+a keyword argument `order_pk`. The
 [drf-nested-routers](https://github.com/alanjds/drf-nested-routers) package
 is useful for defining such nested routes in your urlconf.
 
