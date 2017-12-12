@@ -1,8 +1,14 @@
-import django
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor,
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor
+)
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
+from django.urls import NoReverseMatch
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.response import Response
@@ -18,30 +24,10 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_instance
 )
 
-if django.VERSION >= (1, 10):
-    from django.urls import NoReverseMatch
-else:
-    from django.core.urlresolvers import NoReverseMatch
-
-if django.VERSION < (1, 9):
-    from django.db.models.fields.related import (
-        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor,
-        ManyRelatedObjectsDescriptor as ManyToManyDescriptor,
-        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor,
-        SingleRelatedObjectDescriptor as ReverseOneToOneDescriptor,
-    )
-else:
-    from django.db.models.fields.related_descriptors import (
-        ForwardManyToOneDescriptor,
-        ManyToManyDescriptor,
-        ReverseManyToOneDescriptor,
-        ReverseOneToOneDescriptor,
-    )
-
 
 class PrefetchForIncludesHelperMixin(object):
     def get_queryset(self):
-        """ This viewset provides a helper attribute to prefetch related models
+        """This viewset provides a helper attribute to prefetch related models
         based on the include specified in the URL.
 
         __all__ can be used to specify a prefetch which should be done regardless of the include
@@ -99,10 +85,7 @@ class AutoPrefetchMixin(object):
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    if django.VERSION < (1, 9):
-                        model_field = field.related
-                    else:
-                        model_field = field.field
+                    model_field = field.field
 
                     if is_forward_relation:
                         level_model = model_field.related_model
@@ -197,9 +180,8 @@ class RelationshipView(generics.GenericAPIView):
             related_instance_or_manager.all().delete()
             # have to set bulk to False since data isn't saved yet
             class_name = related_instance_or_manager.__class__.__name__
-            if django.VERSION >= (1, 9) and class_name != 'ManyRelatedManager':
-                related_instance_or_manager.add(*serializer.validated_data,
-                                                bulk=False)
+            if class_name != 'ManyRelatedManager':
+                related_instance_or_manager.add(*serializer.validated_data, bulk=False)
             else:
                 related_instance_or_manager.add(*serializer.validated_data)
         else:

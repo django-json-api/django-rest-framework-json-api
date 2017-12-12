@@ -89,7 +89,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
@@ -99,8 +98,8 @@ setup(
     ],
     install_requires=[
         'inflection>=0.3.0',
-        'djangorestframework>=3.1.0',
-        'django',
+        'djangorestframework>=3.6.3',
+        'django>=1.11',
         'six',
     ],
     setup_requires=pytest_runner + sphinx + wheel,

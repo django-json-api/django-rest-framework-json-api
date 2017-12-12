@@ -1,3 +1,10 @@
+v2.4.0
+
+* Drop support for Django 1.8 - 1.10 (EOL)
+* Drop support for Django REST Framework < 3.6.3
+  (3.6.3 is the first to support Django 1.11)
+* Drop support for Python 3.3 (EOL)
+
 v2.3.0 - Released November 28, 2017
 
 * Added support for polymorphic models
