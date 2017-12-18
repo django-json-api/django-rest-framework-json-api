@@ -1,5 +1,5 @@
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from rest_framework_json_api.pagination import PageNumberPagination
 
