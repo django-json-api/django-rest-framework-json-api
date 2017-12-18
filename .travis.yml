@@ -15,8 +15,6 @@ matrix:
     - python: 3.4
       env: DJANGO=">=1.11,<2.0" DRF=">=3.7.0,<3.8"
     - python: 3.4
-      env: DJANGO=">=2.0,<2.1" DRF=">=3.6.3,<3.7"
-    - python: 3.4
       env: DJANGO=">=2.0,<2.1" DRF=">=3.7.0,<3.8"
 
     - python: 3.5
@@ -24,16 +22,12 @@ matrix:
     - python: 3.5
       env: DJANGO=">=1.11,<2.0" DRF=">=3.7.0,<3.8"
     - python: 3.5
-      env: DJANGO=">=2.0,<2.1" DRF=">=3.6.3,<3.7"
-    - python: 3.5
       env: DJANGO=">=2.0,<2.1" DRF=">=3.7.0,<3.8"
 
     - python: 3.6
       env: DJANGO=">=1.11,<2.0" DRF=">=3.6.3,<3.7"
     - python: 3.6
       env: DJANGO=">=1.11,<2.0" DRF=">=3.7.0,<3.8"
-    - python: 3.6
-      env: DJANGO=">=2.0,<2.1" DRF=">=3.6.3,<3.7"
     - python: 3.6
       env: DJANGO=">=2.0,<2.1" DRF=">=3.7.0,<3.8"
 before_install:
