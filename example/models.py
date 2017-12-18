@@ -71,7 +71,7 @@ class Author(BaseModel):
 
 @python_2_unicode_compatible
 class AuthorBio(BaseModel):
-    author = models.OneToOneField(Author, related_name='bio')
+    author = models.OneToOneField(Author, related_name='bio', on_delete=models.CASCADE)
     body = models.TextField()
 
     def __str__(self):
