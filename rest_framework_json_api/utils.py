@@ -1,56 +1,34 @@
-"""
-Utils.
-"""
 import copy
 import inspect
 import operator
 import warnings
 from collections import OrderedDict
 
-import django
 import inflection
 from django.conf import settings
 from django.db.models import Manager
+from django.db.models.fields.related_descriptors import (
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor
+)
 from django.utils import encoding, six
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
-
-try:
-    from rest_framework.serializers import ManyRelatedField
-except ImportError:
-    ManyRelatedField = object()
+from rest_framework.serializers import ManyRelatedField  # noqa: F401
 
 try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
     HyperlinkedRouterField = object()
 
-if django.VERSION >= (1, 9):
-    from django.db.models.fields.related_descriptors import (
-        ManyToManyDescriptor, ReverseManyToOneDescriptor  # noqa: F401
-    )
-    ReverseManyRelatedObjectsDescriptor = object()
-else:
-    from django.db.models.fields.related import (  # noqa: F401
-        ManyRelatedObjectsDescriptor as ManyToManyDescriptor
-    )
-    from django.db.models.fields.related import (
-        ForeignRelatedObjectsDescriptor as ReverseManyToOneDescriptor
-    )
-    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor  # noqa: F401
-
 # Generic relation descriptor from django.contrib.contenttypes.
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
     # Target application does not use contenttypes. Importing would cause errors.
     ReverseGenericManyToOneDescriptor = object()
-elif django.VERSION >= (1, 9):
-    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor  # noqa: F401
 else:
-    from django.contrib.contenttypes.fields import (  # noqa: F401
-        ReverseGenericRelatedObjectsDescriptor as ReverseGenericManyToOneDescriptor  # noqa: F401
-    )
+    from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
 
 
 def get_resource_name(context, expand_polymorphic_types=False):
@@ -236,30 +214,14 @@ def get_related_resource_type(relation):
 
             parent_model_relation_type = type(parent_model_relation)
             if parent_model_relation_type is ReverseManyToOneDescriptor:
-                if django.VERSION >= (1, 9):
-                    relation_model = parent_model_relation.rel.related_model
-                elif django.VERSION >= (1, 8):
-                    relation_model = parent_model_relation.related.related_model
-                else:
-                    relation_model = parent_model_relation.related.model
+                relation_model = parent_model_relation.rel.related_model
             elif parent_model_relation_type is ManyToManyDescriptor:
-                if django.VERSION >= (1, 9):
-                    relation_model = parent_model_relation.field.remote_field.model
-                    # In case we are in a reverse relation
-                    if relation_model == parent_model:
-                        relation_model = parent_model_relation.field.model
-                elif django.VERSION >= (1, 8):
-                    relation_model = parent_model_relation.related.model
-                    # In case we are in a reverse relation
-                    if relation_model == parent_model:
-                        relation_model = parent_model_relation.related.related_model
-            elif parent_model_relation_type is ReverseManyRelatedObjectsDescriptor:
-                relation_model = parent_model_relation.field.related.model
+                relation_model = parent_model_relation.field.remote_field.model
+                # In case we are in a reverse relation
+                if relation_model == parent_model:
+                    relation_model = parent_model_relation.field.model
             elif parent_model_relation_type is ReverseGenericManyToOneDescriptor:
-                if django.VERSION >= (1, 9):
-                    relation_model = parent_model_relation.rel.model
-                else:
-                    relation_model = parent_model_relation.field.related_model
+                relation_model = parent_model_relation.rel.model
             elif hasattr(parent_model_relation, 'field'):
                 try:
                     relation_model = parent_model_relation.field.remote_field.model
