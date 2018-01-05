@@ -108,8 +108,7 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
     class NonPaginatedEntryViewSet(EntryViewSet):
         pagination_class = NoPagination
 
-    request = rf.get(
-        reverse("entry-list"))
+    request = rf.get(reverse("entry-list"))
     view = NonPaginatedEntryViewSet.as_view({'get': 'list'})
     response = view(request)
     response.render()

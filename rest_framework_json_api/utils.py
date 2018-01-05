@@ -40,7 +40,7 @@ def get_resource_name(context, expand_polymorphic_types=False):
 
     # Sanity check to make sure we have a view.
     if not view:
-        raise APIException(_('Could not find view.'))
+        return None
 
     # Check to see if there is a status code and return early
     # with the resource_name value of `errors`.

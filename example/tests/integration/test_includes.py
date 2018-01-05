@@ -1,8 +1,6 @@
 import pytest
 from django.core.urlresolvers import reverse
 
-from example.tests.utils import load_json
-
 pytestmark = pytest.mark.django_db
 
 
@@ -14,9 +12,9 @@ def test_default_included_data_on_list(multiple_entries, client):
 
 def test_included_data_on_list(multiple_entries, client, query='?include=comments&page_size=5'):
     response = client.get(reverse("entry-list") + query)
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
-    assert len(load_json(response.content)['data']) == len(multiple_entries), (
+    assert len(response.json()['data']) == len(multiple_entries), (
         'Incorrect entry count'
     )
     assert [x.get('type') for x in included] == ['comments', 'comments'], (
@@ -34,7 +32,7 @@ def test_default_included_data_on_detail(single_entry, client):
 
 def test_included_data_on_detail(single_entry, client, query='?include=comments'):
     response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) + query)
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
     assert [x.get('type') for x in included] == ['comments'], 'Detail included types are incorrect'
 
@@ -48,7 +46,7 @@ def test_dynamic_related_data_is_included(single_entry, entry_factory, client):
     response = client.get(
         reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=featured'
     )
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
     assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
     assert len(included) == 1, 'The dynamically included blog entries are of an incorrect count'
@@ -59,7 +57,7 @@ def test_dynamic_many_related_data_is_included(single_entry, entry_factory, clie
     response = client.get(
         reverse("entry-detail", kwargs={'pk': single_entry.pk}) + '?include=suggested'
     )
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
     assert included
     assert [x.get('type') for x in included] == ['entries'], 'Dynamic included types are incorrect'
@@ -69,12 +67,11 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
     # First author does not have a bio
     author = author_factory(bio=None)
     response = client.get(reverse('author-detail', args=[author.pk]) + '?include=bio')
-    data = load_json(response.content)
-    assert 'included' not in data
+    assert 'included' not in response.json()
     # Second author does
     author = author_factory()
     response = client.get(reverse('author-detail', args=[author.pk]) + '?include=bio')
-    data = load_json(response.content)
+    data = response.json()
     assert 'included' in data
     assert len(data['included']) == 1
     assert data['included'][0]['attributes']['body'] == author.bio.body
@@ -83,9 +80,9 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
 def test_deep_included_data_on_list(multiple_entries, client):
     response = client.get(reverse("entry-list") + '?include=comments,comments.author,'
                           'comments.author.bio,comments.writer&page_size=5')
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
-    assert len(load_json(response.content)['data']) == len(multiple_entries), (
+    assert len(response.json()['data']) == len(multiple_entries), (
         'Incorrect entry count'
     )
     assert [x.get('type') for x in included] == [
@@ -117,9 +114,9 @@ def test_deep_included_data_on_list(multiple_entries, client):
     # Also include entry authors
     response = client.get(reverse("entry-list") + '?include=authors,comments,comments.author,'
                           'comments.author.bio&page_size=5')
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
-    assert len(load_json(response.content)['data']) == len(multiple_entries), (
+    assert len(response.json()['data']) == len(multiple_entries), (
         'Incorrect entry count'
     )
     assert [x.get('type') for x in included] == [
@@ -138,7 +135,7 @@ def test_deep_included_data_on_detail(single_entry, client):
     # are returned along with the leaf nodes
     response = client.get(reverse("entry-detail", kwargs={'pk': single_entry.pk}) +
                           '?include=comments,comments.author.bio')
-    included = load_json(response.content).get('included')
+    included = response.json().get('included')
 
     assert [x.get('type') for x in included] == ['authorBios', 'authors', 'comments'], \
         'Detail included types are incorrect'

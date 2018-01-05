@@ -76,16 +76,12 @@ class TestRelationshipView(APITestCase):
 
     def test_patch_invalid_entry_relationship_blog_returns_400(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
-        response = self.client.patch(url,
-                                     data=json.dumps({'data': {'invalid': ''}}),
-                                     content_type='application/vnd.api+json')
+        response = self.client.patch(url, data={'data': {'invalid': ''}})
         assert response.status_code == 400
 
     def test_relationship_view_errors_format(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
-        response = self.client.patch(url,
-                                     data=json.dumps({'data': {'invalid': ''}}),
-                                     content_type='application/vnd.api+json')
+        response = self.client.patch(url, data={'data': {'invalid': ''}})
         assert response.status_code == 400
 
         result = json.loads(response.content.decode('utf-8'))
@@ -115,9 +111,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
-        response = self.client.patch(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
@@ -129,9 +123,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)}, ]
         }
-        response = self.client.patch(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
@@ -148,9 +140,7 @@ class TestRelationshipView(APITestCase):
                 },
             ]
         }
-        response = self.client.patch(url,
-                                     data=json.dumps(request_data),
-                                     content_type='application/vnd.api+json')
+        response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
 
@@ -162,9 +152,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
-        response = self.client.post(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.post(url, data=request_data)
         assert response.status_code == 405, response.content.decode()
 
     def test_post_to_many_relationship_with_no_change(self):
@@ -172,9 +160,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
-        response = self.client.post(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.post(url, data=request_data)
         assert response.status_code == 204, response.content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
@@ -183,9 +169,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
-        response = self.client.post(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.post(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
 
         assert request_data['data'][0] in response.data
@@ -195,9 +179,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
-        response = self.client.delete(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.delete(url, data=request_data)
         assert response.status_code == 405, response.content.decode()
 
     def test_delete_relationship_overriding_with_none(self):
@@ -213,9 +195,7 @@ class TestRelationshipView(APITestCase):
                 }
             }
         }
-        response = self.client.patch(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
         assert response.data['author'] is None
 
@@ -224,9 +204,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
-        response = self.client.delete(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.delete(url, data=request_data)
         assert response.status_code == 204, response.content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
@@ -235,9 +213,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
-        response = self.client.delete(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.delete(url, data=request_data)
         assert response.status_code == 409, response.content.decode()
 
     def test_delete_to_many_relationship_with_change(self):
@@ -245,9 +221,7 @@ class TestRelationshipView(APITestCase):
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
-        response = self.client.delete(
-            url, data=json.dumps(request_data), content_type='application/vnd.api+json'
-        )
+        response = self.client.delete(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
 
 

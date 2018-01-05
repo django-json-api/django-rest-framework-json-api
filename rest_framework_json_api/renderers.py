@@ -496,6 +496,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
 
+        renderer_context = renderer_context or {}
+
         view = renderer_context.get("view", None)
         request = renderer_context.get("request", None)
 
