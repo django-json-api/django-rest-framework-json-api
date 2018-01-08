@@ -2,9 +2,9 @@ import collections
 import json
 from collections import OrderedDict
 
+import django
 import inflection
 import six
-import django
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.fields import MISSING_ERROR_MESSAGE
