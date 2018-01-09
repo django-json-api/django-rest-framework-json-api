@@ -170,6 +170,47 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
         fields = super(ModelSerializer, self).get_field_names(declared, info)
         return list(fields) + list(getattr(self.Meta, 'meta_fields', list()))
 
+    def to_representation(self, instance):
+        """
+        Object instance -> Dict of primitive datatypes.
+        """
+        ret = OrderedDict()
+        readable_fields = [
+            field for field in self.fields.values()
+            if not field.write_only
+        ]
+
+        for field in readable_fields:
+            try:
+
+                if isinstance(field, ModelSerializer) and hasattr(field, field.source + "_id"):
+                    attribute = getattr(instance, field.source + "_id")
+                    if attribute is None:
+                        ret[field.field_name] = None
+                        continue
+                    resource_type = get_resource_type_from_instance(field)
+                    if resource_type:
+                        ret[field.field_name] = OrderedDict([("type", resource_type),
+                                                             ("id", attribute)])
+                        continue
+
+                attribute = field.get_attribute(instance)
+            except SkipField:
+                continue
+
+            # We skip `to_representation` for `None` values so that fields do
+            # not have to explicitly deal with that case.
+            #
+            # For related fields with `use_pk_only_optimization` we need to
+            # resolve the pk value.
+            check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
+            if check_for_none is None:
+                ret[field.field_name] = None
+            else:
+                ret[field.field_name] = field.to_representation(attribute)
+
+        return ret
+
 
 class PolymorphicSerializerMetaclass(SerializerMetaclass):
     """

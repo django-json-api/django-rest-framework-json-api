@@ -125,11 +125,12 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             if isinstance(field, ResourceRelatedField):
-                resolved, relation_instance = utils.get_relation_instance(
-                    resource_instance, source, field.parent
-                )
-                if not resolved:
-                    continue
+                relation_instance_id = getattr(resource_instance, source + "_id", None)
+                if not relation_instance_id:
+                    resolved, relation_instance = utils.get_relation_instance(resource_instance,
+                                                                              source, field.parent)
+                    if not resolved:
+                        continue
 
                 # special case for ResourceRelatedField
                 relation_data = {
@@ -256,18 +257,23 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
             if isinstance(field, Serializer):
-                resolved, relation_instance = utils.get_relation_instance(
-                    resource_instance, source, field.parent
-                )
-                if not resolved:
-                    continue
+                relation_instance_id = getattr(resource_instance, source + "_id", None)
+                if not relation_instance_id:
+                    resolved, relation_instance = utils.get_relation_instance(
+                        resource_instance, source, field.parent
+                    )
+                    if not resolved:
+                        continue
+
+                    if relation_instance is not None:
+                        relation_instance_id = relation_instance.pk
 
                 data.update({
                     field_name: {
                         'data': (
                             OrderedDict([
                                 ('type', relation_type),
-                                ('id', encoding.force_text(relation_instance.pk))
+                                ('id', encoding.force_text(relation_instance_id))
                             ]) if resource.get(field_name) else None)
                     }
                 })

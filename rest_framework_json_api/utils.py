@@ -310,12 +310,12 @@ def get_relation_instance(resource_instance, source, serializer):
         if serializer_method and hasattr(serializer_method, '__call__'):
             relation_instance = serializer_method(resource_instance)
         else:
-            return (False, None)
+            return False, None
 
     if isinstance(relation_instance, Manager):
         relation_instance = relation_instance.all()
 
-    return (True, relation_instance)
+    return True, relation_instance
 
 
 class Hyperlink(six.text_type):
