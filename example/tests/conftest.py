@@ -1,6 +1,6 @@
 import pytest
 from pytest_factoryboy import register
-from rest_framework.test import APIClient, APIRequestFactory
+from rest_framework.test import APIClient
 
 from example.factories import (
     ArtProjectFactory,
@@ -62,8 +62,3 @@ def single_art_project(art_project_factory):
 @pytest.fixture
 def client():
     return APIClient()
-
-
-@pytest.fixture
-def rf():
-    return APIRequestFactory()
