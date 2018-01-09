@@ -5,6 +5,7 @@ from rest_framework import exceptions
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
+from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
@@ -66,6 +67,14 @@ class EntryViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return EntrySerializer
+
+
+class NoPagination(PageNumberPagination):
+    page_size = None
+
+
+class NonPaginatedEntryViewSet(EntryViewSet):
+    pagination_class = NoPagination
 
 
 class AuthorViewSet(ModelViewSet):

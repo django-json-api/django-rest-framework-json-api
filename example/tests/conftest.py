@@ -1,5 +1,6 @@
 import pytest
 from pytest_factoryboy import register
+from rest_framework.test import APIClient
 
 from example.factories import (
     ArtProjectFactory,
@@ -56,3 +57,8 @@ def single_company(art_project_factory, research_project_factory, company_factor
 @pytest.fixture
 def single_art_project(art_project_factory):
     return art_project_factory()
+
+
+@pytest.fixture
+def client():
+    return APIClient()

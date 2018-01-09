@@ -1,8 +1,6 @@
 import pytest
 from django.core.urlresolvers import reverse
 
-from example.tests.utils import load_json
-
 try:
     from unittest import mock
 except ImportError:
@@ -81,6 +79,5 @@ def test_pagination_with_single_entry(single_entry, client):
     }
 
     response = client.get(reverse("entry-list"))
-    parsed_content = load_json(response.content)
 
-    assert expected == parsed_content
+    assert expected == response.json()

@@ -5,7 +5,6 @@ from django.core.urlresolvers import reverse
 from rest_framework import status
 
 from example import models, serializers, views
-from example.tests.utils import dump_json, load_json
 
 pytestmark = pytest.mark.django_db
 
@@ -19,8 +18,8 @@ def _check_resource_and_relationship_comment_type_match(django_client):
     entry_response = django_client.get(reverse("entry-list"))
     comment_response = django_client.get(reverse("comment-list"))
 
-    comment_resource_type = load_json(comment_response.content).get('data')[0].get('type')
-    comment_relationship_type = load_json(entry_response.content).get(
+    comment_resource_type = comment_response.json().get('data')[0].get('type')
+    comment_relationship_type = entry_response.json().get(
         'data')[0].get('relationships').get('comments').get('data')[0].get('type')
 
     assert comment_resource_type == comment_relationship_type, (
@@ -30,8 +29,8 @@ def _check_resource_and_relationship_comment_type_match(django_client):
 
 def _check_relationship_and_included_comment_type_are_the_same(django_client, url):
     response = django_client.get(url + "?include=comments")
-    data = load_json(response.content).get('data')[0]
-    comment = load_json(response.content).get('included')[0]
+    data = response.json().get('data')[0]
+    comment = response.json().get('included')[0]
 
     comment_relationship_type = data.get('relationships').get('comments').get('data')[0].get('type')
     comment_included_type = comment.get('type')
@@ -65,7 +64,7 @@ class TestModelResourceName:
     def test_model_resource_name_on_list(self, client):
         models.Comment.__bases__ += (_PatchedModel,)
         response = client.get(reverse("comment-list"))
-        data = load_json(response.content)['data'][0]
+        data = response.json()['data'][0]
         # name should be super-author instead of model name RenamedAuthor
         assert (data.get('type') == 'resource_name_from_JSONAPIMeta'), (
             'resource_name from model incorrect on list')
@@ -74,14 +73,14 @@ class TestModelResourceName:
     def test_resource_name_precendence(self, client, monkeypatch):
         # default
         response = client.get(reverse("comment-list"))
-        data = load_json(response.content)['data'][0]
+        data = response.json()['data'][0]
         assert (data.get('type') == 'comments'), (
             'resource_name from model incorrect on list')
 
         # model > default
         models.Comment.__bases__ += (_PatchedModel,)
         response = client.get(reverse("comment-list"))
-        data = load_json(response.content)['data'][0]
+        data = response.json()['data'][0]
         assert (data.get('type') == 'resource_name_from_JSONAPIMeta'), (
             'resource_name from model incorrect on list')
 
@@ -93,23 +92,21 @@ class TestModelResourceName:
             False
         )
         response = client.get(reverse("comment-list"))
-        data = load_json(response.content)['data'][0]
+        data = response.json()['data'][0]
         assert (data.get('type') == 'resource_name_from_serializer'), (
             'resource_name from serializer incorrect on list')
 
         # view > serializer > model
         monkeypatch.setattr(views.CommentViewSet, 'resource_name', 'resource_name_from_view', False)
         response = client.get(reverse("comment-list"))
-        data = load_json(response.content)['data'][0]
+        data = response.json()['data'][0]
         assert (data.get('type') == 'resource_name_from_view'), (
             'resource_name from view incorrect on list')
 
     def test_model_resource_name_create(self, client):
         models.Comment.__bases__ += (_PatchedModel,)
         models.Entry.__bases__ += (_PatchedModel,)
-        response = client.post(reverse("comment-list"),
-                               dump_json(self.create_data),
-                               content_type='application/vnd.api+json')
+        response = client.post(reverse("comment-list"), self.create_data)
 
         assert response.status_code == status.HTTP_201_CREATED
 
@@ -130,9 +127,7 @@ class TestModelResourceName:
         create_data['data']['type'] = 'renamed_comments'
         create_data['data']['relationships']['entry']['data']['type'] = 'renamed_entries'
 
-        response = client.post(reverse("comment-list"),
-                               dump_json(create_data),
-                               content_type='application/vnd.api+json')
+        response = client.post(reverse("comment-list"), create_data)
 
         assert response.status_code == status.HTTP_201_CREATED
 

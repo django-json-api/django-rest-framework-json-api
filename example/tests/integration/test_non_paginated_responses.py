@@ -1,11 +1,6 @@
 import pytest
 from django.core.urlresolvers import reverse
 
-from rest_framework_json_api.pagination import PageNumberPagination
-
-from example.tests.utils import load_json
-from example.views import EntryViewSet
-
 try:
     from unittest import mock
 except ImportError:
@@ -14,12 +9,11 @@ except ImportError:
 pytestmark = pytest.mark.django_db
 
 
-# rf == request_factory
 @mock.patch(
     'rest_framework_json_api.utils'
     '.get_default_included_resources_from_serializer',
     new=lambda s: [])
-def test_multiple_entries_no_pagination(multiple_entries, rf):
+def test_multiple_entries_no_pagination(multiple_entries, client):
 
     expected = {
         "data": [
@@ -102,18 +96,6 @@ def test_multiple_entries_no_pagination(multiple_entries, rf):
         ]
     }
 
-    class NoPagination(PageNumberPagination):
-        page_size = None
+    response = client.get(reverse("nopage-entry-list"))
 
-    class NonPaginatedEntryViewSet(EntryViewSet):
-        pagination_class = NoPagination
-
-    request = rf.get(
-        reverse("entry-list"))
-    view = NonPaginatedEntryViewSet.as_view({'get': 'list'})
-    response = view(request)
-    response.render()
-
-    parsed_content = load_json(response.content)
-
-    assert expected == parsed_content
+    assert expected == response.json()

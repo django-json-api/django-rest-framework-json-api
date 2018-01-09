@@ -3,7 +3,6 @@ from django.core.urlresolvers import reverse
 from django.utils import encoding
 
 from example.tests import TestBase
-from example.tests.utils import load_json
 
 
 class FormatKeysSetTests(TestBase):
@@ -51,6 +50,4 @@ class FormatKeysSetTests(TestBase):
             }
         }
 
-        parsed_content = load_json(response.content)
-
-        assert expected == parsed_content
+        assert expected == response.json()

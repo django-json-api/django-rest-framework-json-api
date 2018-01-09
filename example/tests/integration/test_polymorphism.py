@@ -1,23 +1,20 @@
-import json
 import random
 
 import pytest
 from django.core.urlresolvers import reverse
-
-from example.tests.utils import load_json
 
 pytestmark = pytest.mark.django_db
 
 
 def test_polymorphism_on_detail(single_art_project, client):
     response = client.get(reverse("project-detail", kwargs={'pk': single_art_project.pk}))
-    content = load_json(response.content)
+    content = response.json()
     assert content["data"]["type"] == "artProjects"
 
 
 def test_polymorphism_on_detail_relations(single_company, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
-    content = load_json(response.content)
+    content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
     assert (
         set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) ==
@@ -28,7 +25,7 @@ def test_polymorphism_on_detail_relations(single_company, client):
 def test_polymorphism_on_included_relations(single_company, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}) +
                           '?include=current_project,future_projects')
-    content = load_json(response.content)
+    content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
     assert (
         set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) ==
@@ -45,13 +42,13 @@ def test_polymorphism_on_included_relations(single_company, client):
 def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, client):
     url = reverse("project-detail", kwargs={'pk': single_art_project.pk})
     response = client.get(url)
-    content = load_json(response.content)
+    content = response.json()
     test_topic = 'test-{}'.format(random.randint(0, 999999))
     test_artist = 'test-{}'.format(random.randint(0, 999999))
     content['data']['attributes']['topic'] = test_topic
     content['data']['attributes']['artist'] = test_artist
-    response = client.patch(url, data=json.dumps(content), content_type='application/vnd.api+json')
-    new_content = load_json(response.content)
+    response = client.patch(url, data=content)
+    new_content = response.json()
     assert new_content['data']['type'] == "artProjects"
     assert new_content['data']['attributes']['topic'] == test_topic
     assert new_content['data']['attributes']['artist'] == test_artist
@@ -70,8 +67,8 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
             }
         }
     }
-    response = client.post(url, data=json.dumps(data), content_type='application/vnd.api+json')
-    content = load_json(response.content)
+    response = client.post(url, data=data)
+    content = response.json()
     assert content['data']['id'] is not None
     assert content['data']['type'] == "artProjects"
     assert content['data']['attributes']['topic'] == test_topic
@@ -98,7 +95,7 @@ def test_polymorphic_model_without_any_instance(client):
 
     response = client.get(reverse('project-list'))
     assert response.status_code == 200
-    content = load_json(response.content)
+    content = response.json()
     assert expected == content
 
 
@@ -115,9 +112,9 @@ def test_invalid_type_on_polymorphic_model(client):
             }
         }
     }
-    response = client.post(url, data=json.dumps(data), content_type='application/vnd.api+json')
+    response = client.post(url, data=data)
     assert response.status_code == 409
-    content = load_json(response.content)
+    content = response.json()
     assert len(content["errors"]) is 1
     assert content["errors"][0]["status"] == "409"
     try:
@@ -133,7 +130,7 @@ def test_invalid_type_on_polymorphic_model(client):
 
 def test_polymorphism_relations_update(single_company, research_project_factory, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
-    content = load_json(response.content)
+    content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
 
     research_project = research_project_factory()
@@ -142,9 +139,9 @@ def test_polymorphism_relations_update(single_company, research_project_factory,
         "id": research_project.pk
     }
     response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
-                          data=json.dumps(content), content_type='application/vnd.api+json')
+                          data=content)
     assert response.status_code == 200
-    content = load_json(response.content)
+    content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "researchProjects"
     assert int(content["data"]["relationships"]["currentProject"]["data"]["id"]) == \
         research_project.pk
@@ -152,7 +149,7 @@ def test_polymorphism_relations_update(single_company, research_project_factory,
 
 def test_invalid_type_on_polymorphic_relation(single_company, research_project_factory, client):
     response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
-    content = load_json(response.content)
+    content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
 
     research_project = research_project_factory()
@@ -161,9 +158,9 @@ def test_invalid_type_on_polymorphic_relation(single_company, research_project_f
         "id": research_project.pk
     }
     response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
-                          data=json.dumps(content), content_type='application/vnd.api+json')
+                          data=content)
     assert response.status_code == 409
-    content = load_json(response.content)
+    content = response.json()
     assert len(content["errors"]) is 1
     assert content["errors"][0]["status"] == "409"
     try:

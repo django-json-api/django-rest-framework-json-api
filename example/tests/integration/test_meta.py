@@ -3,8 +3,6 @@ from datetime import datetime
 import pytest
 from django.core.urlresolvers import reverse
 
-from example.tests.utils import load_json
-
 pytestmark = pytest.mark.django_db
 
 
@@ -42,9 +40,8 @@ def test_top_level_meta_for_list_view(blog, client):
     }
 
     response = client.get(reverse("blog-list"))
-    parsed_content = load_json(response.content)
 
-    assert expected == parsed_content
+    assert expected == response.json()
 
 
 def test_top_level_meta_for_detail_view(blog, client):
@@ -74,6 +71,5 @@ def test_top_level_meta_for_detail_view(blog, client):
     }
 
     response = client.get(reverse("blog-detail", kwargs={'pk': blog.pk}))
-    parsed_content = load_json(response.content)
 
-    assert expected == parsed_content
+    assert expected == response.json()

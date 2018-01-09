@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse
 
 from example.tests import TestBase
-from example.tests.utils import load_json
 
 
 class GenericValidationTest(TestBase):
@@ -30,6 +29,4 @@ class GenericValidationTest(TestBase):
             }]
         }
 
-        parsed_content = load_json(response.content)
-
-        assert expected == parsed_content
+        assert expected == response.json()
