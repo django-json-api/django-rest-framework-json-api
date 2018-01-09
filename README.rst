@@ -20,7 +20,6 @@ Overview
 **JSON API support for Django REST Framework**
 
 * Documentation: http://django-rest-framework-json-api.readthedocs.org/
-* Live demo (resets every hour): http://json-api.jerel.co/
 * Format specification: http://jsonapi.org/format/
 
 
