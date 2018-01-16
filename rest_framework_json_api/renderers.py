@@ -11,6 +11,7 @@ from rest_framework import relations, renderers
 from rest_framework.serializers import BaseSerializer, ListSerializer, Serializer
 from rest_framework.settings import api_settings
 
+import rest_framework_json_api
 from rest_framework_json_api import utils
 
 
@@ -543,12 +544,6 @@ class JSONRenderer(renderers.JSONRenderer):
 
         if serializer is not None:
 
-            # Get the serializer fields
-            fields = utils.get_serializer_fields(serializer)
-
-            # Determine if resource name must be resolved on each instance (polymorphic serializer)
-            force_type_resolution = getattr(serializer, '_poly_force_type_resolution', False)
-
             # Extract root meta for any type of serializer
             json_api_meta.update(self.extract_root_meta(serializer, serializer_data))
 
@@ -558,6 +553,17 @@ class JSONRenderer(renderers.JSONRenderer):
                 for position in range(len(serializer_data)):
                     resource = serializer_data[position]  # Get current resource
                     resource_instance = serializer.instance[position]  # Get current instance
+
+                    if isinstance(serializer.child, rest_framework_json_api.
+                                  serializers.PolymorphicModelSerializer):
+                        resource_serializer_class = serializer.child.\
+                            get_polymorphic_serializer_for_instance(resource_instance)()
+                    else:
+                        resource_serializer_class = serializer.child
+
+                    fields = utils.get_serializer_fields(resource_serializer_class)
+                    force_type_resolution = getattr(
+                        resource_serializer_class, '_poly_force_type_resolution', False)
 
                     json_resource_obj = self.build_json_resource_obj(
                         fields, resource, resource_instance, resource_name, force_type_resolution
@@ -573,6 +579,9 @@ class JSONRenderer(renderers.JSONRenderer):
                     if included:
                         json_api_included.extend(included)
             else:
+                fields = utils.get_serializer_fields(serializer)
+                force_type_resolution = getattr(serializer, '_poly_force_type_resolution', False)
+
                 resource_instance = serializer.instance
                 json_api_data = self.build_json_resource_obj(
                     fields, serializer_data, resource_instance, resource_name, force_type_resolution
