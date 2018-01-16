@@ -554,7 +554,8 @@ class JSONRenderer(renderers.JSONRenderer):
                     resource = serializer_data[position]  # Get current resource
                     resource_instance = serializer.instance[position]  # Get current instance
 
-                    if isinstance(serializer.child, rest_framework_json_api.serializers.PolymorphicModelSerializer):
+                    if isinstance(serializer.child, rest_framework_json_api.
+                                  serializers.PolymorphicModelSerializer):
                         resource_serializer_class = serializer.child.\
                             get_polymorphic_serializer_for_instance(resource_instance)()
                     else:
