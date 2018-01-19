@@ -7,6 +7,7 @@ import six
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField
 from rest_framework.reverse import reverse
@@ -270,7 +271,10 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
         if 'id' not in data:
             self.fail('missing_id')
 
-        expected_relation_types = self.polymorphic_serializer.get_polymorphic_types()
+        polymorphic_serializer = self.polymorphic_serializer
+        if not isinstance(polymorphic_serializer, type):
+            polymorphic_serializer = import_class_from_dotted_path(polymorphic_serializer)
+        expected_relation_types = polymorphic_serializer.get_polymorphic_types()
 
         if data['type'] not in expected_relation_types:
             self.conflict('incorrect_relation_type', relation_type=", ".join(
