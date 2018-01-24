@@ -6,8 +6,8 @@ import inflection
 import six
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
-from django.utils.translation import ugettext_lazy as _
 from django.utils.module_loading import import_string as import_class_from_dotted_path
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.fields import MISSING_ERROR_MESSAGE
 from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField
 from rest_framework.reverse import reverse
