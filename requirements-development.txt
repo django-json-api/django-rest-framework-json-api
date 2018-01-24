@@ -1,5 +1,5 @@
 -e .
-django-polymorphic
+django-polymorphic>=2.0
 Faker
 isort
 mock

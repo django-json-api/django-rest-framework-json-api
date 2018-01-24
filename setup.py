@@ -108,7 +108,7 @@ setup(
         'factory-boy<2.9.0',
         'pytest-django',
         'pytest>=2.8,<3',
-        'django-polymorphic',
+        'django-polymorphic>=2.0',
         'packaging',
         'django-debug-toolbar'
     ] + mock,
