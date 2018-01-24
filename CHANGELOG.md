@@ -1,5 +1,7 @@
 v2.4.0
 
+* Add support for Django REST Framework 3.7.x.
+* Add support for Django 2.0.
 * Drop support for Django 1.8 - 1.10 (EOL)
 * Drop support for Django REST Framework < 3.6.3
   (3.6.3 is the first to support Django 1.11)

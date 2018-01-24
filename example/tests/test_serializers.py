@@ -1,6 +1,6 @@
 import pytest
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer

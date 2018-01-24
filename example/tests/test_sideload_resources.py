@@ -3,7 +3,7 @@ Test sideloading resources
 """
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import encoding
 
 from example.tests import TestBase
