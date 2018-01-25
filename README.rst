@@ -1,6 +1,6 @@
-====================================
+==================================
 JSON API and Django Rest Framework
-====================================
+==================================
 
 .. image:: https://travis-ci.org/django-json-api/django-rest-framework-json-api.svg?branch=develop
    :target: https://travis-ci.org/django-json-api/django-rest-framework-json-api
