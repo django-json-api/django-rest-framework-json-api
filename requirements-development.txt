@@ -3,10 +3,9 @@ django-polymorphic>=2.0
 Faker
 isort
 mock
-pytest>=2.9.0,<3.0
+pytest
 pytest-django
-# factory_boy is currently broken at 2.9 and above. See: https://github.com/pytest-dev/pytest-factoryboy/issues/47
-factory-boy<2.9.0
+factory-boy
 pytest-factoryboy
 recommonmark
 Sphinx

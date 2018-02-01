@@ -105,9 +105,9 @@ setup(
     setup_requires=pytest_runner + sphinx + wheel,
     tests_require=[
         'pytest-factoryboy',
-        'factory-boy<2.9.0',
+        'factory-boy',
         'pytest-django',
-        'pytest>=2.8,<3',
+        'pytest',
         'django-polymorphic>=2.0',
         'packaging',
         'django-debug-toolbar'
