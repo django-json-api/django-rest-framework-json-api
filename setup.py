@@ -107,7 +107,7 @@ setup(
         'pytest-factoryboy',
         'factory-boy',
         'pytest-django',
-        'pytest>=2.8,<3',
+        'pytest',
         'django-polymorphic>=2.0',
         'packaging',
         'django-debug-toolbar'

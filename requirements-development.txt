@@ -3,7 +3,7 @@ django-polymorphic>=2.0
 Faker
 isort
 mock
-pytest>=2.9.0,<3.0
+pytest
 pytest-django
 factory-boy
 pytest-factoryboy
