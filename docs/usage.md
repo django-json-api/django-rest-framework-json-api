@@ -421,7 +421,7 @@ url(
 The `related_field` kwarg specifies which relationship to use, so
 if we are interested in the relationship represented by the related
 model field `Order.line_items` on the Order with pk 3, the url would be
-`/order/3/relationships/line_items`. On `HyperlinkedModelSerializer`, the
+`/orders/3/relationships/line_items`. On `HyperlinkedModelSerializer`, the
 `ResourceRelatedField` will construct the url based on the provided
 `self_link_view_name` keyword argument, which should match the `name=`
 provided in the urlconf, and will use the name of the field for the
