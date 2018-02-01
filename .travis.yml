@@ -33,7 +33,7 @@ matrix:
 before_install:
   # Force an upgrade of py & pytest to avoid VersionConflict
   - pip install --upgrade py
-  - pip install "pytest>=2.8,<3"
+  - pip install pytest
   - pip install codecov flake8 isort
 install:
   - pip install Django${DJANGO} djangorestframework${DRF}
