@@ -8,7 +8,8 @@ from example.views import (
     CommentViewSet,
     CompanyViewset,
     EntryViewSet,
-    ProjectViewset
+    ProjectViewset,
+    EntryRelationshipView,
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -22,6 +23,13 @@ router.register(r'projects', ProjectViewset)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+        EntryRelationshipView.as_view(),
+        name='entry-relationships'),
+    url(r'^entries/(?P<entry_pk>[^/.]+)/suggested/',
+        EntryViewSet.as_view({'get': 'list'}),
+        name='entry-suggested'
+        ),
 ]
 
 

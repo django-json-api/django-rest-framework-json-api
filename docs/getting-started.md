@@ -70,7 +70,6 @@ From Source
 
     git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     cd django-rest-framework-json-api
-    pip install -e .
     pip install -r example/requirements.txt
     django-admin.py runserver
 
@@ -78,5 +77,5 @@ Browse to http://localhost:8000
 
 ## Running Tests
 
-    python runtests.py
+    tox
 
