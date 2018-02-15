@@ -2,12 +2,13 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions, status
 
-from rest_framework_json_api import renderers, utils
+from rest_framework_json_api import utils
 
 
 def rendered_with_json_api(view):
+    from rest_framework_json_api.renderers import JSONRenderer
     for renderer_class in getattr(view, 'renderer_classes', []):
-        if issubclass(renderer_class, renderers.JSONRenderer):
+        if issubclass(renderer_class, JSONRenderer):
             return True
     return False
 
