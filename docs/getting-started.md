@@ -73,6 +73,7 @@ From Source
     python -m venv env
     source env/bin/activate
     pip install -r example/requirements.txt
+	pip install -e .
     django-admin.py startproject example .
     python manage.py migrate
     python manage.py runserver
