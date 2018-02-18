@@ -112,7 +112,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         OrderedDict([
                             ('type', relation_type),
                             ('id', encoding.force_text(getattr(
-                                related_object.pk, field.lookup_field)))
+                                related_object, field.lookup_field)))
                         ])
                     )
 
@@ -223,14 +223,14 @@ class JSONRenderer(renderers.JSONRenderer):
                     )
 
                     if hasattr(field.child_relation, 'lookup_field'):
-                        _id = getattr(nested_resource_instance,
-                                      field.child_relation.lookup_field)
+                        pk = getattr(nested_resource_instance,
+                                     field.child_relation.lookup_field)
                     else:
-                        _id = nested_resource_instance.pk
+                        pk = nested_resource_instance.pk
 
                     relation_data.append(OrderedDict([
                         ('type', nested_resource_instance_type),
-                        ('id', encoding.force_text(_id))
+                        ('id', encoding.force_text(pk))
                     ]))
                 data.update({
                     field_name: {
