@@ -70,13 +70,18 @@ From Source
 
     git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     cd django-rest-framework-json-api
-    pip install -e .
+    python -m venv env
+    source env/bin/activate
     pip install -r example/requirements.txt
-    django-admin.py runserver
+	pip install -e .
+    django-admin.py startproject example .
+    python manage.py migrate
+    python manage.py runserver
 
 Browse to http://localhost:8000
 
 ## Running Tests
 
-    python runtests.py
+    pip install tox
+    tox
 
