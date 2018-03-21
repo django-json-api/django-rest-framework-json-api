@@ -1,10 +1,13 @@
+import re
+
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions, status
-import re
 from rest_framework.response import Response
-from django.core.exceptions import FieldDoesNotExist, FieldError
+
 from rest_framework_json_api import utils
+
 
 def rendered_with_json_api(view):
     from rest_framework_json_api.renderers import JSONRenderer
@@ -12,6 +15,7 @@ def rendered_with_json_api(view):
         if issubclass(renderer_class, JSONRenderer):
             return True
     return False
+
 
 def unhandled_drf_exception_handler(exc, context):
     """
@@ -53,6 +57,7 @@ def unhandled_drf_exception_handler(exc, context):
             }
         ]
     return Response(errors, status=status_code)
+
 
 def exception_handler(exc, context):
     # Import this here to avoid potential edge-case circular imports, which

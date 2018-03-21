@@ -3,17 +3,17 @@ Pagination fields
 """
 from collections import OrderedDict
 
+from django.conf import settings
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import Response
-
-from django.conf import settings
 
 
 class PageNumberPagination(PageNumberPagination):
     """
     A json-api compatible pagination format
-    TODO: Consider changing defaults to page[number] and page[size]. This would be a breaking change.
+    TODO: Consider changing defaults to page[number] and page[size].
+      This would be a breaking change.
     """
     page_query_param = getattr(settings, 'JSON_API_PAGE_NUMBER_PARAM', 'page')
     page_size_query_param = getattr(settings, 'JSON_API_PAGE_SIZE_PARAM', 'page_size')
@@ -59,7 +59,7 @@ class LimitOffsetPagination(LimitOffsetPagination):
     http://api.example.org/accounts/?page[offset]=400&page[limit]=100
     """
     limit_query_param = getattr(settings, 'JSON_API_PAGE_LIMIT_PARAM', 'page[limit]')
-    offset_query_param = getattr(settings, 'JSON_API_PAGE_OFFSET_PARM','page[offset]')
+    offset_query_param = getattr(settings, 'JSON_API_PAGE_OFFSET_PARM', 'page[offset]')
     # TODO: inconsistent w/max_page_size value default of 100
     max_limit = getattr(settings, 'JSON_API_MAX_PAGE_LIMIT', None)
 

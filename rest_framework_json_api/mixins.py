@@ -27,8 +27,10 @@ class FilterMixin(object):
     A stackable Mixin that overrides get_queryset for JSON API filter query parameter support
     per http://jsonapi.org/recommendations/#filtering.
 
-    The `filter` syntax is `filter[name1]=list,of,alternative,values&filter[name2]=more,alternatives...`
-    which can be interpreted as `(name1 in [list,of,alternative,values]) and (name2 in [more,alternatives])`
+    The `filter` syntax is
+    `filter[name1]=list,of,alternative,values&filter[name2]=more,alternatives...`
+    which can be interpreted as `(name1 in [list,of,alternative,values])
+    and (name2 in [more,alternatives])`
     `name` can be `id` or attributes field.
 
     @example
@@ -44,7 +46,8 @@ class FilterMixin(object):
         Override :meth:``get_queryset``
         """
         self.queryset = super(FilterMixin, self).get_queryset()
-        qp = dict(self.request.query_params if hasattr(self.request, 'query_params') else self.request.QUERY_PARAMS)
+        qp = dict(self.request.query_params if hasattr(self.request, 'query_params')
+                  else self.request.QUERY_PARAMS)
         if not qp:
             return self.queryset
         FILTER = 'filter['
@@ -53,7 +56,7 @@ class FilterMixin(object):
         for k in qp:
             if k[:flen] == FILTER and k[-1] == ']':
                 attr = k[flen:-1]
-                filters[attr+"__in"] = qp.get(k)[0].split(',')
+                filters[attr + "__in"] = qp.get(k)[0].split(',')
 
         self.queryset = self.queryset.filter(**filters)
         return self.queryset
@@ -79,7 +82,8 @@ class SortMixin(object):
         Override :meth:``get_queryset``
         """
         self.queryset = super(SortMixin, self).get_queryset()
-        qp = dict(self.request.query_params if hasattr(self.request, 'query_params') else self.request.QUERY_PARAMS)
+        qp = dict(self.request.query_params if hasattr(self.request, 'query_params')
+                  else self.request.QUERY_PARAMS)
         if not qp:
             return self.queryset
         sorts = []
