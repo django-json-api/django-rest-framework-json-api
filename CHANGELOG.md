@@ -1,3 +1,17 @@
+v2.4.x - [Unreleased]
+* Pagination updates:
+  * Improve existing documentation of pagination, mixins
+    * Document LimitOffsetPagination
+    * Describe how to override pagination class query parameter names.
+    * Remove reference to PAGINATE_BY_PARAM which was deprecated in DRF 3.2.
+    * Document SparseFieldsetsMixin
+  * Add new default settings for pagination query parameters and maximum size.
+* Add combinable mixins for filter and sort query parameters and make MultiplIDMixin combinable.
+* Exceptions updates:
+  * Document JSON_API_UNIFORM_EXCEPTIONS setting.
+  * handle missing fields exception thrown by new filter and sort Mixins as a 400 error.
+  * Catch all exceptions not caught by DRF and format as JSON API error objects instead of returning HTML error pages.
+  
 v2.4.0 - Released January 25, 2018
 
 * Add support for Django REST Framework 3.7.x.
