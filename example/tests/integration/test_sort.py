@@ -3,6 +3,7 @@ from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
 
+
 # TODO: Need to have a view that includes the mixins.
 def test_sort_view(multiple_entries, client):
     base_url = reverse('entry-list')
