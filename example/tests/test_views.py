@@ -299,8 +299,8 @@ class TestSortFilterViewSet(TestBase):
         url = '/entries'
         querystring = 'sort=-headline,body_text'
         response = self.client.get(url + '?page_size=10&' + querystring)
-        assert response.status_code == 200, response.content.decode()
-        j = json.loads(response.content)
+        assert response.status_code == 200, response.content.decode('utf-8')
+        j = json.loads(response.content.decode('utf-8'))
         assert len(j['data']) == 3
         assert j['data'][0]['attributes']['headline'] == 'differ header'
         assert j['data'][1]['attributes']['headline'] == 'common header'
@@ -314,7 +314,7 @@ class TestSortFilterViewSet(TestBase):
         querystring = 'filter[headline]=common header'
         response = self.client.get(url + '?page_size=10&' + querystring)
         assert response.status_code == 200, response.content.decode()
-        j = json.loads(response.content)
+        j = json.loads(response.content.decode('utf-8'))
         assert len(j['data']) == 2
         assert j['data'][0]['attributes']['headline'] == 'common header'
         assert j['data'][1]['attributes']['headline'] == 'common header'
@@ -327,7 +327,7 @@ class TestSortFilterViewSet(TestBase):
                       '&fields[entries]=body_text,mod_date'
         response = self.client.get(url + '?page_size=10&' + querystring)
         assert response.status_code == 200, response.content.decode()
-        j = json.loads(response.content)
+        j = json.loads(response.content.decode('utf-8'))
         assert len(j['data']) == 2
         assert j['data'][0]['attributes']['bodyText'] == '1st body text'
         assert j['data'][1]['attributes']['bodyText'] == '3rd body text'
@@ -338,7 +338,7 @@ class TestSortFilterViewSet(TestBase):
         querystring = 'sort=-body_text,XxX'
         response = self.client.get(url + '?page_size=10&' + querystring)
         assert response.status_code == 400, response.content.decode()
-        j = json.loads(response.content)
+        j = json.loads(response.content.decode('utf-8'))
         assert j['errors'][0]['code'] == 'field_error'
         assert j['errors'][0]['source']['parameter'] == 'XxX'
 
@@ -347,6 +347,6 @@ class TestSortFilterViewSet(TestBase):
         querystring = 'filter[XxX]=43'
         response = self.client.get(url + '?page_size=10&' + querystring)
         assert response.status_code == 400, response.content.decode()
-        j = json.loads(response.content)
+        j = json.loads(response.content.decode('utf-8'))
         assert j['errors'][0]['code'] == 'field_error'
         assert j['errors'][0]['source']['parameter'] == 'XxX'
