@@ -280,3 +280,73 @@ class TestModelViewSet(TestBase):
         response = self.client.delete(url)
         assert response.status_code == 204, response.rendered_content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
+
+
+class TestSortFilterViewSet(TestBase):
+    def setUp(self):
+        self.blog = Blog.objects.create(name='Some Blog', tagline="Also a blog")
+        self.entry1 = Entry.objects.create(blog=self.blog,
+                                           headline="common header",
+                                           body_text="1st body text")
+        self.entry2 = Entry.objects.create(blog=self.blog,
+                                           headline="differ header",
+                                           body_text="2nd body text")
+        self.entry3 = Entry.objects.create(blog=self.blog,
+                                           headline="common header",
+                                           body_text="3rd body text")
+
+    def test_sort_view(self):
+        url = '/entries'
+        querystring = 'sort=-headline,body_text'
+        response = self.client.get(url + '?page_size=10&' + querystring)
+        assert response.status_code == 200, response.content.decode()
+        j = json.loads(response.content)
+        assert len(j['data']) == 3
+        assert j['data'][0]['attributes']['headline'] == 'differ header'
+        assert j['data'][1]['attributes']['headline'] == 'common header'
+        assert j['data'][2]['attributes']['headline'] == 'common header'
+        assert j['data'][0]['attributes']['bodyText'] == '2nd body text'
+        assert j['data'][1]['attributes']['bodyText'] == '1st body text'
+        assert j['data'][2]['attributes']['bodyText'] == '3rd body text'
+
+    def test_filter_view(self):
+        url = '/entries'
+        querystring = 'filter[headline]=common header'
+        response = self.client.get(url + '?page_size=10&' + querystring)
+        assert response.status_code == 200, response.content.decode()
+        j = json.loads(response.content)
+        assert len(j['data']) == 2
+        assert j['data'][0]['attributes']['headline'] == 'common header'
+        assert j['data'][1]['attributes']['headline'] == 'common header'
+
+    def test_sort_filter_fields_view(self):
+        url = '/entries'
+        # TODO: this is a pre-existing bug in SparseFieldSetsMixin:
+        #  fields[body_text] vs. camelized bodyText in response.
+        querystring = 'sort=-headline,body_text&filter[headline]=common header'\
+                      '&fields[entries]=body_text,mod_date'
+        response = self.client.get(url + '?page_size=10&' + querystring)
+        assert response.status_code == 200, response.content.decode()
+        j = json.loads(response.content)
+        assert len(j['data']) == 2
+        assert j['data'][0]['attributes']['bodyText'] == '1st body text'
+        assert j['data'][1]['attributes']['bodyText'] == '3rd body text'
+        assert 'headline' not in j['data'][0]['attributes']
+
+    def test_sort_bad_key(self):
+        url = '/entries'
+        querystring = 'sort=-body_text,XxX'
+        response = self.client.get(url + '?page_size=10&' + querystring)
+        assert response.status_code == 400, response.content.decode()
+        j = json.loads(response.content)
+        assert j['errors'][0]['code'] == 'field_error'
+        assert j['errors'][0]['source']['parameter'] == 'XxX'
+
+    def test_filter_bad_key(self):
+        url = '/entries'
+        querystring = 'filter[XxX]=43'
+        response = self.client.get(url + '?page_size=10&' + querystring)
+        assert response.status_code == 400, response.content.decode()
+        j = json.loads(response.content)
+        assert j['errors'][0]['code'] == 'field_error'
+        assert j['errors'][0]['source']['parameter'] == 'XxX'
