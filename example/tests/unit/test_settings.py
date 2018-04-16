@@ -13,5 +13,5 @@ def test_settings_default():
 
 
 def test_settings_override(settings):
-    settings.JSON_API_FORMAT_KEYS = 'dasherize'
-    assert json_api_settings.FORMAT_KEYS == 'dasherize'
+    settings.JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
+    assert json_api_settings.FORMAT_FIELD_NAMES == 'dasherize'

@@ -1,3 +1,5 @@
+import json
+
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
 
@@ -19,9 +21,14 @@ class DummyTestSerializer(serializers.ModelSerializer):
     related_models = RelatedModelSerializer(
         source='comments', many=True, read_only=True)
 
+    json_field = serializers.SerializerMethodField()
+
+    def get_json_field(self, entry):
+        return {'JsonKey': 'JsonValue'}
+
     class Meta:
         model = Entry
-        fields = ('related_models',)
+        fields = ('related_models', 'json_field')
 
     class JSONAPIMeta:
         included_resources = ('related_models',)
@@ -61,3 +68,22 @@ def test_simple_reverse_relation_included_read_only_viewset():
         ReadOnlyDummyTestViewSet)
 
     assert rendered
+
+
+def test_render_format_field_names(settings):
+    """Test that json field is kept untouched."""
+    settings.JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
+
+    result = json.loads(rendered.decode())
+    assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
+
+
+def test_render_format_keys(settings):
+    """Test that json field value keys are formated."""
+    delattr(settings, 'JSON_API_FORMAT_FILED_NAMES')
+    settings.JSON_API_FORMAT_KEYS = 'dasherize'
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
+
+    result = json.loads(rendered.decode())
+    assert result['data']['attributes']['json-field'] == {'json-key': 'JsonValue'}

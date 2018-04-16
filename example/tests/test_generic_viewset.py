@@ -4,7 +4,7 @@ from django.urls import reverse
 from example.tests import TestBase
 
 
-@override_settings(JSON_API_FORMAT_KEYS='dasherize')
+@override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize')
 class GenericViewSet(TestBase):
     """
     Test expected responses coming from a Generic ViewSet

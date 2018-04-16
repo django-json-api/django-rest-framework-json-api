@@ -149,13 +149,13 @@ multiple endpoints. Setting the `resource_name` on views may result in a differe
 
 ### Inflecting object and relation keys
 
-This package includes the ability (off by default) to automatically convert json
-requests and responses from the python/rest_framework's preferred underscore to
+This package includes the ability (off by default) to automatically convert [json
+api field names](http://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
 a format of your choice. To hook this up include the following setting in your
 project settings:
 
 ``` python
-JSON_API_FORMAT_KEYS = 'dasherize'
+JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
 ```
 
 Possible values:

@@ -98,13 +98,50 @@ def get_serializer_fields(serializer):
         return fields
 
 
+def format_field_names(obj, format_type=None):
+    """
+    Takes a dict and returns it with formatted keys as set in `format_type`
+    or `JSON_API_FORMAT_FIELD_NAMES`
+
+    :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
+    """
+    if format_type is None:
+        format_type = json_api_settings.FORMAT_FIELD_NAMES
+
+    if isinstance(obj, dict):
+        formatted = OrderedDict()
+        for key, value in obj.items():
+            key = format_value(key, format_type)
+            formatted[key] = value
+        return formatted
+
+    return obj
+
+
+def _format_object(obj, format_type=None):
+    """Depending on settings calls either `format_keys` or `format_field_names`"""
+
+    if json_api_settings.FORMAT_KEYS is not None:
+        return format_keys(obj, format_type)
+
+    return format_field_names(obj, format_type)
+
+
 def format_keys(obj, format_type=None):
     """
     Takes either a dict or list and returns it with camelized keys only if
     JSON_API_FORMAT_KEYS is set.
 
-    :format_type: Either 'dasherize', 'camelize' or 'underscore'
+    :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
     """
+    warnings.warn(
+        "`format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be "
+        "removed in the future. "
+        "Use `format_field_names` and `JSON_API_FIELD_NAMES` instead. Be aware that "
+        "`format_field_names` only formats keys and preserves value.",
+        DeprecationWarning
+    )
+
     if format_type is None:
         format_type = json_api_settings.FORMAT_KEYS
 
@@ -138,7 +175,7 @@ def format_keys(obj, format_type=None):
 
 def format_value(value, format_type=None):
     if format_type is None:
-        format_type = json_api_settings.FORMAT_KEYS
+        format_type = json_api_settings.format_type
     if format_type == 'dasherize':
         # inflection can't dasherize camelCase
         value = inflection.underscore(value)
@@ -155,7 +192,9 @@ def format_value(value, format_type=None):
 def format_relation_name(value, format_type=None):
     warnings.warn(
         "The 'format_relation_name' function has been renamed 'format_resource_type' and the "
-        "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'"
+        "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of "
+        "'JSON_API_FORMAT_RELATION_KEYS' and 'JSON_API_PLURALIZE_RELATION_TYPE'",
+        DeprecationWarning
     )
     if format_type is None:
         format_type = json_api_settings.FORMAT_RELATION_KEYS

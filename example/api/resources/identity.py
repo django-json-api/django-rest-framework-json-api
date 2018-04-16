@@ -37,7 +37,7 @@ class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
             encoding.force_text('identities'): IdentitySerializer(identities, many=True).data,
             encoding.force_text('posts'): PostSerializer(posts, many=True).data,
         }
-        return Response(utils.format_keys(data, format_type='camelize'))
+        return Response(utils.format_field_names(data, format_type='camelize'))
 
     @detail_route()
     def manual_resource_name(self, request, *args, **kwargs):
