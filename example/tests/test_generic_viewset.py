@@ -1,22 +1,14 @@
-from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
 
 from example.tests import TestBase
 
 
+@override_settings(JSON_API_FORMAT_KEYS='dasherize')
 class GenericViewSet(TestBase):
     """
     Test expected responses coming from a Generic ViewSet
     """
-
-    def setUp(self):
-        super(GenericViewSet, self).setUp()
-
-        setattr(settings, 'JSON_API_FORMAT_KEYS', 'dasherize')
-
-    def tearDown(self):
-
-        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelize')
 
     def test_default_rest_framework_behavior(self):
         """

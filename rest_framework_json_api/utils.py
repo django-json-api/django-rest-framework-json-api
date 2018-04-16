@@ -18,6 +18,8 @@ from rest_framework import exceptions
 from rest_framework.exceptions import APIException
 from rest_framework.serializers import ManyRelatedField  # noqa: F401
 
+from .settings import json_api_settings
+
 try:
     from rest_framework_nested.relations import HyperlinkedRouterField
 except ImportError:
@@ -104,7 +106,7 @@ def format_keys(obj, format_type=None):
     :format_type: Either 'dasherize', 'camelize' or 'underscore'
     """
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+        format_type = json_api_settings.FORMAT_KEYS
 
     if format_type in ('dasherize', 'camelize', 'underscore', 'capitalize'):
 
@@ -136,7 +138,7 @@ def format_keys(obj, format_type=None):
 
 def format_value(value, format_type=None):
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+        format_type = json_api_settings.FORMAT_KEYS
     if format_type == 'dasherize':
         # inflection can't dasherize camelCase
         value = inflection.underscore(value)
@@ -156,17 +158,17 @@ def format_relation_name(value, format_type=None):
         "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES'"
     )
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_FORMAT_RELATION_KEYS', None)
-    pluralize = getattr(settings, 'JSON_API_PLURALIZE_RELATION_TYPE', None)
+        format_type = json_api_settings.FORMAT_RELATION_KEYS
+    pluralize = json_api_settings.PLURALIZE_RELATION_TYPE
     return format_resource_type(value, format_type, pluralize)
 
 
 def format_resource_type(value, format_type=None, pluralize=None):
     if format_type is None:
-        format_type = getattr(settings, 'JSON_API_FORMAT_TYPES', False)
+        format_type = json_api_settings.FORMAT_TYPES
 
     if pluralize is None:
-        pluralize = getattr(settings, 'JSON_API_PLURALIZE_TYPES', False)
+        pluralize = json_api_settings.PLURALIZE_TYPES
 
     if format_type:
         # format_type will never be None here so we can use format_value

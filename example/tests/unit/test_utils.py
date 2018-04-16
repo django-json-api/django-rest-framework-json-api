@@ -1,6 +1,6 @@
 import pytest
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.utils import six
 from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
@@ -29,12 +29,12 @@ class ResourceSerializer(serializers.ModelSerializer):
 def test_get_resource_name():
     view = APIView()
     context = {'view': view}
-    setattr(settings, 'JSON_API_FORMAT_TYPES', None)
-    assert 'APIViews' == utils.get_resource_name(context), 'not formatted'
+    with override_settings(JSON_API_FORMAT_TYPES=None):
+        assert 'APIViews' == utils.get_resource_name(context), 'not formatted'
 
     context = {'view': view}
-    setattr(settings, 'JSON_API_FORMAT_TYPES', 'dasherize')
-    assert 'api-views' == utils.get_resource_name(context), 'derived from view'
+    with override_settings(JSON_API_FORMAT_TYPES='dasherize'):
+        assert 'api-views' == utils.get_resource_name(context), 'derived from view'
 
     view.model = get_user_model()
     assert 'users' == utils.get_resource_name(context), 'derived from view model'
