@@ -1,15 +1,16 @@
 -e .
+django-debug-toolbar
 django-polymorphic>=2.0
+factory-boy
 Faker
 isort
 mock
+packaging==16.8
 pytest
 pytest-django
-factory-boy
 pytest-factoryboy
 recommonmark
 Sphinx
 sphinx_rtd_theme
 tox
-django-debug-toolbar
-packaging==16.8
+twine
