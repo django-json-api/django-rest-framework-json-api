@@ -3,6 +3,7 @@ Pagination fields
 """
 from collections import OrderedDict
 
+from django.conf import settings
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import Response
@@ -11,10 +12,12 @@ from rest_framework.views import Response
 class PageNumberPagination(PageNumberPagination):
     """
     A json-api compatible pagination format
+    TODO: Consider changing defaults to page[number] and page[size].
+      This would be a breaking change.
     """
-
-    page_size_query_param = 'page_size'
-    max_page_size = 100
+    page_query_param = getattr(settings, 'JSON_API_PAGE_NUMBER_PARAM', 'page')
+    page_size_query_param = getattr(settings, 'JSON_API_PAGE_SIZE_PARAM', 'page_size')
+    max_page_size = getattr(settings, 'JSON_API_MAX_PAGE_SIZE', 100)
 
     def build_link(self, index):
         if not index:
@@ -55,8 +58,10 @@ class LimitOffsetPagination(LimitOffsetPagination):
     http://api.example.org/accounts/?page[limit]=100
     http://api.example.org/accounts/?page[offset]=400&page[limit]=100
     """
-    limit_query_param = 'page[limit]'
-    offset_query_param = 'page[offset]'
+    limit_query_param = getattr(settings, 'JSON_API_PAGE_LIMIT_PARAM', 'page[limit]')
+    offset_query_param = getattr(settings, 'JSON_API_PAGE_OFFSET_PARM', 'page[offset]')
+    # TODO: inconsistent w/max_page_size value default of 100
+    max_limit = getattr(settings, 'JSON_API_MAX_PAGE_LIMIT', None)
 
     def get_last_link(self):
         if self.count == 0:
@@ -96,3 +101,5 @@ class LimitOffsetPagination(LimitOffsetPagination):
                 ('prev', self.get_previous_link())
             ])
         })
+
+# TODO: Add CursorPagination

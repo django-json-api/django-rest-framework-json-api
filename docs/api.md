@@ -4,8 +4,70 @@
 ## mixins
 ### MultipleIDMixin
 
-Add this mixin to a view to override `get_queryset` to automatically filter
+Add this mixin to a view to override `get_queryset` to filter
 records by `ids[]=1&ids[]=2` in URL query params.
+
+For example:
+```http request
+GET /widgets/?ids[]=123&ids[]=456
+```
+
+You might want to consider using the `FilterMixin` where the equivalent example is:
+```http request
+GET /widgets/?filter[id]=123,456
+```
+
+### FilterMixin
+
+This ViewSet mixin augments `get_queryset` to provide JSON API filter query parameter support
+per the [recommendation](http://jsonapi.org/recommendations/#filtering).
+
+The `filter` syntax is `filter[name1]=list,of,alternative,values&filter[name2]=more,alternatives...`
+which can be interpreted as `(name1 in [list,of,alternative,values]) and (name2 in [more,alternatives])`
+`name` can be `id` or attributes fields.
+
+For example:
+
+```http request
+GET /widgets/?filter[name]=can+opener,tap&filter[color]=red
+```
+
+### SortMixin
+
+This ViewSet mixin augments `get_queryset` to provide JSON API sort query parameter support
+per the [recommendation](http://jsonapi.org/format/#fetching-sorting).
+
+The `sort` syntax is `sort=-field1,field2,...`
+
+For example:
+
+```http request
+GET /widgets/?sort=-name,color
+```
+
+### SparseFieldsetsMixin
+
+This Serializer mixin implements [sparse fieldsets](http://jsonapi.org/format/#fetching-sparse-fieldsets)
+with the `fields[type]=` parameter. It is included by default in the HyperLinkedModelSerializer and
+ModelSerializer classes.
+
+For example:
+
+```http request
+GET /widgets/?fields[widgets]=name
+``` 
+
+### IncludedResourcesValidationMixin
+
+This Serializer mixin implements [included compound documents](http://jsonapi.org/format/#document-compound-documents)
+with the `include=` parameter. It is included by default in the HyperLinkedModelSerializer and
+ModelSerializer classes. 
+
+For example:
+
+```http request
+GET /widgets/?included=locations
+```
 
 ## rest_framework_json_api.renderers.JSONRenderer
 

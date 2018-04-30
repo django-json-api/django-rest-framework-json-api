@@ -1,6 +1,10 @@
+import re
+
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions, status
+from rest_framework.response import Response
 
 from rest_framework_json_api import utils
 
@@ -11,6 +15,48 @@ def rendered_with_json_api(view):
         if issubclass(renderer_class, JSONRenderer):
             return True
     return False
+
+
+def unhandled_drf_exception_handler(exc, context):
+    """
+    Deals with exceptions that DRF doesn't catch, specifically for filter & sort query parameters:
+    "Cannot resolve keyword 'xname' into field. Choices are: name, title, ...."
+
+    Even a 500 error for a jsonapi view should return a jsonapi error object, not an HTML response.
+    """
+    if not rendered_with_json_api(context['view']):
+        return None
+    keymatch = re.compile(r"^Cannot resolve keyword '(?P<keyword>\w+)' into field.")
+    if isinstance(exc, (FieldError, FieldDoesNotExist,)):
+        matched = keymatch.match(str(exc))
+        bad_kw = matched.group("keyword") if matched else "?"
+        status_code = 400
+        errors = [
+            {
+                "status": status_code,
+                "code": "field_error",
+                "title": "Field error",
+                "detail": str(exc),
+                "source": {
+                    "pointer": context["request"].path,
+                    "parameter": bad_kw
+                }
+            }
+        ]
+    else:
+        status_code = 500
+        errors = [
+            {
+                "status": 500,
+                "code": "server_error",
+                "title": "Internal Server Error",
+                "detail": str(exc),
+                "source": {
+                    "pointer": context["request"].path,
+                }
+            }
+        ]
+    return Response(errors, status=status_code)
 
 
 def exception_handler(exc, context):
@@ -25,7 +71,7 @@ def exception_handler(exc, context):
     # Render exception with DRF
     response = drf_exception_handler(exc, context)
     if not response:
-        return response
+        return unhandled_drf_exception_handler(exc, context)
 
     # Use regular DRF format if not rendered by DRF JSON API and not uniform
     is_json_api_view = rendered_with_json_api(context['view'])

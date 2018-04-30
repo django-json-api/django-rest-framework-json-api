@@ -5,6 +5,7 @@ from rest_framework import exceptions
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
+from rest_framework_json_api.mixins import FilterMixin, MultipleIDMixin, SortMixin
 from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
@@ -22,12 +23,16 @@ from example.serializers import (
 HTTP_422_UNPROCESSABLE_ENTITY = 422
 
 
-class BlogViewSet(ModelViewSet):
+class BaseModelViewSet(SortMixin, FilterMixin, MultipleIDMixin, ModelViewSet):
+    pass
+
+
+class BlogViewSet(BaseModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
 
 
-class JsonApiViewSet(ModelViewSet):
+class JsonApiViewSet(BaseModelViewSet):
     """
     This is an example on how to configure DRF-jsonapi from
     within a class. It allows using DRF-jsonapi alongside
@@ -61,7 +66,7 @@ class BlogCustomViewSet(JsonApiViewSet):
     serializer_class = BlogSerializer
 
 
-class EntryViewSet(ModelViewSet):
+class EntryViewSet(BaseModelViewSet):
     queryset = Entry.objects.all()
     resource_name = 'posts'
 
@@ -77,12 +82,12 @@ class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
 
 
-class AuthorViewSet(ModelViewSet):
+class AuthorViewSet(BaseModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
 
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(BaseModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     prefetch_for_includes = {
@@ -91,12 +96,12 @@ class CommentViewSet(ModelViewSet):
     }
 
 
-class CompanyViewset(ModelViewSet):
+class CompanyViewset(BaseModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
 
 
-class ProjectViewset(ModelViewSet):
+class ProjectViewset(BaseModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
