@@ -1,12 +1,12 @@
 """
 Parsers
 """
-from django.conf import settings
 from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
 from . import exceptions, renderers, serializers, utils
+from .settings import json_api_settings
 
 
 class JSONParser(parsers.JSONParser):
@@ -32,7 +32,7 @@ class JSONParser(parsers.JSONParser):
     @staticmethod
     def parse_attributes(data):
         attributes = data.get('attributes')
-        uses_format_translation = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+        uses_format_translation = json_api_settings.FORMAT_KEYS
 
         if not attributes:
             return dict()
@@ -44,7 +44,7 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_relationships(data):
-        uses_format_translation = getattr(settings, 'JSON_API_FORMAT_KEYS', False)
+        uses_format_translation = json_api_settings.FORMAT_KEYS
         relationships = data.get('relationships')
 
         if not relationships:

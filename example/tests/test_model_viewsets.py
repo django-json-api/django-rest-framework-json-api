@@ -1,12 +1,13 @@
 import pytest
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import encoding
 
 from example.tests import TestBase
 
 
+@override_settings(JSON_API_FORMAT_KEYS='dasherize')
 class ModelViewSetTests(TestBase):
     """
     Test usage with ModelViewSets, also tests pluralization, camelization,
@@ -20,12 +21,6 @@ class ModelViewSetTests(TestBase):
     def setUp(self):
         super(ModelViewSetTests, self).setUp()
         self.detail_url = reverse('user-detail', kwargs={'pk': self.miles.pk})
-
-        setattr(settings, 'JSON_API_FORMAT_KEYS', 'dasherize')
-
-    def tearDown(self):
-
-        setattr(settings, 'JSON_API_FORMAT_KEYS', 'camelize')
 
     def test_key_in_list_result(self):
         """

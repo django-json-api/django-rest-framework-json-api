@@ -1,8 +1,9 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions, status
 
 from rest_framework_json_api import utils
+
+from .settings import json_api_settings
 
 
 def rendered_with_json_api(view):
@@ -29,7 +30,7 @@ def exception_handler(exc, context):
 
     # Use regular DRF format if not rendered by DRF JSON API and not uniform
     is_json_api_view = rendered_with_json_api(context['view'])
-    is_uniform = getattr(settings, 'JSON_API_UNIFORM_EXCEPTIONS', False)
+    is_uniform = json_api_settings.UNIFORM_EXCEPTIONS
     if not is_json_api_view and not is_uniform:
         return response
 
