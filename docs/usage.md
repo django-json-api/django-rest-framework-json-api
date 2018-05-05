@@ -34,14 +34,65 @@ REST_FRAMEWORK = {
 }
 ```
 
-If `PAGE_SIZE` is set the renderer will return a `meta` object with
-record count and a `links` object with the next, previous, first, and last links.
-Pages can be selected with the `page` GET parameter. The query parameter used to
-retrieve the page can be customized by subclassing `PageNumberPagination` and
-overriding the `page_query_param`.  Page size can be controlled per request via
-the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
+### Pagination settings
 
-#### Performance Testing
+If `REST_FRAMEWORK['PAGE_SIZE']` is set the renderer will return a `meta` object with
+record count and a `links` object with the next, previous, first, and last links.
+
+#### Subclassing paginators
+
+The JSON API pagination classes can be subclassed to override settings as
+described in the [DRF pagination documentation](http://www.django-rest-framework.org/api-guide/pagination/).
+
+The default values are shown in these examples:
+
+```python
+from rest_framework_json_api.pagination import PageNumberPagination, LimitOffsetPagination
+
+class MyPagePagination(PageNumberPagination):
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class MyLimitPagination(LimitOffsetPagination):
+    offset_query_param = 'page[offset]'
+    limit_query_param = 'page[limit]'
+    max_limit = None
+```
+
+As shown above, pages can be selected with the `page` or `page[limit]` GET query parameter when using
+the PageNumberPagination or LimitOffsetPagination class, respectively. 
+
+If you want to use the PageNumberPagination query parameter names shown
+as an example in the JSON API [specification](http://jsonapi.org/format/#fetching-pagination),
+set them as follows:
+```python
+class MyPagePagination(PageNumberPagination):
+    page_query_param = 'page[number]'
+    page_size_query_param = 'page[size]'
+```
+
+#### Setting global defaults for pagination
+
+Set global defaults for the `PageNumberPagination` class with these settings:
+- `JSON_API_PAGE_NUMBER_PARAM` sets the name of the page number query parameter (default: "page").
+- `JSON_API_PAGE_SIZE_PARAM` sets the name of the page size query parameter (default: "page_size").
+- `JSON_API_MAX_PAGE_SIZE` sets an upper limit for the page size query parameter (default: 100).
+
+Set global defaults for the `LimitOffsetPagination` class with these settings:
+- `JSON_API_PAGE_OFFSET_PARAM` sets the name of the page offset query parameter (default: "page\[offset\]").
+- `JSON_API_PAGE_LIMIT_PARAM` sets the name of the page limit query parameter (default: "page\[limit\]").
+- `JSON_API_MAX_PAGE_LIMIT` sets an upper limit for the page limit query parameter (default: None).
+
+If you want to set the default PageNumberPagination query parameter names shown
+as an example in the JSON API [specification](http://jsonapi.org/format/#fetching-pagination),
+set them as follows:
+```python
+JSON_API_PAGE_NUMBER_PARAM = 'page[number]'
+JSON_API_PAGE_SIZE_PARAM = 'page[size]'
+```
+
+### Performance Testing
 
 If you are trying to see if your viewsets are configured properly to optimize performance,
 it is preferable to use `example.utils.BrowsableAPIRendererWithoutForms` instead of the default `BrowsableAPIRenderer`
@@ -606,6 +657,7 @@ with 1e18 rows which will likely exhaust any available memory and
 slow your database to crawl.
 
 The prefetch_related case will issue 4 queries, but they will be small and fast queries.
+
 <!--
 ### Relationships
 ### Errors
