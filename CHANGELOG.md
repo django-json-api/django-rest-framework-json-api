@@ -1,3 +1,6 @@
+[unreleased]
+* Add configurable pagination query parameters that comply with jsonapi 1.0 recommended names.
+
 v2.4.0 - Released January 25, 2018
 
 * Add support for Django REST Framework 3.7.x.
