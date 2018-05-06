@@ -150,7 +150,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         if not isinstance(data, dict):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
-        expected_relation_type = get_resource_type_from_queryset(self.queryset)
+        expected_relation_type = get_resource_type_from_queryset(self.get_queryset())
         serializer_resource_type = self.get_resource_type_from_included_serializer()
 
         if serializer_resource_type is not None:
