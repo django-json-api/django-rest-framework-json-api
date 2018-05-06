@@ -13,6 +13,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import datetime
 import sys
 import os
 import shlex
@@ -52,8 +53,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Django REST Framework JSON API'
-copyright = '2015, Jerel Unruh and contributors'
-author = 'Jerel Unruh'
+year = datetime.date.today().year
+copyright = '{}, Django REST Framework JSON API contributors'.format(year)
+author = 'Django REST Framework JSON API contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -235,7 +237,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'DjangoRESTFrameworkJSONAPI.tex', 'Django REST Framework JSON API Documentation',
-   'Jerel Unruh', 'manual'),
+   'Django REST Framework JSON API contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

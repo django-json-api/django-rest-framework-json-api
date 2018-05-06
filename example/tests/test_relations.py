@@ -129,8 +129,13 @@ class TestResourceRelatedField(TestBase):
         }
 
 
+class BlogResourceRelatedField(ResourceRelatedField):
+    def get_queryset(self):
+        return Blog.objects
+
+
 class BlogFKSerializer(serializers.Serializer):
-    blog = ResourceRelatedField(queryset=Blog.objects)
+    blog = BlogResourceRelatedField()
 
 
 class EntryFKSerializer(serializers.Serializer):
