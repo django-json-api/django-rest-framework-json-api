@@ -15,7 +15,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_json_api.pagination.PageNumberPagination',
+        'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -34,14 +34,67 @@ REST_FRAMEWORK = {
 }
 ```
 
-If `PAGE_SIZE` is set the renderer will return a `meta` object with
-record count and a `links` object with the next, previous, first, and last links.
-Pages can be selected with the `page` GET parameter. The query parameter used to
-retrieve the page can be customized by subclassing `PageNumberPagination` and
-overriding the `page_query_param`.  Page size can be controlled per request via
-the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
+### Pagination
 
-#### Performance Testing
+DJA pagination is based on [DRF pagination](http://www.django-rest-framework.org/api-guide/pagination/).
+
+When pagination is enabled, the renderer will return a `meta` object with
+record count and a `links` object with the next, previous, first, and last links.
+
+#### Configuring the Pagination Style
+
+Pagination style can be set on a particular viewset with the `pagination_class` attribute or by default for all viewsets
+by setting `REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS']` and by setting `REST_FRAMEWORK['PAGE_SIZE']`.
+
+You can configure fixed values for the page size or limit -- or allow the client to choose the size or limit
+via query parameters.
+
+Two pagination styles are available:
+- **PageNumber** breaks a response up into pages that start at a given page number with a given size 
+  (number of items per page). Two classes are available: `JsonApiPageNumberPagination` 
+  and `PageNumberPagination` (deprecated). They can be configured with the following attributes:
+  - `page_query_param` (default `page[number]` for `JsonApiPageNumberPagination`; `page` for `PageNumberPagination`.)
+  - `page_size_query_param` (default `page[size]` for `JsonApiPageNumberPagination`; `page_size` 
+     for `PageNumberPagination`.) Set this to `None` if you don't want to allow the client to specify the size.
+  - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
+     Set it to `None` if you don't want to enforce an upper bound.
+- **LimitOffset** breaks a response up into pages that start from an item's offset in the viewset for a given number of
+  items (the limit). Two classes are available: `JsonApiLimitOffsetPagination` and `LimitOffsetPagination` (deprecated).
+  They can be configured with the following attributes:
+  - `offset_query_param` (default `page[offset]`).
+  - `limit_query_param` (default `page[limit]`).
+  - `max_limit` (default `100` for JsonApiLimitOffsetPagination; `None` for `LimitOffsetPagination`) enforces an upper
+     bound on the limit. Set it to `None` if you don't want to enforce an upper bound.
+
+
+These examples show how to configure the parameters to use non-standard names and different limits:
+
+```python
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination, JsonApiLimitOffsetPagination
+
+class MyPagePagination(JsonApiPageNumberPagination):
+    page_query_param = 'page_number'
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+class MyLimitPagination(JsonApiLimitOffsetPagination):
+    offset_query_param = 'offset'
+    limit_query_param = 'limit'
+    max_limit = None
+```
+
+#### Deprecated Pagination Classes
+
+The `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination` classes implement the *recommended*
+query parameter names found in the [JSON:API specification](http://jsonapi.org/format/#fetching-pagination).
+
+`PageNumberPagination` and `LimitOffsetPagination` are deprecated and may be removed in a future release as they
+use different defaults for query parameters: `page` and `page_size` query parameters are the defaults for 
+`PageNumberPagination`. Also, `JsonApiLimitOffsetPagination` sets a default `max_limit = 100` whereas the 
+`LimitOffsetPagination` class sets no max limit. To avoid a breaking change, these classes and default values
+have been retained for the time being.
+
+### Performance Testing
 
 If you are trying to see if your viewsets are configured properly to optimize performance,
 it is preferable to use `example.utils.BrowsableAPIRendererWithoutForms` instead of the default `BrowsableAPIRenderer`

@@ -96,3 +96,19 @@ class LimitOffsetPagination(LimitOffsetPagination):
                 ('prev', self.get_previous_link())
             ])
         })
+
+
+class JsonApiPageNumberPagination(PageNumberPagination):
+    """
+    A version of PageNumberPagination that uses the [jsonapi](http://jsonapi.org/format/#fetching-pagination)
+    recommended pagination parameter names and keeps max_page_size = 100.
+    """
+    page_query_param = 'page[number]'
+    page_size_query_param = 'page[size]'
+
+
+class JsonApiLimitOffsetPagination(LimitOffsetPagination):
+    """
+    A version of LimitOffsetPagination with the exception that it sets max_limit = 100 rather than None.
+    """
+    max_limit = 100

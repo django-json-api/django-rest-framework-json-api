@@ -1,5 +1,5 @@
 v2.5.0 - [unreleased]
-* Add configurable pagination query parameters that comply with jsonapi 1.0 recommended names.
+* Add new pagination classes based on JSON:API recommendations.
 
 v2.4.0 - Released January 25, 2018
 
