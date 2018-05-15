@@ -25,6 +25,9 @@ from rest_framework_json_api.utils import (
 )
 
 
+
+
+
 class PrefetchForIncludesHelperMixin(object):
     def get_queryset(self):
         """This viewset provides a helper attribute to prefetch related models
