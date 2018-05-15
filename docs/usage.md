@@ -49,22 +49,21 @@ by setting `REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS']` and by setting `REST_FRA
 You can configure fixed values for the page size or limit -- or allow the client to choose the size or limit
 via query parameters.
 
-Two pagination styles are available:
-- **PageNumber** breaks a response up into pages that start at a given page number with a given size 
-  (number of items per page). Two classes are available: `JsonApiPageNumberPagination` 
-  and `PageNumberPagination` (deprecated). They can be configured with the following attributes:
-  - `page_query_param` (default `page[number]` for `JsonApiPageNumberPagination`; `page` for `PageNumberPagination`.)
-  - `page_size_query_param` (default `page[size]` for `JsonApiPageNumberPagination`; `page_size` 
-     for `PageNumberPagination`.) Set this to `None` if you don't want to allow the client to specify the size.
+Two pagination classes are available:
+- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
+  (number of items per page). It can be configured with the following attributes:
+  - `page_query_param` (default `page[number]`)
+  - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client 
+     to specify the size.
   - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
      Set it to `None` if you don't want to enforce an upper bound.
-- **LimitOffset** breaks a response up into pages that start from an item's offset in the viewset for a given number of
-  items (the limit). Two classes are available: `JsonApiLimitOffsetPagination` and `LimitOffsetPagination` (deprecated).
-  They can be configured with the following attributes:
+- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
+  a given number of items (the limit).
+  It can be configured with the following attributes:
   - `offset_query_param` (default `page[offset]`).
   - `limit_query_param` (default `page[limit]`).
-  - `max_limit` (default `100` for JsonApiLimitOffsetPagination; `None` for `LimitOffsetPagination`) enforces an upper
-     bound on the limit. Set it to `None` if you don't want to enforce an upper bound.
+  - `max_limit` (default `100`) enforces an upper bound on the limit.
+     Set it to `None` if you don't want to enforce an upper bound.
 
 
 These examples show how to configure the parameters to use non-standard names and different limits:
@@ -82,17 +81,6 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
     limit_query_param = 'limit'
     max_limit = None
 ```
-
-#### Deprecated Pagination Classes
-
-The `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination` classes implement the *recommended*
-query parameter names found in the [JSON:API specification](http://jsonapi.org/format/#fetching-pagination).
-
-`PageNumberPagination` and `LimitOffsetPagination` are deprecated and may be removed in a future release as they
-use different defaults for query parameters: `page` and `page_size` query parameters are the defaults for 
-`PageNumberPagination`. Also, `JsonApiLimitOffsetPagination` sets a default `max_limit = 100` whereas the 
-`LimitOffsetPagination` class sets no max limit. To avoid a breaking change, these classes and default values
-have been retained for the time being.
 
 ### Performance Testing
 
