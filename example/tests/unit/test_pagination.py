@@ -1,21 +1,22 @@
 from collections import OrderedDict
 
+import pytest
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from rest_framework.utils.urls import replace_query_param
 
-from rest_framework_json_api.pagination import LimitOffsetPagination
+from rest_framework_json_api import pagination
 
 factory = APIRequestFactory()
 
 
 class TestLimitOffset:
     """
-    Unit tests for `pagination.LimitOffsetPagination`.
+    Unit tests for `pagination.JsonApiLimitOffsetPagination`.
     """
 
     def setup(self):
-        class ExamplePagination(LimitOffsetPagination):
+        class ExamplePagination(pagination.JsonApiLimitOffsetPagination):
             default_limit = 10
             max_limit = 15
 
@@ -76,3 +77,30 @@ class TestLimitOffset:
 
         assert queryset == list(range(offset + 1, next_offset + 1))
         assert content == expected_content
+
+    def test_LimitOffset_deprecation(self):
+        with pytest.warns(DeprecationWarning) as record:
+            pagination.LimitOffsetPagination()
+        assert len(record) == 1
+        assert 'LimitOffsetPagination' in str(record[0].message)
+
+
+class TestPageNumber:
+    """
+    Unit tests for `pagination.JsonApiPageNumberPagination`.
+    TODO: add unit tests for changing query parameter names, limits, etc.
+    """
+    def setup(self):
+        class ExamplePagination(pagination.JsonApiPageNumberPagination):
+            default_limit = 10
+            max_limit = 15
+
+        self.pagination = ExamplePagination()
+        self.queryset = range(1, 101)
+        self.base_url = 'http://testserver/'
+
+    def test_PageNumber_deprecation(self):
+        with pytest.warns(DeprecationWarning) as record:
+            pagination.PageNumberPagination()
+        assert len(record) == 1
+        assert 'PageNumberPagination' in str(record[0].message)
