@@ -1,3 +1,8 @@
+v2.5.0 - [unreleased]
+* Add new pagination classes based on JSON:API query parameter *recommendations*:
+  * JsonApiPageNumberPagination and JsonApiLimitOffsetPagination. See [usage docs](docs/usage.md#pagination).
+  * Deprecates PageNumberPagination and LimitOffsetPagination.
+
 v2.4.0 - Released January 25, 2018
 
 * Add support for Django REST Framework 3.7.x.
