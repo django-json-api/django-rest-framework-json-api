@@ -1,3 +1,4 @@
+import sys
 from collections import OrderedDict
 
 import pytest
@@ -78,7 +79,7 @@ class TestLimitOffset:
         assert queryset == list(range(offset + 1, next_offset + 1))
         assert content == expected_content
 
-    def test_LimitOffset_deprecation(self):
+    def test_limit_offset_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
             pagination.LimitOffsetPagination()
         assert len(record) == 1
@@ -86,13 +87,15 @@ class TestLimitOffset:
 
 
 # TODO: This test fails under py27 but it's not clear why so just leave it out for now.
-# class TestPageNumber:
-#     """
-#     Unit tests for `pagination.JsonApiPageNumberPagination`.
-#     TODO: add unit tests for changing query parameter names, limits, etc.
-#     """
-#     def test_PageNumber_deprecation(self):
-#         with pytest.warns(DeprecationWarning) as record:
-#             pagination.PageNumberPagination()
-#         assert len(record) == 1
-#         assert 'PageNumberPagination' in str(record[0].message)
+@pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2,7),
+                   reason="python2.7 fails for unknown reason")
+class TestPageNumber:
+    """
+    Unit tests for `pagination.JsonApiPageNumberPagination`.
+    TODO: add unit tests for changing query parameter names, limits, etc.
+    """
+    def test_page_number_deprecation(self):
+        with pytest.warns(DeprecationWarning) as record:
+            pagination.PageNumberPagination()
+        assert len(record) == 1
+        assert 'PageNumberPagination' in str(record[0].message)
