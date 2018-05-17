@@ -82,6 +82,14 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
     max_limit = None
 ```
 
+### Exception handling
+
+For the `exception_handler` class, if the optional `JSON_API_UNIFORM_EXCEPTIONS` is set to True,
+all exceptions will respond with the JSON API [error format](http://jsonapi.org/format/#error-objects).
+
+When `JSON_API_UNIFORM_EXCEPTIONS` is False (the default), non-JSON API views will respond
+with the normal DRF error format.
+
 ### Performance Testing
 
 If you are trying to see if your viewsets are configured properly to optimize performance,
