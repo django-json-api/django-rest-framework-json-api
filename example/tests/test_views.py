@@ -1,5 +1,7 @@
 import json
+import sys
 
+import pytest
 from django.test import RequestFactory
 from django.utils import timezone
 from rest_framework.reverse import reverse
@@ -297,6 +299,11 @@ class BadBlogViewSet(ModelViewSet):
         return self.queryset.filter(foo=1)
 
 
+@pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                   reason="python2.7 mock raises "
+                   "'unbound method get_queryset() must be called with BadBlogViewSet "
+                   "instance as first argument (got nothing instead)' "
+                   "rather than working properly as does python3.x mock")
 class TestViewExceptions(TestBase):
     def setUp(self):
         self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
@@ -307,5 +314,7 @@ class TestViewExceptions(TestBase):
     def test_field_error_exception(self):
         url = '/blogs'
         response = self.client.get(url)
-        self.assertEqual(response.data[0]['code'], "field_error")
-        self.assertEqual(response.data[0]['source']['parameter'], "foo")
+        self.assertEqual(response.data[0]['code'], "field_error",
+                         msg=response.data[0]['detail'])
+        self.assertEqual(response.data[0]['source']['parameter'], "foo",
+                         msg=response.data[0]['detail'])
