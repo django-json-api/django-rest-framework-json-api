@@ -1,15 +1,24 @@
 import json
+import sys
 
+import pytest
 from django.test import RequestFactory
 from django.utils import timezone
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase, force_authenticate
 
 from rest_framework_json_api.utils import format_resource_type
+from rest_framework_json_api.views import ModelViewSet
 
 from . import TestBase
 from .. import views
 from example.models import Author, Blog, Comment, Entry
+from example.serializers import BlogSerializer
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestRelationshipView(APITestCase):
@@ -280,3 +289,32 @@ class TestModelViewSet(TestBase):
         response = self.client.delete(url)
         assert response.status_code == 204, response.rendered_content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
+
+
+class BadBlogViewSet(ModelViewSet):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        return self.queryset.filter(foo=1)
+
+
+@pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                   reason="python2.7 mock raises "
+                   "'unbound method get_queryset() must be called with BadBlogViewSet "
+                   "instance as first argument (got nothing instead)' "
+                   "rather than working properly as does python3.x mock")
+class TestViewExceptions(TestBase):
+    def setUp(self):
+        self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+
+    @mock.patch(
+        'example.views.BlogViewSet.get_queryset',
+        new=BadBlogViewSet.get_queryset)
+    def test_field_error_exception(self):
+        url = '/blogs'
+        response = self.client.get(url)
+        self.assertEqual(response.data[0]['code'], "field_error",
+                         msg=response.data[0]['detail'])
+        self.assertEqual(response.data[0]['source']['parameter'], "foo",
+                         msg=response.data[0]['detail'])

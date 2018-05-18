@@ -31,11 +31,15 @@ pip-delete-this-directory.txt
 
 # PyTest cache
 .cache/
+.pytest_cache/
+
 
 # Tox
 .tox/
 .cache/
 .python-version
+.coverage
+htmlcov/
 
 # VirtualEnv
 .venv/
