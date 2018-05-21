@@ -102,6 +102,12 @@ class ModelViewSet(AutoPrefetchMixin, PrefetchForIncludesHelperMixin, viewsets.M
     pass
 
 
+class ReadOnlyModelViewSet(AutoPrefetchMixin,
+                           PrefetchForIncludesHelperMixin,
+                           viewsets.ReadOnlyModelViewSet):
+    pass
+
+
 class RelationshipView(generics.GenericAPIView):
     serializer_class = ResourceIdentifierObjectSerializer
     self_link_view_name = None
