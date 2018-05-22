@@ -612,19 +612,29 @@ class QuestSerializer(serializers.ModelSerializer):
 
 #### Performance improvements
 
-Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m*(n+1) queries.
+Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m\*(n+1) queries.
 
 A viewset helper was designed to allow for greater flexibility and it is automatically available when subclassing
-`views.ModelViewSet`
-```
- # When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
- class MyViewSet(viewsets.ModelViewSet):
+`rest_framework_json_api.views.ModelViewSet`:
+```python
+from rest_framework_json_api import views
+
+# When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
+class MyViewSet(views.ModelViewSet):
     queryset = Book.objects.all()
     prefetch_for_includes = {
-    '__all__': [],
-    'author': ['author', 'author__bio']
-    'category.section': ['category']
-}
+        '__all__': [],
+        'author': ['author', 'author__bio'],
+        'category.section': ['category']
+    }
+```
+
+An additional convenience DJA class exists for read-only views, just as it does in DRF.
+```python
+from rest_framework_json_api import views
+
+class MyReadOnlyViewSet(views.ReadOnlyModelViewSet):
+    # ...
 ```
 
 The special keyword `__all__` can be used to specify a prefetch which should be done regardless of the include, similar to making the prefetch yourself on the QuerySet.
