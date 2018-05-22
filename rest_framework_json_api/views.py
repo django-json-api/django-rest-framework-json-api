@@ -38,7 +38,7 @@ class PrefetchForIncludesHelperMixin(object):
             queryset = Book.objects.all()
             prefetch_for_includes = {
                 '__all__': [],
-                'author': ['author', 'author__authorbio']
+                'author': ['author', 'author__authorbio'],
                 'category.section': ['category']
             }
         """
@@ -99,6 +99,12 @@ class AutoPrefetchMixin(object):
 
 
 class ModelViewSet(AutoPrefetchMixin, PrefetchForIncludesHelperMixin, viewsets.ModelViewSet):
+    pass
+
+
+class ReadOnlyModelViewSet(AutoPrefetchMixin,
+                           PrefetchForIncludesHelperMixin,
+                           viewsets.ReadOnlyModelViewSet):
     pass
 
 

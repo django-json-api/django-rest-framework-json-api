@@ -33,14 +33,31 @@ class DummyTestViewSet(views.ModelViewSet):
     serializer_class = DummyTestSerializer
 
 
+class ReadOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
+    queryset = Entry.objects.all()
+    serializer_class = DummyTestSerializer
+
+
+def render_dummy_test_serialized_view(view_class):
+    serializer = DummyTestSerializer(instance=Entry())
+    renderer = JSONRenderer()
+    return renderer.render(
+        serializer.data,
+        renderer_context={'view': view_class()})
+
+
 def test_simple_reverse_relation_included_renderer():
     '''
     Test renderer when a single reverse fk relation is passed.
     '''
-    serializer = DummyTestSerializer(instance=Entry())
-    renderer = JSONRenderer()
-    rendered = renderer.render(
-        serializer.data,
-        renderer_context={'view': DummyTestViewSet()})
+    rendered = render_dummy_test_serialized_view(
+        DummyTestViewSet)
+
+    assert rendered
+
+
+def test_simple_reverse_relation_included_read_only_viewset():
+    rendered = render_dummy_test_serialized_view(
+        ReadOnlyDummyTestViewSet)
 
     assert rendered
