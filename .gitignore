@@ -30,7 +30,10 @@ pip-delete-this-directory.txt
 .idea/
 
 # PyTest cache
-.cache/
+.pytest_cache/
+
+# Coverage
+.coverage
 
 # Tox
 .tox/
