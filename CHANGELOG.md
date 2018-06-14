@@ -3,6 +3,7 @@ v2.5.0 - [unreleased]
   * JsonApiPageNumberPagination and JsonApiLimitOffsetPagination. See [usage docs](docs/usage.md#pagination).
   * Deprecates PageNumberPagination and LimitOffsetPagination.
 * Add ReadOnlyModelViewSet extension with prefetch mixins.
+* Add support for Django REST Framework 3.8.x
 
 v2.4.0 - Released January 25, 2018
 
