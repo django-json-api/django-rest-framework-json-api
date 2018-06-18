@@ -32,26 +32,26 @@ class JSONParser(parsers.JSONParser):
     @staticmethod
     def parse_attributes(data):
         attributes = data.get('attributes')
-        uses_format_translation = json_api_settings.FORMAT_KEYS
+        uses_format_translation = json_api_settings.format_type
 
         if not attributes:
             return dict()
         elif uses_format_translation:
             # convert back to python/rest_framework's preferred underscore format
-            return utils.format_keys(attributes, 'underscore')
+            return utils._format_object(attributes, 'underscore')
         else:
             return attributes
 
     @staticmethod
     def parse_relationships(data):
-        uses_format_translation = json_api_settings.FORMAT_KEYS
+        uses_format_translation = json_api_settings.format_type
         relationships = data.get('relationships')
 
         if not relationships:
             relationships = dict()
         elif uses_format_translation:
             # convert back to python/rest_framework's preferred underscore format
-            relationships = utils.format_keys(relationships, 'underscore')
+            relationships = utils._format_object(relationships, 'underscore')
 
         # Parse the relationships
         parsed_relationships = dict()

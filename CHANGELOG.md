@@ -1,9 +1,12 @@
 v2.5.0 - [unreleased]
 * Add new pagination classes based on JSON:API query parameter *recommendations*:
-  * JsonApiPageNumberPagination and JsonApiLimitOffsetPagination. See [usage docs](docs/usage.md#pagination).
-  * Deprecates PageNumberPagination and LimitOffsetPagination.
-* Add ReadOnlyModelViewSet extension with prefetch mixins.
+  * `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`. See [usage docs](docs/usage.md#pagination).
+  * Deprecates `PageNumberPagination` and `LimitOffsetPagination`.
+* Add `ReadOnlyModelViewSet` extension with prefetch mixins.
 * Add support for Django REST Framework 3.8.x
+* Introduce `JSON_API_FORMAT_FIELD_NAMES` option replacing `JSON_API_FORMAT_KEYS` but in comparision preserving
+  values from being formatted as attributes can contain any [json value](http://jsonapi.org/format/#document-resource-object-attributes).
+   * `JSON_API_FORMAT_KEYS` still works as before (formating all json value keys also nested) but is marked as deprecated.
 
 v2.4.0 - Released January 25, 2018
 

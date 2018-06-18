@@ -7,7 +7,7 @@ from django.utils import encoding
 from example.tests import TestBase
 
 
-@override_settings(JSON_API_FORMAT_KEYS='dasherize')
+@override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize')
 class ModelViewSetTests(TestBase):
     """
     Test usage with ModelViewSets, also tests pluralization, camelization,

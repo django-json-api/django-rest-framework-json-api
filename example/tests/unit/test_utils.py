@@ -69,7 +69,8 @@ def test_format_keys():
     }
 
     output = {'firstName': 'a', 'lastName': 'b'}
-    assert utils.format_keys(underscored, 'camelize') == output
+    result = pytest.deprecated_call(utils.format_keys, underscored, 'camelize')
+    assert result == output
 
     output = {'FirstName': 'a', 'LastName': 'b'}
     assert utils.format_keys(underscored, 'capitalize') == output
@@ -82,6 +83,19 @@ def test_format_keys():
 
     output = [{'first-name': 'a', 'last-name': 'b'}]
     assert utils.format_keys([underscored], 'dasherize') == output
+
+
+@pytest.mark.parametrize("format_type,output", [
+    ('camelize', {'fullName': {'last-name': 'a', 'first-name': 'b'}}),
+    ('capitalize', {'FullName': {'last-name': 'a', 'first-name': 'b'}}),
+    ('dasherize', {'full-name': {'last-name': 'a', 'first-name': 'b'}}),
+    ('underscore', {'full_name': {'last-name': 'a', 'first-name': 'b'}}),
+])
+def test_format_field_names(settings, format_type, output):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    value = {'full_name': {'last-name': 'a', 'first-name': 'b'}}
+    assert utils.format_field_names(value, format_type) == output
 
 
 def test_format_value():
