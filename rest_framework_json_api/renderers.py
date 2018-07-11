@@ -134,10 +134,12 @@ class JSONRenderer(renderers.JSONRenderer):
                     if not resolved:
                         continue
 
+                relation_data = {}
                 # special case for ResourceRelatedField
-                relation_data = {
-                    'data': resource.get(field_name)
-                }
+                if field_name in resource:
+                    relation_data.update({
+                        'data': resource.get(field_name)
+                    })
 
                 field_links = field.get_links(
                     resource_instance, field.related_link_lookup_field)
@@ -188,9 +190,15 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 if isinstance(field.child_relation, ResourceRelatedField):
                     # special case for ResourceRelatedField
-                    relation_data = {
-                        'data': resource.get(field_name)
-                    }
+                    relation_data = {}
+
+                    if field_name in resource:
+                        relation_data.update({
+                            'data': resource.get(field_name),
+                            'meta': {
+                                'count': len(resource.get(field_name))
+                            }
+                        })
 
                     field_links = field.child_relation.get_links(
                         resource_instance,
@@ -200,13 +208,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         {'links': field_links}
                         if field_links else dict()
                     )
-                    relation_data.update(
-                        {
-                            'meta': {
-                                'count': len(resource.get(field_name))
-                            }
-                        }
-                    )
+
                     data.update({field_name: relation_data})
                     continue
 
