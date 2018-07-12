@@ -140,7 +140,7 @@ override ``settings.REST_FRAMEWORK``
         'PAGE_SIZE': 10,
         'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
         'DEFAULT_PAGINATION_CLASS':
-            'rest_framework_json_api.pagination.PageNumberPagination',
+            'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
         'DEFAULT_PARSER_CLASSES': (
             'rest_framework_json_api.parsers.JSONParser',
             'rest_framework.parsers.FormParser',
@@ -151,10 +151,14 @@ override ``settings.REST_FRAMEWORK``
             'rest_framework.renderers.BrowsableAPIRenderer',
         ),
         'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+        'DEFAULT_FILTER_BACKENDS': (
+            'rest_framework.filters.OrderingFilter',
+        ),
+        'ORDERING_PARAM': 'sort',
+        'TEST_REQUEST_RENDERER_CLASSES': (
+            'rest_framework_json_api.renderers.JSONRenderer',
+        ),
+        'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
     }
-
-If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
-record count and a ``links`` object with the next and previous links. Pages
-can be specified with the ``page`` GET parameter.
 
 This package provides much more including automatic inflection of JSON keys, extra top level data (using nested serializers), relationships, links, and handy shortcuts like MultipleIDMixin. Read more at http://django-rest-framework-json-api.readthedocs.org/
