@@ -7,8 +7,8 @@ import six
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.fields import MISSING_ERROR_MESSAGE
-from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField
+from rest_framework.fields import MISSING_ERROR_MESSAGE, SkipField
+from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField, ManyRelatedField as DRFManyRelatedField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
 
@@ -27,6 +27,22 @@ LINKS_PARAMS = [
     'related_link_lookup_field',
     'related_link_url_kwarg'
 ]
+
+
+class ManyRelatedField(DRFManyRelatedField):
+    """
+    This workaround skips "data" rendering for relationships
+    in order to save some sql queries and improve performance
+    """
+
+    def __init__(self, child_relation=None, *args, **kwargs):
+        self.render_data = kwargs.pop('render_data', True)
+        super(ManyRelatedField, self).__init__(child_relation, *args, **kwargs)
+
+    def get_attribute(self, instance):
+        if self.render_data:
+            return super(ManyRelatedField, self).get_attribute(instance)
+        raise SkipField
 
 
 class ResourceRelatedField(PrimaryKeyRelatedField):
@@ -49,7 +65,7 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         'no_match': _('Invalid hyperlink - No URL match.'),
     }
 
-    def __init__(self, self_link_view_name=None, related_link_view_name=None, **kwargs):
+    def __init__(self, self_link_view_name=None, related_link_view_name=None, render_data=True, **kwargs):
         if self_link_view_name is not None:
             self.self_link_view_name = self_link_view_name
         if related_link_view_name is not None:
@@ -73,6 +89,29 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         self.reverse = reverse
 
         super(ResourceRelatedField, self).__init__(**kwargs)
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """
+        This method handles creating a parent `ManyRelatedField` instance
+        when the `many=True` keyword argument is passed.
+
+        Typically you won't need to override this method.
+
+        Note that we're over-cautious in passing most arguments to both parent
+        and child classes in order to try to cover the general case. If you're
+        overriding this method you'll probably want something much simpler, eg:
+
+        @classmethod
+        def many_init(cls, *args, **kwargs):
+            kwargs['child'] = cls()
+            return CustomManyRelatedField(*args, **kwargs)
+        """
+        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        for key in kwargs.keys():
+            if key in MANY_RELATION_KWARGS + ('render_data',):
+                list_kwargs[key] = kwargs[key]
+        return ManyRelatedField(**list_kwargs)
 
     def use_pk_only_optimization(self):
         # We need the real object to determine its type...
@@ -293,7 +332,8 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
             return cls.many_init(*args, **kwargs)
         return super(ResourceRelatedField, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, child_relation=None, *args, **kwargs):
+    def __init__(self, child_relation=None, render_data=True, *args, **kwargs):
+        self.render_data = render_data
         model = kwargs.pop('model', None)
         if child_relation is not None:
             self.child_relation = child_relation
@@ -306,11 +346,13 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         list_kwargs = {k: kwargs.pop(k) for k in LINKS_PARAMS if k in kwargs}
         list_kwargs['child_relation'] = cls(*args, **kwargs)
         for key in kwargs.keys():
-            if key in ('model',) + MANY_RELATION_KWARGS:
+            if key in ('model', 'render_data') + MANY_RELATION_KWARGS:
                 list_kwargs[key] = kwargs[key]
         return cls(**list_kwargs)
 
     def get_attribute(self, instance):
+        if not self.render_data:
+            raise SkipField
         # check for a source fn defined on the serializer instead of the model
         if self.source and hasattr(self.parent, self.source):
             serializer_method = getattr(self.parent, self.source)
