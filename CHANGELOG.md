@@ -1,3 +1,9 @@
+[unreleased]
+
+* Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](http://www.django-rest-framework.org/api-guide/testing/#configuration)
+* Add sorting configuration to `REST_FRAMEWORK` as defined in [json api spec](http://jsonapi.org/format/#fetching-sorting)
+
+
 v2.5.0 - Released July 11, 2018
 
 * Add new pagination classes based on JSON:API query parameter *recommendations*:
