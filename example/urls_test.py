@@ -37,10 +37,25 @@ urlpatterns = [
         GenericIdentity.as_view(), name='user-default'),
 
 
+    url(r'^entries/(?P<entry_pk>[^/.]+)/blog',
+        BlogViewSet.as_view({'get': 'retrieve'}),
+        name='entry-blog'
+        ),
+    url(r'^entries/(?P<entry_pk>[^/.]+)/comments',
+        CommentViewSet.as_view({'get': 'list'}),
+        name='entry-comments'
+        ),
     url(r'^entries/(?P<entry_pk>[^/.]+)/suggested/',
         EntryViewSet.as_view({'get': 'list'}),
         name='entry-suggested'
         ),
+    url(r'entries/(?P<entry_pk>[^/.]+)/authors',
+        AuthorViewSet.as_view({'get': 'list'}),
+        name='entry-authors'),
+    url(r'entries/(?P<entry_pk>[^/.]+)/featured',
+        EntryViewSet.as_view({'get': 'retrieve'}),
+        name='entry-featured'),
+
     url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         EntryRelationshipView.as_view(),
         name='entry-relationships'),
