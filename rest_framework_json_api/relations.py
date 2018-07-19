@@ -7,8 +7,10 @@ import six
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.fields import MISSING_ERROR_MESSAGE
-from rest_framework.relations import MANY_RELATION_KWARGS, PrimaryKeyRelatedField
+from rest_framework.fields import MISSING_ERROR_MESSAGE, SkipField
+from rest_framework.relations import MANY_RELATION_KWARGS
+from rest_framework.relations import ManyRelatedField as DRFManyRelatedField
+from rest_framework.relations import PrimaryKeyRelatedField, RelatedField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
 
@@ -29,25 +31,30 @@ LINKS_PARAMS = [
 ]
 
 
-class ResourceRelatedField(PrimaryKeyRelatedField):
-    _skip_polymorphic_optimization = True
+class SkipDataMixin(object):
+    """
+    This workaround skips "data" rendering for relationships
+    in order to save some sql queries and improve performance
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(SkipDataMixin, self).__init__(*args, **kwargs)
+
+    def get_attribute(self, instance):
+        raise SkipField
+
+    def to_representation(self, *args):
+        raise NotImplementedError
+
+
+class ManyRelatedFieldWithNoData(SkipDataMixin, DRFManyRelatedField):
+    pass
+
+
+class HyperlinkedMixin(object):
     self_link_view_name = None
     related_link_view_name = None
     related_link_lookup_field = 'pk'
-
-    default_error_messages = {
-        'required': _('This field is required.'),
-        'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
-        'incorrect_type': _(
-            'Incorrect type. Expected resource identifier object, received {data_type}.'
-        ),
-        'incorrect_relation_type': _(
-            'Incorrect relation type. Expected {relation_type}, received {received_type}.'
-        ),
-        'missing_type': _('Invalid resource identifier object: missing \'type\' attribute'),
-        'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
-        'no_match': _('Invalid hyperlink - No URL match.'),
-    }
 
     def __init__(self, self_link_view_name=None, related_link_view_name=None, **kwargs):
         if self_link_view_name is not None:
@@ -62,34 +69,12 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
             'related_link_url_kwarg', self.related_link_lookup_field
         )
 
-        # check for a model class that was passed in for the relation type
-        model = kwargs.pop('model', None)
-        if model:
-            self.model = model
-
         # We include this simply for dependency injection in tests.
         # We can't add it as a class attributes or it would expect an
         # implicit `self` argument to be passed.
         self.reverse = reverse
 
-        super(ResourceRelatedField, self).__init__(**kwargs)
-
-    def use_pk_only_optimization(self):
-        # We need the real object to determine its type...
-        return self.get_resource_type_from_included_serializer() is not None
-
-    def conflict(self, key, **kwargs):
-        """
-        A helper method that simply raises a validation error.
-        """
-        try:
-            msg = self.error_messages[key]
-        except KeyError:
-            class_name = self.__class__.__name__
-            msg = MISSING_ERROR_MESSAGE.format(class_name=class_name, key=key)
-            raise AssertionError(msg)
-        message_string = msg.format(**kwargs)
-        raise Conflict(message_string)
+        super(HyperlinkedMixin, self).__init__(**kwargs)
 
     def get_url(self, name, view_name, kwargs, request):
         """
@@ -139,6 +124,78 @@ class ResourceRelatedField(PrimaryKeyRelatedField):
         if related_link:
             return_data.update({'related': related_link})
         return return_data
+
+
+class HyperlinkedRelatedField(HyperlinkedMixin, SkipDataMixin, RelatedField):
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """
+        This method handles creating a parent `ManyRelatedField` instance
+        when the `many=True` keyword argument is passed.
+
+        Typically you won't need to override this method.
+
+        Note that we're over-cautious in passing most arguments to both parent
+        and child classes in order to try to cover the general case. If you're
+        overriding this method you'll probably want something much simpler, eg:
+
+        @classmethod
+        def many_init(cls, *args, **kwargs):
+            kwargs['child'] = cls()
+            return CustomManyRelatedField(*args, **kwargs)
+        """
+        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        for key in kwargs:
+            if key in MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return ManyRelatedFieldWithNoData(**list_kwargs)
+
+
+class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
+    _skip_polymorphic_optimization = True
+    self_link_view_name = None
+    related_link_view_name = None
+    related_link_lookup_field = 'pk'
+
+    default_error_messages = {
+        'required': _('This field is required.'),
+        'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
+        'incorrect_type': _(
+            'Incorrect type. Expected resource identifier object, received {data_type}.'
+        ),
+        'incorrect_relation_type': _(
+            'Incorrect relation type. Expected {relation_type}, received {received_type}.'
+        ),
+        'missing_type': _('Invalid resource identifier object: missing \'type\' attribute'),
+        'missing_id': _('Invalid resource identifier object: missing \'id\' attribute'),
+        'no_match': _('Invalid hyperlink - No URL match.'),
+    }
+
+    def __init__(self, **kwargs):
+        # check for a model class that was passed in for the relation type
+        model = kwargs.pop('model', None)
+        if model:
+            self.model = model
+
+        super(ResourceRelatedField, self).__init__(**kwargs)
+
+    def use_pk_only_optimization(self):
+        # We need the real object to determine its type...
+        return self.get_resource_type_from_included_serializer() is not None
+
+    def conflict(self, key, **kwargs):
+        """
+        A helper method that simply raises a validation error.
+        """
+        try:
+            msg = self.error_messages[key]
+        except KeyError:
+            class_name = self.__class__.__name__
+            msg = MISSING_ERROR_MESSAGE.format(class_name=class_name, key=key)
+            raise AssertionError(msg)
+        message_string = msg.format(**kwargs)
+        raise Conflict(message_string)
 
     def to_internal_value(self, data):
         if isinstance(data, six.text_type):
@@ -323,3 +380,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
+
+
+class SerializerMethodHyperlinkedRelatedField(SkipDataMixin, SerializerMethodResourceRelatedField):
+    pass

@@ -324,6 +324,8 @@ When set to pluralize:
 
 ### Related fields
 
+#### ResourceRelatedField
+
 Because of the additional structure needed to represent relationships in JSON
 API, this package provides the `ResourceRelatedField` for serializers, which
 works similarly to `PrimaryKeyRelatedField`. By default,
@@ -434,6 +436,12 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
         return queryset
 ```
+
+#### HyperlinkedRelatedField
+
+`HyperlinkedRelatedField` has same functionality as `ResourceRelatedField` but does
+not render `data`. Use this in case you only need links of relationships and want to lower payload
+and increase performance.
 
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build

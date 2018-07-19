@@ -26,6 +26,13 @@ class BlogViewSet(ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
 
+    def get_object(self):
+        entry_pk = self.kwargs.get('entry_pk', None)
+        if entry_pk is not None:
+            return Entry.objects.get(id=entry_pk).blog
+
+        return super(BlogViewSet, self).get_object()
+
 
 class JsonApiViewSet(ModelViewSet):
     """
@@ -68,6 +75,14 @@ class EntryViewSet(ModelViewSet):
     def get_serializer_class(self):
         return EntrySerializer
 
+    def get_object(self):
+        # Handle featured
+        entry_pk = self.kwargs.get('entry_pk', None)
+        if entry_pk is not None:
+            return Entry.objects.exclude(pk=entry_pk).first()
+
+        return super(EntryViewSet, self).get_object()
+
 
 class NoPagination(PageNumberPagination):
     page_size = None
@@ -89,6 +104,13 @@ class CommentViewSet(ModelViewSet):
         '__all__': [],
         'author': ['author__bio', 'author__entries'],
     }
+
+    def get_queryset(self, *args, **kwargs):
+        entry_pk = self.kwargs.get('entry_pk', None)
+        if entry_pk is not None:
+            return self.queryset.filter(entry_id=entry_pk)
+
+        return super(CommentViewSet, self).get_queryset()
 
 
 class CompanyViewset(ModelViewSet):

@@ -35,6 +35,12 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "blog": {
                         "data": {"type": "blogs", "id": "1"}
                     },
+                    "blogHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/1/blog",
+                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked"
+                        }
+                    },
                     "authors": {
                         "meta": {"count": 1},
                         "data": [{"type": "authors", "id": "1"}]
@@ -43,11 +49,30 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "1"}]
                     },
+                    "commentsHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/1/comments",
+                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked"
+                        }
+                    },
                     "suggested": {
                         "data": [{"type": "entries", "id": "2"}],
                         "links": {
                             "related": "http://testserver/entries/1/suggested/",
                             "self": "http://testserver/entries/1/relationships/suggested"
+                        }
+                    },
+                    "suggestedHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/1/suggested/",
+                            "self": "http://testserver/entries/1"
+                                    "/relationships/suggested_hyperlinked"
+                        }
+                    },
+                    "featuredHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/1/featured",
+                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked"
                         }
                     },
                     "tags": {
@@ -73,6 +98,12 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "blog": {
                         "data": {"type": "blogs", "id": "2"}
                     },
+                    "blogHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/2/blog",
+                            "self": "http://testserver/entries/2/relationships/blog_hyperlinked",
+                        }
+                    },
                     "authors": {
                         "meta": {"count": 1},
                         "data": [{"type": "authors", "id": "2"}]
@@ -81,11 +112,30 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                         "meta": {"count": 1},
                         "data": [{"type": "comments", "id": "2"}]
                     },
+                    "commentsHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/2/comments",
+                            "self": "http://testserver/entries/2/relationships/comments_hyperlinked"
+                        }
+                    },
                     "suggested": {
                         "data": [{"type": "entries", "id": "1"}],
                         "links": {
                             "related": "http://testserver/entries/2/suggested/",
                             "self": "http://testserver/entries/2/relationships/suggested"
+                        }
+                    },
+                    "suggestedHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/2/suggested/",
+                            "self": "http://testserver/entries/2"
+                                    "/relationships/suggested_hyperlinked"
+                        }
+                    },
+                    "featuredHyperlinked": {
+                        "links": {
+                            "related": "http://testserver/entries/2/featured",
+                            "self": "http://testserver/entries/2/relationships/featured_hyperlinked"
                         }
                     },
                     "tags": {

@@ -67,19 +67,58 @@ class EntrySerializer(serializers.ModelSerializer):
     }
 
     body_format = serializers.SerializerMethodField()
+    # single related from model
+    blog_hyperlinked = relations.HyperlinkedRelatedField(
+        related_link_view_name='entry-blog',
+        related_link_url_kwarg='entry_pk',
+        self_link_view_name='entry-relationships',
+        read_only=True,
+        source='blog'
+    )
     # many related from model
     comments = relations.ResourceRelatedField(
         many=True, read_only=True)
+    # many related hyperlinked from model
+    comments_hyperlinked = relations.HyperlinkedRelatedField(
+        related_link_view_name='entry-comments',
+        related_link_url_kwarg='entry_pk',
+        self_link_view_name='entry-relationships',
+        many=True,
+        read_only=True,
+        source='comments'
+    )
     # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
-        source='get_suggested', model=Entry, many=True, read_only=True,
         related_link_view_name='entry-suggested',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
+        source='get_suggested',
+        model=Entry,
+        many=True,
+        read_only=True
+    )
+    # many related hyperlinked from serializer
+    suggested_hyperlinked = relations.SerializerMethodHyperlinkedRelatedField(
+        related_link_view_name='entry-suggested',
+        related_link_url_kwarg='entry_pk',
+        self_link_view_name='entry-relationships',
+        source='get_suggested',
+        model=Entry,
+        many=True,
+        read_only=True
     )
     # single related from serializer
     featured = relations.SerializerMethodResourceRelatedField(
         source='get_featured', model=Entry, read_only=True)
+    # single related hyperlinked from serializer
+    featured_hyperlinked = relations.SerializerMethodHyperlinkedRelatedField(
+        related_link_view_name='entry-featured',
+        related_link_url_kwarg='entry_pk',
+        self_link_view_name='entry-relationships',
+        source='get_featured',
+        model=Entry,
+        read_only=True
+    )
     tags = TaggedItemSerializer(many=True, read_only=True)
 
     def get_suggested(self, obj):
@@ -93,8 +132,9 @@ class EntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Entry
-        fields = ('blog', 'headline', 'body_text', 'pub_date', 'mod_date',
-                  'authors', 'comments', 'featured', 'suggested', 'tags')
+        fields = ('blog', 'blog_hyperlinked', 'headline', 'body_text', 'pub_date', 'mod_date',
+                  'authors', 'comments', 'comments_hyperlinked', 'featured', 'suggested',
+                  'suggested_hyperlinked', 'tags', 'featured_hyperlinked')
         read_only_fields = ('tags',)
         meta_fields = ('body_format',)
 

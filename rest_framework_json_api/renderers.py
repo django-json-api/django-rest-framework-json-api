@@ -2,7 +2,7 @@
 Renderers
 """
 import copy
-from collections import OrderedDict, defaultdict
+from collections import Iterable, OrderedDict, defaultdict
 
 import inflection
 from django.db.models import Manager
@@ -13,7 +13,7 @@ from rest_framework.settings import api_settings
 
 import rest_framework_json_api
 from rest_framework_json_api import utils
-from rest_framework_json_api.relations import ResourceRelatedField
+from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedField, SkipDataMixin
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -126,7 +126,13 @@ class JSONRenderer(renderers.JSONRenderer):
                 }})
                 continue
 
-            if isinstance(field, ResourceRelatedField):
+            relation_data = {}
+            if isinstance(field, HyperlinkedMixin):
+                field_links = field.get_links(resource_instance, field.related_link_lookup_field)
+                relation_data.update({'links': field_links} if field_links else dict())
+                data.update({field_name: relation_data})
+
+            if isinstance(field, (ResourceRelatedField, )):
                 relation_instance_id = getattr(resource_instance, source + "_id", None)
                 if not relation_instance_id:
                     resolved, relation_instance = utils.get_relation_instance(resource_instance,
@@ -134,17 +140,9 @@ class JSONRenderer(renderers.JSONRenderer):
                     if not resolved:
                         continue
 
-                # special case for ResourceRelatedField
-                relation_data = {
-                    'data': resource.get(field_name)
-                }
+                if not isinstance(field, SkipDataMixin):
+                    relation_data.update({'data': resource.get(field_name)})
 
-                field_links = field.get_links(
-                    resource_instance, field.related_link_lookup_field)
-                relation_data.update(
-                    {'links': field_links}
-                    if field_links else dict()
-                )
                 data.update({field_name: relation_data})
                 continue
 
@@ -186,12 +184,22 @@ class JSONRenderer(renderers.JSONRenderer):
                 if not resolved:
                     continue
 
+                relation_data = {}
+
+                if isinstance(resource.get(field_name), Iterable):
+                    relation_data.update(
+                        {
+                            'meta': {'count': len(resource.get(field_name))}
+                        }
+                    )
+
                 if isinstance(field.child_relation, ResourceRelatedField):
                     # special case for ResourceRelatedField
-                    relation_data = {
-                        'data': resource.get(field_name)
-                    }
+                    relation_data.update(
+                        {'data': resource.get(field_name)}
+                    )
 
+                if isinstance(field.child_relation, HyperlinkedMixin):
                     field_links = field.child_relation.get_links(
                         resource_instance,
                         field.child_relation.related_link_lookup_field
@@ -200,13 +208,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         {'links': field_links}
                         if field_links else dict()
                     )
-                    relation_data.update(
-                        {
-                            'meta': {
-                                'count': len(resource.get(field_name))
-                            }
-                        }
-                    )
+
                     data.update({field_name: relation_data})
                     continue
 
