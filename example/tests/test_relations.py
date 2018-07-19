@@ -247,6 +247,20 @@ class TestSerializerMethodHyperlinkedRelatedField(TestHyperlinkedFieldBase):
         got = field.get_links(self.entry)
         self.assertEqual(got, expected)
 
+    def test_get_blog(self):
+        serializer = EntryModelSerializerWithHyperLinks(instance=self.entry)
+        got = serializer.get_blog(self.entry)
+        expected = self.entry.blog
+
+        self.assertEqual(got, expected)
+
+    def test_get_comments(self):
+        serializer = EntryModelSerializerWithHyperLinks(instance=self.entry)
+        got = serializer.get_comments(self.entry)
+        expected = self.entry.comments.all()
+
+        self.assertListEqual(list(got), list(expected))
+
 
 class BlogResourceRelatedField(ResourceRelatedField):
     def get_queryset(self):
@@ -295,5 +309,5 @@ class EntryModelSerializerWithHyperLinks(serializers.ModelSerializer):
     def get_blog(self, obj):
         return obj.blog
 
-    def get_authors(self, obj):
+    def get_comments(self, obj):
         return obj.comments.all()
