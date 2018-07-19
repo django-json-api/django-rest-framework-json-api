@@ -51,7 +51,7 @@ class ManyRelatedFieldWithNoData(SkipDataMixin, DRFManyRelatedField):
     pass
 
 
-class HyperLinkedMixin(object):
+class HyperlinkedMixin(object):
     self_link_view_name = None
     related_link_view_name = None
     related_link_lookup_field = 'pk'
@@ -74,7 +74,7 @@ class HyperLinkedMixin(object):
         # implicit `self` argument to be passed.
         self.reverse = reverse
 
-        super(HyperLinkedMixin, self).__init__(**kwargs)
+        super(HyperlinkedMixin, self).__init__(**kwargs)
 
     def get_url(self, name, view_name, kwargs, request):
         """
@@ -126,7 +126,7 @@ class HyperLinkedMixin(object):
         return return_data
 
 
-class HyperLinkedRelatedField(HyperLinkedMixin, SkipDataMixin, RelatedField):
+class HyperlinkedRelatedField(HyperlinkedMixin, SkipDataMixin, RelatedField):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
@@ -152,7 +152,7 @@ class HyperLinkedRelatedField(HyperLinkedMixin, SkipDataMixin, RelatedField):
         return ManyRelatedFieldWithNoData(**list_kwargs)
 
 
-class ResourceRelatedField(HyperLinkedMixin, PrimaryKeyRelatedField):
+class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
     _skip_polymorphic_optimization = True
     self_link_view_name = None
     related_link_view_name = None
@@ -382,5 +382,5 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
 
 
-class SerializerMethodHyperLinkedRelatedField(SkipDataMixin, SerializerMethodResourceRelatedField):
+class SerializerMethodHyperlinkedRelatedField(SkipDataMixin, SerializerMethodResourceRelatedField):
     pass

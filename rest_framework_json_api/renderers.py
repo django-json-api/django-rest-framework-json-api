@@ -13,7 +13,7 @@ from rest_framework.settings import api_settings
 
 import rest_framework_json_api
 from rest_framework_json_api import utils
-from rest_framework_json_api.relations import HyperLinkedMixin, ResourceRelatedField, SkipDataMixin
+from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedField, SkipDataMixin
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -127,7 +127,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             relation_data = {}
-            if isinstance(field, HyperLinkedMixin):
+            if isinstance(field, HyperlinkedMixin):
                 field_links = field.get_links(resource_instance, field.related_link_lookup_field)
                 relation_data.update({'links': field_links} if field_links else dict())
                 data.update({field_name: relation_data})
@@ -199,7 +199,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         {'data': resource.get(field_name)}
                     )
 
-                if isinstance(field.child_relation, HyperLinkedMixin):
+                if isinstance(field.child_relation, HyperlinkedMixin):
                     field_links = field.child_relation.get_links(
                         resource_instance,
                         field.child_relation.related_link_lookup_field

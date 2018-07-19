@@ -8,9 +8,9 @@ from rest_framework.reverse import reverse
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import (
-    HyperLinkedRelatedField,
+    HyperlinkedRelatedField,
     ResourceRelatedField,
-    SerializerMethodHyperLinkedRelatedField
+    SerializerMethodHyperlinkedRelatedField
 )
 from rest_framework_json_api.utils import format_resource_type
 
@@ -137,10 +137,10 @@ class TestResourceRelatedField(TestBase):
         }
 
 
-class TestHyperLinkedFieldBase(TestBase):
+class TestHyperlinkedFieldBase(TestBase):
 
     def setUp(self):
-        super(TestHyperLinkedFieldBase, self).setUp()
+        super(TestHyperlinkedFieldBase, self).setUp()
         self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
         self.entry = Entry.objects.create(
             blog=self.blog,
@@ -161,10 +161,10 @@ class TestHyperLinkedFieldBase(TestBase):
         self.view = EntryViewSet(request=self.request, kwargs={'entry_pk': self.entry.id})
 
 
-class TestHyperLinkedRelatedField(TestHyperLinkedFieldBase):
+class TestHyperlinkedRelatedField(TestHyperlinkedFieldBase):
 
     def test_single_hyperlinked_related_field(self):
-        field = HyperLinkedRelatedField(
+        field = HyperlinkedRelatedField(
             related_link_view_name='entry-blog',
             related_link_url_kwarg='entry_pk',
             self_link_view_name='entry-relationships',
@@ -184,7 +184,7 @@ class TestHyperLinkedRelatedField(TestHyperLinkedFieldBase):
         self.assertEqual(got, links_expected)
 
     def test_many_hyperlinked_related_field(self):
-        field = HyperLinkedRelatedField(
+        field = HyperlinkedRelatedField(
             related_link_view_name='entry-comments',
             related_link_url_kwarg='entry_pk',
             self_link_view_name='entry-relationships',
@@ -205,7 +205,7 @@ class TestHyperLinkedRelatedField(TestHyperLinkedFieldBase):
         self.assertEqual(got, links_expected)
 
 
-class TestSerializerMethodHyperLinkedRelatedField(TestHyperLinkedFieldBase):
+class TestSerializerMethodHyperlinkedRelatedField(TestHyperlinkedFieldBase):
 
     def test_single_serializer_method_hyperlinked_related_field(self):
         serializer = EntryModelSerializerWithHyperLinks(
@@ -271,7 +271,7 @@ class EntryModelSerializer(serializers.ModelSerializer):
 
 
 class EntryModelSerializerWithHyperLinks(serializers.ModelSerializer):
-    blog = SerializerMethodHyperLinkedRelatedField(
+    blog = SerializerMethodHyperlinkedRelatedField(
         related_link_view_name='entry-blog',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
@@ -279,7 +279,7 @@ class EntryModelSerializerWithHyperLinks(serializers.ModelSerializer):
         read_only=True,
         source='get_blog'
     )
-    comments = SerializerMethodHyperLinkedRelatedField(
+    comments = SerializerMethodHyperlinkedRelatedField(
         related_link_view_name='entry-comments',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
