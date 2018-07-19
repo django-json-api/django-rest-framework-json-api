@@ -79,7 +79,7 @@ class EntryViewSet(ModelViewSet):
         # Handle featured
         entry_pk = self.kwargs.get('entry_pk', None)
         if entry_pk is not None:
-            return Entry.objects.first()
+            return Entry.objects.exclude(pk=entry_pk).first()
 
         return super(EntryViewSet, self).get_object()
 
