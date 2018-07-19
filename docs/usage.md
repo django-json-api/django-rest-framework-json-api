@@ -439,10 +439,9 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
 #### HyperlinkedRelatedField
 
-In order to improve performance by saving some sql queries we can skip `data`
-key, and thus decrease payload size. Use `HyperlinkedRelatedField`. It works same as `ResourceRelatedField`
->>>>>>> 8595bfe... Added few words to docs
-but just skips `data` calculating.
+`HyperlinkedRelatedField` has same functionality as `ResourceRelatedField` but does
+not render `data`. Use this in case you only need links of relationships and want to lower payload
+and increase performance.
 
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
