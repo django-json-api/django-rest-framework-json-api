@@ -62,6 +62,20 @@ like the following::
     }
 
 
+-----
+Goals
+-----
+
+As a Django REST Framework JSON API (short DJA) we are trying to address following goals:
+
+1. Support the [JSON API](http://jsonapi.org/) spec to compliance
+2. Be as compatible with Django REST Framework as possible
+   e.g. issues in Django REST Framework should be fixed upstream and not worked around in DJA
+3. Have sane defaults to be as easy to pick up as possible
+4. Be solid and tested with good coverage
+5. Be performant
+
+
 ------------
 Requirements
 ------------
