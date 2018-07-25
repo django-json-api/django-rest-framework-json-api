@@ -111,7 +111,7 @@ class PageNumberPagination(JsonApiPageNumberPagination):
         warnings.warn(
             'PageNumberPagination is deprecated. Use JsonApiPageNumberPagination '
             'or create custom pagination. See '
-            'http://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
+            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
             DeprecationWarning)
         super(PageNumberPagination, self).__init__()
 
@@ -126,6 +126,6 @@ class LimitOffsetPagination(JsonApiLimitOffsetPagination):
         warnings.warn(
             'LimitOffsetPagination is deprecated. Use JsonApiLimitOffsetPagination '
             'or create custom pagination. See '
-            'http://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
+            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
             DeprecationWarning)
         super(LimitOffsetPagination, self).__init__()

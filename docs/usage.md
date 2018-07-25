@@ -44,7 +44,7 @@ REST_FRAMEWORK = {
 
 ### Pagination
 
-DJA pagination is based on [DRF pagination](http://www.django-rest-framework.org/api-guide/pagination/).
+DJA pagination is based on [DRF pagination](https://www.django-rest-framework.org/api-guide/pagination/).
 
 When pagination is enabled, the renderer will return a `meta` object with
 record count and a `links` object with the next, previous, first, and last links.

@@ -1,6 +1,6 @@
 [unreleased]
 
-* Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](http://www.django-rest-framework.org/api-guide/testing/#configuration)
+* Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
 * Add sorting configuration to `REST_FRAMEWORK` as defined in [json api spec](http://jsonapi.org/format/#fetching-sorting)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 
