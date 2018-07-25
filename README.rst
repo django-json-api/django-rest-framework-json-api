@@ -7,7 +7,7 @@ JSON API and Django Rest Framework
 
 .. image:: https://readthedocs.org/projects/django-rest-framework-json-api/badge/?version=latest
    :alt: Read the docs
-   :target: http://django-rest-framework-json-api.readthedocs.org/
+   :target: https://django-rest-framework-json-api.readthedocs.org/
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
@@ -19,7 +19,7 @@ Overview
 
 **JSON API support for Django REST Framework**
 
-* Documentation: http://django-rest-framework-json-api.readthedocs.org/
+* Documentation: https://django-rest-framework-json-api.readthedocs.org/
 * Format specification: http://jsonapi.org/format/
 
 
@@ -68,13 +68,20 @@ Goals
 
 As a Django REST Framework JSON API (short DJA) we are trying to address following goals:
 
-1. Support the [JSON API](http://jsonapi.org/) spec to compliance
-2. Be as compatible with Django REST Framework as possible
+1. Support the `JSON API`_ spec to compliance
+
+2. Be as compatible with `Django REST Framework`_ as possible
+
    e.g. issues in Django REST Framework should be fixed upstream and not worked around in DJA
+
 3. Have sane defaults to be as easy to pick up as possible
+
 4. Be solid and tested with good coverage
+
 5. Be performant
 
+.. _JSON API: http://jsonapi.org
+.. _Django REST Framework: https://www.django-rest-framework.org/
 
 ------------
 Requirements
