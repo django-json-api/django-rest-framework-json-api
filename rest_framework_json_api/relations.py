@@ -116,7 +116,11 @@ class HyperlinkedMixin(object):
         })
         self_link = self.get_url('self', self.self_link_view_name, self_kwargs, request)
 
-        related_kwargs = {self.related_link_url_kwarg: kwargs[self.related_link_lookup_field]}
+        if self.related_link_url_kwarg == 'pk':
+            related_kwargs = self_kwargs
+        else:
+            related_kwargs = {self.related_link_url_kwarg: kwargs[self.related_link_lookup_field]}
+
         related_link = self.get_url('related', self.related_link_view_name, related_kwargs, request)
 
         if self_link:
