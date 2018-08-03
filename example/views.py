@@ -7,10 +7,11 @@ import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
-from rest_framework_json_api.views import ModelViewSet, RelationshipView
+from rest_framework_json_api.views import ModelViewSet, RelatedMixin, RelationshipView
 
 from example.models import Author, Blog, Comment, Company, Entry, Project
 from example.serializers import (
+    AuthorBioSerializer,
     AuthorSerializer,
     BlogSerializer,
     CommentSerializer,
@@ -92,9 +93,13 @@ class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
 
 
-class AuthorViewSet(ModelViewSet):
+class AuthorViewSet(RelatedMixin, ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    related_serializers = {
+        'bio': AuthorBioSerializer,
+        'entries': EntrySerializer
+    }
 
 
 class CommentViewSet(ModelViewSet):

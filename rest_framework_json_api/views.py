@@ -1,3 +1,5 @@
+from collections import Iterable
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
 from django.db.models.fields.related_descriptors import (
@@ -96,6 +98,54 @@ class AutoPrefetchMixin(object):
                 qs = qs.prefetch_related(included.replace('.', '__'))
 
         return qs
+
+
+class RelatedMixin(object):
+    """
+    This mixin handles all related entities, whose Serializers are declared in "related_serializers"
+    """
+    related_serializers = {}
+    field_name_mapping = {}
+
+    def retrieve_related(self, request, *args, **kwargs):
+        serializer_kwargs = {}
+        instance = self.get_related_instance()
+
+        if hasattr(instance, 'all'):
+            instance = instance.all()
+
+        if callable(instance):
+            instance = instance()
+
+        if instance is None:
+            return Response(data=None)
+
+        if isinstance(instance, Iterable):
+            serializer_kwargs['many'] = True
+
+        serializer = self.get_serializer(instance, **serializer_kwargs)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if 'related_field' in self.kwargs:
+            field_name = self.get_related_field_name()
+            _class = self.related_serializers.get(field_name, None)
+            if _class is None:
+                raise NotFound
+            return _class
+        return super(RelatedMixin, self).get_serializer_class()
+
+    def get_related_field_name(self):
+        field_name = self.kwargs['related_field']
+        if field_name in self.field_name_mapping:
+            return self.field_name_mapping[field_name]
+        return field_name
+
+    def get_related_instance(self):
+        try:
+            return getattr(self.get_object(), self.get_related_field_name())
+        except AttributeError:
+            raise NotFound
 
 
 class ModelViewSet(AutoPrefetchMixin, PrefetchForIncludesHelperMixin, viewsets.ModelViewSet):

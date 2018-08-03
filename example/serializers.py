@@ -155,6 +155,17 @@ class AuthorBioSerializer(serializers.ModelSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
+    bio = relations.ResourceRelatedField(
+        related_link_view_name='author-related',
+        self_link_view_name='author-relationships',
+        queryset=AuthorBio.objects,
+    )
+    entries = relations.ResourceRelatedField(
+        related_link_view_name='author-related',
+        self_link_view_name='author-relationships',
+        queryset=Entry.objects,
+        many=True
+    )
     included_serializers = {
         'bio': AuthorBioSerializer,
         'type': AuthorTypeSerializer
