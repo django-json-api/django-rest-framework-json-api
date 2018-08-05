@@ -15,7 +15,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_json_api.pagination.PageNumberPagination',
+        'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -31,17 +31,66 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer'
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.OrderingFilter',
+    ),
+    'ORDERING_PARAM': 'sort',
+    'TEST_REQUEST_RENDERER_CLASSES': (
+        'rest_framework_json_api.renderers.JSONRenderer',
+    ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
 }
 ```
 
-If `PAGE_SIZE` is set the renderer will return a `meta` object with
-record count and a `links` object with the next, previous, first, and last links.
-Pages can be selected with the `page` GET parameter. The query parameter used to
-retrieve the page can be customized by subclassing `PageNumberPagination` and
-overriding the `page_query_param`.  Page size can be controlled per request via
-the `PAGINATE_BY_PARAM` query parameter (`page_size` by default).
+### Pagination
 
-#### Performance Testing
+DJA pagination is based on [DRF pagination](https://www.django-rest-framework.org/api-guide/pagination/).
+
+When pagination is enabled, the renderer will return a `meta` object with
+record count and a `links` object with the next, previous, first, and last links.
+
+#### Configuring the Pagination Style
+
+Pagination style can be set on a particular viewset with the `pagination_class` attribute or by default for all viewsets
+by setting `REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS']` and by setting `REST_FRAMEWORK['PAGE_SIZE']`.
+
+You can configure fixed values for the page size or limit -- or allow the client to choose the size or limit
+via query parameters.
+
+Two pagination classes are available:
+- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
+  (number of items per page). It can be configured with the following attributes:
+  - `page_query_param` (default `page[number]`)
+  - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client 
+     to specify the size.
+  - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
+     Set it to `None` if you don't want to enforce an upper bound.
+- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
+  a given number of items (the limit).
+  It can be configured with the following attributes:
+  - `offset_query_param` (default `page[offset]`).
+  - `limit_query_param` (default `page[limit]`).
+  - `max_limit` (default `100`) enforces an upper bound on the limit.
+     Set it to `None` if you don't want to enforce an upper bound.
+
+
+These examples show how to configure the parameters to use non-standard names and different limits:
+
+```python
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination, JsonApiLimitOffsetPagination
+
+class MyPagePagination(JsonApiPageNumberPagination):
+    page_query_param = 'page_number'
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+class MyLimitPagination(JsonApiLimitOffsetPagination):
+    offset_query_param = 'offset'
+    limit_query_param = 'limit'
+    max_limit = None
+```
+
+### Performance Testing
 
 If you are trying to see if your viewsets are configured properly to optimize performance,
 it is preferable to use `example.utils.BrowsableAPIRendererWithoutForms` instead of the default `BrowsableAPIRenderer`
@@ -108,13 +157,13 @@ multiple endpoints. Setting the `resource_name` on views may result in a differe
 
 ### Inflecting object and relation keys
 
-This package includes the ability (off by default) to automatically convert json
-requests and responses from the python/rest_framework's preferred underscore to
+This package includes the ability (off by default) to automatically convert [json
+api field names](http://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
 a format of your choice. To hook this up include the following setting in your
 project settings:
 
 ``` python
-JSON_API_FORMAT_KEYS = 'dasherize'
+JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
 ```
 
 Possible values:
@@ -275,6 +324,8 @@ When set to pluralize:
 
 ### Related fields
 
+#### ResourceRelatedField
+
 Because of the additional structure needed to represent relationships in JSON
 API, this package provides the `ResourceRelatedField` for serializers, which
 works similarly to `PrimaryKeyRelatedField`. By default,
@@ -373,7 +424,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
     serializer_class = LineItemSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = super(LineItemViewSet, self).get_queryset()
 
         # if this viewset is accessed via the 'order-lineitems-list' route,
         # it wll have been passed the `order_pk` kwarg and the queryset
@@ -385,6 +436,12 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
         return queryset
 ```
+
+#### HyperlinkedRelatedField
+
+`HyperlinkedRelatedField` has same functionality as `ResourceRelatedField` but does
+not render `data`. Use this in case you only need links of relationships and want to lower payload
+and increase performance.
 
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
@@ -571,19 +628,29 @@ class QuestSerializer(serializers.ModelSerializer):
 
 #### Performance improvements
 
-Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m*(n+1) queries.
+Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m\*(n+1) queries.
 
 A viewset helper was designed to allow for greater flexibility and it is automatically available when subclassing
-`views.ModelViewSet`
-```
- # When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
- class MyViewSet(viewsets.ModelViewSet):
+`rest_framework_json_api.views.ModelViewSet`:
+```python
+from rest_framework_json_api import views
+
+# When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
+class MyViewSet(views.ModelViewSet):
     queryset = Book.objects.all()
     prefetch_for_includes = {
-    '__all__': [],
-    'author': ['author', 'author__bio']
-    'category.section': ['category']
-}
+        '__all__': [],
+        'author': ['author', 'author__bio'],
+        'category.section': ['category']
+    }
+```
+
+An additional convenience DJA class exists for read-only views, just as it does in DRF.
+```python
+from rest_framework_json_api import views
+
+class MyReadOnlyViewSet(views.ReadOnlyModelViewSet):
+    # ...
 ```
 
 The special keyword `__all__` can be used to specify a prefetch which should be done regardless of the include, similar to making the prefetch yourself on the QuerySet.

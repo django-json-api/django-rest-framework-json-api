@@ -14,6 +14,7 @@ Contents:
    getting-started
    usage
    api
+   CONTRIBUTING
 
 Indices and tables
 ==================

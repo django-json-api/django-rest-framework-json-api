@@ -280,3 +280,127 @@ class TestModelViewSet(TestBase):
         response = self.client.delete(url)
         assert response.status_code == 204, response.rendered_content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
+
+
+class TestBlogViewSet(APITestCase):
+
+    def setUp(self):
+        self.blog = Blog.objects.create(
+            name='Some Blog',
+            tagline="It's a blog"
+        )
+        self.entry = Entry.objects.create(
+            blog=self.blog,
+            headline='headline one',
+            body_text='body_text two',
+        )
+
+    def test_get_object_gives_correct_blog(self):
+        url = reverse('entry-blog', kwargs={'entry_pk': self.entry.id})
+        resp = self.client.get(url)
+        expected = {
+            'data': {
+                'attributes': {'name': self.blog.name},
+                'id': '{}'.format(self.blog.id),
+                'links': {'self': 'http://testserver/blogs/{}'.format(self.blog.id)},
+                'meta': {'copyright': 2018},
+                'relationships': {'tags': {'data': []}},
+                'type': 'blogs'
+            },
+            'meta': {'apiDocs': '/docs/api/blogs'}
+        }
+        got = resp.json()
+        self.assertEqual(got, expected)
+
+
+class TestEntryViewSet(APITestCase):
+
+    def setUp(self):
+        self.blog = Blog.objects.create(
+            name='Some Blog',
+            tagline="It's a blog"
+        )
+        self.first_entry = Entry.objects.create(
+            blog=self.blog,
+            headline='headline two',
+            body_text='body_text two',
+        )
+        self.second_entry = Entry.objects.create(
+            blog=self.blog,
+            headline='headline two',
+            body_text='body_text two',
+        )
+        self.maxDiff = None
+
+    def test_get_object_gives_correct_entry(self):
+        url = reverse('entry-featured', kwargs={'entry_pk': self.first_entry.id})
+        resp = self.client.get(url)
+        expected = {
+            'data': {
+                'attributes': {
+                    'bodyText': self.second_entry.body_text,
+                    'headline': self.second_entry.headline,
+                    'modDate': self.second_entry.mod_date,
+                    'pubDate': self.second_entry.pub_date
+                },
+                'id': '{}'.format(self.second_entry.id),
+                'meta': {'bodyFormat': 'text'},
+                'relationships': {
+                    'authors': {'data': [], 'meta': {'count': 0}},
+                    'blog': {
+                        'data': {
+                            'id': '{}'.format(self.second_entry.blog_id),
+                            'type': 'blogs'
+                        }
+                    },
+                    'blogHyperlinked': {
+                        'links': {
+                            'related': 'http://testserver/entries/{}'
+                                       '/blog'.format(self.second_entry.id),
+                            'self': 'http://testserver/entries/{}'
+                                    '/relationships/blog_hyperlinked'.format(self.second_entry.id)
+                        }
+                    },
+                    'comments': {
+                        'data': [],
+                        'meta': {'count': 0}
+                    },
+                    'commentsHyperlinked': {
+                        'links': {
+                            'related': 'http://testserver/entries/{}'
+                                       '/comments'.format(self.second_entry.id),
+                            'self': 'http://testserver/entries/{}/relationships'
+                                    '/comments_hyperlinked'.format(self.second_entry.id)
+                        }
+                    },
+                    'featuredHyperlinked': {
+                        'links': {
+                            'related': 'http://testserver/entries/{}'
+                                       '/featured'.format(self.second_entry.id),
+                            'self': 'http://testserver/entries/{}/relationships'
+                                    '/featured_hyperlinked'.format(self.second_entry.id)
+                        }
+                    },
+                    'suggested': {
+                        'data': [{'id': '1', 'type': 'entries'}],
+                        'links': {
+                            'related': 'http://testserver/entries/{}'
+                                       '/suggested/'.format(self.second_entry.id),
+                            'self': 'http://testserver/entries/{}'
+                                    '/relationships/suggested'.format(self.second_entry.id)
+                        }
+                    },
+                    'suggestedHyperlinked': {
+                        'links': {
+                            'related': 'http://testserver/entries/{}'
+                                       '/suggested/'.format(self.second_entry.id),
+                            'self': 'http://testserver/entries/{}/relationships'
+                                    '/suggested_hyperlinked'.format(self.second_entry.id)
+                        }
+                    },
+                    'tags': {'data': []}},
+                'type': 'posts'
+            }
+        }
+        got = resp.json()
+        self.assertEqual(got, expected)

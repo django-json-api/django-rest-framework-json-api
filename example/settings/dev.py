@@ -65,7 +65,7 @@ MIDDLEWARE = (
 
 INTERNAL_IPS = ('127.0.0.1', )
 
-JSON_API_FORMAT_KEYS = 'camelize'
+JSON_API_FORMAT_FIELD_NAMES = 'camelize'
 JSON_API_FORMAT_TYPES = 'camelize'
 REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
@@ -88,6 +88,10 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.OrderingFilter',
+    ),
+    'ORDERING_PARAM': 'sort',
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
     ),

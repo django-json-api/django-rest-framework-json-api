@@ -9,7 +9,7 @@ DATABASES = {
 
 ROOT_URLCONF = 'example.urls_test'
 
-JSON_API_FORMAT_KEYS = 'camelize'
+JSON_API_FIELD_NAMES = 'camelize'
 JSON_API_FORMAT_TYPES = 'camelize'
 JSON_API_PLURALIZE_TYPES = True
 REST_FRAMEWORK.update({

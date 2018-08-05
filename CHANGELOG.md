@@ -1,3 +1,23 @@
+[unreleased]
+
+* Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
+* Add sorting configuration to `REST_FRAMEWORK` as defined in [json api spec](http://jsonapi.org/format/#fetching-sorting)
+* Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
+
+
+v2.5.0 - Released July 11, 2018
+
+* Add new pagination classes based on JSON:API query parameter *recommendations*:
+  * `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`. See [usage docs](docs/usage.md#pagination).
+  * Deprecates `PageNumberPagination` and `LimitOffsetPagination`
+* Add `ReadOnlyModelViewSet` extension with prefetch mixins
+* Add support for Django REST Framework 3.8.x
+* Introduce `JSON_API_FORMAT_FIELD_NAMES` option replacing `JSON_API_FORMAT_KEYS` but in comparison preserving
+  values from being formatted as attributes can contain any [json value](http://jsonapi.org/format/#document-resource-object-attributes).
+   * `JSON_API_FORMAT_KEYS` still works as before (formatting all json value keys also nested) but is marked as deprecated
+* Performance improvement when rendering included data
+* Allow overwriting of `get_queryset()` in custom `ResourceRelatedField`
+
 v2.4.0 - Released January 25, 2018
 
 * Add support for Django REST Framework 3.7.x.

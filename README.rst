@@ -7,7 +7,7 @@ JSON API and Django Rest Framework
 
 .. image:: https://readthedocs.org/projects/django-rest-framework-json-api/badge/?version=latest
    :alt: Read the docs
-   :target: http://django-rest-framework-json-api.readthedocs.org/
+   :target: https://django-rest-framework-json-api.readthedocs.org/
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
    :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
@@ -19,7 +19,7 @@ Overview
 
 **JSON API support for Django REST Framework**
 
-* Documentation: http://django-rest-framework-json-api.readthedocs.org/
+* Documentation: https://django-rest-framework-json-api.readthedocs.org/
 * Format specification: http://jsonapi.org/format/
 
 
@@ -62,13 +62,34 @@ like the following::
     }
 
 
+-----
+Goals
+-----
+
+As a Django REST Framework JSON API (short DJA) we are trying to address following goals:
+
+1. Support the `JSON API`_ spec to compliance
+
+2. Be as compatible with `Django REST Framework`_ as possible
+
+   e.g. issues in Django REST Framework should be fixed upstream and not worked around in DJA
+
+3. Have sane defaults to be as easy to pick up as possible
+
+4. Be solid and tested with good coverage
+
+5. Be performant
+
+.. _JSON API: http://jsonapi.org
+.. _Django REST Framework: https://www.django-rest-framework.org/
+
 ------------
 Requirements
 ------------
 
 1. Python (2.7, 3.4, 3.5, 3.6)
 2. Django (1.11, 2.0)
-3. Django REST Framework (3.6, 3.7)
+3. Django REST Framework (3.6, 3.7, 3.8)
 
 ------------
 Installation
@@ -140,7 +161,7 @@ override ``settings.REST_FRAMEWORK``
         'PAGE_SIZE': 10,
         'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
         'DEFAULT_PAGINATION_CLASS':
-            'rest_framework_json_api.pagination.PageNumberPagination',
+            'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
         'DEFAULT_PARSER_CLASSES': (
             'rest_framework_json_api.parsers.JSONParser',
             'rest_framework.parsers.FormParser',
@@ -151,10 +172,14 @@ override ``settings.REST_FRAMEWORK``
             'rest_framework.renderers.BrowsableAPIRenderer',
         ),
         'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+        'DEFAULT_FILTER_BACKENDS': (
+            'rest_framework.filters.OrderingFilter',
+        ),
+        'ORDERING_PARAM': 'sort',
+        'TEST_REQUEST_RENDERER_CLASSES': (
+            'rest_framework_json_api.renderers.JSONRenderer',
+        ),
+        'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
     }
-
-If ``PAGINATE_BY`` is set the renderer will return a ``meta`` object with
-record count and a ``links`` object with the next and previous links. Pages
-can be specified with the ``page`` GET parameter.
 
 This package provides much more including automatic inflection of JSON keys, extra top level data (using nested serializers), relationships, links, and handy shortcuts like MultipleIDMixin. Read more at http://django-rest-framework-json-api.readthedocs.org/

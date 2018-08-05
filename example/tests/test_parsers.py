@@ -1,7 +1,7 @@
 import json
 from io import BytesIO
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from rest_framework.exceptions import ParseError
 
 from rest_framework_json_api.parsers import JSONParser
@@ -22,7 +22,10 @@ class TestJSONParser(TestCase):
         data = {
             'data': {
                 'id': 123,
-                'type': 'Blog'
+                'type': 'Blog',
+                'attributes': {
+                    'json-value': {'JsonKey': 'JsonValue'}
+                },
             },
             'meta': {
                 'random_key': 'random_value'
@@ -31,13 +34,25 @@ class TestJSONParser(TestCase):
 
         self.string = json.dumps(data)
 
-    def test_parse_include_metadata(self):
+    @override_settings(JSON_API_FORMAT_KEYS='camelize')
+    def test_parse_include_metadata_format_keys(self):
         parser = JSONParser()
 
         stream = BytesIO(self.string.encode('utf-8'))
         data = parser.parse(stream, None, self.parser_context)
 
         self.assertEqual(data['_meta'], {'random_key': 'random_value'})
+        self.assertEqual(data['json_value'], {'json_key': 'JsonValue'})
+
+    @override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize')
+    def test_parse_include_metadata_format_field_names(self):
+        parser = JSONParser()
+
+        stream = BytesIO(self.string.encode('utf-8'))
+        data = parser.parse(stream, None, self.parser_context)
+
+        self.assertEqual(data['_meta'], {'random_key': 'random_value'})
+        self.assertEqual(data['json_value'], {'JsonKey': 'JsonValue'})
 
     def test_parse_invalid_data(self):
         parser = JSONParser()

@@ -1,6 +1,6 @@
 import pytest
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.utils import six
 from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
@@ -29,12 +29,12 @@ class ResourceSerializer(serializers.ModelSerializer):
 def test_get_resource_name():
     view = APIView()
     context = {'view': view}
-    setattr(settings, 'JSON_API_FORMAT_TYPES', None)
-    assert 'APIViews' == utils.get_resource_name(context), 'not formatted'
+    with override_settings(JSON_API_FORMAT_TYPES=None):
+        assert 'APIViews' == utils.get_resource_name(context), 'not formatted'
 
     context = {'view': view}
-    setattr(settings, 'JSON_API_FORMAT_TYPES', 'dasherize')
-    assert 'api-views' == utils.get_resource_name(context), 'derived from view'
+    with override_settings(JSON_API_FORMAT_TYPES='dasherize'):
+        assert 'api-views' == utils.get_resource_name(context), 'derived from view'
 
     view.model = get_user_model()
     assert 'users' == utils.get_resource_name(context), 'derived from view model'
@@ -69,7 +69,8 @@ def test_format_keys():
     }
 
     output = {'firstName': 'a', 'lastName': 'b'}
-    assert utils.format_keys(underscored, 'camelize') == output
+    result = pytest.deprecated_call(utils.format_keys, underscored, 'camelize')
+    assert result == output
 
     output = {'FirstName': 'a', 'LastName': 'b'}
     assert utils.format_keys(underscored, 'capitalize') == output
@@ -82,6 +83,19 @@ def test_format_keys():
 
     output = [{'first-name': 'a', 'last-name': 'b'}]
     assert utils.format_keys([underscored], 'dasherize') == output
+
+
+@pytest.mark.parametrize("format_type,output", [
+    ('camelize', {'fullName': {'last-name': 'a', 'first-name': 'b'}}),
+    ('capitalize', {'FullName': {'last-name': 'a', 'first-name': 'b'}}),
+    ('dasherize', {'full-name': {'last-name': 'a', 'first-name': 'b'}}),
+    ('underscore', {'full_name': {'last-name': 'a', 'first-name': 'b'}}),
+])
+def test_format_field_names(settings, format_type, output):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    value = {'full_name': {'last-name': 'a', 'first-name': 'b'}}
+    assert utils.format_field_names(value, format_type) == output
 
 
 def test_format_value():
