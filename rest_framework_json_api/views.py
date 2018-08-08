@@ -148,12 +148,16 @@ class RelatedMixin(object):
             raise NotFound
 
 
-class ModelViewSet(AutoPrefetchMixin, PrefetchForIncludesHelperMixin, viewsets.ModelViewSet):
+class ModelViewSet(AutoPrefetchMixin,
+                   PrefetchForIncludesHelperMixin,
+                   RelatedMixin,
+                   viewsets.ModelViewSet):
     pass
 
 
 class ReadOnlyModelViewSet(AutoPrefetchMixin,
                            PrefetchForIncludesHelperMixin,
+                           RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
     pass
 
