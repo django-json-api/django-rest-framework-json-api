@@ -11,6 +11,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.response import Response
@@ -129,10 +130,10 @@ class RelatedMixin(object):
     def get_serializer_class(self):
         if 'related_field' in self.kwargs:
             field_name = self.get_related_field_name()
-            _class = self.related_serializers.get(field_name, None)
-            if _class is None:
+            class_str = self.related_serializers.get(field_name, None)
+            if class_str is None:
                 raise NotFound
-            return _class
+            return import_class_from_dotted_path(class_str)
         return super(RelatedMixin, self).get_serializer_class()
 
     def get_related_field_name(self):
