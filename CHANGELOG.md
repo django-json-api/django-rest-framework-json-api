@@ -1,8 +1,12 @@
 [unreleased]
 
 * Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
-* Add sorting configuration to `REST_FRAMEWORK` as defined in [json api spec](http://jsonapi.org/format/#fetching-sorting)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
+* Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
+  * query parameter validation -- raises 400 errors rather than silently ignoring "bad" parameters
+  * sort - based on `rest_framework.filters.OrderingFilter`
+  * keyword filter across multiple fields based on `rest_framework.filters.SearchFilter`
+  * field-level filter based on `django_filters.rest_framework.DjangoFilterBackend`
 
 
 v2.5.0 - Released July 11, 2018

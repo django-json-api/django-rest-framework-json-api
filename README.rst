@@ -173,9 +173,11 @@ override ``settings.REST_FRAMEWORK``
         ),
         'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
         'DEFAULT_FILTER_BACKENDS': (
-            'rest_framework.filters.OrderingFilter',
+            'rest_framework_json_api.backends.JsonApiQueryValidationFilter',
+            'rest_framework_json_api.backends.JsonApiOrderingFilter',
+            'rest_framework_json_api.backends.JsonApiFilterFilter',
+            'rest_framework_json_api.backends.JsonApiSearchFilter',
         ),
-        'ORDERING_PARAM': 'sort',
         'TEST_REQUEST_RENDERER_CLASSES': (
             'rest_framework_json_api.renderers.JSONRenderer',
         ),
