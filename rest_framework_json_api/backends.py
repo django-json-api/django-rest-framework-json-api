@@ -1,34 +1,34 @@
-from django.db.models.sql.constants import ORDER_PATTERN
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
-from rest_framework.filters import (BaseFilterBackend, OrderingFilter,
-                                    SearchFilter)
+from rest_framework.filters import BaseFilterBackend, OrderingFilter, SearchFilter
 from rest_framework.settings import api_settings
 
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_json_api.utils import format_value
 
-class JsonApiFilterMixin(object):
+
+class JSONAPIFilterMixin(object):
     """
     class to share data among filtering backends
     """
-    jsonapi_query_keywords = ('sort', 'filter', 'fields', 'page', 'include')
+    # search_param is used both in SearchFilter and JSONAPIFilterFilter
     search_param = api_settings.SEARCH_PARAM
-    ordering_param = 'sort'
 
     def __init__(self):
         self.filter_keys = []
 
 
-class JsonApiQueryValidationFilter(JsonApiFilterMixin, BaseFilterBackend):
+class JSONAPIQueryValidationFilter(JSONAPIFilterMixin, BaseFilterBackend):
     """
-    A backend filter that validates query parameters for jsonapi spec conformance and raises a 400 error
-    rather than silently ignoring unknown parameters or incorrect usage.
+    A backend filter that validates query parameters for jsonapi spec conformance and raises a 400
+    error rather than silently ignoring unknown parameters or incorrect usage.
 
     set `allow_duplicate_filters = True` if you are OK with the same filter being repeated.
 
-    TODO: For jsonapi error object compliance, must set jsonapi errors "parameter" for the ValidationError.
-          This requires extending DRF/DJA Exceptions.
+    TODO: For jsonapi error object compliance, must set jsonapi errors "parameter" for the
+          ValidationError. This requires extending DRF/DJA Exceptions.
     """
-    allow_duplicated_filters = False
+    jsonapi_query_keywords = ('sort', 'filter', 'fields', 'page', 'include')
+    jsonapi_allow_duplicated_filters = False
 
     def validate_query_params(self, request):
         """
@@ -47,8 +47,8 @@ class JsonApiQueryValidationFilter(JsonApiFilterMixin, BaseFilterBackend):
             if keyword not in self.jsonapi_query_keywords:
                 raise ValidationError(
                     'invalid query parameter: {}'.format(keyword))
-            if not self.allow_duplicated_filters and len(
-                    request.query_params.getlist(qp)) > 1:
+            if not self.jsonapi_allow_duplicated_filters \
+                    and len(request.query_params.getlist(qp)) > 1:
                 raise ValidationError(
                     'repeated query parameter not allowed: {}'.format(qp))
 
@@ -57,27 +57,34 @@ class JsonApiQueryValidationFilter(JsonApiFilterMixin, BaseFilterBackend):
         return queryset
 
 
-class JsonApiOrderingFilter(JsonApiFilterMixin, OrderingFilter):
+class JSONAPIOrderingFilter(JSONAPIFilterMixin, OrderingFilter):
     """
-    The standard rest_framework.filters.OrderingFilter works mostly fine as is, but with .ordering_param = 'sort'.
+    The standard rest_framework.filters.OrderingFilter works mostly fine as is,
+    but with .ordering_param = 'sort'.
 
-    This implements http://jsonapi.org/format/#fetching-sorting and raises 400 if any sort field is invalid.
+    This implements http://jsonapi.org/format/#fetching-sorting and raises 400
+    if any sort field is invalid.
     """
-    ignore_bad_sort_fields = False
+    jsonapi_ignore_bad_sort_fields = False
+    ordering_param = 'sort'
 
     def remove_invalid_fields(self, queryset, fields, view, request):
         """
         override remove_invalid_fields to raise a 400 exception instead of silently removing them.
         """
-        valid_fields = [item[0] for item in self.get_valid_fields(queryset, view, {'request': request})]
-        bad_terms = [term for term in fields if term.lstrip('-') not in valid_fields and ORDER_PATTERN.match(term)]
-        if bad_terms and not self.ignore_bad_sort_fields:
+        valid_fields = [item[0] for item
+                        in self.get_valid_fields(queryset, view, {'request': request})]
+        bad_terms = [term for term
+                     in fields if format_value(term.lstrip('-'), "underscore") not in valid_fields]
+        if bad_terms and not self.jsonapi_ignore_bad_sort_fields:
             raise ValidationError(
-                'invalid sort parameter{}: {}'.format(('s' if len(bad_terms) > 1 else ''), ','.join(bad_terms)))
-        return super(JsonApiOrderingFilter, self).remove_invalid_fields(queryset, fields, view, request)
+                'invalid sort parameter{}: {}'.format(('s' if len(bad_terms) > 1 else ''),
+                                                      ','.join(bad_terms)))
+        return super(JSONAPIOrderingFilter, self).remove_invalid_fields(queryset,
+                                                                        fields, view, request)
 
 
-class JsonApiSearchFilter(JsonApiFilterMixin, SearchFilter):
+class JSONAPISearchFilter(JSONAPIFilterMixin, SearchFilter):
     """
     The (multi-field) rest_framework.filters.SearchFilter works just fine as is, but with a
     defined `filter[NAME]` such as `filter[all]` or `filter[_all_]` or something like that.
@@ -89,35 +96,45 @@ class JsonApiSearchFilter(JsonApiFilterMixin, SearchFilter):
     pass
 
 
-class JsonApiFilterFilter(JsonApiFilterMixin, DjangoFilterBackend):
+class JSONAPIFilterFilter(JSONAPIFilterMixin, DjangoFilterBackend):
     """
-    Overrides django_filters.rest_framework.DjangoFilterBackend to use `filter[field]` query parameter.
+    Overrides django_filters.rest_framework.DjangoFilterBackend to use `filter[field]` query
+    parameter.
 
     This is not part of the jsonapi standard per-se, other than the requirement to use the `filter`
     keyword: This is an optional implementation of style of filtering in which each filter is an ORM
-    expression as implemented by DjangoFilterBackend and seems to be in alignment with an interpretation of
-    http://jsonapi.org/recommendations/#filtering, including relationship chaining.
-    Filters can be:
-    - A resource field equality test: ?filter[foo]=123
-    - Apply other relational operators: ?filter[foo.in]=bar,baz or ?filter[count.ge]=7...
-    - Membership in a list of values (OR): ?filter[foo]=abc,123,zzz (foo in ['abc','123','zzz'])
-    - Filters can be combined for intersection (AND): ?filter[foo]=123&filter[bar]=abc,123,zzz&filter[...]
-    - A related resource field for above tests: ?filter[foo.rel.baz]=123 (where `rel` is the relationship name)
+    expression as implemented by DjangoFilterBackend and seems to be in alignment with an
+    interpretation of http://jsonapi.org/recommendations/#filtering, including relationship
+    chaining.
 
-    It is meaningless to intersect the same filter: ?filter[foo]=123&filter[foo]=abc will always yield nothing so
-    detect this repeated appearance of the same filter in JsonApiQueryValidationFilter and complain there.
+    Filters can be:
+    - A resource field equality test:
+        `?filter[foo]=123`
+    - Apply other relational operators:
+        `?filter[foo.in]=bar,baz or ?filter[count.ge]=7...`
+    - Membership in a list of values (OR):
+        `?filter[foo]=abc,123,zzz (foo in ['abc','123','zzz'])`
+    - Filters can be combined for intersection (AND):
+        `?filter[foo]=123&filter[bar]=abc,123,zzz&filter[...]`
+    - A related resource field for above tests:
+        `?filter[foo.rel.baz]=123 (where `rel` is the relationship name)`
+
+    It is meaningless to intersect the same filter: ?filter[foo]=123&filter[foo]=abc will
+    always yield nothing so detect this repeated appearance of the same filter in
+    JSONAPIQueryValidationFilter and complain there.
     """
 
     def get_filterset(self, request, queryset, view):
         """
-        Validate that the `filter[field]` is defined in the filters and raise ValidationError if it's missing.
+        Validate that the `filter[field]` is defined in the filters and raise ValidationError if
+        it's missing.
 
-        While `filter` syntax and semantics is undefined by the jsonapi 1.0 spec, this behavior is consistent with the
-        style used for missing query parameters: http://jsonapi.org/format/#query-parameters. In general, unlike
-        django/DRF, jsonapi raises 400 rather than ignoring "bad" query parameters.
+        While `filter` syntax and semantics is undefined by the jsonapi 1.0 spec, this behavior is
+        consistent with the style used for missing query parameters:
+        http://jsonapi.org/format/#query-parameters. In general, unlike django/DRF, jsonapi
+        raises 400 rather than ignoring "bad" query parameters.
         """
-        fs = super(JsonApiFilterFilter, self).get_filterset(
-            request, queryset, view)
+        fs = super(JSONAPIFilterFilter, self).get_filterset(request, queryset, view)
         # TODO: change to have option to silently ignore bad filters
         for k in self.filter_keys:
             if k not in fs.filters:
@@ -132,12 +149,11 @@ class JsonApiFilterFilter(JsonApiFilterMixin, DjangoFilterBackend):
         # rewrite `filter[field]` query parameters to make DjangoFilterBackend work.
         data = request.query_params.copy()
         for qp, val in data.items():
-            if qp[:
-                  7] == 'filter[' and qp[-1] == ']' and qp != self.search_param:
-                key = qp[7:-1].replace(
-                    '.', '__'
-                )  # convert jsonapi relationship path to Django ORM's __ notation
-                # TODO: implement JSON_API_FORMAT_FIELD_NAMES conversions inbound.
+            if qp[:7] == 'filter[' and qp[-1] == ']' and qp != self.search_param:
+                # convert jsonapi relationship path to Django ORM's __ notation:
+                key = qp[7:-1].replace('.', '__')
+                # undo JSON_API_FORMAT_FIELD_NAMES conversion:
+                key = format_value(key, 'underscore')
                 data[key] = val
                 self.filter_keys.append(key)
                 del data[qp]

@@ -33,10 +33,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_json_api.backends.JsonApiQueryValidationFilter',
-        'rest_framework_json_api.backends.JsonApiOrderingFilter',
-        'rest_framework_json_api.backends.JsonApiFilterFilter',
-        'rest_framework_json_api.backends.JsonApiSearchFilter',
+        'rest_framework_json_api.backends.JSONAPIQueryValidationFilter',
+        'rest_framework_json_api.backends.JSONAPIOrderingFilter',
+        'rest_framework_json_api.backends.JSONAPIFilterFilter',
+        'rest_framework_json_api.backends.JSONAPISearchFilter',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
@@ -111,21 +111,21 @@ from rest_framework_json_api.backends import *
 class LineItemViewSet(viewsets.ModelViewSet):
     queryset = LineItem.objects
     serializer_class = LineItemSerializer
-    filter_backends = (JsonApiQueryValidationFilter, JsonApiOrderingFilter, JsonApiFilterFilter, JsonApiSearchFilter,)
+    filter_backends = (JSONAPIQueryValidationFilter, JSONAPIOrderingFilter, JSONAPIFilterFilter, JSONAPISearchFilter,)
     filterset_fields = {
-        'subject_area_code': usual_rels,
-        'course_name': ('exact', ) + text_rels,
-        'course_description': text_rels + usual_rels,
-        'course_identifier': text_rels + usual_rels,
+        'subject_area_code': ('exact', 'gt', 'lt',),
+        'course_name': ('exact', 'icontains',),
+        'course_description': ('exact', 'icontains'),
+        'course_identifier': ('exact'),
         'course_number': ('exact', ),
-        'course_terms__term_identifier': usual_rels,
+        'course_terms__term_identifier': ('exact', 'gt', 'gte', 'lt', 'lte',),
         'school_bulletin_prefix_code': ('exact', 'regex'),
     }
     search_fields = ('course_name', 'course_description', 'course_identifier', 'course_number')
 ``` 
 
-#### `JsonApiQueryValidationFilter`
-`JsonApiQueryValidationFilter` checks the query parameters to make sure they are all valid per JSON:API
+#### `JSONAPIQueryValidationFilter`
+`JSONAPIQueryValidationFilter` checks the query parameters to make sure they are all valid per JSON:API
 and returns a `400 Bad Request` if they are not. By default it also flags duplicated `filter` parameters (it is
 generally meaningless to have two of the same filter as filters are ANDed together). You can override these
 attributes if you need to step outside the spec:
@@ -133,7 +133,7 @@ attributes if you need to step outside the spec:
 **TODO: check this**
 ```python
 jsonapi_query_keywords = ('sort', 'filter', 'fields', 'page', 'include')
-allow_duplicated_filters = False
+jsonapi_allow_duplicated_filters = False
 ```
 
 If, for example, your client sends in a query with an invalid parameter (`?sort` misspelled as `?snort`),
@@ -168,15 +168,15 @@ And if two conflicting filters are provided (`?filter[foo]=123&filter[foo]=456`)
 ```
 
 If you would rather have your API silently ignore incorrect parameters, simply leave this filter backend out
-and set `allow_duplicated_filters = True`.
+and set `jsonapi_allow_duplicated_filters = True`.
 
-#### `JsonApiOrderingFilter`
-`JsonApiOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) just uses
+#### `JSONAPIOrderingFilter`
+`JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) just uses
 DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
 You can use a non-standard parameter name isntead of `sort` by setting `ordering_param`:
 ```json
 ordering_param = 'sort'
-ignore_bad_sort_fields = False
+jsonapi_ignore_bad_sort_fields = False
 ```
 Per the JSON:API, "If the server does not support sorting as specified in the query parameter `sort`,
 it **MUST** return `400 Bad Request`." This error looks like ()for `?sort=`abc,foo,def` where `foo` is a valid
@@ -194,10 +194,10 @@ field name and the other two are not):
     ]
 }
 ```
-If you want to silently ignore bad sort fields, set `ignore_bad_sort_fields = True`
+If you want to silently ignore bad sort fields, set `jsonapi_ignore_bad_sort_fields = True`
 
-#### `JsonApiFilterFilter`
-`JsonApiFilterFilter` exploits the power of the [django-filter DjangoFilterBackend](https://django-filter.readthedocs.io/en/latest/guide/rest_framework.html).
+#### `JSONAPIFilterFilter`
+`JSONAPIFilterFilter` exploits the power of the [django-filter DjangoFilterBackend](https://django-filter.readthedocs.io/en/latest/guide/rest_framework.html).
 The JSON:API spec explicitly does not define the syntax or meaning of a filter beyond requiring use of the `filter`
 query parameter. This filter implementation is "just a suggestion", but hopefully a useful one with these features:
 - A resource field exact match test: `?filter[foo]=123`
@@ -228,8 +228,8 @@ A `400 Bad Request` like the following is returned if the requested filter is no
 }
 ```
 
-#### `JsonApiSearchFilter`
-`JsonApiSearchFilter` implements keyword searching across multiple text fields using 
+#### `JSONAPISearchFilter`
+`JSONAPISearchFilter` implements keyword searching across multiple text fields using 
 [`rest_framework.filters.SearchFilter`](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter)
 You configure this filter with `search_fields` and name the filter with `search_param`. For lack of a better name,
 the default is:
