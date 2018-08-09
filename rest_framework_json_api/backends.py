@@ -63,13 +63,15 @@ class JsonApiOrderingFilter(JsonApiFilterMixin, OrderingFilter):
 
     This implements http://jsonapi.org/format/#fetching-sorting and raises 400 if any sort field is invalid.
     """
+    ignore_bad_sort_fields = False
+
     def remove_invalid_fields(self, queryset, fields, view, request):
         """
         override remove_invalid_fields to raise a 400 exception instead of silently removing them.
         """
         valid_fields = [item[0] for item in self.get_valid_fields(queryset, view, {'request': request})]
         bad_terms = [term for term in fields if term.lstrip('-') not in valid_fields and ORDER_PATTERN.match(term)]
-        if bad_terms:
+        if bad_terms and not self.ignore_bad_sort_fields:
             raise ValidationError(
                 'invalid sort parameter{}: {}'.format(('s' if len(bad_terms) > 1 else ''), ','.join(bad_terms)))
         return super(JsonApiOrderingFilter, self).remove_invalid_fields(queryset, fields, view, request)
@@ -116,6 +118,7 @@ class JsonApiFilterFilter(JsonApiFilterMixin, DjangoFilterBackend):
         """
         fs = super(JsonApiFilterFilter, self).get_filterset(
             request, queryset, view)
+        # TODO: change to have option to silently ignore bad filters
         for k in self.filter_keys:
             if k not in fs.filters:
                 raise ValidationError("invalid filter[{}]".format(k))

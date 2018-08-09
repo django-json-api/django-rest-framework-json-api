@@ -1,10 +1,11 @@
 
 # Usage
 
-The DJA package implements a custom renderer, parser, exception handler, and
+The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
-Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`.
+Many features of the [JSON:API](http://jsonapi.org/format) format standard have been implemented using 
+Mixin classes in `serializers.py`.
 The easiest way to make use of those features is to import ModelSerializer variants
 from `rest_framework_json_api` instead of the usual `rest_framework`
 
@@ -32,9 +33,11 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework.filters.OrderingFilter',
+        'rest_framework_json_api.backends.JsonApiQueryValidationFilter',
+        'rest_framework_json_api.backends.JsonApiOrderingFilter',
+        'rest_framework_json_api.backends.JsonApiFilterFilter',
+        'rest_framework_json_api.backends.JsonApiSearchFilter',
     ),
-    'ORDERING_PARAM': 'sort',
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
     ),
@@ -88,6 +91,150 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
     offset_query_param = 'offset'
     limit_query_param = 'limit'
     max_limit = None
+```
+
+### Filter Backends
+
+[JSON:API](http://jsonapi.org) specifies certain query parameter names but not always the meaning of a particular name.
+The following four filter backends extend existing common filter backends found in DRF and the `django-filter` package
+to comply with the required parts of the [spec](http://jsonapi.org/format) and offer up a Django-flavored
+implementation of parts that are left undefined (like what a `filter` looks like.) The four backends may be
+[configured](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#setting-filter-backends)
+either as `REST_FRAMWORK['DEFAULT_FILTER_BACKENDS']` or as a list of `filter_backends`. Following is an example
+with explanations of each filter backend after it:
+
+**TODO: change to match example model**
+
+```python
+from rest_framework_json_api.backends import *
+
+class LineItemViewSet(viewsets.ModelViewSet):
+    queryset = LineItem.objects
+    serializer_class = LineItemSerializer
+    filter_backends = (JsonApiQueryValidationFilter, JsonApiOrderingFilter, JsonApiFilterFilter, JsonApiSearchFilter,)
+    filterset_fields = {
+        'subject_area_code': usual_rels,
+        'course_name': ('exact', ) + text_rels,
+        'course_description': text_rels + usual_rels,
+        'course_identifier': text_rels + usual_rels,
+        'course_number': ('exact', ),
+        'course_terms__term_identifier': usual_rels,
+        'school_bulletin_prefix_code': ('exact', 'regex'),
+    }
+    search_fields = ('course_name', 'course_description', 'course_identifier', 'course_number')
+``` 
+
+#### `JsonApiQueryValidationFilter`
+`JsonApiQueryValidationFilter` checks the query parameters to make sure they are all valid per JSON:API
+and returns a `400 Bad Request` if they are not. By default it also flags duplicated `filter` parameters (it is
+generally meaningless to have two of the same filter as filters are ANDed together). You can override these
+attributes if you need to step outside the spec:
+
+**TODO: check this**
+```python
+jsonapi_query_keywords = ('sort', 'filter', 'fields', 'page', 'include')
+allow_duplicated_filters = False
+```
+
+If, for example, your client sends in a query with an invalid parameter (`?sort` misspelled as `?snort`),
+this error will be returned:
+```json
+{
+    "errors": [
+        {
+            "detail": "invalid query parameter: snort",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+
+And if two conflicting filters are provided (`?filter[foo]=123&filter[foo]=456`), this error:
+```json
+{
+    "errors": [
+        {
+            "detail": "repeated query parameter not allowed: filter[foo]",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+
+If you would rather have your API silently ignore incorrect parameters, simply leave this filter backend out
+and set `allow_duplicated_filters = True`.
+
+#### `JsonApiOrderingFilter`
+`JsonApiOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) just uses
+DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
+You can use a non-standard parameter name isntead of `sort` by setting `ordering_param`:
+```json
+ordering_param = 'sort'
+ignore_bad_sort_fields = False
+```
+Per the JSON:API, "If the server does not support sorting as specified in the query parameter `sort`,
+it **MUST** return `400 Bad Request`." This error looks like ()for `?sort=`abc,foo,def` where `foo` is a valid
+field name and the other two are not):
+```json
+{
+    "errors": [
+        {
+            "detail": "invalid sort parameters: abc,def",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+If you want to silently ignore bad sort fields, set `ignore_bad_sort_fields = True`
+
+#### `JsonApiFilterFilter`
+`JsonApiFilterFilter` exploits the power of the [django-filter DjangoFilterBackend](https://django-filter.readthedocs.io/en/latest/guide/rest_framework.html).
+The JSON:API spec explicitly does not define the syntax or meaning of a filter beyond requiring use of the `filter`
+query parameter. This filter implementation is "just a suggestion", but hopefully a useful one with these features:
+- A resource field exact match test: `?filter[foo]=123`
+- Apply other [relational operators](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#field-lookups):
+`?filter[foo.icontains]=bar or ?filter[count.gt]=7...`
+- Membership in a list of values (OR): `?filter[foo]=abc,123,zzz` (foo in ['abc','123','zzz'])
+- Filters can be combined for intersection (AND): `?filter[foo]=123&filter[bar]=abc,123,zzz&filter[...]`
+- Chaining related resource fields for above filters: `?filter[foo.rel.baz]=123` (where `rel` is the relationship name)
+
+Both the usual Django ORM double-underscore notation (`foo__bar__eq`) and a more JSON:API-flavored dotted
+notation (`foo.bar.eq`) are supported.
+
+See the [django-filter](https://django-filter.readthedocs.io/en/latest/guide/rest_framework.html) documentation
+for more details. See an example using a dictionary of filter definitions [above](#filter-backends).
+
+A `400 Bad Request` like the following is returned if the requested filter is not defined:
+```json
+{
+    "errors": [
+        {
+            "detail": "invalid filter[foo]",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+
+#### `JsonApiSearchFilter`
+`JsonApiSearchFilter` implements keyword searching across multiple text fields using 
+[`rest_framework.filters.SearchFilter`](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter)
+You configure this filter with `search_fields` and name the filter with `search_param`. For lack of a better name,
+the default is:
+```python
+search_param = 'filter[all]'
 ```
 
 ### Performance Testing
