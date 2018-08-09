@@ -1,6 +1,8 @@
 -e .
+django>=2.0
 django-debug-toolbar
 django-polymorphic>=2.0
+django-filter>=2.0
 factory-boy
 Faker
 isort
