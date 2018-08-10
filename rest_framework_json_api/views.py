@@ -128,13 +128,26 @@ class RelatedMixin(object):
         return Response(serializer.data)
 
     def get_serializer_class(self):
+        parent_serializer_class = super(RelatedMixin, self).get_serializer_class()
+
         if 'related_field' in self.kwargs:
             field_name = self.kwargs['related_field']
+
+            assert hasattr(parent_serializer_class, 'included_serializers') or self.related_serializers,\
+                'Either "included_serializers" or "related_serializers" should be configured'
+
+            # Try get the class from related_serializers
             class_str = self.related_serializers.get(field_name, None)
+
             if class_str is None:
-                raise NotFound
+                # Class was not found in related_serializers, look for it in included_serializers
+                class_str = getattr(self, 'included_serializers', {}).get(field_name, None)
+
+                if class_str is None:
+                    raise NotFound
             return import_class_from_dotted_path(class_str)
-        return super(RelatedMixin, self).get_serializer_class()
+
+        return parent_serializer_class
 
     def get_related_field_name(self):
         field_name = self.kwargs['related_field']
