@@ -156,10 +156,18 @@ class RelatedMixin(object):
         return field_name
 
     def get_related_instance(self):
-        try:
-            return getattr(self.get_object(), self.get_related_field_name())
-        except AttributeError:
-            raise NotFound
+        parent_obj = self.get_object()
+        parent_serializer = self.serializer_class(parent_obj)
+        field_name = self.get_related_field_name()
+        field = parent_serializer.fields.get(field_name, None)
+
+        if field is not None:
+            return field.get_attribute(parent_obj)
+        else:
+            try:
+                return getattr(parent_obj, field_name)
+            except AttributeError:
+                raise NotFound
 
 
 class ModelViewSet(AutoPrefetchMixin,
