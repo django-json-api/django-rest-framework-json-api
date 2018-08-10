@@ -97,7 +97,8 @@ class AuthorViewSet(ModelViewSet):
     serializer_class = AuthorSerializer
     related_serializers = {
         'bio': 'example.serializers.AuthorBioSerializer',
-        'entries': 'example.serializers.EntrySerializer'
+        'entries': 'example.serializers.EntrySerializer',
+        'first_entry': 'example.serializers.EntrySerializer'
     }
 
 
