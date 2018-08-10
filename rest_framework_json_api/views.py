@@ -133,8 +133,10 @@ class RelatedMixin(object):
         if 'related_field' in self.kwargs:
             field_name = self.kwargs['related_field']
 
-            assert hasattr(parent_serializer_class, 'included_serializers') or self.related_serializers,\
-                'Either "included_serializers" or "related_serializers" should be configured'
+            assert hasattr(parent_serializer_class, 'included_serializers')\
+                or self.related_serializers,\
+                'Either "included_serializers" or ' \
+                '"related_serializers" should be configured'
 
             # Try get the class from related_serializers
             class_str = self.related_serializers.get(field_name, None)
