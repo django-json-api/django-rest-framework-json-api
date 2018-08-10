@@ -106,6 +106,7 @@ class RelatedMixin(object):
     This mixin handles all related entities, whose Serializers are declared in "related_serializers"
     """
     related_serializers = {}
+    related_field_mapping = {}
 
     def retrieve_related(self, request, *args, **kwargs):
         serializer_kwargs = {}
@@ -137,12 +138,8 @@ class RelatedMixin(object):
 
     def get_related_field_name(self):
         field_name = self.kwargs['related_field']
-        # Making sure we're getting correct model field/property/method name
-        try:
-            return super(RelatedMixin, self).get_serializer_class()().fields[field_name].source
-        except KeyError:
-            # Looks like the field was not declared on the serializer
-            pass
+        if field_name in self.related_field_mapping:
+            return self.related_field_mapping[field_name]
         return field_name
 
     def get_related_instance(self):
