@@ -177,6 +177,11 @@ class AuthorSerializer(serializers.ModelSerializer):
         'bio': AuthorBioSerializer,
         'type': AuthorTypeSerializer
     }
+    related_serializers = {
+        'bio': 'example.serializers.AuthorBioSerializer',
+        'entries': 'example.serializers.EntrySerializer',
+        'first_entry': 'example.serializers.EntrySerializer'
+    }
 
     class Meta:
         model = Author

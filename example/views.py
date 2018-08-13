@@ -95,11 +95,6 @@ class NonPaginatedEntryViewSet(EntryViewSet):
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
-    related_serializers = {
-        'bio': 'example.serializers.AuthorBioSerializer',
-        'entries': 'example.serializers.EntrySerializer',
-        'first_entry': 'example.serializers.EntrySerializer'
-    }
 
 
 class CommentViewSet(ModelViewSet):

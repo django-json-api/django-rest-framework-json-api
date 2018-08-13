@@ -105,8 +105,6 @@ class RelatedMixin(object):
     """
     This mixin handles all related entities, whose Serializers are declared in "related_serializers"
     """
-    related_serializers = {}
-    related_field_mapping = {}
 
     def retrieve_related(self, request, *args, **kwargs):
         serializer_kwargs = {}
@@ -133,29 +131,27 @@ class RelatedMixin(object):
         if 'related_field' in self.kwargs:
             field_name = self.kwargs['related_field']
 
-            assert hasattr(parent_serializer_class, 'included_serializers')\
-                or self.related_serializers,\
-                'Either "included_serializers" or ' \
-                '"related_serializers" should be configured'
-
             # Try get the class from related_serializers
-            class_str = self.related_serializers.get(field_name, None)
-
-            if class_str is None:
-                # Class was not found in related_serializers, look for it in included_serializers
-                class_str = getattr(self, 'included_serializers', {}).get(field_name, None)
-
+            if hasattr(parent_serializer_class, 'related_serializers'):
+                class_str = parent_serializer_class.related_serializers.get(field_name, None)
                 if class_str is None:
                     raise NotFound
+
+            elif hasattr(parent_serializer_class, 'included_serializers'):
+                class_str = parent_serializer_class.included_serializers.get(field_name, None)
+                if class_str is None:
+                    raise NotFound
+
+            else:
+                assert False, \
+                    'Either "included_serializers" or "related_serializers" should be configured'
+
             return import_class_from_dotted_path(class_str)
 
         return parent_serializer_class
 
     def get_related_field_name(self):
-        field_name = self.kwargs['related_field']
-        if field_name in self.related_field_mapping:
-            return self.related_field_mapping[field_name]
-        return field_name
+        return self.kwargs['related_field']
 
     def get_related_instance(self):
         parent_obj = self.get_object()
