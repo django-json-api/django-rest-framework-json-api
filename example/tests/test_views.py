@@ -13,7 +13,7 @@ from . import TestBase
 from .. import views
 from example.factories import AuthorFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
-from example.serializers import AuthorBioSerializer, EntrySerializer
+from example.serializers import AuthorBioSerializer, EntrySerializer, AuthorTypeSerializer
 from example.views import AuthorViewSet
 
 
@@ -269,6 +269,16 @@ class TestRelatedMixin(APITestCase):
         view = self._get_view(kwargs)
         got = view.get_serializer_class()
         self.assertEqual(got, EntrySerializer)
+
+    def test_get_serializer_comes_from_included_serializers(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'type'}
+        view = self._get_view(kwargs)
+        related_serializers = view.serializer_class.related_serializers
+        delattr(view.serializer_class, 'related_serializers')
+        got = view.get_serializer_class()
+        self.assertEqual(got, AuthorTypeSerializer)
+
+        view.serializer_class.related_serializers = related_serializers
 
     def test_get_serializer_class_raises_error(self):
         kwargs = {'pk': self.author.id, 'related_field': 'type'}

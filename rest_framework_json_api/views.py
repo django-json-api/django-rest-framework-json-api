@@ -133,20 +133,22 @@ class RelatedMixin(object):
 
             # Try get the class from related_serializers
             if hasattr(parent_serializer_class, 'related_serializers'):
-                class_str = parent_serializer_class.related_serializers.get(field_name, None)
-                if class_str is None:
+                _class = parent_serializer_class.related_serializers.get(field_name, None)
+                if _class is None:
                     raise NotFound
 
             elif hasattr(parent_serializer_class, 'included_serializers'):
-                class_str = parent_serializer_class.included_serializers.get(field_name, None)
-                if class_str is None:
+                _class = parent_serializer_class.included_serializers.get(field_name, None)
+                if _class is None:
                     raise NotFound
 
             else:
                 assert False, \
                     'Either "included_serializers" or "related_serializers" should be configured'
 
-            return import_class_from_dotted_path(class_str)
+            if not isinstance(_class, type):
+                return import_class_from_dotted_path(_class)
+            return _class
 
         return parent_serializer_class
 
