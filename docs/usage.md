@@ -448,6 +448,9 @@ and increase performance.
 There is a nice way to handle "related" urls like `/orders/3/lineitems/` or `/orders/3/customer/`.
 All you need is just add to `urls.py`:
 ```python
+url(r'^orders/(?P<pk>[^/.]+)/$',
+        OrderViewSet.as_view({'get': 'retrieve'}),
+        name='order-detail'),
 url(r'^orders/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
         OrderViewSet.as_view({'get': 'retrieve_related'}),
         name='order-related'),
@@ -457,14 +460,14 @@ Make sure that RelatedField declaration has `related_link_url_kwarg='pk'` or sim
     line_items = ResourceRelatedField(
         queryset=LineItem.objects,
         many=True,
-        related_link_view_name='order-lineitems-list',
+        related_link_view_name='order-related',
         related_link_url_kwarg='pk',
-        self_link_view_name='order_relationships'
+        self_link_view_name='order-relationships'
     )
 
     customer = ResourceRelatedField(
         queryset=Customer.objects,
-        related_link_view_name='order-customer-detail',
+        related_link_view_name='order-related',
         self_link_view_name='order-relationships'
     )
 ```

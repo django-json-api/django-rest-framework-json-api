@@ -13,7 +13,7 @@ from . import TestBase
 from .. import views
 from example.factories import AuthorFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
-from example.serializers import AuthorBioSerializer, EntrySerializer, AuthorTypeSerializer
+from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
 from example.views import AuthorViewSet
 
 
