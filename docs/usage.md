@@ -443,6 +443,53 @@ class LineItemViewSet(viewsets.ModelViewSet):
 not render `data`. Use this in case you only need links of relationships and want to lower payload
 and increase performance.
 
+#### Related urls
+
+There is a nice way to handle "related" urls like `/orders/3/lineitems/` or `/orders/3/customer/`.
+All you need is just add to `urls.py`:
+```python
+url(r'^orders/(?P<pk>[^/.]+)/$',
+        OrderViewSet.as_view({'get': 'retrieve'}),
+        name='order-detail'),
+url(r'^orders/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+        OrderViewSet.as_view({'get': 'retrieve_related'}),
+        name='order-related'),
+```
+Make sure that RelatedField declaration has `related_link_url_kwarg='pk'` or simply skipped (will be set by default):
+```python
+    line_items = ResourceRelatedField(
+        queryset=LineItem.objects,
+        many=True,
+        related_link_view_name='order-related',
+        related_link_url_kwarg='pk',
+        self_link_view_name='order-relationships'
+    )
+
+    customer = ResourceRelatedField(
+        queryset=Customer.objects,
+        related_link_view_name='order-related',
+        self_link_view_name='order-relationships'
+    )
+```
+And, the most important part - declare serializer for each related entity:
+```python
+class OrderSerializer(serializers.HyperlinkedModelSerializer):
+    ...
+    related_serializers = {
+        'customer': 'example.serializers.CustomerSerializer',
+        'line_items': 'example.serializers.LineItemSerializer'
+    }
+```
+Or, if you already have `included_serializers` declared and your `related_serializers` look the same, just skip it:
+```python
+class OrderSerializer(serializers.HyperlinkedModelSerializer):
+    ...
+    included_serializers = {
+        'customer': 'example.serializers.CustomerSerializer',
+        'line_items': 'example.serializers.LineItemSerializer'
+    }
+```
+
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
 relationship views (see the

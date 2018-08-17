@@ -155,14 +155,40 @@ class AuthorBioSerializer(serializers.ModelSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
+    bio = relations.ResourceRelatedField(
+        related_link_view_name='author-related',
+        self_link_view_name='author-relationships',
+        queryset=AuthorBio.objects,
+    )
+    entries = relations.ResourceRelatedField(
+        related_link_view_name='author-related',
+        self_link_view_name='author-relationships',
+        queryset=Entry.objects,
+        many=True
+    )
+    first_entry = relations.SerializerMethodResourceRelatedField(
+        related_link_view_name='author-related',
+        self_link_view_name='author-relationships',
+        model=Entry,
+        read_only=True,
+        source='get_first_entry'
+    )
     included_serializers = {
         'bio': AuthorBioSerializer,
         'type': AuthorTypeSerializer
     }
+    related_serializers = {
+        'bio': 'example.serializers.AuthorBioSerializer',
+        'entries': 'example.serializers.EntrySerializer',
+        'first_entry': 'example.serializers.EntrySerializer'
+    }
 
     class Meta:
         model = Author
-        fields = ('name', 'email', 'bio', 'entries', 'type')
+        fields = ('name', 'email', 'bio', 'entries', 'first_entry', 'type')
+
+    def get_first_entry(self, obj):
+        return obj.entries.first()
 
 
 class WriterSerializer(serializers.ModelSerializer):

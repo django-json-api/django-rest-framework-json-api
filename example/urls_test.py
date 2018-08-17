@@ -56,6 +56,10 @@ urlpatterns = [
         EntryViewSet.as_view({'get': 'retrieve'}),
         name='entry-featured'),
 
+    url(r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+        AuthorViewSet.as_view({'get': 'retrieve_related'}),
+        name='author-related'),
+
     url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         EntryRelationshipView.as_view(),
         name='entry-relationships'),

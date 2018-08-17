@@ -2,14 +2,19 @@ import json
 
 from django.test import RequestFactory
 from django.utils import timezone
+from rest_framework.exceptions import NotFound
+from rest_framework.request import Request
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase, force_authenticate
+from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
 from rest_framework_json_api.utils import format_resource_type
 
 from . import TestBase
 from .. import views
+from example.factories import AuthorFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
+from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
+from example.views import AuthorViewSet
 
 
 class TestRelationshipView(APITestCase):
@@ -223,6 +228,96 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.delete(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
+
+
+class TestRelatedMixin(APITestCase):
+
+    def setUp(self):
+        self.author = AuthorFactory()
+
+    def _get_view(self, kwargs):
+        factory = APIRequestFactory()
+        request = Request(factory.get('', content_type='application/vnd.api+json'))
+        return AuthorViewSet(request=request, kwargs=kwargs)
+
+    def test_get_related_field_name(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'bio'}
+        view = self._get_view(kwargs)
+        got = view.get_related_field_name()
+        self.assertEqual(got, kwargs['related_field'])
+
+    def test_get_related_instance_serializer_field(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'bio'}
+        view = self._get_view(kwargs)
+        got = view.get_related_instance()
+        self.assertEqual(got, self.author.bio)
+
+    def test_get_related_instance_model_field(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'id'}
+        view = self._get_view(kwargs)
+        got = view.get_related_instance()
+        self.assertEqual(got, self.author.id)
+
+    def test_get_serializer_class(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'bio'}
+        view = self._get_view(kwargs)
+        got = view.get_serializer_class()
+        self.assertEqual(got, AuthorBioSerializer)
+
+    def test_get_serializer_class_many(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'entries'}
+        view = self._get_view(kwargs)
+        got = view.get_serializer_class()
+        self.assertEqual(got, EntrySerializer)
+
+    def test_get_serializer_comes_from_included_serializers(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'type'}
+        view = self._get_view(kwargs)
+        related_serializers = view.serializer_class.related_serializers
+        delattr(view.serializer_class, 'related_serializers')
+        got = view.get_serializer_class()
+        self.assertEqual(got, AuthorTypeSerializer)
+
+        view.serializer_class.related_serializers = related_serializers
+
+    def test_get_serializer_class_raises_error(self):
+        kwargs = {'pk': self.author.id, 'related_field': 'type'}
+        view = self._get_view(kwargs)
+        self.assertRaises(NotFound, view.get_serializer_class)
+
+    def test_retrieve_related_single(self):
+        url = reverse('author-related', kwargs={'pk': self.author.pk, 'related_field': 'bio'})
+        resp = self.client.get(url)
+        expected = {
+            'data': {
+                'type': 'authorBios', 'id': str(self.author.bio.id),
+                'relationships': {
+                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}}},
+                'attributes': {
+                    'body': str(self.author.bio.body)
+                },
+            }
+        }
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected)
+
+    def test_retrieve_related_many(self):
+        entry = EntryFactory(authors=self.author)
+        url = reverse('author-related', kwargs={'pk': self.author.pk, 'related_field': 'entries'})
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(isinstance(resp.json()['data'], list))
+        self.assertEqual(len(resp.json()['data']), 1)
+        self.assertEqual(resp.json()['data'][0]['id'], str(entry.id))
+
+    def test_retrieve_related_None(self):
+        kwargs = {'pk': self.author.pk, 'related_field': 'first_entry'}
+        url = reverse('author-related', kwargs=kwargs)
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), {'data': None})
 
 
 class TestValidationErrorResponses(TestBase):

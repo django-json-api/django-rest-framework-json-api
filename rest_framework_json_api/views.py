@@ -1,3 +1,5 @@
+from collections import Iterable
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
 from django.db.models.fields.related_descriptors import (
@@ -9,6 +11,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.response import Response
@@ -98,12 +101,85 @@ class AutoPrefetchMixin(object):
         return qs
 
 
-class ModelViewSet(AutoPrefetchMixin, PrefetchForIncludesHelperMixin, viewsets.ModelViewSet):
+class RelatedMixin(object):
+    """
+    This mixin handles all related entities, whose Serializers are declared in "related_serializers"
+    """
+
+    def retrieve_related(self, request, *args, **kwargs):
+        serializer_kwargs = {}
+        instance = self.get_related_instance()
+
+        if hasattr(instance, 'all'):
+            instance = instance.all()
+
+        if callable(instance):
+            instance = instance()
+
+        if instance is None:
+            return Response(data=None)
+
+        if isinstance(instance, Iterable):
+            serializer_kwargs['many'] = True
+
+        serializer = self.get_serializer(instance, **serializer_kwargs)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        parent_serializer_class = super(RelatedMixin, self).get_serializer_class()
+
+        if 'related_field' in self.kwargs:
+            field_name = self.kwargs['related_field']
+
+            # Try get the class from related_serializers
+            if hasattr(parent_serializer_class, 'related_serializers'):
+                _class = parent_serializer_class.related_serializers.get(field_name, None)
+                if _class is None:
+                    raise NotFound
+
+            elif hasattr(parent_serializer_class, 'included_serializers'):
+                _class = parent_serializer_class.included_serializers.get(field_name, None)
+                if _class is None:
+                    raise NotFound
+
+            else:
+                assert False, \
+                    'Either "included_serializers" or "related_serializers" should be configured'
+
+            if not isinstance(_class, type):
+                return import_class_from_dotted_path(_class)
+            return _class
+
+        return parent_serializer_class
+
+    def get_related_field_name(self):
+        return self.kwargs['related_field']
+
+    def get_related_instance(self):
+        parent_obj = self.get_object()
+        parent_serializer = self.serializer_class(parent_obj)
+        field_name = self.get_related_field_name()
+        field = parent_serializer.fields.get(field_name, None)
+
+        if field is not None:
+            return field.get_attribute(parent_obj)
+        else:
+            try:
+                return getattr(parent_obj, field_name)
+            except AttributeError:
+                raise NotFound
+
+
+class ModelViewSet(AutoPrefetchMixin,
+                   PrefetchForIncludesHelperMixin,
+                   RelatedMixin,
+                   viewsets.ModelViewSet):
     pass
 
 
 class ReadOnlyModelViewSet(AutoPrefetchMixin,
                            PrefetchForIncludesHelperMixin,
+                           RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
     pass
 
