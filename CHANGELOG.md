@@ -4,7 +4,8 @@
 * Add sorting configuration to `REST_FRAMEWORK` as defined in [json api spec](http://jsonapi.org/format/#fetching-sorting)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
-
+* For naming consistency, renamed new `JsonApi`-prefix pagination classes to `JSONAPI`-prefix.
+  * Deprecates `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`
 
 v2.5.0 - Released July 11, 2018
 
