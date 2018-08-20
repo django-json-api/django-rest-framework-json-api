@@ -1,0 +1,60 @@
+- model: example.blog
+  pk: 1
+  fields: {name: ANTB, tagline: ANTHROPOLOGY (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.blog
+  pk: 2
+  fields: {name: CLSB, tagline: CLASSICS (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.blog
+  pk: 3
+  fields: {name: AMSB, tagline: AMERICAN STUDIES (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.blog
+  pk: 4
+  fields: {name: CHMB, tagline: CHEMISTRY (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.blog
+  pk: 5
+  fields: {name: ARHB, tagline: ART HISTORY (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.blog
+  pk: 6
+  fields: {name: ITLB, tagline: ITALIAN (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.blog
+  pk: 7
+  fields: {name: BIOB, tagline: BIOLOGICAL SCIENCES (BARNARD), created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 1
+  fields: {blog: 1, headline: ANTH1009V, body_text: INTRO TO LANGUAGE & CULTURE, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 2
+  fields: {blog: 2, headline: CLCV2442V, body_text: EGYPT IN CLASSICAL WORLD-DISC, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 3
+  fields: {blog: 3, headline: AMST3704X, body_text: SENIOR RESEARCH ESSAY SEMINAR, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 4
+  fields: {blog: 1, headline: ANTH3976V, body_text: ANTHROPOLOGY OF SCIENCE, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 5
+  fields: {blog: 4, headline: CHEM3271X, body_text: INORGANIC CHEMISTRY, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 6
+  fields: {blog: 5, headline: AHIS3915X, body_text: ISLAM AND MEDIEVAL WEST, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 7
+  fields: {blog: 1, headline: ANTH3868X, body_text: ETHNOGRAPHIC FIELD RESEARCH IN
+      NYC, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 8
+  fields: {blog: 6, headline: CLIA3660V, body_text: MAFIA MOVIES, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 9
+  fields: {blog: 5, headline: AHIS3999X, body_text: INDEPENDENT RESEARCH, created_at: '2018-08-20', modified_at: '2018-08-20'}
+- model: example.entry
+  pk: 10
+  fields: {blog: 7, headline: BIOL3594X, body_text: SENIOR THESIS SEMINAR, created_at: '2018-08-20', modified_at: '2018-08-20'}
+# a null body_text:
+- model: example.entry
+  pk: 11
+  fields: {blog: 7, headline: BIOL9999X, body_text: null, created_at: '2018-08-20', modified_at: '2018-08-20'}
+# an empty body_text:
+- model: example.entry
+  pk: 12
+  fields: {blog: 7, headline: BIOL0000X, body_text: "", created_at: '2018-08-20', modified_at: '2018-08-20'}
