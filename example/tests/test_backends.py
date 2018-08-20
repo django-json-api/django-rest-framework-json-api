@@ -1,6 +1,7 @@
 import json
 
 from rest_framework.test import APITestCase
+
 from ..models import Blog, Entry
 
 ENTRIES = "/nopage-entries"
