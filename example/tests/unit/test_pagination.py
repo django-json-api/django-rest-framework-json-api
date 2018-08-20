@@ -13,11 +13,11 @@ factory = APIRequestFactory()
 
 class TestLimitOffset:
     """
-    Unit tests for `pagination.JsonApiLimitOffsetPagination`.
+    Unit tests for `pagination.JSONAPILimitOffsetPagination`.
     """
 
     def setup(self):
-        class ExamplePagination(pagination.JsonApiLimitOffsetPagination):
+        class ExamplePagination(pagination.JSONAPILimitOffsetPagination):
             default_limit = 10
             max_limit = 15
 
@@ -91,7 +91,7 @@ class TestLimitOffset:
                    reason="python2.7 fails for unknown reason")
 class TestPageNumber:
     """
-    Unit tests for `pagination.JsonApiPageNumberPagination`.
+    Unit tests for `pagination.JSONAPIPageNumberPagination`.
     TODO: add unit tests for changing query parameter names, limits, etc.
     """
     def test_page_number_deprecation(self):
