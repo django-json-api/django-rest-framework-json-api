@@ -68,15 +68,15 @@ From Source
 
 ## Running the example app
 
-    git clone https://github.com/django-json-api/django-rest-framework-json-api.git
-    cd django-rest-framework-json-api
-    python -m venv env
-    source env/bin/activate
-    pip install -r example/requirements.txt
+	git clone https://github.com/django-json-api/django-rest-framework-json-api.git
+	cd django-rest-framework-json-api
+	python3 -m venv env
+	source env/bin/activate
+	pip install -r example/requirements.txt
 	pip install -e .
-    django-admin.py startproject example .
-    python manage.py migrate
-    python manage.py runserver
+	django-admin migrate --settings=example.settings
+	django-admin runserver --settings=example.settings
+
 
 Browse to http://localhost:8000
 
