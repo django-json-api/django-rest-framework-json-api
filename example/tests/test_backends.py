@@ -1,9 +1,8 @@
-import json
-
-from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
 
 from ..models import Blog, Entry
+
 
 class DJATestParameters(APITestCase):
     """
@@ -20,7 +19,7 @@ class DJATestParameters(APITestCase):
         """
         test sort
         """
-        response = self.client.get(self.url, data = {'sort': 'headline'})
+        response = self.client.get(self.url, data={'sort': 'headline'})
         self.assertEqual(response.status_code, 200,
                          msg=response.content.decode("utf-8"))
         dja_response = response.json()
@@ -33,7 +32,7 @@ class DJATestParameters(APITestCase):
         """
         confirm switching the sort order actually works
         """
-        response = self.client.get(self.url, data = {'sort': '-headline'})
+        response = self.client.get(self.url, data={'sort': '-headline'})
         self.assertEqual(response.status_code, 200,
                          msg=response.content.decode("utf-8"))
         dja_response = response.json()
@@ -47,7 +46,7 @@ class DJATestParameters(APITestCase):
         test sort of invalid field
         """
         response = self.client.get(self.url,
-                                   data = {'sort': 'nonesuch,headline,-not_a_field'})
+                                   data={'sort': 'nonesuch,headline,-not_a_field'})
         self.assertEqual(response.status_code, 400,
                          msg=response.content.decode("utf-8"))
         dja_response = response.json()
