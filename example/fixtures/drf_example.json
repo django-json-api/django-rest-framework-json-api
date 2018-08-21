@@ -1,0 +1,124 @@
+[
+{
+  "model": "example.blog",
+  "pk": 1,
+  "fields": {
+    "created_at": "2016-05-02T08:27:16.889",
+    "modified_at": "2016-05-02T08:27:16.889",
+    "name": "Personal",
+    "tagline": ""
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 2,
+  "fields": {
+    "created_at": "2016-05-02T08:27:23.871",
+    "modified_at": "2016-05-02T08:27:23.871",
+    "name": "Work",
+    "tagline": ""
+  }
+},
+{
+  "model": "example.author",
+  "pk": 1,
+  "fields": {
+    "created_at": "2016-05-02T10:09:48.277",
+    "modified_at": "2016-05-02T10:09:48.277",
+    "name": "Alice",
+    "email": "alice@example.com",
+    "type": null
+  }
+},
+{
+  "model": "example.author",
+  "pk": 2,
+  "fields": {
+    "created_at": "2016-05-02T10:09:57.133",
+    "modified_at": "2016-05-02T10:09:57.133",
+    "name": "Bob",
+    "email": "bob@example.com",
+    "type": null
+  }
+},
+{
+  "model": "example.authorbio",
+  "pk": 1,
+  "fields": {
+    "created_at": "2016-05-02T10:10:23.429",
+    "modified_at": "2016-05-02T10:10:23.429",
+    "author": 1,
+    "body": "I just want to send messages to Bob."
+  }
+},
+{
+  "model": "example.authorbio",
+  "pk": 2,
+  "fields": {
+    "created_at": "2016-05-02T10:11:30.327",
+    "modified_at": "2016-05-02T10:11:30.327",
+    "author": 2,
+    "body": "I get messages from Alice and send them to Carol"
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 1,
+  "fields": {
+    "created_at": "2016-05-02T10:43:21.271",
+    "modified_at": "2016-05-02T10:43:21.271",
+    "blog": 1,
+    "headline": "This is a test, this is only a test",
+    "body_text": "And this is the body text for the blog entry. To see comments included in this payload visit: /entries/1?include=comments",
+    "pub_date": "2015-01-01",
+    "mod_date": "2015-04-05",
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": [
+      1
+    ]
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 2,
+  "fields": {
+    "created_at": "2016-05-02T10:44:14.376",
+    "modified_at": "2016-05-02T10:49:30.150",
+    "blog": 1,
+    "headline": "Django, the framework for perfectionists with deadlines",
+    "body_text": "And this is the body text. Try out includes by using this uri: /entries/2?include=comments,authors,authors.bio",
+    "pub_date": "2015-05-01",
+    "mod_date": "2015-09-03",
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": [
+      2
+    ]
+  }
+},
+{
+  "model": "example.comment",
+  "pk": 1,
+  "fields": {
+    "created_at": "2016-05-02T10:44:35.093",
+    "modified_at": "2016-05-02T10:44:35.093",
+    "entry": 1,
+    "body": "Love this article!",
+    "author": 2
+  }
+},
+{
+  "model": "example.comment",
+  "pk": 2,
+  "fields": {
+    "created_at": "2016-05-02T10:44:55.482",
+    "modified_at": "2016-05-02T10:44:55.482",
+    "entry": 2,
+    "body": "Frist comment!!!",
+    "author": null
+  }
+}
+]

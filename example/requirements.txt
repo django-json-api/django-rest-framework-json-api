@@ -11,4 +11,4 @@ pyparsing
 pytz
 six
 sqlparse
-PyYAML
+
