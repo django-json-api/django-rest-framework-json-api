@@ -47,3 +47,6 @@ pip-delete-this-directory.txt
 *.sw*
 manage.py
 .DS_Store
+
+# example database
+drf_example
