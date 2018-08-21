@@ -75,6 +75,7 @@ From Source
 	pip install -r example/requirements.txt
 	pip install -e .
 	django-admin migrate --settings=example.settings
+	django-admin loaddata drf_example --settings=example.settings
 	django-admin runserver --settings=example.settings
 
 
