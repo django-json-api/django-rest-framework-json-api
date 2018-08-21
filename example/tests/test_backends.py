@@ -1,11 +1,9 @@
 import json
 
 from rest_framework.test import APITestCase
+from rest_framework.reverse import reverse
 
 from ..models import Blog, Entry
-
-ENTRIES = "/nopage-entries"
-
 
 class DJATestParameters(APITestCase):
     """
@@ -16,17 +14,18 @@ class DJATestParameters(APITestCase):
     def setUp(self):
         self.entries = Entry.objects.all()
         self.blogs = Blog.objects.all()
+        self.url = reverse('nopage-entry-list')
 
     def test_sort(self):
         """
         test sort
         """
-        response = self.client.get(ENTRIES + '?sort=headline')
+        response = self.client.get(self.url, data = {'sort': 'headline'})
         self.assertEqual(response.status_code, 200,
                          msg=response.content.decode("utf-8"))
-        j = json.loads(response.content.decode("utf-8"))
-        headlines = [c['attributes']['headline'] for c in j['data']]
-        sorted_headlines = [c['attributes']['headline'] for c in j['data']]
+        dja_response = response.json()
+        headlines = [c['attributes']['headline'] for c in dja_response['data']]
+        sorted_headlines = [c['attributes']['headline'] for c in dja_response['data']]
         sorted_headlines.sort()
         self.assertEqual(headlines, sorted_headlines)
 
@@ -34,12 +33,12 @@ class DJATestParameters(APITestCase):
         """
         confirm switching the sort order actually works
         """
-        response = self.client.get(ENTRIES + '?sort=-headline')
+        response = self.client.get(self.url, data = {'sort': '-headline'})
         self.assertEqual(response.status_code, 200,
                          msg=response.content.decode("utf-8"))
-        j = json.loads(response.content.decode("utf-8"))
-        headlines = [c['attributes']['headline'] for c in j['data']]
-        sorted_headlines = [c['attributes']['headline'] for c in j['data']]
+        dja_response = response.json()
+        headlines = [c['attributes']['headline'] for c in dja_response['data']]
+        sorted_headlines = [c['attributes']['headline'] for c in dja_response['data']]
         sorted_headlines.sort()
         self.assertNotEqual(headlines, sorted_headlines)
 
@@ -47,10 +46,10 @@ class DJATestParameters(APITestCase):
         """
         test sort of invalid field
         """
-        response = self.client.get(
-            ENTRIES + '?sort=nonesuch,headline,-not_a_field')
+        response = self.client.get(self.url,
+                                   data = {'sort': 'nonesuch,headline,-not_a_field'})
         self.assertEqual(response.status_code, 400,
                          msg=response.content.decode("utf-8"))
-        j = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(j['errors'][0]['detail'],
+        dja_response = response.json()
+        self.assertEqual(dja_response['errors'][0]['detail'],
                          "invalid sort parameters: nonesuch,-not_a_field")

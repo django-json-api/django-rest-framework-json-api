@@ -1,0 +1,280 @@
+[
+{
+  "model": "example.blog",
+  "pk": 1,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "ANTB",
+    "tagline": "ANTHROPOLOGY (BARNARD)"
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 2,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "CLSB",
+    "tagline": "CLASSICS (BARNARD)"
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 3,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "AMSB",
+    "tagline": "AMERICAN STUDIES (BARNARD)"
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 4,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "CHMB",
+    "tagline": "CHEMISTRY (BARNARD)"
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 5,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "ARHB",
+    "tagline": "ART HISTORY (BARNARD)"
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 6,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "ITLB",
+    "tagline": "ITALIAN (BARNARD)"
+  }
+},
+{
+  "model": "example.blog",
+  "pk": 7,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "name": "BIOB",
+    "tagline": "BIOLOGICAL SCIENCES (BARNARD)"
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 1,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 1,
+    "headline": "ANTH1009V",
+    "body_text": "INTRO TO LANGUAGE & CULTURE",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": [
+      1
+    ]
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 2,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 2,
+    "headline": "CLCV2442V",
+    "body_text": "EGYPT IN CLASSICAL WORLD-DISC",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": [
+      2
+    ]
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 3,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 3,
+    "headline": "AMST3704X",
+    "body_text": "SENIOR RESEARCH ESSAY SEMINAR",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 4,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 1,
+    "headline": "ANTH3976V",
+    "body_text": "ANTHROPOLOGY OF SCIENCE",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 5,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 4,
+    "headline": "CHEM3271X",
+    "body_text": "INORGANIC CHEMISTRY",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 6,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 5,
+    "headline": "AHIS3915X",
+    "body_text": "ISLAM AND MEDIEVAL WEST",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 7,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 1,
+    "headline": "ANTH3868X",
+    "body_text": "ETHNOGRAPHIC FIELD RESEARCH IN NYC",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 8,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 6,
+    "headline": "CLIA3660V",
+    "body_text": "MAFIA MOVIES",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 9,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 5,
+    "headline": "AHIS3999X",
+    "body_text": "INDEPENDENT RESEARCH",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 10,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 7,
+    "headline": "BIOL3594X",
+    "body_text": "SENIOR THESIS SEMINAR",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 11,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 7,
+    "headline": "BIOL9999X",
+    "body_text": null,
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+},
+{
+  "model": "example.entry",
+  "pk": 12,
+  "fields": {
+    "created_at": "2018-08-20T00:00:00",
+    "modified_at": "2018-08-20T00:00:00",
+    "blog": 7,
+    "headline": "BIOL0000X",
+    "body_text": "",
+    "pub_date": null,
+    "mod_date": null,
+    "n_comments": 0,
+    "n_pingbacks": 0,
+    "rating": 0,
+    "authors": []
+  }
+}
+]

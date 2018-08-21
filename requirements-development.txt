@@ -14,4 +14,4 @@ Sphinx
 sphinx_rtd_theme
 tox
 twine
-PyYAML
+
