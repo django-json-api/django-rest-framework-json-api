@@ -13,11 +13,11 @@ factory = APIRequestFactory()
 
 class TestLimitOffset:
     """
-    Unit tests for `pagination.JsonApiLimitOffsetPagination`.
+    Unit tests for `pagination.JSONAPILimitOffsetPagination`.
     """
 
     def setup(self):
-        class ExamplePagination(pagination.JsonApiLimitOffsetPagination):
+        class ExamplePagination(pagination.JSONAPILimitOffsetPagination):
             default_limit = 10
             max_limit = 15
 
@@ -85,13 +85,18 @@ class TestLimitOffset:
         assert len(record) == 1
         assert 'LimitOffsetPagination' in str(record[0].message)
 
+        with pytest.warns(DeprecationWarning) as record:
+            pagination.JsonApiLimitOffsetPagination()
+        assert len(record) == 1
+        assert 'JsonApiLimitOffsetPagination' in str(record[0].message)
+
 
 # TODO: This test fails under py27 but it's not clear why so just leave it out for now.
 @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
                    reason="python2.7 fails for unknown reason")
 class TestPageNumber:
     """
-    Unit tests for `pagination.JsonApiPageNumberPagination`.
+    Unit tests for `pagination.JSONAPIPageNumberPagination`.
     TODO: add unit tests for changing query parameter names, limits, etc.
     """
     def test_page_number_deprecation(self):
@@ -99,3 +104,8 @@ class TestPageNumber:
             pagination.PageNumberPagination()
         assert len(record) == 1
         assert 'PageNumberPagination' in str(record[0].message)
+
+        with pytest.warns(DeprecationWarning) as record:
+            pagination.JsonApiPageNumberPagination()
+        assert len(record) == 1
+        assert 'JsonApiPageNumberPagination' in str(record[0].message)
