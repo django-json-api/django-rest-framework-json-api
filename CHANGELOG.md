@@ -1,11 +1,10 @@
 [unreleased]
 
 * Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
-* Add sorting configuration to `REST_FRAMEWORK` as defined in [json api spec](http://jsonapi.org/format/#fetching-sorting)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
 * Replaced binary `drf_example` sqlite3 db with a [fixture](example/fixtures/drf_example.yaml). See [usage docs](docs/usage.md#running-the-example-app).
-
+* Add optional [jsonapi-style](http://jsonapi.org/format/) sort filter backend. See [usage docs](docs/usage.md#filter-backends)
 
 v2.5.0 - Released July 11, 2018
 

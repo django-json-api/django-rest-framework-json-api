@@ -1,10 +1,11 @@
 
 # Usage
 
-The DJA package implements a custom renderer, parser, exception handler, and
+The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
-Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`.
+Many features of the [JSON:API](http://jsonapi.org/format) format standard have been implemented using 
+Mixin classes in `serializers.py`.
 The easiest way to make use of those features is to import ModelSerializer variants
 from `rest_framework_json_api` instead of the usual `rest_framework`
 
@@ -32,9 +33,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework.filters.OrderingFilter',
+        'rest_framework_json_api.backends.JSONAPIOrderingFilter',
     ),
-    'ORDERING_PARAM': 'sort',
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
     ),
@@ -89,6 +89,35 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
     limit_query_param = 'limit'
     max_limit = None
 ```
+
+### Filter Backends
+
+_This is the first of several anticipated JSON:API-specific filter backends._
+
+#### `JSONAPIOrderingFilter`
+`JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
+DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
+
+Per the JSON:API, "If the server does not support sorting as specified in the query parameter `sort`,
+it **MUST** return `400 Bad Request`." For example, for `?sort=`abc,foo,def` where `foo` is a valid
+field name and the other two are not valid:
+```json
+{
+    "errors": [
+        {
+            "detail": "invalid sort parameters: abc,def",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+
+If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
+`ordering_param` to `sort`.
+
 
 ### Performance Testing
 
