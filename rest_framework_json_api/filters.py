@@ -1,8 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
+from rest_framework.settings import api_settings
 
 from rest_framework_json_api.utils import format_value
-
+import re
 
 class JSONAPIOrderingFilter(OrderingFilter):
     """
@@ -42,3 +44,88 @@ class JSONAPIOrderingFilter(OrderingFilter):
 
         return super(JSONAPIOrderingFilter, self).remove_invalid_fields(
             queryset, underscore_fields, view, request)
+
+
+class JSONAPIDjangoFilter(DjangoFilterBackend):
+    """
+    A Django-style ORM filter implementation, using `django-filter`.
+
+    This is not part of the jsonapi standard per-se, other than the requirement
+    to use the `filter` keyword: This is an optional implementation of style of
+    filtering in which each filter is an ORM expression as implemented by
+    DjangoFilterBackend and seems to be in alignment with an interpretation of
+    http://jsonapi.org/recommendations/#filtering, including relationship
+    chaining.
+
+    Filters can be:
+    - A resource field equality test:
+        `?filter[foo]=123`
+    - Apply other relational operators:
+        `?filter[foo.in]=bar,baz or ?filter[name.isnull]=true...`
+    - Membership in a list of values (OR):
+        `?filter[foo]=abc,123,zzz (foo in ['abc','123','zzz'])`
+    - Filters can be combined for intersection (AND):
+        `?filter[foo]=123&filter[bar]=abc,123,zzz&filter[...]`
+    - A related resource path for above tests:
+        `?filter[foo.rel.baz]=123 (where `rel` is the relationship name)`
+
+    If you are also using rest_framework.filters.SearchFilter you'll want to customize
+    the name of the query parameter for searching to make sure it doesn't conflict
+    with a field name defined in the filterset.
+    The recommended value is: `search_param="filter[search]"` but just make sure it's
+    `filter[<something>]` to comply with the jsonapi spec requirement to use the filter
+    keyword. The default is "search" unless overriden but it's used here just to make sure
+    we don't complain about it being an invalid filter.
+
+    TODO: find a better way to deal with search_param.
+    """
+    search_param = api_settings.SEARCH_PARAM
+    # since 'filter' passes query parameter validation but is still invalid,
+    # make this regex check for it but not set `filter` regex group.
+    filter_regex = re.compile(r'^filter(?P<ldelim>\W*)(?P<assoc>[\w._]*)(?P<rdelim>\W*$)')
+
+    def get_filterset(self, request, queryset, view):
+        """
+        Sometimes there's no filterset_class defined yet the client still
+        requests a filter. Make sure they see an error too. This means
+        we have to get_filterset_kwargs() even if there's no filterset_class.
+
+        TODO: .base_filters vs. .filters attr (not always present)
+        """
+        filterset_class = self.get_filterset_class(view, queryset)
+        kwargs = self.get_filterset_kwargs(request, queryset, view)
+        for k in self.filter_keys:
+            if ((not filterset_class)
+                    or (k not in filterset_class.base_filters)):
+                raise ValidationError("invalid filter[{}]".format(k))
+        if filterset_class is None:
+            return None
+        return filterset_class(**kwargs)
+
+    def get_filterset_kwargs(self, request, queryset, view):
+        """
+        Turns filter[<field>]=<value> into <field>=<value> which is what
+        DjangoFilterBackend expects
+        """
+        self.filter_keys = []
+        # rewrite filter[field] query params to make DjangoFilterBackend work.
+        data = request.query_params.copy()
+        for qp, val in data.items():
+            m = self.filter_regex.match(qp)
+            if m and (not m['assoc'] or m['ldelim'] != '[' or m['rdelim'] != ']'):
+                raise ValidationError("invalid filter: {}".format(qp))
+            if m and qp != self.search_param:
+                if not val:
+                    raise ValidationError("missing {} test value".format(qp))
+                # convert jsonapi relationship path to Django ORM's __ notation
+                key = m['assoc'].replace('.', '__')
+                # undo JSON_API_FORMAT_FIELD_NAMES conversion:
+                key = format_value(key, 'underscore')
+                data[key] = val
+                self.filter_keys.append(key)
+                del data[qp]
+        return {
+            'data': data,
+            'queryset': queryset,
+            'request': request,
+        }
