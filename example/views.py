@@ -90,6 +90,7 @@ class NoPagination(PageNumberPagination):
 
 class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
+    ordering_fields = ('headline', 'body_text', 'blog__name', 'blog__id')
 
 
 class AuthorViewSet(ModelViewSet):

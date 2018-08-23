@@ -33,7 +33,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_json_api.backends.JSONAPIOrderingFilter',
+        'rest_framework_json_api.filters.JSONAPIOrderingFilter',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
@@ -98,7 +98,7 @@ _This is the first of several anticipated JSON:API-specific filter backends._
 `JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
 DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
 
-Per the JSON:API, "If the server does not support sorting as specified in the query parameter `sort`,
+Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
 it **MUST** return `400 Bad Request`." For example, for `?sort=`abc,foo,def` where `foo` is a valid
 field name and the other two are not valid:
 ```json
@@ -117,6 +117,20 @@ field name and the other two are not valid:
 
 If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
 `ordering_param` to `sort`.
+
+#### Configuring Filter Backends
+
+You can configure the filter backends either by setting the `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` as shown
+in the [preceding](#configuration) example or individually add them as `.filter_backends` View attributes:
+ 
+ ```python
+from rest_framework_json_api import filters
+
+class MyViewset(ModelViewSet):
+    queryset = MyModel.objects.all()
+    serializer_class = MyModelSerializer
+    filter_backends = (filters.JSONAPIOrderingFilter,)
+```
 
 
 ### Performance Testing

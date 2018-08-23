@@ -10,27 +10,35 @@ class JSONAPIOrderingFilter(OrderingFilter):
     if any sort field is invalid. If you prefer *not* to report 400 errors for
     invalid sort fields, just use OrderingFilter with `ordering_param='sort'`
 
-    TODO: Add sorting based upon relationships (sort=relname.fieldname)
+    Also applies DJA format_value() to convert (e.g. camelcase) to underscore.
+    (See JSON_API_FORMAT_FIELD_NAMES in docs/usage.md)
     """
     ordering_param = 'sort'
 
     def remove_invalid_fields(self, queryset, fields, view, request):
-        """
-        overrides remove_invalid_fields to raise a 400 exception instead of
-        silently removing them. set `ignore_bad_sort_fields = True` to not
-        do this validation.
-        """
         valid_fields = [
             item[0] for item in self.get_valid_fields(queryset, view,
                                                       {'request': request})
         ]
         bad_terms = [
             term for term in fields
-            if format_value(term.lstrip('-'), "underscore") not in valid_fields
+            if format_value(term.replace(".", "__").lstrip('-'), "underscore") not in valid_fields
         ]
         if bad_terms:
             raise ValidationError('invalid sort parameter{}: {}'.format(
                 ('s' if len(bad_terms) > 1 else ''), ','.join(bad_terms)))
+        # this looks like it duplicates code above, but we want the ValidationError to report
+        # the actual parameter supplied while we want the fields passed to the super() to
+        # be correctly rewritten.
+        # The leading `-` has to be stripped to prevent format_value from turning it into `_`.
+        underscore_fields = []
+        for item in fields:
+            item_rewritten = item.replace(".", "__")
+            if item_rewritten.startswith('-'):
+                underscore_fields.append(
+                    '-' + format_value(item_rewritten.lstrip('-'), "underscore"))
+            else:
+                underscore_fields.append(format_value(item_rewritten, "underscore"))
 
         return super(JSONAPIOrderingFilter, self).remove_invalid_fields(
-            queryset, fields, view, request)
+            queryset, underscore_fields, view, request)
