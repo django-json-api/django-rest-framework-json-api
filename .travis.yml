@@ -42,7 +42,7 @@ matrix:
     - python: 3.6
       env: TOXENV=py36-df20-django20-drf37
     - python: 3.6
-x      env: TOXENV=py36-df20-django20-drf38
+      env: TOXENV=py36-df20-django20-drf38
 
     - python: 3.6
       env: TOXENV=flake8
