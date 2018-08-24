@@ -26,8 +26,13 @@ INSTALLED_APPS = [
     'polymorphic',
     'example',
     'debug_toolbar',
-    'django_filters',
 ]
+
+try:
+    import django_filters   # noqa: 401
+    INSTALLED_APPS += ['django_filters']
+except ImportError:
+    pass
 
 TEMPLATES = [
     {

@@ -1,7 +1,6 @@
 import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
-from django_filters import rest_framework as filters
 
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
@@ -106,13 +105,20 @@ class NonPaginatedEntryViewSet(EntryViewSet):
     filter_fields = filterset_fields  # django-filter<=1.11  (required for py27)
 
 
-class EntryFilter(filters.FilterSet):
-    bname = filters.CharFilter(field_name="blog__name",
-                               lookup_expr="exact")
+# While this example is used for testing with django-filter, leave the option of running it without.
+# The test cases will fail, but the app will run.
+try:
+    from django_filters import rest_framework as filters
 
-    class Meta:
-        model = Entry
-        fields = ['id', 'headline', 'body_text']
+    class EntryFilter(filters.FilterSet):
+        bname = filters.CharFilter(field_name="blog__name",
+                                   lookup_expr="exact")
+
+        class Meta:
+            model = Entry
+            fields = ['id', 'headline', 'body_text']
+except ImportError:
+    EntryFilter = None
 
 
 class FiltersetEntryViewSet(EntryViewSet):
