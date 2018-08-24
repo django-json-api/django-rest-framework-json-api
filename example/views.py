@@ -103,6 +103,7 @@ class NonPaginatedEntryViewSet(EntryViewSet):
         'blog__name': rels,
         'blog__tagline': rels,
     }
+    filter_fields = filterset_fields  # django-filter<=1.11  (required for py27)
 
 
 class EntryFilter(filters.FilterSet):
@@ -121,6 +122,8 @@ class FiltersetEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = EntryFilter
+    filter_fields = filterset_fields  # django-filter<=1.11
+    filter_class = filterset_class
 
 
 class NoFiltersetEntryViewSet(EntryViewSet):
@@ -130,6 +133,8 @@ class NoFiltersetEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = None
+    filter_fields = filterset_fields  # django-filter<=1.11
+    filter_class = filterset_class
 
 
 class AuthorViewSet(ModelViewSet):

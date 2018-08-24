@@ -93,6 +93,11 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
     # make this regex check for it but not set `filter` regex group.
     filter_regex = re.compile(r'^filter(?P<ldelim>\W*)(?P<assoc>[\w._]*)(?P<rdelim>\W*$)')
 
+    def validate_filter(self, keys, filterset_class):
+        for k in keys:
+            if ((not filterset_class) or (k not in filterset_class.base_filters)):
+                raise ValidationError("invalid filter[{}]".format(k))
+
     def get_filterset(self, request, queryset, view):
         """
         Sometimes there's no filterset_class defined yet the client still
@@ -103,9 +108,7 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
         """
         filterset_class = self.get_filterset_class(view, queryset)
         kwargs = self.get_filterset_kwargs(request, queryset, view)
-        for k in self.filter_keys:
-            if ((not filterset_class) or (k not in filterset_class.base_filters)):
-                raise ValidationError("invalid filter[{}]".format(k))
+        self.validate_filter(self.filter_keys, filterset_class)
         if filterset_class is None:
             return None
         return filterset_class(**kwargs)
@@ -120,13 +123,14 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
         data = request.query_params.copy()
         for qp, val in data.items():
             m = self.filter_regex.match(qp)
-            if m and (not m['assoc'] or m['ldelim'] != '[' or m['rdelim'] != ']'):
+            if m and (not m.groupdict()['assoc'] or
+                      m.groupdict()['ldelim'] != '[' or m.groupdict()['rdelim'] != ']'):
                 raise ValidationError("invalid filter: {}".format(qp))
             if m and qp != self.search_param:
                 if not val:
                     raise ValidationError("missing {} test value".format(qp))
                 # convert jsonapi relationship path to Django ORM's __ notation
-                key = m['assoc'].replace('.', '__')
+                key = m.groupdict()['assoc'].replace('.', '__')
                 # undo JSON_API_FORMAT_FIELD_NAMES conversion:
                 key = format_value(key, 'underscore')
                 data[key] = val
@@ -137,3 +141,17 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
             'queryset': queryset,
             'request': request,
         }
+
+    def filter_queryset(self, request, queryset, view):
+        """
+        backwards compatibility to 1.1
+        """
+        filter_class = self.get_filter_class(view, queryset)
+
+        kwargs = self.get_filterset_kwargs(request, queryset, view)
+        self.validate_filter(self.filter_keys, filter_class)
+
+        if filter_class:
+            return filter_class(kwargs['data'], queryset=queryset, request=request).qs
+
+        return queryset
