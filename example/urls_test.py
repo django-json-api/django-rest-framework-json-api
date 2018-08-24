@@ -12,9 +12,9 @@ from example.views import (
     CompanyViewset,
     EntryRelationshipView,
     EntryViewSet,
-    NonPaginatedEntryViewSet,
     FiltersetEntryViewSet,
     NoFiltersetEntryViewSet,
+    NonPaginatedEntryViewSet,
     ProjectViewset
 )
 

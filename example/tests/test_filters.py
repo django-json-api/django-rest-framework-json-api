@@ -208,7 +208,7 @@ class DJATestFilters(APITestCase):
         """
         test field for a list of values(ORed): ?filter[field.in]': 'val1,val2,val3
         """
-        response = self.client.get(self.url, 
+        response = self.client.get(self.url,
                                    data={'filter[headline.in]': 'CLCV2442V,XXX,BIOL3594X'})
         dja_response = response.json()
         self.assertEqual(response.status_code, 200,
@@ -225,7 +225,7 @@ class DJATestFilters(APITestCase):
         test fields (ANDed): ?filter[field1]': 'val1&filter[field2]'='val2
         """
         #
-        response = self.client.get(self.url, 
+        response = self.client.get(self.url,
                                    data={'filter[headline.regex]': '^A',
                                          'filter[body_text.icontains]': 'in'})
         self.assertEqual(response.status_code, 200,
@@ -285,7 +285,7 @@ class DJATestFilters(APITestCase):
         """
         test for `filter` with missing filter[association] name and =value
         """
-        response = self.client.get(self.url +'?filter')
+        response = self.client.get(self.url + '?filter')
         self.assertEqual(response.status_code, 400,
                          msg=response.content.decode("utf-8"))
         dja_response = response.json()
@@ -349,4 +349,3 @@ class DJATestFilters(APITestCase):
         dja_response = response.json()
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "missing filter[headline] test value")
-

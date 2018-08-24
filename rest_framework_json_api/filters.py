@@ -1,10 +1,18 @@
-from django_filters.rest_framework import DjangoFilterBackend
+import re
+
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.settings import api_settings
 
 from rest_framework_json_api.utils import format_value
-import re
+
+try:
+    from django_filters.rest_framework import DjangoFilterBackend
+except ImportError as e:
+    class DjangoFilterBackend(object):
+        def __init__(self):
+            raise ImportError("must install django-filter package to use JSONAPIDjangoFilter")
+
 
 class JSONAPIOrderingFilter(OrderingFilter):
     """
@@ -55,19 +63,20 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
     filtering in which each filter is an ORM expression as implemented by
     DjangoFilterBackend and seems to be in alignment with an interpretation of
     http://jsonapi.org/recommendations/#filtering, including relationship
-    chaining.
+    chaining. It also returns a 400 error for invalid filters.
 
     Filters can be:
     - A resource field equality test:
-        `?filter[foo]=123`
-    - Apply other relational operators:
-        `?filter[foo.in]=bar,baz or ?filter[name.isnull]=true...`
-    - Membership in a list of values (OR):
-        `?filter[foo]=abc,123,zzz (foo in ['abc','123','zzz'])`
+        `?filter[qty]=123`
+    - Apply other [field lookup](https://docs.djangoproject.com/en/stable/ref/models/querysets/#field-lookups)  # noqa: E501
+      operators:
+        `?filter[name.icontains]=bar` or `?filter[name.isnull]=true...`
+    - Membership in a list of values:
+        `?filter[name.in]=abc,123,zzz (name in ['abc','123','zzz'])`
     - Filters can be combined for intersection (AND):
-        `?filter[foo]=123&filter[bar]=abc,123,zzz&filter[...]`
-    - A related resource path for above tests:
-        `?filter[foo.rel.baz]=123 (where `rel` is the relationship name)`
+        `?filter[qty]=123&filter[name.in]=abc,123,zzz&filter[...]`
+    - A related resource path can be used:
+    `?filter[inventory.item.partNum]=123456 (where `inventory.item` is the relationship path)`
 
     If you are also using rest_framework.filters.SearchFilter you'll want to customize
     the name of the query parameter for searching to make sure it doesn't conflict
@@ -95,8 +104,7 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
         filterset_class = self.get_filterset_class(view, queryset)
         kwargs = self.get_filterset_kwargs(request, queryset, view)
         for k in self.filter_keys:
-            if ((not filterset_class)
-                    or (k not in filterset_class.base_filters)):
+            if ((not filterset_class) or (k not in filterset_class.base_filters)):
                 raise ValidationError("invalid filter[{}]".format(k))
         if filterset_class is None:
             return None

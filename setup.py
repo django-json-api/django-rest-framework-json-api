@@ -111,7 +111,8 @@ setup(
         'pytest-cov',
         'django-polymorphic>=2.0',
         'packaging',
-        'django-debug-toolbar'
+        'django-debug-toolbar',
+        'django-filter>=2.0'
     ] + mock,
     zip_safe=False,
 )
