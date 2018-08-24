@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'polymorphic',
     'example',
     'debug_toolbar',
+    'django_filters',
 ]
 
 TEMPLATES = [
