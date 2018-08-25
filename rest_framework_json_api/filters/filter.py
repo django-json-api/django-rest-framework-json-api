@@ -1,4 +1,5 @@
 import re
+import warnings
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
@@ -10,6 +11,13 @@ try:
     from django_filters.rest_framework import DjangoFilterBackend
 except ImportError:
     class JSONAPIDjangoFilter(object):
+
+        def __init__(self, *args, **kwargs):
+            """
+            complain that they need django-filter
+            TODO: should this be a warning or an exception?
+            """
+            warnings.warn("must install django-filter package to use JSONAPIDjangoFilter")
 
         def filter_queryset(self, request, queryset, view):
             """
