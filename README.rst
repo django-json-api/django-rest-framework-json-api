@@ -173,7 +173,9 @@ override ``settings.REST_FRAMEWORK``
         ),
         'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
         'DEFAULT_FILTER_BACKENDS': (
+            'rest_framework_json_api.filters.JSONAPIQueryValidationFilter',
             'rest_framework_json_api.backends.JSONAPIOrderingFilter',
+            'rest_framework_json_api.filters.JSONAPIDjangoFilter',
         ),
         'TEST_REQUEST_RENDERER_CLASSES': (
             'rest_framework_json_api.renderers.JSONRenderer',

@@ -33,6 +33,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_json_api.filters.JSONAPIQueryValidationFilter',
         'rest_framework_json_api.filters.JSONAPIOrderingFilter',
         'rest_framework_json_api.filters.JSONAPIDjangoFilter',
     ),
@@ -93,7 +94,7 @@ class MyLimitPagination(JSONAPILimitOffsetPagination):
 
 ### Filter Backends
 
-_There are several anticipated JSON:API-specific filter backends in development. The first two are described below._
+_There are several anticipated JSON:API-specific filter backends in development. The first three are described below._
 
 #### `JSONAPIOrderingFilter`
 `JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
@@ -165,6 +166,21 @@ for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 }
 ```
 
+#### `JSONAPIQueryValidationFilter`
+`JSONAPIQueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
+(sort, include, filter, fields, page) and returns a `400 Bad Request`. If a non-matching query parameter
+is used. This can help the client identify misspelled query parameters, for example.
+
+If you want to add some additional non-standard query parameters,
+simply override `.query_regex` adding the new parameters but, "with the additional
+requirement that they MUST contain contain at least one non a-z character (U+0061 to U+007A).
+It is RECOMMENDED that a U+002D HYPHEN-MINUS, “-“, U+005F LOW LINE, “_”, or capital letter is
+used (e.g. camelCasing)."  -- http://jsonapi.org/format/#query-parameters
+
+If you don't care if non-JSON:API query parameters are allowed (and potentially silently ignored),
+simply don't use this filter backend.
+
+
 #### Configuring Filter Backends
 
 You can configure the filter backends either by setting the `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` as shown
@@ -176,7 +192,8 @@ from rest_framework_json_api import filters
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIOrderingFilter, filters.JSONAPIDjangoFilter,)
+    filter_backends = (filters.JSONAPIQueryValidationFilter,
+                       filters.JSONAPIOrderingFilter, filters.JSONAPIDjangoFilter,)
 ```
 
 
