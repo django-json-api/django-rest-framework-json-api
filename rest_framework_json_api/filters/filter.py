@@ -57,13 +57,19 @@ else:
         `filter[<something>]` to comply with the jsonapi spec requirement to use the filter
         keyword. The default is "search" unless overriden but it's used here just to make sure
         we don't complain about it being an invalid filter.
-
-        TODO: find a better way to deal with search_param.
         """
+        # TODO: find a better way to deal with search_param.
         search_param = api_settings.SEARCH_PARAM
-        # since 'filter' passes query parameter validation but is still invalid,
-        # make this regex check for it but not set `filter` regex group.
-        filter_regex = re.compile(r'^filter(?P<ldelim>\W*)(?P<assoc>[\w._]*)(?P<rdelim>\W*$)')
+
+        # Make this regex check for 'filter' as well as 'filter[...]'
+        # Leave other incorrect usages of 'filter' to JSONAPIQueryValidationFilter.
+        # See http://jsonapi.org/format/#document-member-names for allowed characters
+        # and http://jsonapi.org/format/#document-member-names-reserved-characters for reserved
+        # characters (for use in paths, lists or as delimiters).
+        # regex `\w` matches [a-zA-Z0-9_].
+        # TODO: U+0080 and above allowed but not recommended. Leave them out for now. Fix later?
+        #       Also, ' ' (space) is allowed within a member name but not recommended.
+        filter_regex = re.compile(r'^filter(?P<ldelim>\[?)(?P<assoc>[\w\.\-]*)(?P<rdelim>\]?$)')
 
         def validate_filter(self, keys, filterset_class):
             for k in keys:

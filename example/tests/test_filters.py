@@ -314,17 +314,6 @@ class DJATestFilters(APITestCase):
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "invalid filter: filter[headline")
 
-    def test_filter_incorrect_brackets(self):
-        """
-        test for filter with incorrect brackets
-        """
-        response = self.client.get(self.url, data={'filter{headline}': 'foobar'})
-        self.assertEqual(response.status_code, 400,
-                         msg=response.content.decode("utf-8"))
-        dja_response = response.json()
-        self.assertEqual(dja_response['errors'][0]['detail'],
-                         "invalid filter: filter{headline}")
-
     def test_filter_missing_rvalue(self):
         """
         test for filter with missing value to test against
