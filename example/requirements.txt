@@ -11,4 +11,4 @@ pyparsing
 pytz
 six
 sqlparse
-
+django-filter>=2.0
