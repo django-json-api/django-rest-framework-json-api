@@ -5,6 +5,7 @@ import rest_framework.renderers
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
+from django_filters import rest_framework as filters
 from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
@@ -102,23 +103,16 @@ class NonPaginatedEntryViewSet(EntryViewSet):
         'blog__name': rels,
         'blog__tagline': rels,
     }
-    filter_fields = filterset_fields  # django-filter<=1.11  (required for py27)
+    filter_fields = filterset_fields  # django-filter<=1.1  (required for py27)
 
 
-# While this example is used for testing with django-filter, leave the option of running it without.
-# The test cases will fail, but the app will run.
-try:
-    from django_filters import rest_framework as filters
+class EntryFilter(filters.FilterSet):
+    bname = filters.CharFilter(field_name="blog__name",
+                               lookup_expr="exact")
 
-    class EntryFilter(filters.FilterSet):
-        bname = filters.CharFilter(field_name="blog__name",
-                                   lookup_expr="exact")
-
-        class Meta:
-            model = Entry
-            fields = ['id', 'headline', 'body_text']
-except ImportError:
-    EntryFilter = None
+    class Meta:
+        model = Entry
+        fields = ['id', 'headline', 'body_text']
 
 
 class FiltersetEntryViewSet(EntryViewSet):
@@ -128,7 +122,7 @@ class FiltersetEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = EntryFilter
-    filter_fields = filterset_fields  # django-filter<=1.11
+    filter_fields = filterset_fields  # django-filter<=1.1
     filter_class = filterset_class
 
 
@@ -139,7 +133,7 @@ class NoFiltersetEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = None
-    filter_fields = filterset_fields  # django-filter<=1.11
+    filter_fields = filterset_fields  # django-filter<=1.1
     filter_class = filterset_class
 
 
