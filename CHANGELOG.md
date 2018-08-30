@@ -5,6 +5,9 @@
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
 * Replaced binary `drf_example` sqlite3 db with a [fixture](example/fixtures/drf_example.yaml). See [usage docs](docs/usage.md#running-the-example-app).
 * Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
+* **breaking change**: Reverted v2.5.0's `JsonApiPagenumberPagination` back to `PageNumberPagination` and `JsonApiLimitOffsetPagination` back to `LimitOffsetPagination`
+  You have to set `JSON_API_STANDARD_PAGINATION = True` (default is False) to get the "new" JSON:API-style query parameters. This retains the deprecated
+  behavior for now. See [usage docs](docs/usage.md#pagination).
 
 v2.5.0 - Released July 11, 2018
 

@@ -14,6 +14,7 @@ DEFAULTS = {
     'FORMAT_TYPES': False,
     'PLURALIZE_TYPES': False,
     'UNIFORM_EXCEPTIONS': False,
+    'STANDARD_PAGINATION': False,
 
     # deprecated settings to be removed in the future
     'FORMAT_KEYS': None,

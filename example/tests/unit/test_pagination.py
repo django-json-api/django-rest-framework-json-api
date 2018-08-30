@@ -13,11 +13,11 @@ factory = APIRequestFactory()
 
 class TestLimitOffset:
     """
-    Unit tests for `pagination.JsonApiLimitOffsetPagination`.
+    Unit tests for `pagination.LimitOffsetPagination`.
     """
 
     def setup(self):
-        class ExamplePagination(pagination.JsonApiLimitOffsetPagination):
+        class ExamplePagination(pagination.LimitOffsetPagination):
             default_limit = 10
             max_limit = 15
 
@@ -81,9 +81,9 @@ class TestLimitOffset:
 
     def test_limit_offset_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
-            pagination.LimitOffsetPagination()
+            pagination.JsonApiLimitOffsetPagination()
         assert len(record) == 1
-        assert 'LimitOffsetPagination' in str(record[0].message)
+        assert 'JsonApiLimitOffsetPagination' in str(record[0].message)
 
 
 # TODO: This test fails under py27 but it's not clear why so just leave it out for now.
@@ -91,11 +91,88 @@ class TestLimitOffset:
                    reason="python2.7 fails for unknown reason")
 class TestPageNumber:
     """
-    Unit tests for `pagination.JsonApiPageNumberPagination`.
-    TODO: add unit tests for changing query parameter names, limits, etc.
+    Unit tests for `pagination.PageNumberPagination`.
+    TODO: add unit tests for changing query parameter names, max limits, etc.
     """
+
+    def setup(self):
+        class ExamplePagination(pagination.PageNumberPagination):
+            default_page_size = 10
+            max_page_size = 15
+
+        self.pagination = ExamplePagination()
+        self.queryset = range(1, 401)
+        self.base_url = 'http://testserver/'
+
+    def paginate_queryset(self, request):
+        return list(self.pagination.paginate_queryset(self.queryset, request))
+
+    def get_paginated_content(self, queryset):
+        response = self.pagination.get_paginated_response(queryset)
+        return response.data
+
+    def get_test_request(self, arguments):
+        return Request(factory.get('/', arguments))
+
+    def test_valid_page_size(self):
+        """
+        Basic test, assumes page and size are given.
+        """
+        page = 10
+        size = 5
+        count = len(self.queryset)
+        last_page = (count // size)
+        next_page = 11
+        prev_page = 9
+
+        request = self.get_test_request({
+            self.pagination.page_size_query_param: size,
+            self.pagination.page_query_param: page
+        })
+        base_url = replace_query_param(self.base_url, self.pagination.page_size_query_param, size)
+        first_url = replace_query_param(base_url, self.pagination.page_query_param, 1)
+        last_url = replace_query_param(base_url, self.pagination.page_query_param, last_page)
+        next_url = replace_query_param(base_url, self.pagination.page_query_param, next_page)
+        prev_url = replace_query_param(base_url, self.pagination.page_query_param, prev_page)
+        queryset = self.paginate_queryset(request)
+        content = self.get_paginated_content(queryset)
+
+        expected_content = {
+            'results': list(range((page - 1) * size + 1, (next_page - 1) * size + 1)),
+            'links': OrderedDict([
+                ('first', first_url),
+                ('last', last_url),
+                ('next', next_url),
+                ('prev', prev_url),
+            ]),
+            'meta': {
+                'pagination': OrderedDict([
+                    ('page', page),
+                    ('pages', count // size),
+                    ('count', count),
+                ])
+            }
+        }
+
+        assert queryset == list(range((page - 1) * size + 1, (next_page - 1) * size + 1))
+        assert content == expected_content
+
+    def test_page_size_too_big(self):
+        """
+        ask for a page size that's more than the max
+        """
+        page = 3
+        size = 20
+        request = self.get_test_request({
+            self.pagination.page_size_query_param: size,
+            self.pagination.page_query_param: page
+        })
+        queryset = self.paginate_queryset(request)
+        assert len(queryset) == self.pagination.max_page_size
+        assert len(queryset) < size
+
     def test_page_number_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
-            pagination.PageNumberPagination()
+            pagination.JsonApiPageNumberPagination()
         assert len(record) == 1
-        assert 'PageNumberPagination' in str(record[0].message)
+        assert 'JsonApiPageNumberPagination' in str(record[0].message)
