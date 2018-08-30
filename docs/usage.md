@@ -16,7 +16,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_json_api.pagination.JSONAPIPageNumberPagination',
+        'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -59,15 +59,15 @@ You can configure fixed values for the page size or limit -- or allow the client
 via query parameters.
 
 Two pagination classes are available:
-- `JSONAPIPageNumberPagination` breaks a response up into pages that start at a given page number
-   with a given size (number of items per page). It can be configured with the following attributes:
+- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
+  (number of items per page). It can be configured with the following attributes:
   - `page_query_param` (default `page[number]`)
   - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client 
      to specify the size.
   - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
      Set it to `None` if you don't want to enforce an upper bound.
-- `JSONAPILimitOffsetPagination` breaks a response up into pages that start from an item's offset
-  in the viewset for a given number of items (the limit).
+- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
+  a given number of items (the limit).
   It can be configured with the following attributes:
   - `offset_query_param` (default `page[offset]`).
   - `limit_query_param` (default `page[limit]`).
@@ -78,14 +78,14 @@ Two pagination classes are available:
 These examples show how to configure the parameters to use non-standard names and different limits:
 
 ```python
-from rest_framework_json_api.pagination import JSONAPIPageNumberPagination, JSONAPILimitOffsetPagination
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination, JsonApiLimitOffsetPagination
 
-class MyPagePagination(JSONAPIPageNumberPagination):
+class MyPagePagination(JsonApiPageNumberPagination):
     page_query_param = 'page_number'
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
-class MyLimitPagination(JSONAPILimitOffsetPagination):
+class MyLimitPagination(JsonApiLimitOffsetPagination):
     offset_query_param = 'offset'
     limit_query_param = 'limit'
     max_limit = None

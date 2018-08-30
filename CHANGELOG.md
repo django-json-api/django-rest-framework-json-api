@@ -4,8 +4,6 @@
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
 * Replaced binary `drf_example` sqlite3 db with a [fixture](example/fixtures/drf_example.yaml). See [usage docs](docs/usage.md#running-the-example-app).
-* For naming consistency, renamed new `JsonApi`-prefix pagination classes to `JSONAPI`-prefix.
-  * Deprecates `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`
 * Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
 
 v2.5.0 - Released July 11, 2018
