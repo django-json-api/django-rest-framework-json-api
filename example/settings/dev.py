@@ -68,6 +68,7 @@ INTERNAL_IPS = ('127.0.0.1', )
 
 JSON_API_FORMAT_FIELD_NAMES = 'camelize'
 JSON_API_FORMAT_TYPES = 'camelize'
+JSON_API_STANDARD_PAGINATION = True
 REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
