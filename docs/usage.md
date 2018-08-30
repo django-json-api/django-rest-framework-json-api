@@ -34,7 +34,7 @@ REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.JSONAPIOrderingFilter',
-        'rest_framework_json_api.filters.JSONAPIDjangoFilter',
+        'rest_framework_json_api.filters.DjangoFilterBackend',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
@@ -119,8 +119,8 @@ field name and the other two are not valid:
 If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
 `ordering_param` to `sort`.
 
-#### `JSONAPIDjangoFilter`
-`JSONAPIDjangoFilter` implements a Django ORM-style [JSON:API `filter`](http://jsonapi.org/format/#fetching-filtering)
+#### `DjangoFilterBackend`
+`DjangoFilterBackend` implements a Django ORM-style [JSON:API `filter`](http://jsonapi.org/format/#fetching-filtering)
 using the [django-filter](https://django-filter.readthedocs.io/) package.
 
 This filter is not part of the JSON:API standard per-se, other than the requirement
@@ -176,7 +176,7 @@ from rest_framework_json_api import filters
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIOrderingFilter, filters.JSONAPIDjangoFilter,)
+    filter_backends = (filters.JSONAPIOrderingFilter, filters.DjangoFilterBackend,)
 ```
 
 

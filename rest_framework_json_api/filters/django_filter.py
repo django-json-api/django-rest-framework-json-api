@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_json_api.utils import format_value
 
 
-class JSONAPIDjangoFilter(DjangoFilterBackend):
+class DjangoFilterBackend(DjangoFilterBackend):
     """
     A Django-style ORM filter implementation, using `django-filter`.
 
@@ -110,7 +110,7 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
         """
         # TODO: remove when Python 2.7 support is deprecated
         if VERSION >= (2, 0, 0):
-            return super(JSONAPIDjangoFilter, self).filter_queryset(request, queryset, view)
+            return super(DjangoFilterBackend, self).filter_queryset(request, queryset, view)
 
         filter_class = self.get_filter_class(view, queryset)
 
