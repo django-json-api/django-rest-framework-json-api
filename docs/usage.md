@@ -1,10 +1,11 @@
 
 # Usage
 
-The DJA package implements a custom renderer, parser, exception handler, and
+The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
-Many features of the JSON:API format standard have been implemented using Mixin classes in `serializers.py`.
+Many features of the [JSON:API](http://jsonapi.org/format) format standard have been implemented using 
+Mixin classes in `serializers.py`.
 The easiest way to make use of those features is to import ModelSerializer variants
 from `rest_framework_json_api` instead of the usual `rest_framework`
 
@@ -15,7 +16,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
+        'rest_framework_json_api.pagination.JSONAPIPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -32,9 +33,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework.filters.OrderingFilter',
+        'rest_framework_json_api.filters.JSONAPIOrderingFilter',
     ),
-    'ORDERING_PARAM': 'sort',
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
     ),
@@ -58,15 +58,15 @@ You can configure fixed values for the page size or limit -- or allow the client
 via query parameters.
 
 Two pagination classes are available:
-- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
-  (number of items per page). It can be configured with the following attributes:
+- `JSONAPIPageNumberPagination` breaks a response up into pages that start at a given page number
+   with a given size (number of items per page). It can be configured with the following attributes:
   - `page_query_param` (default `page[number]`)
   - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client 
      to specify the size.
   - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
      Set it to `None` if you don't want to enforce an upper bound.
-- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
-  a given number of items (the limit).
+- `JSONAPILimitOffsetPagination` breaks a response up into pages that start from an item's offset
+  in the viewset for a given number of items (the limit).
   It can be configured with the following attributes:
   - `offset_query_param` (default `page[offset]`).
   - `limit_query_param` (default `page[limit]`).
@@ -77,18 +77,61 @@ Two pagination classes are available:
 These examples show how to configure the parameters to use non-standard names and different limits:
 
 ```python
-from rest_framework_json_api.pagination import JsonApiPageNumberPagination, JsonApiLimitOffsetPagination
+from rest_framework_json_api.pagination import JSONAPIPageNumberPagination, JSONAPILimitOffsetPagination
 
-class MyPagePagination(JsonApiPageNumberPagination):
+class MyPagePagination(JSONAPIPageNumberPagination):
     page_query_param = 'page_number'
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
-class MyLimitPagination(JsonApiLimitOffsetPagination):
+class MyLimitPagination(JSONAPILimitOffsetPagination):
     offset_query_param = 'offset'
     limit_query_param = 'limit'
     max_limit = None
 ```
+
+### Filter Backends
+
+_This is the first of several anticipated JSON:API-specific filter backends._
+
+#### `JSONAPIOrderingFilter`
+`JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
+DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
+
+Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
+it **MUST** return `400 Bad Request`." For example, for `?sort=`abc,foo,def` where `foo` is a valid
+field name and the other two are not valid:
+```json
+{
+    "errors": [
+        {
+            "detail": "invalid sort parameters: abc,def",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+
+If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
+`ordering_param` to `sort`.
+
+#### Configuring Filter Backends
+
+You can configure the filter backends either by setting the `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` as shown
+in the [preceding](#configuration) example or individually add them as `.filter_backends` View attributes:
+ 
+ ```python
+from rest_framework_json_api import filters
+
+class MyViewset(ModelViewSet):
+    queryset = MyModel.objects.all()
+    serializer_class = MyModelSerializer
+    filter_backends = (filters.JSONAPIOrderingFilter,)
+```
+
 
 ### Performance Testing
 
