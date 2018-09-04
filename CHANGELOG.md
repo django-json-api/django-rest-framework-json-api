@@ -7,7 +7,7 @@
 * Add optional [jsonapi-style](http://jsonapi.org/format/) sort filter backend. See [usage docs](docs/usage.md#filter-backends)
 * For naming consistency, renamed new `JsonApi`-prefix pagination classes to `JSONAPI`-prefix.
   * Deprecates `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`
-* Performance improvment when rendering relationships with `ModelSerializer`
+* Performance improvement when rendering relationships with `ModelSerializer`
 
 
 v2.5.0 - Released July 11, 2018
