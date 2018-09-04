@@ -40,11 +40,9 @@ class DjangoFilterBackend(DjangoFilterBackend):
     keyword. The default is "search" unless overriden but it's used here just to make sure
     we don't complain about it being an invalid filter.
     """
-    # TODO: find a better way to deal with search_param.
     search_param = api_settings.SEARCH_PARAM
 
     # Make this regex check for 'filter' as well as 'filter[...]'
-    # Leave other incorrect usages of 'filter' to JSONAPIQueryValidationFilter.
     # See http://jsonapi.org/format/#document-member-names for allowed characters
     # and http://jsonapi.org/format/#document-member-names-reserved-characters for reserved
     # characters (for use in paths, lists or as delimiters).
