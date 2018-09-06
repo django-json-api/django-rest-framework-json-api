@@ -34,6 +34,7 @@ REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.JSONAPIOrderingFilter',
+        'rest_framework_json_api.django_filters.DjangoFilterBackend',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
@@ -92,14 +93,14 @@ class MyLimitPagination(JSONAPILimitOffsetPagination):
 
 ### Filter Backends
 
-_This is the first of several anticipated JSON:API-specific filter backends._
+_There are several anticipated JSON:API-specific filter backends in development. The first two are described below._
 
 #### `JSONAPIOrderingFilter`
 `JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
 DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
 
 Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
-it **MUST** return `400 Bad Request`." For example, for `?sort=`abc,foo,def` where `foo` is a valid
+it **MUST** return `400 Bad Request`." For example, for `?sort=abc,foo,def` where `foo` is a valid
 field name and the other two are not valid:
 ```json
 {
@@ -118,18 +119,65 @@ field name and the other two are not valid:
 If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
 `ordering_param` to `sort`.
 
+#### `DjangoFilterBackend`
+`DjangoFilterBackend` implements a Django ORM-style [JSON:API `filter`](http://jsonapi.org/format/#fetching-filtering)
+using the [django-filter](https://django-filter.readthedocs.io/) package.
+
+This filter is not part of the JSON:API standard per-se, other than the requirement
+to use the `filter` keyword: It is an optional implementation of a style of
+filtering in which each filter is an ORM expression as implemented by
+`DjangoFilterBackend` and seems to be in alignment with an interpretation of the
+[JSON:API _recommendations_](http://jsonapi.org/recommendations/#filtering), including relationship
+chaining.
+
+Filters can be:
+- A resource field equality test:
+    `?filter[qty]=123`
+- Apply other [field lookup](https://docs.djangoproject.com/en/stable/ref/models/querysets/#field-lookups) operators:
+    `?filter[name.icontains]=bar` or `?filter[name.isnull]=true`
+- Membership in a list of values:
+    `?filter[name.in]=abc,123,zzz (name in ['abc','123','zzz'])`
+- Filters can be combined for intersection (AND):
+    `?filter[qty]=123&filter[name.in]=abc,123,zzz&filter[...]`
+- A related resource path can be used:
+    `?filter[inventory.item.partNum]=123456` (where `inventory.item` is the relationship path)
+
+If you are also using [`rest_framework.filters.SearchFilter`](https://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter)
+(which performs single parameter searchs across multiple fields) you'll want to customize the name of the query
+parameter for searching to make sure it doesn't conflict with a field name defined in the filterset.
+The recommended value is: `search_param="filter[search]"` but just make sure it's
+`filter[_something_]` to comply with the jsonapi spec requirement to use the filter
+keyword. The default is "search" unless overriden.
+
+The filter returns a `400 Bad Request` error for invalid filter query parameters as in this example
+for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
+```json
+{
+    "errors": [
+        {
+            "detail": "invalid filter[bad]",
+            "source": {
+                "pointer": "/data"
+            },
+            "status": "400"
+        }
+    ]
+}
+```
+
 #### Configuring Filter Backends
 
 You can configure the filter backends either by setting the `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` as shown
-in the [preceding](#configuration) example or individually add them as `.filter_backends` View attributes:
+in the [example settings](#configuration) or individually add them as `.filter_backends` View attributes:
  
  ```python
 from rest_framework_json_api import filters
+from rest_framework_json_api import django_filters
 
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIOrderingFilter,)
+    filter_backends = (filters.JSONAPIOrderingFilter, django_filters.DjangoFilterBackend,)
 ```
 
 

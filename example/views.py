@@ -1,10 +1,11 @@
+import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
-from rest_framework import exceptions
 
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
+from django_filters import rest_framework as filters
 from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
@@ -91,6 +92,49 @@ class NoPagination(PageNumberPagination):
 class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     ordering_fields = ('headline', 'body_text', 'blog__name', 'blog__id')
+    rels = ('exact', 'iexact',
+            'contains', 'icontains',
+            'gt', 'gte', 'lt', 'lte',
+            'in', 'regex', 'isnull',)
+    filterset_fields = {
+        'id': ('exact', 'in'),
+        'headline': rels,
+        'body_text': rels,
+        'blog__name': rels,
+        'blog__tagline': rels,
+    }
+    filter_fields = filterset_fields  # django-filter<=1.1  (required for py27)
+
+
+class EntryFilter(filters.FilterSet):
+    bname = filters.CharFilter(field_name="blog__name",
+                               lookup_expr="exact")
+
+    class Meta:
+        model = Entry
+        fields = ['id', 'headline', 'body_text']
+
+
+class FiltersetEntryViewSet(EntryViewSet):
+    """
+    like above but use filterset_class instead of filterset_fields
+    """
+    pagination_class = NoPagination
+    filterset_fields = None
+    filterset_class = EntryFilter
+    filter_fields = filterset_fields  # django-filter<=1.1
+    filter_class = filterset_class
+
+
+class NoFiltersetEntryViewSet(EntryViewSet):
+    """
+    like above but no filtersets
+    """
+    pagination_class = NoPagination
+    filterset_fields = None
+    filterset_class = None
+    filter_fields = filterset_fields  # django-filter<=1.1
+    filter_class = filterset_class
 
 
 class AuthorViewSet(ModelViewSet):

@@ -12,6 +12,8 @@ from example.views import (
     CompanyViewset,
     EntryRelationshipView,
     EntryViewSet,
+    FiltersetEntryViewSet,
+    NoFiltersetEntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectViewset
 )
@@ -20,7 +22,10 @@ router = routers.DefaultRouter(trailing_slash=False)
 
 router.register(r'blogs', BlogViewSet)
 router.register(r'entries', EntryViewSet)
+# these "flavors" of entries are used for various tests:
 router.register(r'nopage-entries', NonPaginatedEntryViewSet, 'nopage-entry')
+router.register(r'filterset-entries', FiltersetEntryViewSet, 'filterset-entry')
+router.register(r'nofilterset-entries', NoFiltersetEntryViewSet, 'nofilterset-entry')
 router.register(r'authors', AuthorViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'companies', CompanyViewset)

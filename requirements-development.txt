@@ -14,4 +14,4 @@ Sphinx
 sphinx_rtd_theme
 tox
 twine
-
+django-filter>=2.0
