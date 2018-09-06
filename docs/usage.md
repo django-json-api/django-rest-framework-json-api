@@ -34,7 +34,7 @@ REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.JSONAPIOrderingFilter',
-        'rest_framework_json_api.filters.DjangoFilterBackend',
+        'rest_framework_json_api.django_filters.DjangoFilterBackend',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
@@ -186,11 +186,12 @@ in the [example settings](#configuration) or individually add them as `.filter_b
  
  ```python
 from rest_framework_json_api import filters
+from rest_framework_json_api import django_filters
 
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIOrderingFilter, filters.DjangoFilterBackend,)
+    filter_backends = (filters.JSONAPIOrderingFilter, django_filters.DjangoFilterBackend,)
 ```
 
 
