@@ -118,15 +118,10 @@ Running the example app
 
 ::
 
-	$ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
-	$ cd django-rest-framework-json-api
-	$ python3 -m venv env
-	$ source env/bin/activate
-	$ pip install -r example/requirements.txt
-	$ pip install -e .
-	$ django-admin migrate --settings=example.settings
-	$ django-admin loaddata drf_example --settings=example.settings
-	$ django-admin runserver --settings=example.settings
+    $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
+    $ cd django-rest-framework-json-api
+    $ pip install -e .
+    $ django-admin.py runserver --settings=example.settings
 
 Browse to http://localhost:8000
 
@@ -141,7 +136,7 @@ installed and activated:
 
     $ pip install -e .
     $ pip install -r requirements-development.txt
-    $ DJANGO_SETTINGS_MODULE=example.settings.test py.test
+    $ py.test
 
 
 -----
@@ -166,7 +161,7 @@ override ``settings.REST_FRAMEWORK``
         'PAGE_SIZE': 10,
         'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
         'DEFAULT_PAGINATION_CLASS':
-            'rest_framework_json_api.pagination.PageNumberPagination',
+            'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
         'DEFAULT_PARSER_CLASSES': (
             'rest_framework_json_api.parsers.JSONParser',
             'rest_framework.parsers.FormParser',
@@ -186,7 +181,5 @@ override ``settings.REST_FRAMEWORK``
         ),
         'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
     }
-
-    JSON_API_STANDARD_PAGINATION = True
 
 This package provides much more including automatic inflection of JSON keys, extra top level data (using nested serializers), relationships, links, and handy shortcuts like MultipleIDMixin. Read more at http://django-rest-framework-json-api.readthedocs.org/
