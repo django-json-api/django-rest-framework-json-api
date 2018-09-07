@@ -79,23 +79,30 @@ class TestLimitOffset:
         assert queryset == list(range(offset + 1, next_offset + 1))
         assert content == expected_content
 
+    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_limit_offset_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
             pagination.LimitOffsetPagination()
-        assert len(record) == 1
-        assert 'LimitOffsetPagination' in str(record[0].message)
+        assert len(record) == 2
+        assert 'LimitOffsetPagination will change in release 3.0' in str(record[0].message)
+        assert 'JsonApiLimitOffsetPagination will be replaced by LimitOffsetPagination' \
+               in str(record[1].message)
 
 
 # TODO: This test fails under py27 but it's not clear why so just leave it out for now.
-@pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                   reason="python2.7 fails for unknown reason")
 class TestPageNumber:
     """
     Unit tests for `pagination.JsonApiPageNumberPagination`.
     TODO: add unit tests for changing query parameter names, limits, etc.
     """
+
+    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_page_number_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
             pagination.PageNumberPagination()
-        assert len(record) == 1
-        assert 'PageNumberPagination' in str(record[0].message)
+        assert len(record) == 2
+        assert 'PageNumberPagination will change in release 3.0' in str(record[0].message)
+        assert 'JsonApiPageNumberPagination will be replaced by PageNumberPagination' \
+               in str(record[1].message)
