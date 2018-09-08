@@ -60,7 +60,8 @@ by setting `REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS']` and by setting `REST_FRA
 You can configure fixed values for the page size or limit -- or allow the client to choose the size or limit
 via query parameters.
 
-Two pagination classes are available **but their names will change in release 3.0**:
+Two pagination classes are available *but their names will change in release 3.0 in order to implement a more
+consistent class naming style*:
 - `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
   (number of items per page). It can be configured with the following attributes:
   - `page_query_param` (default `page[number]`)
@@ -71,7 +72,6 @@ Two pagination classes are available **but their names will change in release 3.
   - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
      Set it to `None` if you don't want to enforce an upper bound.
 
-  In release 3.0, `JsonApiPageNumberPagination` will be renamed `PageNumberPagination`.
 - `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
   a given number of items (the limit).
   It can be configured with the following attributes:
@@ -82,8 +82,23 @@ Two pagination classes are available **but their names will change in release 3.
   - `max_limit` (default `100`) enforces an upper bound on the limit.
      Set it to `None` if you don't want to enforce an upper bound.
 
-  In release 3.0, `JsonApiLimitOffsetPagination` will be renamed `LimitOffsetPagination`.
+##### Preparing for future renaming of paginators with default attributes
 
+In release 3.0, the `JsonApi` prefix will be removed from the paginator names. If you currently use those (deprecated)
+names (`PageNumberPagination` or `LimitOffsetPagination`) or would like to prepare now for this change, you will want to
+explicitly override several of the class attributes.
+
+To retain deprecated values for `PageNumberPagination` set `page_query_param = "page"` and
+`page_size_query_param = "page_size"`.
+
+To prepare for the renaming of `JsonApiPageNumberPagination` use `PageNumberPagination` now with
+`page_query_param = "page[number]"` and `page_size_query_param = "page[size]"`.
+
+To retain deprecated vales for `LimitOffsetPagination` set `max_limit = None`.
+
+To prepare for the renaming of `JsonApiLimitOffsetPagination` to `LimitOffsetPagination` set `max_limit = 100`.
+
+##### Examples
 These examples show how to configure the parameters to use non-standard names and different limits:
 
 ```python
