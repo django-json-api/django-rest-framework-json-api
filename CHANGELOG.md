@@ -21,11 +21,6 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Replaced binary `drf_example` sqlite3 db with a [fixture](example/fixtures/drf_example.json). See [getting started](docs/getting-started.md#running-the-example-app).
 
-### Deprecated
-
-* For naming consistency, renamed new `JsonApi`-prefix pagination classes to `JSONAPI`-prefix.
-  * Deprecates `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`
-
 ### Fixed
 
 * Performance improvement when rendering relationships with `ModelSerializer`
