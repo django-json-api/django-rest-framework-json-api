@@ -9,7 +9,7 @@ from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import Response
 
 
-class _JsonApiPageNumberPagination(PageNumberPagination):
+class JsonApiPageNumberPagination(PageNumberPagination):
     """
     A json-api compatible pagination format.
     Use a private name for the implementation because the public name is pending deprecation.
@@ -51,21 +51,7 @@ class _JsonApiPageNumberPagination(PageNumberPagination):
         })
 
 
-class JsonApiPageNumberPagination(_JsonApiPageNumberPagination):
-    """
-    current public name to be deprecated soon.
-    """
-    def __init__(self):
-        if type(self) == JsonApiPageNumberPagination:
-            warnings.warn(
-                'JsonApiPageNumberPagination will be renamed to PageNumberPagination in'
-                ' release 3.0. See '
-                'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',  # noqa: E501
-                PendingDeprecationWarning)
-        super(_JsonApiPageNumberPagination, self).__init__()
-
-
-class _JsonApiLimitOffsetPagination(LimitOffsetPagination):
+class JsonApiLimitOffsetPagination(LimitOffsetPagination):
     """
     A limit/offset based style. For example:
     http://api.example.org/accounts/?page[limit]=100
@@ -117,22 +103,7 @@ class _JsonApiLimitOffsetPagination(LimitOffsetPagination):
         })
 
 
-class JsonApiLimitOffsetPagination(_JsonApiLimitOffsetPagination):
-    """
-    current public name to be deprecated soon.
-    """
-
-    def __init__(self):
-        warnings.warn(
-            'JsonApiLimitOffsetPagination will be renamed to LimitOffsetPagination in release 3.0'
-            ' See '
-            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
-            PendingDeprecationWarning)
-        super(JsonApiLimitOffsetPagination, self).__init__()
-
-
-
-class PageNumberPagination(_JsonApiPageNumberPagination):
+class PageNumberPagination(JsonApiPageNumberPagination):
     """
     A soon-to-be-changed paginator that uses non-JSON:API query parameters (default:
     'page' and 'page_size' instead of 'page[number]' and 'page[size]').
@@ -148,18 +119,17 @@ class PageNumberPagination(_JsonApiPageNumberPagination):
                     'page_size_query_param' not in type(self).__dict__)
         if warn:
             warnings.warn(
-                'PageNumberPagination will change in release 3.0 to change default values to: '
-                '`page_query_param = "page[number]"` and `page_size_query_param = "page[size]"`. '
-                'If you want to retain the current defaults you will need to explicitly set '
-                '`page_query_param = "page"` and `page_size_query_param = "page_size"`. '
-                'See '
-                'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',  # noqa: E501
-                PendingDeprecationWarning)
+                'PageNumberPagination is deprecated use JsonApiPageNumberPagination instead. '
+                'If you want to retain current defaults you will need to implement custom '
+                'pagination class explicitly setting `page_query_param = "page"` and '
+                '`page_size_query_param = "page_size"`. '
+                'See changelog for more details.',
+                DeprecationWarning)
 
         super(PageNumberPagination, self).__init__()
 
 
-class LimitOffsetPagination(_JsonApiLimitOffsetPagination):
+class LimitOffsetPagination(JsonApiLimitOffsetPagination):
     """
     Deprecated paginator that uses a different max_limit
     """
@@ -172,10 +142,9 @@ class LimitOffsetPagination(_JsonApiLimitOffsetPagination):
             warn = 'max_limit' not in type(self).__dict__
         if warn:
             warnings.warn(
-                'LimitOffsetPagination will change in release 3.0 to default to `max_limit=100`. '
-                'If you want to retain the current default you will need to explicitly set '
-                '`max_limit = None`.'
-                'See '
-                'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',  # noqa: E501
-                PendingDeprecationWarning)
+                'LimitOffsetPagination is deprecated use JsonApiLimitOffsetPagination instead. '
+                'If you want to retain current defaults you will need to implement custom '
+                'pagination class explicitly setting `max_limit = None`. '
+                'See changelog for more details.',
+                DeprecationWarning)
         super(LimitOffsetPagination, self).__init__()

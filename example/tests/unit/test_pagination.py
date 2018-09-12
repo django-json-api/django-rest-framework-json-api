@@ -82,19 +82,10 @@ class TestLimitOffset:
     @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
                        reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_limit_offset_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
+        with pytest.warns(DeprecationWarning) as record:
             pagination.LimitOffsetPagination()
         assert len(record) == 1
-        assert 'LimitOffsetPagination will change in release 3.0' in str(record[0].message)
-
-    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
-    def test_jsonapi_limit_offset_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
-            pagination.JsonApiLimitOffsetPagination()
-        assert len(record) == 1
-        assert 'JsonApiLimitOffsetPagination will be renamed to LimitOffsetPagination'\
-               in str(record[0].message)
+        assert 'LimitOffsetPagination is deprecated' in str(record[0].message)
 
     class MyInheritedLimitOffsetPagination(pagination.LimitOffsetPagination):
         """
@@ -109,10 +100,10 @@ class TestLimitOffset:
         max_limit = None
 
     def test_my_limit_offset_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
+        with pytest.warns(DeprecationWarning) as record:
             self.MyInheritedLimitOffsetPagination()
         assert len(record) == 1
-        assert 'LimitOffsetPagination will change in release 3.0' in str(record[0].message)
+        assert 'LimitOffsetPagination is deprecated' in str(record[0].message)
 
         with pytest.warns(None) as record:
             self.MyOverridenLimitOffsetPagination()
@@ -127,19 +118,10 @@ class TestPageNumber:
     @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
                        reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_page_number_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
+        with pytest.warns(DeprecationWarning) as record:
             pagination.PageNumberPagination()
         assert len(record) == 1
-        assert 'PageNumberPagination will change in release 3.0' in str(record[0].message)
-
-    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
-    def test_jsonapi_page_number_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
-            pagination.JsonApiPageNumberPagination()
-        assert len(record) == 1
-        assert 'JsonApiPageNumberPagination will be renamed to PageNumberPagination' \
-               in str(record[0].message)
+        assert 'PageNumberPagination is deprecated' in str(record[0].message)
 
     class MyInheritedPageNumberPagination(pagination.PageNumberPagination):
         """
@@ -157,20 +139,11 @@ class TestPageNumber:
     @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
                        reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_my_page_number_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
+        with pytest.warns(DeprecationWarning) as record:
             self.MyInheritedPageNumberPagination()
         assert len(record) == 1
-        assert 'PageNumberPagination will change in release 3.0' in str(record[0].message)
+        assert 'PageNumberPagination is deprecated' in str(record[0].message)
 
         with pytest.warns(None) as record:
             self.MyOverridenPageNumberPagination()
         assert len(record) == 0
-
-    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
-    def test_my_jsonapi_page_number_deprecation(self):
-        with pytest.warns(PendingDeprecationWarning) as record:
-            pagination.JsonApiPageNumberPagination()
-        assert len(record) == 1
-        assert 'JsonApiPageNumberPagination will be renamed to PageNumberPagination' \
-               in str(record[0].message)
