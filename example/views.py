@@ -35,7 +35,7 @@ class BlogViewSet(ModelViewSet):
         return super(BlogViewSet, self).get_object()
 
 
-class JSONAPIViewSet(ModelViewSet):
+class JsonApiViewSet(ModelViewSet):
     """
     This is an example on how to configure DRF-jsonapi from
     within a class. It allows using DRF-jsonapi alongside
@@ -59,12 +59,12 @@ class JSONAPIViewSet(ModelViewSet):
             exc.status_code = HTTP_422_UNPROCESSABLE_ENTITY
         # exception handler can't be set on class so you have to
         # override the error response in this method
-        response = super(JSONAPIViewSet, self).handle_exception(exc)
+        response = super(JsonApiViewSet, self).handle_exception(exc)
         context = self.get_exception_handler_context()
         return format_drf_errors(response, context, exc)
 
 
-class BlogCustomViewSet(JSONAPIViewSet):
+class BlogCustomViewSet(JsonApiViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
 

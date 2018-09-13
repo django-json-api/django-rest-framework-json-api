@@ -16,7 +16,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_json_api.pagination.JSONAPIPageNumberPagination',
+        'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
@@ -50,6 +50,8 @@ DJA pagination is based on [DRF pagination](https://www.django-rest-framework.or
 When pagination is enabled, the renderer will return a `meta` object with
 record count and a `links` object with the next, previous, first, and last links.
 
+Optional query parameters can also be provided to customize the page size or offset limit.
+
 #### Configuring the Pagination Style
 
 Pagination style can be set on a particular viewset with the `pagination_class` attribute or by default for all viewsets
@@ -59,35 +61,42 @@ You can configure fixed values for the page size or limit -- or allow the client
 via query parameters.
 
 Two pagination classes are available:
-- `JSONAPIPageNumberPagination` breaks a response up into pages that start at a given page number
-   with a given size (number of items per page). It can be configured with the following attributes:
+- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
+  (number of items per page). It can be configured with the following attributes:
   - `page_query_param` (default `page[number]`)
   - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client 
      to specify the size.
+  - `page_size` (default `REST_FRAMEWORK['PAGE_SIZE']`) default number of items per page unless overridden by
+     `page_size_query_param`.
   - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
      Set it to `None` if you don't want to enforce an upper bound.
-- `JSONAPILimitOffsetPagination` breaks a response up into pages that start from an item's offset
-  in the viewset for a given number of items (the limit).
+
+- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
+  a given number of items (the limit).
   It can be configured with the following attributes:
   - `offset_query_param` (default `page[offset]`).
   - `limit_query_param` (default `page[limit]`).
+  - `default_limit` (default `REST_FRAMEWORK['PAGE_SIZE']`) is the default number of items per page unless
+     overridden by `limit_query_param`.
   - `max_limit` (default `100`) enforces an upper bound on the limit.
      Set it to `None` if you don't want to enforce an upper bound.
 
-
+##### Examples
 These examples show how to configure the parameters to use non-standard names and different limits:
 
 ```python
-from rest_framework_json_api.pagination import JSONAPIPageNumberPagination, JSONAPILimitOffsetPagination
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination, JsonApiLimitOffsetPagination
 
-class MyPagePagination(JSONAPIPageNumberPagination):
+class MyPagePagination(JsonApiPageNumberPagination):
     page_query_param = 'page_number'
-    page_size_query_param = 'page_size'
+    page_size_query_param = 'page_length'
+    page_size = 3
     max_page_size = 1000
 
-class MyLimitPagination(JSONAPILimitOffsetPagination):
+class MyLimitPagination(JsonApiLimitOffsetPagination):
     offset_query_param = 'offset'
     limit_query_param = 'limit'
+    default_limit = 3
     max_limit = None
 ```
 
@@ -146,7 +155,7 @@ If you are also using [`rest_framework.filters.SearchFilter`](https://django-res
 (which performs single parameter searchs across multiple fields) you'll want to customize the name of the query
 parameter for searching to make sure it doesn't conflict with a field name defined in the filterset.
 The recommended value is: `search_param="filter[search]"` but just make sure it's
-`filter[_something_]` to comply with the jsonapi spec requirement to use the filter
+`filter[_something_]` to comply with the JSON:API spec requirement to use the filter
 keyword. The default is "search" unless overriden.
 
 The filter returns a `400 Bad Request` error for invalid filter query parameters as in this example
@@ -446,7 +455,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 ```
 
-In the [JSON API spec](http://jsonapi.org/format/#document-resource-objects),
+In the [JSON:API spec](http://jsonapi.org/format/#document-resource-objects),
 relationship objects contain links to related objects. To make this work
 on a serializer we need to tell the `ResourceRelatedField` about the
 corresponding view. Use the `HyperlinkedModelSerializer` and instantiate
@@ -584,7 +593,7 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
 relationship views (see the
-[JSON API spec](http://jsonapi.org/format/#fetching-relationships)).
+[JSON:API spec](http://jsonapi.org/format/#fetching-relationships)).
 The `self` link on a relationship object should point to the corresponding
 relationship view.
 

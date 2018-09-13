@@ -24,6 +24,8 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Performance improvement when rendering relationships with `ModelSerializer`
+* Do not show deprecation warning when user has implemented custom pagination class overwriting default values.
+
 
 ## [2.5.0] - 2018-07-11
 
@@ -40,6 +42,16 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Deprecated
 
 * Deprecate `PageNumberPagination` and `LimitOffsetPagination`. Use `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination` instead.
+  * To retain deprecated values for `PageNumberPagination` and `LimitOffsetPagination` create new custom class like the following in your code base:
+  ```python
+  class CustomPageNumberPagination(PageNumberPagination):
+    page_query_param = "page"
+    page_size_query_param = "page_size"
+
+  class CustomLimitOffsetPagination(LimitOffsetPagination):
+    max_limit = None
+  ```
+  and adjust `REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS']` setting accordingly.
 * Deprecate `JSON_API_FORMAT_KEYS`, use `JSON_API_FORMAT_FIELD_NAMES`.
 
 ### Fixed
