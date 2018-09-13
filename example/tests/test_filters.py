@@ -338,3 +338,33 @@ class DJATestFilters(APITestCase):
         dja_response = response.json()
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "missing filter[headline] test value")
+
+    def test_search_keywords(self):
+        """
+        test for `filter[search]=keyword1...` (keyword1 [AND keyword2...])
+        """
+        for keywords in ("research", "chemistry", "nonesuch",
+                         "research seminar", "research nonesuch",
+                         "barnard classic"):
+            response = self.client.get(self.url, data={'filter[search]': keywords})
+            self.assertEqual(response.status_code, 200, msg=response.content.decode("utf-8"))
+            dja_response = response.json()
+            # see the search_fields defined in views.py.
+            a = {}
+            b = {}
+            c = {}
+            d = {}
+            keys = keywords.split()
+            for key in keys:
+                a[key] = [str(k.id) for k in self.entries.filter(headline__icontains=key)]
+                b[key] = [str(k.id) for k in self.entries.filter(body_text__icontains=key)]
+                c[key] = [str(k.id) for k in self.entries.filter(blog__name__icontains=key)]
+                d[key] = [str(k.id) for k in self.entries.filter(blog__tagline__icontains=key)]
+            union = []  # a list of sets grouped by keyword
+            for key in keys:
+                union.append(set(a[key] + b[key] + c[key] + d[key]))
+            # all keywords must be present: intersect the keyword sets
+            inter = set.intersection(*union)
+            expected_len = len(inter)
+            self.assertEqual(len(dja_response['data']), expected_len)
+            self.assertEqual(set([k['id'] for k in dja_response['data']]), inter)
