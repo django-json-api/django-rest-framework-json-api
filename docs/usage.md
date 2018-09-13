@@ -33,7 +33,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_json_api.filters.JSONAPIOrderingFilter',
+        'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
@@ -104,8 +104,8 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 
 _There are several anticipated JSON:API-specific filter backends in development. The first two are described below._
 
-#### `JSONAPIOrderingFilter`
-`JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
+#### `OrderingFilter`
+`OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
 DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
 
 Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
@@ -186,7 +186,7 @@ from rest_framework_json_api import django_filters
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIOrderingFilter, django_filters.DjangoFilterBackend,)
+    filter_backends = (filters.OrderingFilter, django_filters.DjangoFilterBackend,)
 ```
 
 
