@@ -1,1 +1,1 @@
-from .sort import JSONAPIOrderingFilter  # noqa: F401
+from .sort import OrderingFilter  # noqa: F401
