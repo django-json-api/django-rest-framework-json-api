@@ -341,6 +341,94 @@ class DJATestFilters(APITestCase):
 
     def test_search_keywords(self):
         """
+        test for `filter[search]="keywords"` where some of the keywords are in the entry and
+        others are in the related blog.
+        """
+        response = self.client.get(self.url, data={'filter[search]': 'barnard field research'})
+        expected_result = {
+            'data': [
+                {
+                    'type': 'posts',
+                    'id': '7',
+                    'attributes': {
+                        'headline': 'ANTH3868X',
+                        'bodyText': 'ETHNOGRAPHIC FIELD RESEARCH IN NYC',
+                        'pubDate': None,
+                        'modDate': None},
+                    'relationships': {
+                        'blog': {
+                            'data': {
+                                'type': 'blogs',
+                                'id': '1'
+                            }
+                        },
+                        'blogHyperlinked': {
+                            'links': {
+                                'self': 'http://testserver/entries/7/relationships/blog_hyperlinked',  # noqa: E501
+                                'related': 'http://testserver/entries/7/blog'}
+                        },
+                        'authors': {
+                            'meta': {
+                                'count': 0
+                            },
+                            'data': []
+                        },
+                        'comments': {
+                            'meta': {
+                                'count': 0
+                            },
+                            'data': []
+                        },
+                        'commentsHyperlinked': {
+                            'links': {
+                                'self': 'http://testserver/entries/7/relationships/comments_hyperlinked',  # noqa: E501
+                                'related': 'http://testserver/entries/7/comments'
+                            }
+                        },
+                        'suggested': {
+                            'links': {
+                                'self': 'http://testserver/entries/7/relationships/suggested',
+                                'related': 'http://testserver/entries/7/suggested/'
+                            },
+                            'data': [
+                                {'type': 'entries', 'id': '1'},
+                                {'type': 'entries', 'id': '2'},
+                                {'type': 'entries', 'id': '3'},
+                                {'type': 'entries', 'id': '4'},
+                                {'type': 'entries', 'id': '5'},
+                                {'type': 'entries', 'id': '6'},
+                                {'type': 'entries', 'id': '8'},
+                                {'type': 'entries', 'id': '9'},
+                                {'type': 'entries', 'id': '10'},
+                                {'type': 'entries', 'id': '11'},
+                                {'type': 'entries', 'id': '12'}
+                            ]
+                        },
+                        'suggestedHyperlinked': {
+                            'links': {
+                                'self': 'http://testserver/entries/7/relationships/suggested_hyperlinked',  # noqa: E501
+                                'related': 'http://testserver/entries/7/suggested/'}
+                        },
+                        'tags': {
+                            'data': []
+                        },
+                        'featuredHyperlinked': {
+                            'links': {
+                                'self': 'http://testserver/entries/7/relationships/featured_hyperlinked',  # noqa: E501
+                                'related': 'http://testserver/entries/7/featured'
+                            }
+                        }
+                    },
+                    'meta': {
+                        'bodyFormat': 'text'
+                    }
+                }
+            ]
+        }
+        assert response.json() == expected_result
+
+    def test_search_multiple_keywords(self):
+        """
         test for `filter[search]=keyword1...` (keyword1 [AND keyword2...])
 
         See the four search_fields defined in views.py which demonstrate both searching
