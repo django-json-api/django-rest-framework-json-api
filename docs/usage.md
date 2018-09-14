@@ -33,7 +33,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_json_api.filters.JSONAPIOrderingFilter',
+        'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
     ),
@@ -107,8 +107,8 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 Following are descriptions for two JSON:API-specific filter backends and documentation on suggested usage
 for a standard DRF keyword-search filter backend that makes it consistent with JSON:API.
 
-#### `JSONAPIOrderingFilter`
-`JSONAPIOrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
+#### `OrderingFilter`
+`OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
 DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
 
 Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
@@ -200,7 +200,7 @@ from models import MyModel
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIOrderingFilter, django_filters.DjangoFilterBackend, SearchFilter)
+    filter_backends = (filters.OrderingFilter, django_filters.DjangoFilterBackend,)
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
         'descriptuon': ('icontains', 'iexact', 'contains'),

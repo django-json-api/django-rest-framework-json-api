@@ -4,7 +4,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework_json_api.utils import format_value
 
 
-class JSONAPIOrderingFilter(OrderingFilter):
+class OrderingFilter(OrderingFilter):
     """
     This implements http://jsonapi.org/format/#fetching-sorting and raises 400
     if any sort field is invalid. If you prefer *not* to report 400 errors for
@@ -40,5 +40,5 @@ class JSONAPIOrderingFilter(OrderingFilter):
             else:
                 underscore_fields.append(format_value(item_rewritten, "underscore"))
 
-        return super(JSONAPIOrderingFilter, self).remove_invalid_fields(
+        return super(OrderingFilter, self).remove_invalid_fields(
             queryset, underscore_fields, view, request)
