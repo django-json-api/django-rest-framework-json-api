@@ -48,6 +48,8 @@ matrix:
       env: TOXENV=flake8
     - python: 3.6
       env: TOXENV=isort
+    - python: 3.6
+      env: TOXENV=sphinx
 install:
   - pip install tox
 script:
