@@ -342,29 +342,51 @@ class DJATestFilters(APITestCase):
     def test_search_keywords(self):
         """
         test for `filter[search]=keyword1...` (keyword1 [AND keyword2...])
+
+        See the four search_fields defined in views.py which demonstrate both searching
+        direct fields (entry) and following ORM links to related fields (blog):
+            `search_fields = ('headline', 'body_text', 'blog__name', 'blog__tagline')`
+
+        SearchFilter searches for items that match all whitespace separated keywords across
+        the many fields.
+
+        This code tests that functionality by comparing the result of the GET request
+        with the equivalent results used by filtering the test data via the model manager.
+        To do so, iterate over the list of given searches:
+        1. For each keyword, search the 4 search_fields for a match and then get the result
+           set which is the union of all results for the given keyword.
+        2. Intersect those results sets such that *all* keywords are represented.
+        See `example/fixtures/blogentry.json` for the test content that the searches are based on.
+        The searches test for both direct entries and related blogs across multiple fields.
         """
-        for keywords in ("research", "chemistry", "nonesuch",
+        for searches in ("research", "chemistry", "nonesuch",
                          "research seminar", "research nonesuch",
-                         "barnard classic"):
-            response = self.client.get(self.url, data={'filter[search]': keywords})
+                         "barnard classic", "barnard ethnographic field research"):
+            response = self.client.get(self.url, data={'filter[search]': searches})
             self.assertEqual(response.status_code, 200, msg=response.content.decode("utf-8"))
             dja_response = response.json()
-            # see the search_fields defined in views.py.
-            a = {}
-            b = {}
-            c = {}
-            d = {}
-            keys = keywords.split()
+            keys = searches.split()
+            # dicts keyed by the search keys for the 4 search_fields:
+            headline = {}      # list of entry ids where key is in entry__headline
+            body_text = {}     # list of entry ids where key is in entry__body_text
+            blog_name = {}     # list of entry ids where key is in entry__blog__name
+            blog_tagline = {}  # list of entry ids where key is in entry__blog__tagline
             for key in keys:
-                a[key] = [str(k.id) for k in self.entries.filter(headline__icontains=key)]
-                b[key] = [str(k.id) for k in self.entries.filter(body_text__icontains=key)]
-                c[key] = [str(k.id) for k in self.entries.filter(blog__name__icontains=key)]
-                d[key] = [str(k.id) for k in self.entries.filter(blog__tagline__icontains=key)]
-            union = []  # a list of sets grouped by keyword
+                headline[key] = [str(k.id) for k in
+                                 self.entries.filter(headline__icontains=key)]
+                body_text[key] = [str(k.id) for k in
+                                  self.entries.filter(body_text__icontains=key)]
+                blog_name[key] = [str(k.id) for k in
+                                  self.entries.filter(blog__name__icontains=key)]
+                blog_tagline[key] = [str(k.id) for k in
+                                     self.entries.filter(blog__tagline__icontains=key)]
+            union = []  # each list item is a set of entry ids matching the given key
             for key in keys:
-                union.append(set(a[key] + b[key] + c[key] + d[key]))
+                union.append(set(headline[key] + body_text[key] +
+                                 blog_name[key] + blog_tagline[key]))
             # all keywords must be present: intersect the keyword sets
-            inter = set.intersection(*union)
-            expected_len = len(inter)
+            expected_ids = set.intersection(*union)
+            expected_len = len(expected_ids)
             self.assertEqual(len(dja_response['data']), expected_len)
-            self.assertEqual(set([k['id'] for k in dja_response['data']]), inter)
+            returned_ids = set([k['id'] for k in dja_response['data']])
+            self.assertEqual(returned_ids, expected_ids)
