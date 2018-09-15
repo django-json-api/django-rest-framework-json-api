@@ -23,24 +23,29 @@ class DjangoFilterBackend(DjangoFilterBackend):
 
     - A resource field
       equality test:
-        `?filter[qty]=123`
+
+      ``?filter[qty]=123``
 
     - Apply other
       https://docs.djangoproject.com/en/stable/ref/models/querysets/#field-lookups
       operators:
-        `?filter[name.icontains]=bar` or `?filter[name.isnull]=true...`
+
+      ``?filter[name.icontains]=bar`` or ``?filter[name.isnull]=true...``
 
     - Membership in
       a list of values:
-        `?filter[name.in]=abc,123,zzz` (name in ['abc','123','zzz'])
+
+      ``?filter[name.in]=abc,123,zzz`` (name in ['abc','123','zzz'])
 
     - Filters can be combined
       for intersection (AND):
-        `?filter[qty]=123&filter[name.in]=abc,123,zzz&filter[...]`
+
+      ``?filter[qty]=123&filter[name.in]=abc,123,zzz&filter[...]``
 
     - A related resource path
       can be used:
-         `?filter[inventory.item.partNum]=123456` (where `inventory.item` is the relationship path)
+
+      ``?filter[inventory.item.partNum]=123456`` (where `inventory.item` is the relationship path)
 
     If you are also using rest_framework.filters.SearchFilter you'll want to customize
     the name of the query parameter for searching to make sure it doesn't conflict
