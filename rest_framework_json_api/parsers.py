@@ -11,7 +11,13 @@ from .settings import json_api_settings
 
 class JSONParser(parsers.JSONParser):
     """
+    Similar to `JSONRenderer`, the `JSONParser` you may override the following methods if you
+    need highly custom parsing control.
+
     A JSON API client will send a payload that looks like this:
+
+    .. code:: json
+
 
         {
             "data": {
@@ -65,6 +71,11 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_metadata(result):
+        """
+        Returns a dictionary which will be merged into parsed data of the request. By default,
+        it reads the `meta` content in the request body and returns it in a dictionary with
+        a `_meta` top level key.
+        """
         metadata = result.get('meta')
         if metadata:
             return {'_meta': metadata}
