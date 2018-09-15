@@ -30,20 +30,22 @@ from rest_framework_json_api.utils import (
 
 class PrefetchForIncludesHelperMixin(object):
     def get_queryset(self):
-        """This viewset provides a helper attribute to prefetch related models
+        """
+        This viewset provides a helper attribute to prefetch related models
         based on the include specified in the URL.
 
         __all__ can be used to specify a prefetch which should be done regardless of the include
 
-        @example
-        # When MyViewSet is called with ?include=author it will prefetch author and authorbio
-        class MyViewSet(viewsets.ModelViewSet):
-            queryset = Book.objects.all()
-            prefetch_for_includes = {
-                '__all__': [],
-                'author': ['author', 'author__authorbio'],
-                'category.section': ['category']
-            }
+        .. code:: python
+
+            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+            class MyViewSet(viewsets.ModelViewSet):
+                queryset = Book.objects.all()
+                prefetch_for_includes = {
+                    '__all__': [],
+                    'author': ['author', 'author__authorbio'],
+                    'category.section': ['category']
+                }
         """
         qs = super(PrefetchForIncludesHelperMixin, self).get_queryset()
         if not hasattr(self, 'prefetch_for_includes'):
