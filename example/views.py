@@ -104,6 +104,7 @@ class NonPaginatedEntryViewSet(EntryViewSet):
         'blog__tagline': rels,
     }
     filter_fields = filterset_fields  # django-filter<=1.1  (required for py27)
+    search_fields = ('headline', 'body_text', 'blog__name', 'blog__tagline')
 
 
 class EntryFilter(filters.FilterSet):
