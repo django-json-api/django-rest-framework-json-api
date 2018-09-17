@@ -182,34 +182,40 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
 
         for field in readable_fields:
             try:
-
-                if isinstance(field, ModelSerializer) and hasattr(field, field.source + "_id"):
-                    attribute = getattr(instance, field.source + "_id")
-                    if attribute is None:
-                        ret[field.field_name] = None
-                        continue
-                    resource_type = get_resource_type_from_instance(field)
-                    if resource_type:
-                        ret[field.field_name] = OrderedDict([("type", resource_type),
-                                                             ("id", attribute)])
-                        continue
-
-                attribute = field.get_attribute(instance)
+                field_representation = self._get_field_representation(field, instance)
+                ret[field.field_name] = field_representation
             except SkipField:
                 continue
 
-            # We skip `to_representation` for `None` values so that fields do
-            # not have to explicitly deal with that case.
-            #
-            # For related fields with `use_pk_only_optimization` we need to
-            # resolve the pk value.
-            check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
-            if check_for_none is None:
-                ret[field.field_name] = None
-            else:
-                ret[field.field_name] = field.to_representation(attribute)
-
         return ret
+
+    def _get_field_representation(self, field, instance):
+        request = self.context.get('request')
+        is_included = field.source in get_included_resources(request)
+        if not is_included and \
+                isinstance(field, ModelSerializer) and \
+                hasattr(instance, field.source + '_id'):
+            attribute = getattr(instance, field.source + '_id')
+
+            if attribute is None:
+                return None
+
+            resource_type = get_resource_type_from_serializer(field)
+            if resource_type:
+                return OrderedDict([('type', resource_type), ('id', attribute)])
+
+        attribute = field.get_attribute(instance)
+
+        # We skip `to_representation` for `None` values so that fields do
+        # not have to explicitly deal with that case.
+        #
+        # For related fields with `use_pk_only_optimization` we need to
+        # resolve the pk value.
+        check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
+        if check_for_none is None:
+            return None
+        else:
+            return field.to_representation(attribute)
 
 
 class PolymorphicSerializerMetaclass(SerializerMetaclass):

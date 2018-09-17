@@ -13,11 +13,11 @@ factory = APIRequestFactory()
 
 class TestLimitOffset:
     """
-    Unit tests for `pagination.JSONAPILimitOffsetPagination`.
+    Unit tests for `pagination.JsonApiLimitOffsetPagination`.
     """
 
     def setup(self):
-        class ExamplePagination(pagination.JSONAPILimitOffsetPagination):
+        class ExamplePagination(pagination.JsonApiLimitOffsetPagination):
             default_limit = 10
             max_limit = 15
 
@@ -79,33 +79,71 @@ class TestLimitOffset:
         assert queryset == list(range(offset + 1, next_offset + 1))
         assert content == expected_content
 
+    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_limit_offset_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
             pagination.LimitOffsetPagination()
         assert len(record) == 1
-        assert 'LimitOffsetPagination' in str(record[0].message)
+        assert 'LimitOffsetPagination is deprecated' in str(record[0].message)
 
+    class MyInheritedLimitOffsetPagination(pagination.LimitOffsetPagination):
+        """
+        Inherit the default values
+        """
+        pass
+
+    class MyOverridenLimitOffsetPagination(pagination.LimitOffsetPagination):
+        """
+        Explicitly set max_limit to the "old" values.
+        """
+        max_limit = None
+
+    def test_my_limit_offset_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
-            pagination.JsonApiLimitOffsetPagination()
+            self.MyInheritedLimitOffsetPagination()
         assert len(record) == 1
-        assert 'JsonApiLimitOffsetPagination' in str(record[0].message)
+        assert 'LimitOffsetPagination is deprecated' in str(record[0].message)
+
+        with pytest.warns(None) as record:
+            self.MyOverridenLimitOffsetPagination()
+        assert len(record) == 0
 
 
-# TODO: This test fails under py27 but it's not clear why so just leave it out for now.
-@pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                   reason="python2.7 fails for unknown reason")
 class TestPageNumber:
     """
-    Unit tests for `pagination.JSONAPIPageNumberPagination`.
-    TODO: add unit tests for changing query parameter names, limits, etc.
+    Unit tests for `pagination.JsonApiPageNumberPagination`.
     """
+
+    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
     def test_page_number_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
             pagination.PageNumberPagination()
         assert len(record) == 1
-        assert 'PageNumberPagination' in str(record[0].message)
+        assert 'PageNumberPagination is deprecated' in str(record[0].message)
 
+    class MyInheritedPageNumberPagination(pagination.PageNumberPagination):
+        """
+        Inherit the default values
+        """
+        pass
+
+    class MyOverridenPageNumberPagination(pagination.PageNumberPagination):
+        """
+        Explicitly set page_query_param and page_size_query_param to the "old" values.
+        """
+        page_query_param = "page"
+        page_size_query_param = "page_size"
+
+    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
+                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
+    def test_my_page_number_deprecation(self):
         with pytest.warns(DeprecationWarning) as record:
-            pagination.JsonApiPageNumberPagination()
+            self.MyInheritedPageNumberPagination()
         assert len(record) == 1
-        assert 'JsonApiPageNumberPagination' in str(record[0].message)
+        assert 'PageNumberPagination is deprecated' in str(record[0].message)
+
+        with pytest.warns(None) as record:
+            self.MyOverridenPageNumberPagination()
+        assert len(record) == 0

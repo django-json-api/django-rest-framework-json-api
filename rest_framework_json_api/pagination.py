@@ -9,9 +9,10 @@ from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import Response
 
 
-class JSONAPIPageNumberPagination(PageNumberPagination):
+class JsonApiPageNumberPagination(PageNumberPagination):
     """
-    A json-api compatible pagination format
+    A json-api compatible pagination format.
+    Use a private name for the implementation because the public name is pending deprecation.
     """
     page_query_param = 'page[number]'
     page_size_query_param = 'page[size]'
@@ -50,11 +51,13 @@ class JSONAPIPageNumberPagination(PageNumberPagination):
         })
 
 
-class JSONAPILimitOffsetPagination(LimitOffsetPagination):
+class JsonApiLimitOffsetPagination(LimitOffsetPagination):
     """
     A limit/offset based style. For example:
     http://api.example.org/accounts/?page[limit]=100
     http://api.example.org/accounts/?page[offset]=400&page[limit]=100
+
+    Use a private name for the implementation because the public name is pending deprecation.
     """
     limit_query_param = 'page[limit]'
     offset_query_param = 'page[offset]'
@@ -100,63 +103,48 @@ class JSONAPILimitOffsetPagination(LimitOffsetPagination):
         })
 
 
-class JsonApiPageNumberPagination(JSONAPIPageNumberPagination):
+class PageNumberPagination(JsonApiPageNumberPagination):
     """
-    Deprecated due to desire to use `JSONAPI` prefix for all classes.
-    """
-    page_query_param = 'page'
-    page_size_query_param = 'page_size'
-
-    def __init__(self):
-        warnings.warn(
-            'JsonApiPageNumberPagination is deprecated. Use JSONAPIPageNumberPagination '
-            'or create custom pagination. See '
-            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
-            DeprecationWarning)
-        super(JsonApiPageNumberPagination, self).__init__()
-
-
-class PageNumberPagination(JSONAPIPageNumberPagination):
-    """
-    Deprecated paginator that uses different query parameters
+    A soon-to-be-changed paginator that uses non-JSON:API query parameters (default:
+    'page' and 'page_size' instead of 'page[number]' and 'page[size]').
     """
     page_query_param = 'page'
     page_size_query_param = 'page_size'
 
     def __init__(self):
-        warnings.warn(
-            'PageNumberPagination is deprecated. Use JSONAPIPageNumberPagination '
-            'or create custom pagination. See '
-            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
-            DeprecationWarning)
+        if type(self) == PageNumberPagination:
+            warn = self.page_query_param == 'page' or self.page_size_query_param == 'page_size'
+        else:  # inherited class doesn't override the attributes?
+            warn = ('page_query_param' not in type(self).__dict__ or
+                    'page_size_query_param' not in type(self).__dict__)
+        if warn:
+            warnings.warn(
+                'PageNumberPagination is deprecated use JsonApiPageNumberPagination instead. '
+                'If you want to retain current defaults you will need to implement custom '
+                'pagination class explicitly setting `page_query_param = "page"` and '
+                '`page_size_query_param = "page_size"`. '
+                'See changelog for more details.',
+                DeprecationWarning)
+
         super(PageNumberPagination, self).__init__()
 
 
-class JsonApiLimitOffsetPagination(JSONAPILimitOffsetPagination):
-    """
-    Deprecated due to desire to use `JSONAPI` prefix for all classes.
-    """
-    max_limit = None
-
-    def __init__(self):
-        warnings.warn(
-            'JsonApiLimitOffsetPagination is deprecated. Use JSONAPILimitOffsetPagination '
-            'or create custom pagination. See '
-            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
-            DeprecationWarning)
-        super(JsonApiLimitOffsetPagination, self).__init__()
-
-
-class LimitOffsetPagination(JSONAPILimitOffsetPagination):
+class LimitOffsetPagination(JsonApiLimitOffsetPagination):
     """
     Deprecated paginator that uses a different max_limit
     """
     max_limit = None
 
     def __init__(self):
-        warnings.warn(
-            'LimitOffsetPagination is deprecated. Use JSONAPILimitOffsetPagination '
-            'or create custom pagination. See '
-            'https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#pagination',
-            DeprecationWarning)
+        if type(self) == LimitOffsetPagination:
+            warn = self.max_limit is None
+        else:
+            warn = 'max_limit' not in type(self).__dict__
+        if warn:
+            warnings.warn(
+                'LimitOffsetPagination is deprecated use JsonApiLimitOffsetPagination instead. '
+                'If you want to retain current defaults you will need to implement custom '
+                'pagination class explicitly setting `max_limit = None`. '
+                'See changelog for more details.',
+                DeprecationWarning)
         super(LimitOffsetPagination, self).__init__()
