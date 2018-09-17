@@ -40,6 +40,7 @@ main(['sphinx-apidoc', '-e',  '-T',  '-M',  '-f',  '-o', 'apidoc', '../rest_fram
 # ones.
 extensions = ['sphinx.ext.autodoc']
 autodoc_member_order = 'bysource'
+autodoc_inherit_docstrings = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
