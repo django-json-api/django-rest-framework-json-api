@@ -33,9 +33,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_json_api.filters.QueryValidationFilter',
         'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
     ),
+    'SEARCH_PARAM': 'filter[search]',
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
     ),
@@ -102,7 +105,31 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 
 ### Filter Backends
 
-_There are several anticipated JSON:API-specific filter backends in development. The first two are described below._
+Following are descriptions for three JSON:API-specific filter backends and documentation on suggested usage
+for a standard DRF keyword-search filter backend that makes it consistent with JSON:API.
+
+#### `QueryValidationFilter`
+`QueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
+(sort, include, filter, fields, page) and returns a `400 Bad Request` if a non-matching query parameter
+is used. This can help the client identify misspelled query parameters, for example.
+
+If you want to change the list of valid query parameters, override the `.query_regex` attribute:
+```python
+# compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters
+# `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
+query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+```
+For example:
+```python
+import re
+from rest_framework_json_api.filters import QueryValidationFilter
+
+class MyQPValidator(QueryValidationFilter):
+    query_regex = re.compile(r'^(sort|include|page|page_size)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+```
+
+If you don't care if non-JSON:API query parameters are allowed (and potentially silently ignored),
+simply don't use this filter backend.
 
 #### `OrderingFilter`
 `OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
@@ -151,12 +178,12 @@ Filters can be:
 - A related resource path can be used:
     `?filter[inventory.item.partNum]=123456` (where `inventory.item` is the relationship path)
 
-If you are also using [`rest_framework.filters.SearchFilter`](https://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter)
-(which performs single parameter searchs across multiple fields) you'll want to customize the name of the query
+If you are also using [`SearchFilter`](#searchfilter)
+(which performs single parameter searches across multiple fields) you'll want to customize the name of the query
 parameter for searching to make sure it doesn't conflict with a field name defined in the filterset.
 The recommended value is: `search_param="filter[search]"` but just make sure it's
 `filter[_something_]` to comply with the JSON:API spec requirement to use the filter
-keyword. The default is "search" unless overriden.
+keyword. The default is `REST_FRAMEWORK['SEARCH_PARAM']` unless overriden.
 
 The filter returns a `400 Bad Request` error for invalid filter query parameters as in this example
 for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
@@ -174,6 +201,17 @@ for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 }
 ```
 
+#### `SearchFilter`
+
+To comply with JSON:API query parameter naming standards, DRF's
+[SearchFilter](https://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter) should
+be configured to use a `filter[_something_]` query parameter. This can be done by default by adding the
+SearchFilter to `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` and setting `REST_FRAMEWORK['SEARCH_PARAM']` or
+adding the `.search_param` attribute to a custom class derived from `SearchFilter`.  If you do this and also
+use [`DjangoFilterBackend`](#djangofilterbackend), make sure you set the same values for both classes.
+
+
+
 #### Configuring Filter Backends
 
 You can configure the filter backends either by setting the `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` as shown
@@ -182,11 +220,21 @@ in the [example settings](#configuration) or individually add them as `.filter_b
  ```python
 from rest_framework_json_api import filters
 from rest_framework_json_api import django_filters
+from rest_framework import SearchFilter
+from models import MyModel
 
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.OrderingFilter, django_filters.DjangoFilterBackend,)
+    filter_backends = (filters.QueryValidationFilter, filters.OrderingFilter,
+	                   django_filters.DjangoFilterBackend, SearchFilter)
+    filterset_fields = {
+        'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
+        'descriptuon': ('icontains', 'iexact', 'contains'),
+        'tagline': ('icontains', 'iexact', 'contains'),
+    }
+    search_fields = ('id', 'description', 'tagline',)
+
 ```
 
 
