@@ -335,7 +335,7 @@ class DJATestFilters(APITestCase):
         """
         test for filter with missing value to test against
         this should probably be an error rather than ignoring the filter:
-            """
+        """
         response = self.client.get(self.url + '?filter[headline]')
         self.assertEqual(response.status_code, 400,
                          msg=response.content.decode("utf-8"))
@@ -482,3 +482,30 @@ class DJATestFilters(APITestCase):
             self.assertEqual(len(dja_response['data']), expected_len)
             returned_ids = set([k['id'] for k in dja_response['data']])
             self.assertEqual(returned_ids, expected_ids)
+
+    def test_param_invalid(self):
+        """
+        Test a "wrong" query parameter
+        """
+        response = self.client.get(self.url, data={'garbage': 'foo'})
+        self.assertEqual(response.status_code, 400,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+        self.assertEqual(dja_response['errors'][0]['detail'],
+                         "invalid query parameter: garbage")
+
+    def test_param_duplicate(self):
+        """
+        Test a duplicated query parameter:
+        `?sort=headline&page[size]=3&sort=bodyText` is not allowed.
+        This is not so obvious when using a data dict....
+        """
+        response = self.client.get(self.url,
+                                   data={'sort': ['headline', 'bodyText'],
+                                         'page[size]': 3}
+                                   )
+        self.assertEqual(response.status_code, 400,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+        self.assertEqual(dja_response['errors'][0]['detail'],
+                         "repeated query parameter not allowed: sort")
