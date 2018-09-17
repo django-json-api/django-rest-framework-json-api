@@ -11,5 +11,6 @@ Submodules
 
 .. toctree::
 
+   rest_framework_json_api.filters.queryvalidation
    rest_framework_json_api.filters.sort
 
