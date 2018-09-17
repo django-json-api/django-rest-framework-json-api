@@ -33,6 +33,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_json_api.filters.QueryValidationFilter',
         'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -104,8 +105,31 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 
 ### Filter Backends
 
-Following are descriptions for two JSON:API-specific filter backends and documentation on suggested usage
+Following are descriptions for three JSON:API-specific filter backends and documentation on suggested usage
 for a standard DRF keyword-search filter backend that makes it consistent with JSON:API.
+
+#### `QueryValidationFilter`
+`QueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
+(sort, include, filter, fields, page) and returns a `400 Bad Request` if a non-matching query parameter
+is used. This can help the client identify misspelled query parameters, for example.
+
+If you want to change the list of valid query parameters, override the `.query_regex` attribute:
+```python
+# compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters
+# `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
+query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+```
+For example:
+```python
+import re
+from rest_framework_json_api.filters import QueryValidationFilter
+
+class MyQPValidator(QueryValidationFilter):
+    query_regex = re.compile(r'^(sort|include|page|page_size)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+```
+
+If you don't care if non-JSON:API query parameters are allowed (and potentially silently ignored),
+simply don't use this filter backend.
 
 #### `OrderingFilter`
 `OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
@@ -177,20 +201,6 @@ for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 }
 ```
 
-#### `QueryValidationFilter`
-`QueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
-(sort, include, filter, fields, page) and returns a `400 Bad Request`. If a non-matching query parameter
-is used. This can help the client identify misspelled query parameters, for example.
-
-If you want to add some additional non-standard query parameters,
-simply override `.query_regex` adding the new parameters but, "with the additional
-requirement that they MUST contain contain at least one non a-z character (U+0061 to U+007A).
-It is RECOMMENDED that a U+002D HYPHEN-MINUS, “-“, U+005F LOW LINE, “_”, or capital letter is
-used (e.g. camelCasing)."  -- http://jsonapi.org/format/#query-parameters
-
-If you don't care if non-JSON:API query parameters are allowed (and potentially silently ignored),
-simply don't use this filter backend.
-
 #### `SearchFilter`
 
 To comply with JSON:API query parameter naming standards, DRF's
@@ -217,7 +227,7 @@ class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
     filter_backends = (filters.QueryValidationFilter, filters.OrderingFilter,
-	                   django_filters.DjangoFilterBackend,)
+	                   django_filters.DjangoFilterBackend, SearchFilter)
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
         'descriptuon': ('icontains', 'iexact', 'contains'),
