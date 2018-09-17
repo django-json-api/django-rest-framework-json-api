@@ -11,19 +11,21 @@ class QueryValidationFilter(BaseFilterBackend):
     found.
 
     If you want to add some additional non-standard query parameters,
-    simply override `.query_regex` adding the new parameters but, "with the additional
+    simply override :py:attr:`query_regex` adding the new parameters, but, "with the additional
     requirement that they MUST contain contain at least one non a-z character (U+0061 to U+007A).
     It is RECOMMENDED that a U+002D HYPHEN-MINUS, "-", U+005F LOW LINE, "_", or capital letter is
     used (e.g. camelCasing)."  -- http://jsonapi.org/format/#query-parameters
     """
-    #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters
+    #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters:
     #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
     query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
 
     def validate_query_params(self, request):
         """
-        Validate that query params are in the list of valid query keywords
-        Raises ValidationError if not.
+        Validate that query params are in the list of valid query keywords in
+        :py:attr:`query_regex`
+
+        :raises ValidationError: if not.
         """
         # TODO: For jsonapi error object conformance, must set jsonapi errors "parameter" for
         # the ValidationError. This requires extending DRF/DJA Exceptions.
@@ -35,5 +37,9 @@ class QueryValidationFilter(BaseFilterBackend):
                     'repeated query parameter not allowed: {}'.format(qp))
 
     def filter_queryset(self, request, queryset, view):
+        """
+        Overrides :py:meth:`BaseFilterBackend.filter_queryset` by first validating the
+        query params with :py:meth:`validate_query_params`
+        """
         self.validate_query_params(request)
         return queryset
