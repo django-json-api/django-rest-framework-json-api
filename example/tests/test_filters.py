@@ -251,7 +251,7 @@ class DJATestFilters(APITestCase):
     def test_filter_empty_association_name(self):
         """
         test for filter with missing association name
-        error texts are different depending on whether JSONAPIQueryValidationFilter is in use.
+        error texts are different depending on whether QueryValidationFilter is in use.
         TODO: Just change the "invalid filter" to "invalid query parameter" in JSONAPIDjangoFilter?
         """
         response = self.client.get(self.url, data={'filter[]': 'foobar'})

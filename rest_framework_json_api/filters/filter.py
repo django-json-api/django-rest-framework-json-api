@@ -44,7 +44,7 @@ class JSONAPIDjangoFilter(DjangoFilterBackend):
     search_param = api_settings.SEARCH_PARAM
 
     # Make this regex check for 'filter' as well as 'filter[...]'
-    # Leave other incorrect usages of 'filter' to JSONAPIQueryValidationFilter.
+    # Leave other incorrect usages of 'filter' to QueryValidationFilter.
     # See http://jsonapi.org/format/#document-member-names for allowed characters
     # and http://jsonapi.org/format/#document-member-names-reserved-characters for reserved
     # characters (for use in paths, lists or as delimiters).

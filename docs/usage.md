@@ -177,8 +177,8 @@ for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 }
 ```
 
-#### `JSONAPIQueryValidationFilter`
-`JSONAPIQueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
+#### `QueryValidationFilter`
+`QueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
 (sort, include, filter, fields, page) and returns a `400 Bad Request`. If a non-matching query parameter
 is used. This can help the client identify misspelled query parameters, for example.
 
@@ -216,7 +216,7 @@ from models import MyModel
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.JSONAPIQueryValidationFilter, filters.OrderingFilter,
+    filter_backends = (filters.QueryValidationFilter, filters.OrderingFilter,
 	                   django_filters.DjangoFilterBackend,)
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),

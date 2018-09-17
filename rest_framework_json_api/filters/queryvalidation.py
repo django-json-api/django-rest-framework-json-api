@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import BaseFilterBackend
 
 
-class JSONAPIQueryValidationFilter(BaseFilterBackend):
+class QueryValidationFilter(BaseFilterBackend):
     """
     A backend filter that performs strict validation of query parameters for
     jsonapi spec conformance and raises a 400 error if non-conforming usage is
@@ -15,11 +15,9 @@ class JSONAPIQueryValidationFilter(BaseFilterBackend):
     requirement that they MUST contain contain at least one non a-z character (U+0061 to U+007A).
     It is RECOMMENDED that a U+002D HYPHEN-MINUS, “-“, U+005F LOW LINE, “_”, or capital letter is
     used (e.g. camelCasing)."  -- http://jsonapi.org/format/#query-parameters
-
-    TODO: For jsonapi error object conformance, must set jsonapi errors
-          "parameter" for the ValidationError. This requires extending DRF/DJA Exceptions.
     """
-    # sort and include stand alone; filter, fields, page have []'s
+    #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters
+    #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
     query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
 
     def validate_query_params(self, request):
@@ -27,6 +25,8 @@ class JSONAPIQueryValidationFilter(BaseFilterBackend):
         Validate that query params are in the list of valid query keywords
         Raises ValidationError if not.
         """
+        # TODO: For jsonapi error object conformance, must set jsonapi errors "parameter" for
+        # the ValidationError. This requires extending DRF/DJA Exceptions.
         for qp in request.query_params.keys():
             if not self.query_regex.match(qp):
                 raise ValidationError('invalid query parameter: {}'.format(qp))
