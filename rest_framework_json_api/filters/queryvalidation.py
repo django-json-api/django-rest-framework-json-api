@@ -13,7 +13,7 @@ class QueryValidationFilter(BaseFilterBackend):
     If you want to add some additional non-standard query parameters,
     simply override `.query_regex` adding the new parameters but, "with the additional
     requirement that they MUST contain contain at least one non a-z character (U+0061 to U+007A).
-    It is RECOMMENDED that a U+002D HYPHEN-MINUS, “-“, U+005F LOW LINE, “_”, or capital letter is
+    It is RECOMMENDED that a U+002D HYPHEN-MINUS, "-", U+005F LOW LINE, "_", or capital letter is
     used (e.g. camelCasing)."  -- http://jsonapi.org/format/#query-parameters
     """
     #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters
