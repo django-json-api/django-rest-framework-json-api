@@ -96,7 +96,8 @@ class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     # override the default filter backends in order to test QueryParameterValidationFilter without
     # breaking older usage of non-standard query params like `page_size`.
-    filter_backends = (QueryParameterValidationFilter, OrderingFilter, DjangoFilterBackend, SearchFilter)
+    filter_backends = (QueryParameterValidationFilter, OrderingFilter,
+                       DjangoFilterBackend, SearchFilter)
     ordering_fields = ('headline', 'body_text', 'blog__name', 'blog__id')
     rels = ('exact', 'iexact',
             'contains', 'icontains',
