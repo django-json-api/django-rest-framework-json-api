@@ -52,6 +52,13 @@ class DjangoFilterBackend(DjangoFilterBackend):
     filter_regex = re.compile(r'^filter(?P<ldelim>\[?)(?P<assoc>[\w\.\-]*)(?P<rdelim>\]?$)')
 
     def _validate_filter(self, keys, filterset_class):
+        """
+        Check that all the filter[key] are valid.
+
+        :param keys: list of FilterSet keys
+        :param filterset_class: :py:class:`django_filters.rest_framework.FilterSet`
+        :raises ValidationError: if key not in FilterSet keys or no FilterSet.
+        """
         for k in keys:
             if ((not filterset_class) or (k not in filterset_class.base_filters)):
                 raise ValidationError("invalid filter[{}]".format(k))
@@ -75,6 +82,8 @@ class DjangoFilterBackend(DjangoFilterBackend):
         """
         Turns filter[<field>]=<value> into <field>=<value> which is what
         DjangoFilterBackend expects
+
+        :raises ValidationError: for bad filter syntax
         """
         filter_keys = []
         # rewrite filter[field] query params to make DjangoFilterBackend work.
@@ -83,7 +92,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
             m = self.filter_regex.match(qp)
             if m and (not m.groupdict()['assoc'] or
                       m.groupdict()['ldelim'] != '[' or m.groupdict()['rdelim'] != ']'):
-                raise ValidationError("invalid filter: {}".format(qp))
+                raise ValidationError("invalid query parameter: {}".format(qp))
             if m and qp != self.search_param:
                 if not val:
                     raise ValidationError("missing {} test value".format(qp))
