@@ -105,7 +105,7 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 
 ### Filter Backends
 
-Following are descriptions for three JSON:API-specific filter backends and documentation on suggested usage
+Following are descriptions of JSON:API-specific filter backends and documentation on suggested usage
 for a standard DRF keyword-search filter backend that makes it consistent with JSON:API.
 
 #### `QueryParameterValidationFilter`
