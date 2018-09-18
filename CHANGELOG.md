@@ -17,6 +17,12 @@ any parts of the framework not mentioned in the documentation should generally b
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
 * Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
 
+### Deprecated
+
+* Deprecate `MultipleIDMixin` because it doesn't comply with the JSON:API 1.0 spec. Replace it with
+  `DjangoFilterBackend` and **change clients** to use `filter[id.in]` query parameter instead of `ids[]`.
+  See [usage docs](docs/usage.md#djangofilterbackend).
+
 ### Changed
 
 * Replaced binary `drf_example` sqlite3 db with a [fixture](example/fixtures/drf_example.json). See [getting started](docs/getting-started.md#running-the-example-app).
