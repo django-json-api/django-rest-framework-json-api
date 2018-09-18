@@ -251,7 +251,7 @@ class DJATestFilters(APITestCase):
     def test_filter_empty_association_name(self):
         """
         test for filter with missing association name
-        error texts are different depending on whether QueryValidationFilter is in use.
+        error texts are different depending on whether QueryParameterValidationFilter is in use.
         """
         response = self.client.get(self.url, data={'filter[]': 'foobar'})
         self.assertEqual(response.status_code, 400,

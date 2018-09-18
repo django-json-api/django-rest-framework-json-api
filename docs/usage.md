@@ -33,7 +33,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_json_api.filters.QueryValidationFilter',
+        'rest_framework_json_api.filters.QueryParameterValidationFilter',
         'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -108,8 +108,8 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 Following are descriptions for three JSON:API-specific filter backends and documentation on suggested usage
 for a standard DRF keyword-search filter backend that makes it consistent with JSON:API.
 
-#### `QueryValidationFilter`
-`QueryValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
+#### `QueryParameterValidationFilter`
+`QueryParameterValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
 (sort, include, filter, fields, page) and returns a `400 Bad Request` if a non-matching query parameter
 is used. This can help the client identify misspelled query parameters, for example.
 
@@ -226,7 +226,7 @@ from models import MyModel
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.QueryValidationFilter, filters.OrderingFilter,
+    filter_backends = (filters.QueryParameterValidationFilter, filters.OrderingFilter,
 	                   django_filters.DjangoFilterBackend, SearchFilter)
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
