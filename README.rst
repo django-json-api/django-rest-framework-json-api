@@ -184,4 +184,6 @@ override ``settings.REST_FRAMEWORK``
         'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
     }
 
-This package provides much more including automatic inflection of JSON keys, extra top level data (using nested serializers), relationships, links, and handy shortcuts like MultipleIDMixin. Read more at http://django-rest-framework-json-api.readthedocs.org/
+This package provides much more including automatic inflection of JSON keys, extra top level data (using nested
+serializers), relationships, links, paginators, filters, and handy shortcuts.
+Read more at http://django-rest-framework-json-api.readthedocs.org/
