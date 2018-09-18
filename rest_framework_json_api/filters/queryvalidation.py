@@ -4,17 +4,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import BaseFilterBackend
 
 
-class QueryValidationFilter(BaseFilterBackend):
+class QueryParameterValidationFilter(BaseFilterBackend):
     """
     A backend filter that performs strict validation of query parameters for
     jsonapi spec conformance and raises a 400 error if non-conforming usage is
     found.
 
     If you want to add some additional non-standard query parameters,
-    simply override :py:attr:`query_regex` adding the new parameters, but, "with the additional
-    requirement that they MUST contain contain at least one non a-z character (U+0061 to U+007A).
-    It is RECOMMENDED that a U+002D HYPHEN-MINUS, "-", U+005F LOW LINE, "_", or capital letter is
-    used (e.g. camelCasing)."  -- http://jsonapi.org/format/#query-parameters
+    override :py:attr:`query_regex` adding the new parameters. Make sure to comply with
+    the rules at http://jsonapi.org/format/#query-parameters.
     """
     #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters:
     #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
