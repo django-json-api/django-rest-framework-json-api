@@ -374,7 +374,6 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        """"""  # without this sphinx complains and copies a prior many_init docstring!
         list_kwargs = {k: kwargs.pop(k) for k in LINKS_PARAMS if k in kwargs}
         list_kwargs['child_relation'] = cls(*args, **kwargs)
         for key in kwargs.keys():
