@@ -1,11 +1,14 @@
 import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
+from rest_framework.filters import SearchFilter
 
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from django_filters import rest_framework as filters
+from rest_framework_json_api.django_filters import DjangoFilterBackend
+from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
 from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
@@ -91,6 +94,10 @@ class NoPagination(PageNumberPagination):
 
 class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
+    # override the default filter backends in order to test QueryParameterValidationFilter without
+    # breaking older usage of non-standard query params like `page_size`.
+    filter_backends = (QueryParameterValidationFilter, OrderingFilter,
+                       DjangoFilterBackend, SearchFilter)
     ordering_fields = ('headline', 'body_text', 'blog__name', 'blog__id')
     rels = ('exact', 'iexact',
             'contains', 'icontains',
