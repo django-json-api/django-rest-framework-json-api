@@ -127,6 +127,7 @@ class HyperlinkedModelSerializer(
     * Relationships to other instances are hyperlinks, instead of primary keys.
 
     Included Mixins:
+
     * A mixin class to enable sparse fieldsets is included
     * A mixin class to enable validation of included resources is included
     """
@@ -150,6 +151,7 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
 
 
     Included Mixins:
+
     * A mixin class to enable sparse fieldsets is included
     * A mixin class to enable validation of included resources is included
     """

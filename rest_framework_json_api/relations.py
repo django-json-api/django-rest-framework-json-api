@@ -152,10 +152,12 @@ class HyperlinkedRelatedField(HyperlinkedMixin, SkipDataMixin, RelatedField):
         and child classes in order to try to cover the general case. If you're
         overriding this method you'll probably want something much simpler, eg:
 
-        @classmethod
-        def many_init(cls, *args, **kwargs):
-            kwargs['child'] = cls()
-            return CustomManyRelatedField(*args, **kwargs)
+        .. code:: python
+
+            @classmethod
+            def many_init(cls, *args, **kwargs):
+                kwargs['child'] = cls()
+                return CustomManyRelatedField(*args, **kwargs)
         """
         list_kwargs = {'child_relation': cls(*args, **kwargs)}
         for key in kwargs:

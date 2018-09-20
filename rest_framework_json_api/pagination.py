@@ -12,7 +12,6 @@ from rest_framework.views import Response
 class JsonApiPageNumberPagination(PageNumberPagination):
     """
     A json-api compatible pagination format.
-    Use a private name for the implementation because the public name is pending deprecation.
     """
     page_query_param = 'page[number]'
     page_size_query_param = 'page[size]'
@@ -54,10 +53,12 @@ class JsonApiPageNumberPagination(PageNumberPagination):
 class JsonApiLimitOffsetPagination(LimitOffsetPagination):
     """
     A limit/offset based style. For example:
-    http://api.example.org/accounts/?page[limit]=100
-    http://api.example.org/accounts/?page[offset]=400&page[limit]=100
 
-    Use a private name for the implementation because the public name is pending deprecation.
+    .. code::
+
+        http://api.example.org/accounts/?page[limit]=100
+        http://api.example.org/accounts/?page[offset]=400&page[limit]=100
+
     """
     limit_query_param = 'page[limit]'
     offset_query_param = 'page[offset]'
@@ -105,7 +106,15 @@ class JsonApiLimitOffsetPagination(LimitOffsetPagination):
 
 class PageNumberPagination(JsonApiPageNumberPagination):
     """
-    A soon-to-be-changed paginator that uses non-JSON:API query parameters (default:
+    .. warning::
+
+        PageNumberPagination is deprecated. Use JsonApiPageNumberPagination instead.
+        If you want to retain current defaults you will need to implement custom
+        pagination class explicitly setting `page_query_param = "page"` and
+        `page_size_query_param = "page_size"`.
+        See changelog for more details.
+
+    A paginator that uses non-JSON:API query parameters (default:
     'page' and 'page_size' instead of 'page[number]' and 'page[size]').
     """
     page_query_param = 'page'
@@ -119,7 +128,7 @@ class PageNumberPagination(JsonApiPageNumberPagination):
                     'page_size_query_param' not in type(self).__dict__)
         if warn:
             warnings.warn(
-                'PageNumberPagination is deprecated use JsonApiPageNumberPagination instead. '
+                'PageNumberPagination is deprecated. Use JsonApiPageNumberPagination instead. '
                 'If you want to retain current defaults you will need to implement custom '
                 'pagination class explicitly setting `page_query_param = "page"` and '
                 '`page_size_query_param = "page_size"`. '
@@ -131,7 +140,14 @@ class PageNumberPagination(JsonApiPageNumberPagination):
 
 class LimitOffsetPagination(JsonApiLimitOffsetPagination):
     """
-    Deprecated paginator that uses a different max_limit
+    .. warning::
+
+        LimitOffsetPagination is deprecated. Use JsonApiLimitOffsetPagination instead.
+        If you want to retain current defaults you will need to implement custom
+        pagination class explicitly setting `max_limit = None`.
+        See changelog for more details.
+
+    A paginator that uses a different max_limit from `JsonApiLimitOffsetPagination`.
     """
     max_limit = None
 
@@ -142,7 +158,7 @@ class LimitOffsetPagination(JsonApiLimitOffsetPagination):
             warn = 'max_limit' not in type(self).__dict__
         if warn:
             warnings.warn(
-                'LimitOffsetPagination is deprecated use JsonApiLimitOffsetPagination instead. '
+                'LimitOffsetPagination is deprecated. Use JsonApiLimitOffsetPagination instead. '
                 'If you want to retain current defaults you will need to implement custom '
                 'pagination class explicitly setting `max_limit = None`. '
                 'See changelog for more details.',

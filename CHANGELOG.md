@@ -26,6 +26,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Replaced binary `drf_example` sqlite3 db with a [fixture](example/fixtures/drf_example.json). See [getting started](docs/getting-started.md#running-the-example-app).
+* Replaced unmaintained [API doc](docs/api.md) with [auto-generated API reference](docs/api.rst).
 
 ### Fixed
 

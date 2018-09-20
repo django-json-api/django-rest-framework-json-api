@@ -18,22 +18,29 @@ from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedF
 
 class JSONRenderer(renderers.JSONRenderer):
     """
+    The `JSONRenderer` exposes a number of methods that you may override if you need highly
+    custom rendering control.
+
     Render a JSON response per the JSON API spec:
-    {
-        "data": [{
-            "type": "companies",
-            "id": 1,
-            "attributes": {
-                "name": "Mozilla",
-                "slug": "mozilla",
-                "date-created": "2014-03-13 16:33:37"
-            }
-        }, {
-            "type": "companies",
-            "id": 2,
-            ...
-        }]
-    }
+
+    .. code:: json
+
+        {
+            "data": [{
+                "type": "companies",
+                "id": 1,
+                "attributes": {
+                    "name": "Mozilla",
+                    "slug": "mozilla",
+                    "date-created": "2014-03-13 16:33:37"
+                }
+            }, {
+                "type": "companies",
+                "id": 2,
+                ...
+            }]
+        }
+
     """
 
     media_type = 'application/vnd.api+json'
@@ -41,6 +48,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @classmethod
     def extract_attributes(cls, fields, resource):
+        """
+        Builds the `attributes` object of the JSON API resource object.
+        """
         data = OrderedDict()
         for field_name, field in six.iteritems(fields):
             # ID is always provided in the root of JSON API so remove it from attributes
@@ -72,6 +82,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @classmethod
     def extract_relationships(cls, fields, resource, resource_instance):
+        """
+        Builds the relationships top level object based on related serializers.
+        """
         # Avoid circular deps
         from rest_framework_json_api.relations import ResourceRelatedField
 
@@ -318,6 +331,10 @@ class JSONRenderer(renderers.JSONRenderer):
     @classmethod
     def extract_included(cls, fields, resource, resource_instance, included_resources,
                          included_cache):
+        """
+        Adds related data to the top level included key when the request includes
+        ?include=example,example_field2
+        """
         # this function may be called with an empty record (example: Browsable Interface)
         if not resource_instance:
             return
@@ -442,6 +459,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @classmethod
     def extract_meta(cls, serializer, resource):
+        """
+        Gathers the data from serializer fields specified in meta_fields and adds it to
+        the meta object.
+        """
         if hasattr(serializer, 'child'):
             meta = getattr(serializer.child, 'Meta', None)
         else:
@@ -456,6 +477,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @classmethod
     def extract_root_meta(cls, serializer, resource):
+        """
+        Calls a `get_root_meta` function on a serializer, if it exists.
+        """
         many = False
         if hasattr(serializer, 'child'):
             many = True
@@ -471,6 +495,9 @@ class JSONRenderer(renderers.JSONRenderer):
     @classmethod
     def build_json_resource_obj(cls, fields, resource, resource_instance, resource_name,
                                 force_type_resolution=False):
+        """
+        Builds the resource object (type, id, attributes) and extracts relationships.
+        """
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)

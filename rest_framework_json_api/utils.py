@@ -129,6 +129,13 @@ def _format_object(obj, format_type=None):
 
 def format_keys(obj, format_type=None):
     """
+    .. warning::
+
+        `format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be
+        removed in the future.
+        Use `format_field_names` and `JSON_API_FIELD_NAMES` instead. Be aware that
+        `format_field_names` only formats keys and preserves value.
+
     Takes either a dict or list and returns it with camelized keys only if
     JSON_API_FORMAT_KEYS is set.
 
@@ -190,6 +197,13 @@ def format_value(value, format_type=None):
 
 
 def format_relation_name(value, format_type=None):
+    """
+    .. warning::
+
+        The 'format_relation_name' function has been renamed 'format_resource_type' and the
+        settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of
+        'JSON_API_FORMAT_RELATION_KEYS' and 'JSON_API_PLURALIZE_RELATION_TYPE'
+    """
     warnings.warn(
         "The 'format_relation_name' function has been renamed 'format_resource_type' and the "
         "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of "
