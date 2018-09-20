@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [2.6.0] - 2018-09-20
 
 ### Added
 
@@ -21,7 +21,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Deprecate `MultipleIDMixin` because it doesn't comply with the JSON:API 1.0 spec. Replace it with
   `DjangoFilterBackend` and **change clients** to use `filter[id.in]` query parameter instead of `ids[]`.
-  See [usage docs](docs/usage.md#djangofilterbackend).
+  See [usage docs](docs/usage.md#djangofilterbackend). You also have the option to copy the mixin into your code.
 
 ### Changed
 
