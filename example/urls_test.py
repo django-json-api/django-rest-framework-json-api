@@ -15,6 +15,7 @@ from example.views import (
     FiltersetEntryViewSet,
     NoFiltersetEntryViewSet,
     NonPaginatedEntryViewSet,
+    ProjectTypeViewset,
     ProjectViewset
 )
 
@@ -30,6 +31,7 @@ router.register(r'authors', AuthorViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'companies', CompanyViewset)
 router.register(r'projects', ProjectViewset)
+router.register(r'project-types', ProjectTypeViewset)
 
 # for the old tests
 router.register(r'identities', Identity)

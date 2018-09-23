@@ -3,6 +3,8 @@ import random
 import pytest
 from django.urls import reverse
 
+from example.factories import ArtProjectFactory, ProjectTypeFactory
+
 pytestmark = pytest.mark.django_db
 
 
@@ -57,6 +59,7 @@ def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, clie
 def test_polymorphism_on_polymorphic_model_list_post(client):
     test_topic = 'New test topic {}'.format(random.randint(0, 999999))
     test_artist = 'test-{}'.format(random.randint(0, 999999))
+    test_project_type = ProjectTypeFactory()
     url = reverse('project-list')
     data = {
         'data': {
@@ -64,6 +67,14 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
             'attributes': {
                 'topic': test_topic,
                 'artist': test_artist
+            },
+            'relationships': {
+                'projectType': {
+                    'data': {
+                        'type': 'projectTypes',
+                        'id': test_project_type.pk
+                    }
+                }
             }
         }
     }
@@ -73,6 +84,22 @@ def test_polymorphism_on_polymorphic_model_list_post(client):
     assert content['data']['type'] == "artProjects"
     assert content['data']['attributes']['topic'] == test_topic
     assert content['data']['attributes']['artist'] == test_artist
+    assert content['data']['relationships']['projectType']['data']['id'] == \
+        str(test_project_type.pk)
+
+
+def test_polymorphism_on_polymorphic_model_w_included_serializers(client):
+    test_project = ArtProjectFactory()
+    query = '?include=projectType'
+    url = reverse('project-list')
+    response = client.get(url + query)
+    content = response.json()
+    assert content['data'][0]['id'] == str(test_project.pk)
+    assert content['data'][0]['type'] == 'artProjects'
+    assert content['data'][0]['relationships']['projectType']['data']['id'] == \
+        str(test_project.project_type.pk)
+    assert content['included'][0]['type'] == 'projectTypes'
+    assert content['included'][0]['id'] == str(test_project.project_type.pk)
 
 
 def test_polymorphic_model_without_any_instance(client):

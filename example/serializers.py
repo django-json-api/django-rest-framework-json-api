@@ -15,6 +15,7 @@ from example.models import (
     Company,
     Entry,
     Project,
+    ProjectType,
     ResearchProject,
     TaggedItem
 )
@@ -218,19 +219,34 @@ class CommentSerializer(serializers.ModelSerializer):
         # fields = ('entry', 'body', 'author',)
 
 
-class ArtProjectSerializer(serializers.ModelSerializer):
+class ProjectTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectType
+        fields = ('name', 'url',)
+
+
+class BaseProjectSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'project_type': ProjectTypeSerializer,
+    }
+
+
+class ArtProjectSerializer(BaseProjectSerializer):
     class Meta:
         model = ArtProject
         exclude = ('polymorphic_ctype',)
 
 
-class ResearchProjectSerializer(serializers.ModelSerializer):
+class ResearchProjectSerializer(BaseProjectSerializer):
     class Meta:
         model = ResearchProject
         exclude = ('polymorphic_ctype',)
 
 
 class ProjectSerializer(serializers.PolymorphicModelSerializer):
+    included_serializers = {
+        'project_type': ProjectTypeSerializer,
+    }
     polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
 
     class Meta:
