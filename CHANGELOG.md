@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+
+## [Unreleased]
+
+### Added
+
+### Deprecated
+
+### Changed
+
+### Fixed
+
+* Pass context from `PolymorphicModelSerializer` to child serializers to support fields which require a `request` context such as `url`.
+
+
 ## [2.6.0] - 2018-09-20
 
 ### Added
