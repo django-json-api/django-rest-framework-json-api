@@ -595,7 +595,9 @@ class JSONRenderer(renderers.JSONRenderer):
                     if isinstance(serializer.child, rest_framework_json_api.
                                   serializers.PolymorphicModelSerializer):
                         resource_serializer_class = serializer.child.\
-                            get_polymorphic_serializer_for_instance(resource_instance)()
+                            get_polymorphic_serializer_for_instance(resource_instance)(
+                                context=serializer.child.context
+                            )
                     else:
                         resource_serializer_class = serializer.child
 

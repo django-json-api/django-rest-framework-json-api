@@ -12,6 +12,7 @@ from example.models import (
     Comment,
     Company,
     Entry,
+    ProjectType,
     ResearchProject,
     TaggedItem
 )
@@ -89,12 +90,20 @@ class TaggedItemFactory(factory.django.DjangoModelFactory):
     tag = factory.LazyAttribute(lambda x: faker.word())
 
 
+class ProjectTypeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ProjectType
+
+    name = factory.LazyAttribute(lambda x: faker.name())
+
+
 class ArtProjectFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ArtProject
 
     topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
     artist = factory.LazyAttribute(lambda x: faker.name())
+    project_type = factory.SubFactory(ProjectTypeFactory)
 
 
 class ResearchProjectFactory(factory.django.DjangoModelFactory):
@@ -103,6 +112,7 @@ class ResearchProjectFactory(factory.django.DjangoModelFactory):
 
     topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
     supervisor = factory.LazyAttribute(lambda x: faker.name())
+    project_type = factory.SubFactory(ProjectTypeFactory)
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):

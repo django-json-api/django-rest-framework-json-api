@@ -119,8 +119,20 @@ class Comment(BaseModel):
         ordering = ('id',)
 
 
+@python_2_unicode_compatible
+class ProjectType(BaseModel):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('id',)
+
+
 class Project(PolymorphicModel):
     topic = models.CharField(max_length=30)
+    project_type = models.ForeignKey(ProjectType, null=True, on_delete=models.CASCADE)
 
 
 class ArtProject(Project):
