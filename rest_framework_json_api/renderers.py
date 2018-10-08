@@ -143,7 +143,7 @@ class JSONRenderer(renderers.JSONRenderer):
             if isinstance(field, HyperlinkedMixin):
                 field_links = field.get_links(resource_instance, field.related_link_lookup_field)
                 relation_data.update({'links': field_links} if field_links else dict())
-                data.update({field_name: relation_data})
+                data.update({field_name: relation_data} if relation_data else dict())
 
             if isinstance(field, (ResourceRelatedField, )):
                 relation_instance_id = getattr(resource_instance, source + "_id", None)
