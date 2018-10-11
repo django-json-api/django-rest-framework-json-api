@@ -16,12 +16,14 @@ from example.views import (
     NoFiltersetEntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
-    ProjectViewset
-)
+    ProjectViewset,
+    DRFBlogViewSet)
 
 router = routers.DefaultRouter(trailing_slash=False)
 
 router.register(r'blogs', BlogViewSet)
+# router to test default DRF functionalities
+router.register(r'blogs', DRFBlogViewSet)
 router.register(r'entries', EntryViewSet)
 # these "flavors" of entries are used for various tests:
 router.register(r'nopage-entries', NonPaginatedEntryViewSet, 'nopage-entry')
@@ -47,6 +49,11 @@ urlpatterns = [
     url(r'^entries/(?P<entry_pk>[^/.]+)/blog',
         BlogViewSet.as_view({'get': 'retrieve'}),
         name='entry-blog'
+        ),
+    # url to test default DRF functionalities
+    url(r'^entries/(?P<entry_pk>[^/.]+)/blog',
+        DRFBlogViewSet.as_view({'get': 'retrieve'}),
+        name='drf-entry-blog'
         ),
     url(r'^entries/(?P<entry_pk>[^/.]+)/comments',
         CommentViewSet.as_view({'get': 'list'}),

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from rest_framework_json_api import relations, serializers
+from rest_framework import serializers as drf_serilazers
 
 from example.models import (
     ArtProject,
@@ -19,6 +20,13 @@ from example.models import (
 
 
 class TaggedItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaggedItem
+        fields = ('tag',)
+
+
+# DRF default serializer to test default DRF functionalities
+class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
     class Meta:
         model = TaggedItem
         fields = ('tag',)
@@ -45,6 +53,25 @@ class BlogSerializer(serializers.ModelSerializer):
         fields = ('name', 'url', 'tags')
         read_only_fields = ('tags',)
         meta_fields = ('copyright',)
+
+
+# DRF default serializer to test default DRF functionalities
+class BlogDRFSerializer(serializers.ModelSerializer):
+    copyright = serializers.SerializerMethodField()
+    tags = TaggedItemSerializer(many=True, read_only=True)
+
+    def get_copyright(self, resource):
+        return datetime.now().year
+
+    def get_root_meta(self, resource, many):
+        return {
+            'api_docs': '/docs/api/blogs'
+        }
+
+    class Meta:
+        model = Blog
+        fields = ('name', 'url', 'tags')
+        read_only_fields = ('tags',)
 
 
 class EntrySerializer(serializers.ModelSerializer):

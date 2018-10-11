@@ -1,8 +1,10 @@
 import json
 
+from django.urls import reverse
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import viewsets
 
+from example.tests.test_views import TestBlogViewSet
 from rest_framework_json_api.renderers import JSONRenderer
 
 from example.models import Comment, Entry
@@ -46,6 +48,7 @@ def render_dummy_test_serialized_view(view_class):
         renderer_context={'view': view_class()})
 
 
+# tests
 def test_simple_reverse_relation_included_renderer():
     """
     Test renderer when a single reverse fk relation is passed.
@@ -73,3 +76,24 @@ def test_render_format_keys(settings):
 
     result = json.loads(rendered.decode())
     assert result['data']['attributes']['json-field'] == {'json-key': 'JsonValue'}
+
+
+class TestDRFBlogViewSet(TestBlogViewSet):
+
+    def test_get_object_gives_correct_blog(self):
+        url = reverse('drf-entry-blog', kwargs={'entry_pk': self.entry.id})
+        resp = self.client.get(url)
+        expected = {
+            'data': {
+                'attributes': {'name': self.blog.name},
+                'id': '{}'.format(self.blog.id),
+                'links': {'self': 'http://testserver/blogs/{}'.format(self.blog.id)},
+                'meta': {'copyright': 2018},
+                'relationships': {'tags': {'data': []}},
+                'type': 'blogs'
+            },
+            'meta': {'apiDocs': '/docs/api/blogs'}
+        }
+        got = resp.json()
+        print(got)
+        self.assertEqual(got, expected)

@@ -3,6 +3,7 @@ import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
+from rest_framework import viewsets
 
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
@@ -21,8 +22,8 @@ from example.serializers import (
     CompanySerializer,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer
-)
+    ProjectTypeSerializer,
+    BlogDRFSerializer)
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
 
@@ -37,6 +38,18 @@ class BlogViewSet(ModelViewSet):
             return Entry.objects.get(id=entry_pk).blog
 
         return super(BlogViewSet, self).get_object()
+
+
+class DRFBlogViewSet(viewsets.ModelViewSet):
+    queryset = Blog.objects.all()
+    serializer_class = BlogDRFSerializer
+
+    def get_object(self):
+        entry_pk = self.kwargs.get('entry_pk', None)
+        if entry_pk is not None:
+            return Entry.objects.get(id=entry_pk).blog
+
+        return super(DRFBlogViewSet, self).get_object()
 
 
 class JsonApiViewSet(ModelViewSet):
