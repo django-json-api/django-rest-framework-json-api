@@ -164,6 +164,12 @@ class RelatedMixin(object):
         field = parent_serializer.fields.get(field_name, None)
 
         if field is not None:
+            # TODO: Workaround, not sure this is a correct fix.
+            # when many=False (a toOne relationship), must override field.use_pk_only_optimization()
+            # to return False as `related` needs the attributes
+            # and raises: `'PKOnlyObject' object has no attribute '<attr>'` otherwise.
+            if hasattr(field, 'use_pk_only_optimization') and field.use_pk_only_optimization():
+                field.use_pk_only_optimization = lambda: False
             return field.get_attribute(parent_obj)
         else:
             try:
