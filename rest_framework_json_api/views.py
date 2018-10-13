@@ -109,7 +109,7 @@ class RelatedMixin(object):
     """
     # test bug fix for https://github.com/django-json-api/django-rest-framework-json-api/issues/489
     #: override pk_only optimization
-    override_pk_only_optimization = False
+    override_pk_only_optimization = True
 
     def retrieve_related(self, request, *args, **kwargs):
         serializer_kwargs = {}
