@@ -107,6 +107,9 @@ class RelatedMixin(object):
     """
     This mixin handles all related entities, whose Serializers are declared in "related_serializers"
     """
+    # test bug fix for https://github.com/django-json-api/django-rest-framework-json-api/issues/489
+    #: override pk_only optimization
+    override_pk_only_optimization = False
 
     def retrieve_related(self, request, *args, **kwargs):
         serializer_kwargs = {}
@@ -168,8 +171,9 @@ class RelatedMixin(object):
             # when many=False (a toOne relationship), must override field.use_pk_only_optimization()
             # to return False as `related` needs the attributes
             # and raises: `'PKOnlyObject' object has no attribute '<attr>'` otherwise.
-            if hasattr(field, 'use_pk_only_optimization') and field.use_pk_only_optimization():
-                field.use_pk_only_optimization = lambda: False
+            if self.override_pk_only_optimization:
+                if hasattr(field, 'use_pk_only_optimization') and field.use_pk_only_optimization():
+                    field.use_pk_only_optimization = lambda: False
             return field.get_attribute(parent_obj)
         else:
             try:
