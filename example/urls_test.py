@@ -12,6 +12,8 @@ from example.views import (
     CompanyViewset,
     DRFBlogViewSet,
     DRFEntryViewSet,
+    CourseRelationshipView,
+    CourseViewSet,
     EntryRelationshipView,
     EntryViewSet,
     FiltersetEntryViewSet,
@@ -19,10 +21,8 @@ from example.views import (
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
     ProjectViewset,
-    CourseViewSet,
-    TermViewSet,
-    CourseRelationshipView,
     TermRelationshipView,
+    TermViewSet
 )
 
 router = routers.DefaultRouter(trailing_slash=False)

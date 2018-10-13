@@ -12,13 +12,13 @@ from example.models import (
     Blog,
     Comment,
     Company,
+    Course,
     Entry,
     Project,
     ProjectType,
     ResearchProject,
     TaggedItem,
-    Course,
-    Term,
+    Term
 )
 
 

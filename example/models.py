@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import uuid
+
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from polymorphic.models import PolymorphicModel
-
-import uuid
 
 
 class BaseModel(models.Model):
