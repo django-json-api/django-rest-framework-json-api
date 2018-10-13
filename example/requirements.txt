@@ -1,5 +1,4 @@
 # Requirements specifically for the example app
-packaging
 Django>=1.11
 django-debug-toolbar
 django-polymorphic>=2.0

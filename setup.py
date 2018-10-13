@@ -110,7 +110,6 @@ setup(
         'pytest',
         'pytest-cov',
         'django-polymorphic>=2.0',
-        'packaging',
         'django-debug-toolbar'
     ] + mock,
     zip_safe=False,

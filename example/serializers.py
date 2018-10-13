@@ -1,8 +1,5 @@
 from datetime import datetime
 
-import rest_framework
-from packaging import version
-
 from rest_framework_json_api import relations, serializers
 
 from example.models import (
@@ -269,8 +266,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        if version.parse(rest_framework.VERSION) >= version.parse('3.3'):
-            fields = '__all__'
+        fields = '__all__'
 
 
 # the following serializers are to reproduce/confirm fix for this bug:
