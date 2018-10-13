@@ -1,0 +1,424 @@
+[
+{
+  "model": "example.course",
+  "pk": "001b55e0-9a60-4386-98c7-4c856bb840b4",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "XCEFK9",
+    "suffix_two": "00",
+    "subject_area_code": "ANTB",
+    "course_number": "04961",
+    "course_identifier": "ANTH3160V",
+    "course_name": "THE BODY AND SOCIETY",
+    "course_description": "THE BODY AND SOCIETY"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "00fb17bb-e4a0-49a0-a27e-6939e3e04b62",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "B",
+    "suffix_two": "00",
+    "subject_area_code": "ACCT",
+    "course_number": "73272",
+    "course_identifier": "ACCT8122B",
+    "course_name": "Accounting for Consultants",
+    "course_description": "Accounting for Consultants"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "016659e9-e29f-49b4-b85d-d25da0724dbb",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "B",
+    "suffix_two": "00",
+    "subject_area_code": "ACCT",
+    "course_number": "73290",
+    "course_identifier": "ACCT7022B",
+    "course_name": "Accounting for Value",
+    "course_description": "Accounting for Value"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "01ca197f-c00c-4f24-a743-091b62f1d500",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "XCEFK9",
+    "suffix_two": "00",
+    "subject_area_code": "AMSB",
+    "course_number": "00373",
+    "course_identifier": "AMST3704X",
+    "course_name": "SENIOR RESEARCH ESSAY SEMINAR",
+    "course_description": "SENIOR RESEARCH ESSAY SEMINAR"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "02d5fcbc-cc6d-40e0-9acf-5f4e54cf3d87",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "O",
+    "suffix_two": "00",
+    "subject_area_code": "AUDT",
+    "course_number": "87448",
+    "course_identifier": "AUPH1010O",
+    "course_name": "METHODS/PROB OF PHILOS THOUGHT",
+    "course_description": "METHODS/PROB OF PHILOS THOUGHT"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "02e2e004-326e-4be8-aecc-aa67ece50fdf",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "RXCEIGF2U",
+    "suffix_two": "00",
+    "subject_area_code": "COMS",
+    "course_number": "84695",
+    "course_identifier": "COMS3102W",
+    "course_name": "DEVELOPMENT TECHNOLOGY",
+    "course_description": "MODERN iOS APPLICATION DEVELOP"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "0381673f-e0a4-4212-b95a-3b62ebff9267",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "IG",
+    "suffix_two": "00",
+    "subject_area_code": "APAM",
+    "course_number": "74450",
+    "course_identifier": "APPH9143E",
+    "course_name": "APPLIED PHYSICS SEMINAR",
+    "course_description": "STELLARATOR PHYSICS"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "03e32754-3da7-4005-be6b-8de0e088816a",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "XCEF",
+    "suffix_two": "00",
+    "subject_area_code": "CEEM",
+    "course_number": "26118",
+    "course_identifier": "CIEN3304E",
+    "course_name": "IND STUDIES-CIVIL ENGIN-SENIOR",
+    "course_description": "IND STUDIES-CIVIL ENGIN-SENIOR"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "046741cd-c700-4752-b57a-e37a948ebc44",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "B",
+    "suffix_two": "00",
+    "subject_area_code": "BUEC",
+    "course_number": "72074",
+    "course_identifier": "BUEC7255B",
+    "course_name": "FinTech: Consumer Financial Se",
+    "course_description": "FinTech: Consumer Financial Se"
+  }
+},
+{
+  "model": "example.course",
+  "pk": "04893b8f-0cbe-4e09-b8e6-17a4745900c1",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "school_bulletin_prefix_code": "RXCEIGFKU",
+    "suffix_two": "00",
+    "subject_area_code": "ENCL",
+    "course_number": "89695",
+    "course_identifier": "CLEN4414W",
+    "course_name": "HIST OF LITERARY CRITICISM:PLATO TO KANT",
+    "course_description": "HIST OF LIT CRIT PLATO TO KANT"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "00290ba0-ebae-44c0-9f4b-58a5f27240ed",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20191",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "001b55e0-9a60-4386-98c7-4c856bb840b4"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "00d14ddb-9fb5-4cff-9954-d52fc33217e7",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20191",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "00fb17bb-e4a0-49a0-a27e-6939e3e04b62"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "010a7ff7-ef5a-4b36-b3ff-9c34e30b76e8",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20191",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "016659e9-e29f-49b4-b85d-d25da0724dbb"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "01163a94-fc8f-47fe-bb4a-5407ad1a35fe",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20191",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "01ca197f-c00c-4f24-a743-091b62f1d500"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "01764ebb-34b7-4b21-8835-cf712532cf5c",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20182",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "02d5fcbc-cc6d-40e0-9acf-5f4e54cf3d87"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "02e877b2-35c4-47d4-b72c-25bab1e87065",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20183",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "02e2e004-326e-4be8-aecc-aa67ece50fdf"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "0316e6ad-fe6a-4339-8d18-a98e4ffb0bee",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20191",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "0381673f-e0a4-4212-b95a-3b62ebff9267"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "035c31c5-398d-43b7-a55b-19f6d1472797",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20183",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "03e32754-3da7-4005-be6b-8de0e088816a"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "0378c6c0-b658-4cf6-b8ba-6fa19614e3aa",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20192",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "046741cd-c700-4752-b57a-e37a948ebc44"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "243e2b9c-a3c6-4d40-9b9a-2750d6c03250",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "001b55e0-9a60-4386-98c7-4c856bb840b4"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "2d763c14-a566-4600-860f-329e44cbbd4a",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "02e2e004-326e-4be8-aecc-aa67ece50fdf"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "39ca7b38-f273-4fa3-9494-5a422780aebd",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "016659e9-e29f-49b4-b85d-d25da0724dbb"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "52cc86dd-7a78-48b8-a6a5-76c1fc7fc9be",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "00fb17bb-e4a0-49a0-a27e-6939e3e04b62"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "964ff272-acb8-4adc-9a7e-21a241e63ff1",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "03e32754-3da7-4005-be6b-8de0e088816a"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "bca761f7-03f6-4ff5-bbb8-b58467ef3970",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "046741cd-c700-4752-b57a-e37a948ebc44"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "e8e13192-0677-44e7-a590-606a38d66b34",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "02d5fcbc-cc6d-40e0-9acf-5f4e54cf3d87"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "f9057456-fed6-4982-bb82-3276999cb1ae",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "0381673f-e0a4-4212-b95a-3b62ebff9267"
+  }
+},
+{
+  "model": "example.term",
+  "pk": "f9aa1a51-bf3b-45cf-b1cc-34ce47ca9913",
+  "fields": {
+    "effective_start_date": null,
+    "effective_end_date": null,
+    "last_mod_user_name": "loader",
+    "last_mod_date": "2018-08-03",
+    "term_identifier": "20181",
+    "audit_permitted_code": 0,
+    "exam_credit_flag": false,
+    "course": "01ca197f-c00c-4f24-a743-091b62f1d500"
+  }
+}
+]
