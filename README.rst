@@ -126,18 +126,17 @@ Running the example app
 Browse to http://localhost:8000
 
 
-Running Tests
-^^^^^^^^^^^^^
+Running Tests and linting
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It is recommended to create a virtualenv for testing. Assuming it is already
 installed and activated:
 
 ::
 
-    $ pip install -e .
     $ pip install -r requirements-development.txt
+    $ flake8
     $ py.test
-
 
 -----
 Usage
