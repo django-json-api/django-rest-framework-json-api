@@ -1,5 +1,4 @@
 import json
-import mock
 
 from django.test import RequestFactory
 from django.utils import timezone
@@ -13,9 +12,14 @@ from rest_framework_json_api.utils import format_resource_type
 from . import TestBase
 from .. import views
 from example.factories import AuthorFactory, EntryFactory
-from example.models import Author, Blog, Comment, Entry, Course, Term
+from example.models import Author, Blog, Comment, Course, Entry, Term
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
 from example.views import AuthorViewSet
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestRelationshipView(APITestCase):
@@ -323,11 +327,11 @@ class TestRelatedMixin(APITestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), {'data': None})
 
-    # the following tests are to reproduce/confirm fix for this bug:
+    # the following test reproduces/confirm fix for this bug:
     # https://github.com/django-json-api/django-rest-framework-json-api/issues/489
     def test_term_related_course(self):
         """
-        confirm that the related data reference the primary key
+        confirm that the related child data reference the parent
         """
         term_id = self.term.first().pk
         kwargs = {'pk': term_id, 'related_field': 'course'}
@@ -341,9 +345,13 @@ class TestRelatedMixin(APITestCase):
         self.assertIn({"type": "terms", "id": str(term_id)}, back_reference)
 
         # the following raises AttributeError:
-        with mock.patch('rest_framework_json_api.views.RelatedMixin.override_pk_only_optimization',
-            False):
-            resp = self.client.get(url)
+        with self.assertRaises(AttributeError) as ae:
+            with mock.patch(
+                    'rest_framework_json_api.views.RelatedMixin.override_pk_only_optimization',
+                    False):
+                resp = self.client.get(url)
+        print(ae.exception)
+        self.assertIn('`PKOnlyObject`', ae.exception.args[0])
 
 
 class TestValidationErrorResponses(TestBase):

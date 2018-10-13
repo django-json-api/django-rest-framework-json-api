@@ -10,15 +10,15 @@ from example.views import (
     CommentRelationshipView,
     CommentViewSet,
     CompanyViewset,
+    CourseRelationshipView,
+    CourseViewSet,
     EntryRelationshipView,
     EntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
     ProjectViewset,
-    CourseViewSet,
-    TermViewSet,
-    CourseRelationshipView,
     TermRelationshipView,
+    TermViewSet
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
