@@ -13,7 +13,17 @@ from rest_framework_json_api.pagination import PageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
-from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
+from example.models import (
+    Author,
+    Blog,
+    Comment,
+    Company,
+    Entry,
+    Project,
+    ProjectType,
+    Course,
+    Term,
+)
 from example.serializers import (
     AuthorSerializer,
     BlogSerializer,
@@ -21,7 +31,9 @@ from example.serializers import (
     CompanySerializer,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer
+    ProjectTypeSerializer,
+    CourseSerializer,
+    TermSerializer,
 )
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
@@ -197,3 +209,25 @@ class CommentRelationshipView(RelationshipView):
 class AuthorRelationshipView(RelationshipView):
     queryset = Author.objects.all()
     self_link_view_name = 'author-relationships'
+
+
+# the following views are to reproduce/confirm fix for this bug:
+# https://github.com/django-json-api/django-rest-framework-json-api/issues/489
+class CourseViewSet(ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+
+class TermViewSet(ModelViewSet):
+    queryset = Term.objects.all()
+    serializer_class = TermSerializer
+
+
+class CourseRelationshipView(RelationshipView):
+    queryset = Course.objects
+    self_link_view_name = 'course-relationships'
+
+
+class TermRelationshipView(RelationshipView):
+    queryset = Term.objects
+    self_link_view_name = 'term-relationships'
