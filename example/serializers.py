@@ -25,8 +25,10 @@ class TaggedItemSerializer(serializers.ModelSerializer):
         fields = ('tag',)
 
 
-# DRF default serializer to test default DRF functionalities
 class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
+    """
+    DRF default serializer to test default DRF functionalities
+    """
     class Meta:
         model = TaggedItem
         fields = ('tag',)
@@ -55,8 +57,10 @@ class BlogSerializer(serializers.ModelSerializer):
         meta_fields = ('copyright',)
 
 
-# DRF default serializer to test default DRF functionalities
-class BlogDRFSerializer(serializers.ModelSerializer):
+class BlogDRFSerializer(drf_serilazers.ModelSerializer):
+    """
+    DRF default serializer to test default DRF functionalities
+    """
     copyright = serializers.SerializerMethodField()
     tags = TaggedItemSerializer(many=True, read_only=True)
 

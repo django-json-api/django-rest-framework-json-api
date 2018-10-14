@@ -1,10 +1,12 @@
+import pytest
+import factory
+
 import json
 
 from django.urls import reverse
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import viewsets
 
-from example.tests.test_views import TestBlogViewSet
 from rest_framework_json_api.renderers import JSONRenderer
 
 from example.models import Comment, Entry
@@ -78,22 +80,46 @@ def test_render_format_keys(settings):
     assert result['data']['attributes']['json-field'] == {'json-key': 'JsonValue'}
 
 
-class TestDRFBlogViewSet(TestBlogViewSet):
+@pytest.mark.django_db
+def test_get_object_gives_correct_blog(client, blog, entry):
 
-    def test_get_object_gives_correct_blog(self):
-        url = reverse('drf-entry-blog', kwargs={'entry_pk': self.entry.id})
-        resp = self.client.get(url)
-        expected = {
-            'data': {
-                'attributes': {'name': self.blog.name},
-                'id': '{}'.format(self.blog.id),
-                'links': {'self': 'http://testserver/blogs/{}'.format(self.blog.id)},
-                'meta': {'copyright': 2018},
-                'relationships': {'tags': {'data': []}},
-                'type': 'blogs'
-            },
-            'meta': {'apiDocs': '/docs/api/blogs'}
-        }
-        got = resp.json()
-        print(got)
-        self.assertEqual(got, expected)
+    url = reverse('drf-entry-blog', kwargs={'entry_pk': entry.id})
+    resp = client.get(url)
+    expected = {
+        'data': {
+            'attributes': {'name': blog.name},
+            'id': '{}'.format(blog.id),
+            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
+            'meta': {'copyright': 2018},
+            'relationships': {'tags': {'data': []}},
+            'type': 'blogs'
+        },
+        'meta': {'apiDocs': '/docs/api/blogs'}
+    }
+    got = resp.json()
+    assert got == expected
+
+
+# @pytest.mark.django_db
+# def test_get_object_updates_correct_blog(client, blog, entry):
+#
+#     url = reverse('drf-entry-blog', kwargs={'entry_pk': entry.id})
+#     new_name = blog.name + " update"
+#     assert not new_name == blog.name
+#
+#     resp = client.patch(url, {"name": new_name})
+#     print(resp)
+#
+#     expected = {
+#         'data': {
+#             'attributes': {'name': new_name},
+#             'id': '{}'.format(blog.id),
+#             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
+#             'meta': {'copyright': 2018},
+#             'relationships': {'tags': {'data': []}},
+#             'type': 'blogs'
+#         },
+#         'meta': {'apiDocs': '/docs/api/blogs'}
+#     }
+#     got = resp.json()
+#     assert got == expected

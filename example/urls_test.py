@@ -50,7 +50,7 @@ urlpatterns = [
         BlogViewSet.as_view({'get': 'retrieve'}),
         name='entry-blog'
         ),
-    # url to test default DRF functionalities
+    # get/patch url to test default DRF functionalities
     url(r'^entries/(?P<entry_pk>[^/.]+)/blog',
         DRFBlogViewSet.as_view({'get': 'retrieve'}),
         name='drf-entry-blog'
