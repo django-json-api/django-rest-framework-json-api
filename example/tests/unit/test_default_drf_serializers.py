@@ -98,11 +98,10 @@ def test_blog_create(client):
     blog = Blog.objects.filter(name=name)
 
     # check if blog exists in database
-    assert blog.exists()
     assert blog.count() == 1
 
     # get created blog from database
-    blog = blog[0]
+    blog = blog.first()
 
     expected = {
         'data': {
@@ -179,7 +178,7 @@ def test_get_object_patches_correct_blog(client, blog, entry):
 
 
 @pytest.mark.django_db
-def test_get_object_deletes_correct_blog(client, blog, entry):
+def test_get_object_deletes_correct_blog(client, entry):
 
     url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
 

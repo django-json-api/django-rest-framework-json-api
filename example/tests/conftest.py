@@ -62,13 +62,3 @@ def single_art_project(art_project_factory):
 @pytest.fixture
 def client():
     return APIClient()
-
-
-@pytest.fixture
-def blog():
-    return BlogFactory()
-
-
-@pytest.fixture
-def entry(blog):
-    return EntryFactory(blog=blog)
