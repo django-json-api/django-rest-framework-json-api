@@ -1,5 +1,4 @@
 import pytest
-import factory
 
 import json
 
@@ -9,7 +8,7 @@ from rest_framework import viewsets
 
 from rest_framework_json_api.renderers import JSONRenderer
 
-from example.models import Comment, Entry
+from example.models import Comment, Entry, Blog
 
 
 # serializers
@@ -81,9 +80,50 @@ def test_render_format_keys(settings):
 
 
 @pytest.mark.django_db
+def test_blog_create(client):
+
+    url = reverse('drf-entry-blog-list')
+    name = "Dummy Name"
+
+    request_data = {
+        'data': {
+            'attributes': {'name': name},
+            'type': 'blogs'
+        },
+    }
+
+    resp = client.post(url, request_data)
+
+    # look for created blog in database
+    blog = Blog.objects.filter(name=name)
+
+    # check if blog exists in database
+    assert blog.exists()
+    assert blog.count() == 1
+
+    # get created blog from database
+    blog = blog[0]
+
+    expected = {
+        'data': {
+            'attributes': {'name': blog.name},
+            'id': '{}'.format(blog.id),
+            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
+            'meta': {'copyright': 2018},
+            'relationships': {'tags': {'data': []}},
+            'type': 'blogs'
+        },
+        'meta': {'apiDocs': '/docs/api/blogs'}
+    }
+
+    assert resp.status_code == 201
+    assert resp.json() == expected
+
+
+@pytest.mark.django_db
 def test_get_object_gives_correct_blog(client, blog, entry):
 
-    url = reverse('drf-entry-blog', kwargs={'entry_pk': entry.id})
+    url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
     resp = client.get(url)
     expected = {
         'data': {
@@ -100,26 +140,49 @@ def test_get_object_gives_correct_blog(client, blog, entry):
     assert got == expected
 
 
-# @pytest.mark.django_db
-# def test_get_object_updates_correct_blog(client, blog, entry):
-#
-#     url = reverse('drf-entry-blog', kwargs={'entry_pk': entry.id})
-#     new_name = blog.name + " update"
-#     assert not new_name == blog.name
-#
-#     resp = client.patch(url, {"name": new_name})
-#     print(resp)
-#
-#     expected = {
-#         'data': {
-#             'attributes': {'name': new_name},
-#             'id': '{}'.format(blog.id),
-#             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-#             'meta': {'copyright': 2018},
-#             'relationships': {'tags': {'data': []}},
-#             'type': 'blogs'
-#         },
-#         'meta': {'apiDocs': '/docs/api/blogs'}
-#     }
-#     got = resp.json()
-#     assert got == expected
+@pytest.mark.django_db
+def test_get_object_patches_correct_blog(client, blog, entry):
+
+    url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
+    new_name = blog.name + " update"
+    assert not new_name == blog.name
+
+    request_data = {
+        'data': {
+            'attributes': {'name': new_name},
+            'id': '{}'.format(blog.id),
+            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
+            'meta': {'copyright': 2018},
+            'relationships': {'tags': {'data': []}},
+            'type': 'blogs'
+        },
+        'meta': {'apiDocs': '/docs/api/blogs'}
+    }
+
+    resp = client.patch(url, data=request_data)
+
+    assert resp.status_code == 200
+
+    expected = {
+        'data': {
+            'attributes': {'name': new_name},
+            'id': '{}'.format(blog.id),
+            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
+            'meta': {'copyright': 2018},
+            'relationships': {'tags': {'data': []}},
+            'type': 'blogs'
+        },
+        'meta': {'apiDocs': '/docs/api/blogs'}
+    }
+    got = resp.json()
+    assert got == expected
+
+
+@pytest.mark.django_db
+def test_get_object_deletes_correct_blog(client, blog, entry):
+
+    url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
+
+    resp = client.delete(url)
+
+    assert resp.status_code == 204

@@ -43,9 +43,10 @@ class BlogViewSet(ModelViewSet):
 class DRFBlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogDRFSerializer
+    lookup_url_kwarg = 'entry_pk'
 
     def get_object(self):
-        entry_pk = self.kwargs.get('entry_pk', None)
+        entry_pk = self.kwargs.get(self.lookup_url_kwarg, None)
         if entry_pk is not None:
             return Entry.objects.get(id=entry_pk).blog
 

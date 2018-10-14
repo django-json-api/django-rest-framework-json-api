@@ -74,8 +74,9 @@ class BlogDRFSerializer(drf_serilazers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ('name', 'url', 'tags')
+        fields = ('name', 'url', 'tags', 'copyright')
         read_only_fields = ('tags',)
+        meta_fields = ('copyright',)
 
 
 class EntrySerializer(serializers.ModelSerializer):

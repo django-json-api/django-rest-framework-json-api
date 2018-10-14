@@ -23,7 +23,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 
 router.register(r'blogs', BlogViewSet)
 # router to test default DRF functionalities
-router.register(r'blogs', DRFBlogViewSet)
+router.register(r'drf-blogs', DRFBlogViewSet, 'drf-entry-blog')
 router.register(r'entries', EntryViewSet)
 # these "flavors" of entries are used for various tests:
 router.register(r'nopage-entries', NonPaginatedEntryViewSet, 'nopage-entry')
@@ -49,11 +49,6 @@ urlpatterns = [
     url(r'^entries/(?P<entry_pk>[^/.]+)/blog',
         BlogViewSet.as_view({'get': 'retrieve'}),
         name='entry-blog'
-        ),
-    # get/patch url to test default DRF functionalities
-    url(r'^entries/(?P<entry_pk>[^/.]+)/blog',
-        DRFBlogViewSet.as_view({'get': 'retrieve'}),
-        name='drf-entry-blog'
         ),
     url(r'^entries/(?P<entry_pk>[^/.]+)/comments',
         CommentViewSet.as_view({'get': 'list'}),
