@@ -4,6 +4,9 @@ cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
 matrix:
   include:
+    - python: 3.6
+      env: TOXENV=flake8
+
     - python: 2.7
       env: TOXENV=py27-df11-django111-drf36
     - python: 2.7
@@ -43,11 +46,6 @@ matrix:
       env: TOXENV=py36-df20-django20-drf37
     - python: 3.6
       env: TOXENV=py36-df20-django20-drf38
-
-    - python: 3.6
-      env: TOXENV=flake8
-    - python: 3.6
-      env: TOXENV=isort
 install:
   - pip install tox
 script:

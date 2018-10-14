@@ -1,12 +1,12 @@
 import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
+from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
-from django_filters import rest_framework as filters
 from rest_framework_json_api.django_filters import DjangoFilterBackend
 from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
 from rest_framework_json_api.pagination import PageNumberPagination
