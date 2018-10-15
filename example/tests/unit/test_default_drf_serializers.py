@@ -1,14 +1,13 @@
-import pytest
-
 import json
 
+import pytest
 from django.urls import reverse
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import viewsets
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from rest_framework_json_api.renderers import JSONRenderer
 
-from example.models import Comment, Entry, Blog
+from example.models import Blog, Comment, Entry
 
 
 # serializers

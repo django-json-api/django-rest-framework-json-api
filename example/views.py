@@ -2,8 +2,9 @@ import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
-from rest_framework.filters import SearchFilter
+
 from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
 
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
@@ -17,13 +18,14 @@ from rest_framework_json_api.views import ModelViewSet, RelationshipView
 from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
 from example.serializers import (
     AuthorSerializer,
+    BlogDRFSerializer,
     BlogSerializer,
     CommentSerializer,
     CompanySerializer,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer,
-    BlogDRFSerializer)
+    ProjectTypeSerializer
+)
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
 
