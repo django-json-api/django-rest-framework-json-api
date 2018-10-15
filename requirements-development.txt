@@ -1,8 +1,11 @@
 -e .
 django-debug-toolbar
+django-filter>=2.0
 django-polymorphic>=2.0
 factory-boy
 Faker
+flake8
+flake8-isort
 isort
 mock
 pytest
@@ -11,6 +14,4 @@ pytest-factoryboy
 recommonmark
 Sphinx
 sphinx_rtd_theme
-tox
 twine
-django-filter>=2.0
