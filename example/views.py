@@ -2,6 +2,7 @@ import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
+from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 
 import rest_framework_json_api.metadata
@@ -16,6 +17,7 @@ from rest_framework_json_api.views import ModelViewSet, RelationshipView
 from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
 from example.serializers import (
     AuthorSerializer,
+    BlogDRFSerializer,
     BlogSerializer,
     CommentSerializer,
     CompanySerializer,
@@ -37,6 +39,19 @@ class BlogViewSet(ModelViewSet):
             return Entry.objects.get(id=entry_pk).blog
 
         return super(BlogViewSet, self).get_object()
+
+
+class DRFBlogViewSet(viewsets.ModelViewSet):
+    queryset = Blog.objects.all()
+    serializer_class = BlogDRFSerializer
+    lookup_url_kwarg = 'entry_pk'
+
+    def get_object(self):
+        entry_pk = self.kwargs.get(self.lookup_url_kwarg, None)
+        if entry_pk is not None:
+            return Entry.objects.get(id=entry_pk).blog
+
+        return super(DRFBlogViewSet, self).get_object()
 
 
 class JsonApiViewSet(ModelViewSet):

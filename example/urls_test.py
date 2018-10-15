@@ -10,6 +10,7 @@ from example.views import (
     CommentRelationshipView,
     CommentViewSet,
     CompanyViewset,
+    DRFBlogViewSet,
     EntryRelationshipView,
     EntryViewSet,
     FiltersetEntryViewSet,
@@ -22,6 +23,8 @@ from example.views import (
 router = routers.DefaultRouter(trailing_slash=False)
 
 router.register(r'blogs', BlogViewSet)
+# router to test default DRF functionalities
+router.register(r'drf-blogs', DRFBlogViewSet, 'drf-entry-blog')
 router.register(r'entries', EntryViewSet)
 # these "flavors" of entries are used for various tests:
 router.register(r'nopage-entries', NonPaginatedEntryViewSet, 'nopage-entry')
