@@ -2,7 +2,6 @@ import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
-
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 

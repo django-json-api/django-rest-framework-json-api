@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from rest_framework_json_api import relations, serializers
 from rest_framework import serializers as drf_serilazers
+
+from rest_framework_json_api import relations, serializers
 
 from example.models import (
     ArtProject,
