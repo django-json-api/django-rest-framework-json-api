@@ -11,6 +11,7 @@ from example.views import (
     CommentViewSet,
     CompanyViewset,
     DRFBlogViewSet,
+    DRFEntryViewSet,
     EntryRelationshipView,
     EntryViewSet,
     FiltersetEntryViewSet,
@@ -23,7 +24,7 @@ from example.views import (
 router = routers.DefaultRouter(trailing_slash=False)
 
 router.register(r'blogs', BlogViewSet)
-# router to test default DRF functionalities
+# router to test default DRF blog functionalities
 router.register(r'drf-blogs', DRFBlogViewSet, 'drf-entry-blog')
 router.register(r'entries', EntryViewSet)
 # these "flavors" of entries are used for various tests:
@@ -58,6 +59,10 @@ urlpatterns = [
     url(r'^entries/(?P<entry_pk>[^/.]+)/suggested/',
         EntryViewSet.as_view({'get': 'list'}),
         name='entry-suggested'
+        ),
+    url(r'^drf-entries/(?P<entry_pk>[^/.]+)/suggested/',
+        DRFEntryViewSet.as_view({'get': 'list'}),
+        name='drf-entry-suggested'
         ),
     url(r'entries/(?P<entry_pk>[^/.]+)/authors',
         AuthorViewSet.as_view({'get': 'list'}),

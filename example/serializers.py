@@ -37,7 +37,7 @@ class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     copyright = serializers.SerializerMethodField()
-    tags = TaggedItemSerializer(many=True, read_only=True)
+    tags = TaggedItemDRFSerializer(many=True, read_only=True)
 
     include_serializers = {
         'tags': 'example.serializers.TaggedItemSerializer',
@@ -171,6 +171,22 @@ class EntrySerializer(serializers.ModelSerializer):
 
     class JSONAPIMeta:
         included_resources = ['comments']
+
+
+class EntryDRFSerializers(drf_serilazers.ModelSerializer):
+
+    tags = TaggedItemDRFSerializer(many=True, read_only=True)
+    blog_hyperlinked = drf_serilazers.HyperlinkedIdentityField(
+        view_name='drf-entry-blog-detail',
+        lookup_url_kwarg='entry_pk',
+        read_only=True,
+        source='blog'
+    )
+
+    class Meta:
+        model = Entry
+        fields = ('tags', 'blog', 'blog_hyperlinked',)
+        read_only_fields = ('tags',)
 
 
 class AuthorTypeSerializer(serializers.ModelSerializer):
