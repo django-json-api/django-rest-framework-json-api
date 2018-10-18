@@ -7,6 +7,10 @@ matrix:
     - env: TOXENV=py34-df20-django20-drfmaster
     - env: TOXENV=py35-df20-django20-drfmaster
     - env: TOXENV=py36-df20-django20-drfmaster
+    - env: TOXENV=py37-df20-django20-drfmaster
+    - env: TOXENV=py35-df20-django21-drfmaster
+    - env: TOXENV=py36-df20-django21-drfmaster
+    - env: TOXENV=py37-df20-django21-drfmaster
 
   include:
     - python: 3.6
