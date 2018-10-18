@@ -1,5 +1,4 @@
 language: python
-dist: xenial
 sudo: false
 cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
@@ -88,20 +87,28 @@ matrix:
       env: TOXENV=py36-df20-django21-drfmaster
 
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django20-drf37
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django20-drf38
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django20-drf39
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django20-drfmaster
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django21-drf37
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django21-drf38
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django21-drf39
     - python: 3.7
+      dist: xenial
       env: TOXENV=py37-df20-django21-drfmaster
 install:
   - pip install tox
