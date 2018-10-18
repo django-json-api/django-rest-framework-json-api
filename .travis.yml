@@ -1,4 +1,5 @@
 language: python
+dist: xenial
 sudo: false
 cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
