@@ -87,9 +87,9 @@ As a Django REST Framework JSON API (short DJA) we are trying to address followi
 Requirements
 ------------
 
-1. Python (2.7, 3.4, 3.5, 3.6)
-2. Django (1.11, 2.0)
-3. Django REST Framework (3.6, 3.7, 3.8)
+1. Python (2.7, 3.4, 3.5, 3.6, 3.7)
+2. Django (1.11, 2.0, 2.1)
+3. Django REST Framework (3.6, 3.7, 3.8, 3.9)
 
 ------------
 Installation
@@ -116,12 +116,18 @@ From Source
 Running the example app
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+It is recommended to create a virtualenv for testing. Assuming it is already
+installed and activated:
+
 ::
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     $ cd django-rest-framework-json-api
+    $ pip install -r example/requirements.txt
     $ pip install -e .
-    $ django-admin.py runserver --settings=example.settings
+    $ django-admin migrate --settings=example.settings
+    $ django-admin loaddata drf_example --settings=example.settings
+    $ django-admin runserver --settings=example.settings
 
 Browse to http://localhost:8000
 
@@ -136,7 +142,7 @@ installed and activated:
 
     $ pip install -r requirements-development.txt
     $ flake8
-    $ py.test
+    $ DJANGO_SETTINGS_MODULE=example.settings.test py.test
 
 -----
 Usage
