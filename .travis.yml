@@ -3,6 +3,11 @@ sudo: false
 cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
 matrix:
+  allow_failures:
+    - env: TOXENV=py34-df20-django20-drfmaster
+    - env: TOXENV=py35-df20-django20-drfmaster
+    - env: TOXENV=py36-df20-django20-drfmaster
+
   include:
     - python: 3.6
       env: TOXENV=flake8
@@ -24,6 +29,10 @@ matrix:
       env: TOXENV=py34-df20-django20-drf37
     - python: 3.4
       env: TOXENV=py34-df20-django20-drf38
+    - python: 3.4
+      env: TOXENV=py34-df20-django20-drf39
+    - python: 3.4
+      env: TOXENV=py34-df20-django20-drfmaster
 
     - python: 3.5
       env: TOXENV=py35-df20-django111-drf36
@@ -35,6 +44,10 @@ matrix:
       env: TOXENV=py35-df20-django20-drf37
     - python: 3.5
       env: TOXENV=py35-df20-django20-drf38
+    - python: 3.5
+      env: TOXENV=py35-df20-django20-drf39
+    - python: 3.5
+      env: TOXENV=py35-df20-django20-drfmaster
 
     - python: 3.6
       env: TOXENV=py36-df20-django111-drf36
@@ -46,6 +59,10 @@ matrix:
       env: TOXENV=py36-df20-django20-drf37
     - python: 3.6
       env: TOXENV=py36-df20-django20-drf38
+    - python: 3.6
+      env: TOXENV=py36-df20-django20-drf39
+    - python: 3.6
+      env: TOXENV=py36-df20-django20-drfmaster
 install:
   - pip install tox
 script:
