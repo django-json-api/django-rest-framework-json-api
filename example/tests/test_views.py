@@ -11,7 +11,7 @@ from rest_framework_json_api.utils import format_resource_type
 
 from . import TestBase
 from .. import views
-from example.factories import AuthorFactory, EntryFactory
+from example.factories import AuthorFactory, EntryFactory, CommentFactory
 from example.models import Author, Blog, Comment, Entry
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
 from example.views import AuthorViewSet
@@ -228,6 +228,42 @@ class TestRelationshipView(APITestCase):
         }
         response = self.client.delete(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
+
+    def test_new_comment_data_patch_to_many_relationship(self):
+        entry = EntryFactory(blog=self.blog, authors=(self.author,))
+        comment = CommentFactory(entry=entry)
+
+        url = '/authors/{}/relationships/comment_set'.format(self.author.id)
+        request_data = {
+            'data': [{'type': format_resource_type('Comment'), 'id': str(comment.id)}, ]
+        }
+        previous_response = {
+            'data': [
+                {'type': 'comments',
+                 'id': f'{self.second_comment.id}'
+                 }
+            ],
+            'links': {'self': f'http://testserver/authors/{self.author.id}/relationships/comment_set'}
+        }
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert response.json() == previous_response
+
+        new_patched_response = {
+            'data': [
+                {'type': 'comments',
+                 'id': f'{comment.id}'
+                 }
+            ],
+            'links': {'self': f'http://testserver/authors/{self.author.id}/relationships/comment_set'}
+        }
+
+        response = self.client.patch(url, data=request_data)
+        assert response.status_code == 200
+        assert response.json() == new_patched_response
+
+        assert Comment.objects.filter(id=self.second_comment.id).exists
 
 
 class TestRelatedMixin(APITestCase):
