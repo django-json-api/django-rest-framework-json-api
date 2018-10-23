@@ -55,10 +55,6 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-df20-django20-drfmaster
     - python: 3.5
-      env: TOXENV=py35-df20-django21-drf37
-    - python: 3.5
-      env: TOXENV=py35-df20-django21-drf38
-    - python: 3.5
       env: TOXENV=py35-df20-django21-drf39
     - python: 3.5
       env: TOXENV=py35-df20-django21-drfmaster
@@ -78,22 +74,10 @@ matrix:
     - python: 3.6
       env: TOXENV=py36-df20-django20-drfmaster
     - python: 3.6
-      env: TOXENV=py36-df20-django21-drf37
-    - python: 3.6
-      env: TOXENV=py36-df20-django21-drf38
-    - python: 3.6
       env: TOXENV=py36-df20-django21-drf39
     - python: 3.6
       env: TOXENV=py36-df20-django21-drfmaster
 
-    - python: 3.7
-      dist: xenial
-      sudo: required
-      env: TOXENV=py37-df20-django20-drf37
-    - python: 3.7
-      dist: xenial
-      sudo: required
-      env: TOXENV=py37-df20-django20-drf38
     - python: 3.7
       dist: xenial
       sudo: required
@@ -102,14 +86,6 @@ matrix:
       dist: xenial
       sudo: required
       env: TOXENV=py37-df20-django20-drfmaster
-    - python: 3.7
-      dist: xenial
-      sudo: required
-      env: TOXENV=py37-df20-django21-drf37
-    - python: 3.7
-      dist: xenial
-      sudo: required
-      env: TOXENV=py37-df20-django21-drf38
     - python: 3.7
       dist: xenial
       sudo: required
