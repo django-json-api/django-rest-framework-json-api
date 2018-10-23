@@ -13,6 +13,9 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Added
 
+* Add support for Django 2.1, DRF 3.9 and Python 3.7. Please note:
+  - Django >= 2.1 is not supported with Python < 3.5.
+
 ### Deprecated
 
 ### Changed
