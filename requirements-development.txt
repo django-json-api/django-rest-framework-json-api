@@ -4,7 +4,7 @@ django-filter>=2.0
 django-polymorphic>=2.0
 factory-boy
 Faker
-flake8
+flake8==3.6.0
 flake8-isort
 isort
 mock

@@ -116,14 +116,12 @@ class HyperlinkedMixin(object):
         })
         self_link = self.get_url('self', self.self_link_view_name, self_kwargs, request)
 
-        """
-        Assuming RelatedField will be declared in two ways:
-        1. url(r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
-                AuthorViewSet.as_view({'get': 'retrieve_related'}))
-        2. url(r'^authors/(?P<author_pk>[^/.]+)/bio/$',
-                AuthorBioViewSet.as_view({'get': 'retrieve'}))
-        So, if related_link_url_kwarg == 'pk' it will add 'related_field' parameter to reverse()
-        """
+        # Assuming RelatedField will be declared in two ways:
+        # 1. url(r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+        #         AuthorViewSet.as_view({'get': 'retrieve_related'}))
+        # 2. url(r'^authors/(?P<author_pk>[^/.]+)/bio/$',
+        #         AuthorBioViewSet.as_view({'get': 'retrieve'}))
+        # So, if related_link_url_kwarg == 'pk' it will add 'related_field' parameter to reverse()
         if self.related_link_url_kwarg == 'pk':
             related_kwargs = self_kwargs
         else:
