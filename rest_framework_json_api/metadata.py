@@ -84,7 +84,7 @@ class JSONAPIMetadata(SimpleMetadata):
         serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
         return OrderedDict([
-            (format_value(field_name, json_api_settings.FORMAT_FIELD_NAMES), self.get_field_info(field))
+            (format_value(field_name), self.get_field_info(field))
             for field_name, field in serializer.fields.items()
         ])
 
