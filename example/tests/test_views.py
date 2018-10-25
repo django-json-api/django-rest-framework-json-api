@@ -11,7 +11,7 @@ from rest_framework_json_api.utils import format_resource_type
 
 from . import TestBase
 from .. import views
-from example.factories import AuthorFactory, EntryFactory, CommentFactory
+from example.factories import AuthorFactory, CommentFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
 from example.views import AuthorViewSet
@@ -240,10 +240,14 @@ class TestRelationshipView(APITestCase):
         previous_response = {
             'data': [
                 {'type': 'comments',
-                 'id': f'{self.second_comment.id}'
+                 'id': str(self.second_comment.id)
                  }
             ],
-            'links': {'self': f'http://testserver/authors/{self.author.id}/relationships/comment_set'}
+            'links': {
+                'self': 'http://testserver/authors/{}/relationships/comment_set'.format(
+                    self.author.id
+                )
+            }
         }
 
         response = self.client.get(url)
@@ -253,17 +257,21 @@ class TestRelationshipView(APITestCase):
         new_patched_response = {
             'data': [
                 {'type': 'comments',
-                 'id': f'{comment.id}'
+                 'id': str(comment.id)
                  }
             ],
-            'links': {'self': f'http://testserver/authors/{self.author.id}/relationships/comment_set'}
+            'links': {
+                'self': 'http://testserver/authors/{}/relationships/comment_set'.format(
+                    self.author.id
+                )
+            }
         }
 
         response = self.client.patch(url, data=request_data)
         assert response.status_code == 200
         assert response.json() == new_patched_response
 
-        assert Comment.objects.filter(id=self.second_comment.id).exists
+        assert Comment.objects.filter(id=self.second_comment.id).exists()
 
 
 class TestRelatedMixin(APITestCase):
