@@ -142,7 +142,7 @@ installed and activated:
 
     $ pip install -r requirements-development.txt
     $ flake8
-    $ DJANGO_SETTINGS_MODULE=example.settings.test py.test
+    $ pytest
 
 -----
 Usage
