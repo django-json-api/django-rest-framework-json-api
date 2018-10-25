@@ -251,6 +251,18 @@ class RelationshipView(generics.GenericAPIView):
         serializer_instance = self._instantiate_serializer(related_instance)
         return Response(serializer_instance.data)
 
+    def remove_relationships(self, instance_manager, field):
+        field_object = getattr(instance_manager, field)
+
+        if field_object.null:
+            for obj in instance_manager.all():
+                setattr(obj, field_object.name, None)
+                obj.save()
+        else:
+            instance_manager.all().delete()
+
+        return instance_manager
+
     def patch(self, request, *args, **kwargs):
         parent_obj = self.get_object()
         related_instance_or_manager = self.get_related_instance()
@@ -261,7 +273,16 @@ class RelationshipView(generics.GenericAPIView):
                 data=request.data, model_class=related_model_class, many=True
             )
             serializer.is_valid(raise_exception=True)
-            related_instance_or_manager.all().delete()
+
+            # for to one
+            if hasattr(related_instance_or_manager, "field"):
+                related_instance_or_manager = self.remove_relationships(
+                    instance_manager=related_instance_or_manager, field="field")
+            # for to many
+            else:
+                related_instance_or_manager = self.remove_relationships(
+                    instance_manager=related_instance_or_manager, field="target_field")
+
             # have to set bulk to False since data isn't saved yet
             class_name = related_instance_or_manager.__class__.__name__
             if class_name != 'ManyRelatedManager':
