@@ -108,6 +108,8 @@ class RelatedMixin(object):
     This mixin handles all related entities, whose Serializers are declared in "related_serializers"
     """
 
+    related_filter_backends = {}
+
     def retrieve_related(self, request, *args, **kwargs):
         serializer_kwargs = {}
         instance = self.get_related_instance()
@@ -164,12 +166,23 @@ class RelatedMixin(object):
         field = parent_serializer.fields.get(field_name, None)
 
         if field is not None:
-            return field.get_attribute(parent_obj)
+            result = field.get_attribute(parent_obj)
         else:
             try:
-                return getattr(parent_obj, field_name)
+                result = getattr(parent_obj, field_name)
             except AttributeError:
                 raise NotFound
+
+        if isinstance(result, QuerySet):
+            result = self.filter_related_queryset(field_name, result)
+
+        return result
+
+    def filter_related_queryset(self, field_name, queryset):
+        backends = self.related_filter_backends.get(field_name, [])
+        for backend in list(backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
 
 class ModelViewSet(AutoPrefetchMixin,
