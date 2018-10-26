@@ -11,7 +11,7 @@ mock==2.0.0
 pytest==3.9.2
 pytest-django==3.4.3
 pytest-factoryboy==2.0.1
-recommonmark
+recommonmark==0.4.0
 Sphinx
 sphinx_rtd_theme
 twine
