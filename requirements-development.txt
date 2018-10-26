@@ -6,7 +6,7 @@ factory-boy==2.11.1
 Faker==0.9.2
 flake8==3.6.0
 flake8-isort==2.5
-isort
+isort==4.3.4
 mock
 pytest
 pytest-django
