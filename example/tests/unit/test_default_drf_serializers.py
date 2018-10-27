@@ -204,30 +204,14 @@ def test_get_entry_list_with_blogs(client, entry):
             {
                 'type': 'entries',
                 'id': '1',
-                'attributes': {
-
-                },
+                'attributes': {},
                 'relationships': {
                     'tags': {
-                        'data': [
-
-                        ]
-                    },
-                    'blog': {
-                        'data': {
-                            'type': 'blogs',
-                            'id': '1'
-                        }
-                    },
-                    'blogHyperlinked': {
-                        'data': {
-                            'type': 'blogs',
-                            'id': '1'
-                        },
-                        'links': {
-                            'related': 'http://testserver/drf-blogs/1'
-                        }
+                        'data': []
                     }
+                },
+                'links': {
+                    'self': 'http://testserver/drf-blogs/1'
                 }
             }
         ],

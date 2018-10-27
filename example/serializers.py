@@ -176,7 +176,7 @@ class EntrySerializer(serializers.ModelSerializer):
 class EntryDRFSerializers(drf_serilazers.ModelSerializer):
 
     tags = TaggedItemDRFSerializer(many=True, read_only=True)
-    blog_hyperlinked = drf_serilazers.HyperlinkedIdentityField(
+    url = drf_serilazers.HyperlinkedIdentityField(
         view_name='drf-entry-blog-detail',
         lookup_url_kwarg='entry_pk',
         read_only=True,
@@ -185,7 +185,7 @@ class EntryDRFSerializers(drf_serilazers.ModelSerializer):
 
     class Meta:
         model = Entry
-        fields = ('tags', 'blog', 'blog_hyperlinked',)
+        fields = ('tags', 'url',)
         read_only_fields = ('tags',)
 
 
