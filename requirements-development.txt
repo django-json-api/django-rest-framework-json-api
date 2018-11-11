@@ -10,7 +10,7 @@ isort==4.3.4
 mock==2.0.0
 pytest==3.9.3
 pytest-django==3.4.3
-pytest-factoryboy==2.0.1
+pytest-factoryboy==2.0.2
 recommonmark==0.4.0
 Sphinx==1.8.2
 sphinx_rtd_theme==0.4.2
