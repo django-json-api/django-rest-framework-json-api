@@ -12,7 +12,7 @@ from rest_framework_json_api.utils import format_resource_type
 from . import TestBase
 from .. import views
 from example.factories import AuthorFactory, CommentFactory, EntryFactory
-from example.models import Author, Blog, Comment, Entry, Course, Term
+from example.models import Author, Blog, Comment, Course, Entry, Term
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
 from example.views import AuthorViewSet
 

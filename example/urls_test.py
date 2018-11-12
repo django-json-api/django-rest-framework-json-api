@@ -14,8 +14,6 @@ from example.views import (
     CourseViewSet,
     DRFBlogViewSet,
     DRFEntryViewSet,
-    CourseRelationshipView,
-    CourseViewSet,
     EntryRelationshipView,
     EntryViewSet,
     FiltersetEntryViewSet,

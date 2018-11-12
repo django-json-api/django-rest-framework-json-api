@@ -401,4 +401,3 @@ class TermSerializer(HyperlinkedModelSerializer):
             'effective_start_date', 'effective_end_date',
             'last_mod_user_name', 'last_mod_date',
             'course')
-
