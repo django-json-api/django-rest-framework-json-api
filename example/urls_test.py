@@ -10,6 +10,8 @@ from example.views import (
     CommentRelationshipView,
     CommentViewSet,
     CompanyViewset,
+    CourseRelationshipView,
+    CourseViewSet,
     DRFBlogViewSet,
     DRFEntryViewSet,
     CourseRelationshipView,
