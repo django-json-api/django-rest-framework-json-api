@@ -12,9 +12,14 @@ from rest_framework_json_api.utils import format_resource_type
 from . import TestBase
 from .. import views
 from example.factories import AuthorFactory, CommentFactory, EntryFactory
-from example.models import Author, Blog, Comment, Entry
+from example.models import Author, Blog, Comment, Entry, Course, Term
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
 from example.views import AuthorViewSet
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestRelationshipView(APITestCase):
@@ -275,9 +280,12 @@ class TestRelationshipView(APITestCase):
 
 
 class TestRelatedMixin(APITestCase):
+    fixtures = ('courseterm',)
 
     def setUp(self):
         self.author = AuthorFactory()
+        self.course = Course.objects.all()
+        self.term = Term.objects.all()
 
     def _get_view(self, kwargs):
         factory = APIRequestFactory()
@@ -362,6 +370,31 @@ class TestRelatedMixin(APITestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), {'data': None})
+
+    # the following test reproduces/confirms the fix for this bug:
+    # https://github.com/django-json-api/django-rest-framework-json-api/issues/489
+    def test_term_related_course(self):
+        """
+        confirm that the related child data references the parent
+        """
+        term_id = self.term.first().pk
+        kwargs = {'pk': term_id, 'related_field': 'course'}
+        url = reverse('term-related', kwargs=kwargs)
+        with mock.patch('rest_framework_json_api.views.RelatedMixin.override_pk_only_optimization',
+                        True):
+            resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        dja_response = resp.json()
+        back_reference = dja_response['data']['relationships']['terms']['data']
+        self.assertIn({"type": "terms", "id": str(term_id)}, back_reference)
+
+        # the following raises AttributeError:
+        with self.assertRaises(AttributeError) as ae:
+            with mock.patch(
+                    'rest_framework_json_api.views.RelatedMixin.override_pk_only_optimization',
+                    False):
+                resp = self.client.get(url)
+        self.assertIn('`PKOnlyObject`', ae.exception.args[0])
 
 
 class TestValidationErrorResponses(TestBase):

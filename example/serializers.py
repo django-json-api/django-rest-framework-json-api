@@ -12,11 +12,13 @@ from example.models import (
     Blog,
     Comment,
     Company,
+    Course,
     Entry,
     Project,
     ProjectType,
     ResearchProject,
-    TaggedItem
+    TaggedItem,
+    Term
 )
 
 
@@ -313,3 +315,90 @@ class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = '__all__'
+
+
+# the following serializers are to reproduce/confirm fix for this bug:
+# https://github.com/django-json-api/django-rest-framework-json-api/issues/489
+class HyperlinkedModelSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    .models.CommonModel.last_mod_user_name/date should come from auth.user on a POST/PATCH
+    """
+    def _last_mod(self, validated_data):
+        """
+        override any last_mod_user_name or date with current auth user and current date.
+        """
+        validated_data['last_mod_user_name'] = self.context['request'].user
+        validated_data['last_mod_date'] = datetime.now().date()
+
+    def create(self, validated_data):
+        """
+        extended ModelSerializer to set last_mod_user/date
+        """
+        self._last_mod(validated_data)
+        return super(HyperlinkedModelSerializer, self).create(validated_data)
+
+    def update(self, validated_data):
+        """
+        extended ModelSerializer to set last_mod_user/date
+        """
+        self._last_mod(validated_data)
+        return super(HyperlinkedModelSerializer, self).update(validated_data)
+
+
+class CourseSerializer(HyperlinkedModelSerializer):
+    """
+    (de-)serialize the Course.
+    """
+    terms = relations.ResourceRelatedField(
+        model=Term,
+        many=True,
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=Term.objects.all(),
+        self_link_view_name='course-relationships',
+        related_link_view_name='course-related',
+    )
+
+    # 'included' support (also used for `related_serializers` for DJA 2.6.0)
+    included_serializers = {
+        'terms': 'example.serializers.TermSerializer',
+    }
+
+    class Meta:
+        model = Course
+        fields = (
+            'url',
+            'school_bulletin_prefix_code', 'suffix_two', 'subject_area_code',
+            'course_number', 'course_identifier', 'course_name', 'course_description',
+            'effective_start_date', 'effective_end_date',
+            'last_mod_user_name', 'last_mod_date',
+            'terms')
+
+
+class TermSerializer(HyperlinkedModelSerializer):
+    course = relations.ResourceRelatedField(
+        model=Course,
+        many=False,  # this breaks new 2.6.0 related support. Only works when True.
+        read_only=False,
+        allow_null=True,
+        required=False,
+        queryset=Course.objects.all(),
+        self_link_view_name='term-relationships',
+        related_link_view_name='term-related',
+    )
+
+    included_serializers = {
+        'course': 'example.serializers.CourseSerializer',
+    }
+
+    class Meta:
+        model = Term
+        fields = (
+            'url',
+            'term_identifier', 'audit_permitted_code',
+            'exam_credit_flag',
+            'effective_start_date', 'effective_end_date',
+            'last_mod_user_name', 'last_mod_date',
+            'course')
+

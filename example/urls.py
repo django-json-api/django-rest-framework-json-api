@@ -10,11 +10,15 @@ from example.views import (
     CommentRelationshipView,
     CommentViewSet,
     CompanyViewset,
+    CourseRelationshipView,
+    CourseViewSet,
     EntryRelationshipView,
     EntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
-    ProjectViewset
+    ProjectViewset,
+    TermRelationshipView,
+    TermViewSet
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -27,6 +31,8 @@ router.register(r'comments', CommentViewSet)
 router.register(r'companies', CompanyViewset)
 router.register(r'projects', ProjectViewset)
 router.register(r'project-types', ProjectTypeViewset)
+router.register(r'courses', CourseViewSet)
+router.register(r'terms', TermViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
@@ -63,6 +69,19 @@ urlpatterns = [
     url(r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
         AuthorRelationshipView.as_view(),
         name='author-relationships'),
+
+    url(r'courses/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+        CourseRelationshipView.as_view(),
+        name='course-relationships'),
+    url(r'courses/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+        CourseViewSet.as_view({'get': 'retrieve_related'}),
+        name='course-related'),
+    url(r'terms/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+        TermRelationshipView.as_view(),
+        name='term-relationships'),
+    url(r'terms/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+        TermViewSet.as_view({'get': 'retrieve_related'}),
+        name='term-related'),
 ]
 
 
