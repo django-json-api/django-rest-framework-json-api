@@ -107,10 +107,8 @@ class EntryViewSet(ModelViewSet):
 
 class DRFEntryViewSet(viewsets.ModelViewSet):
     queryset = Entry.objects.all()
+    serializer_class = EntryDRFSerializers
     lookup_url_kwarg = 'entry_pk'
-
-    def get_serializer_class(self):
-        return EntryDRFSerializers
 
     def get_object(self):
         # Handle featured

@@ -37,7 +37,7 @@ class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     copyright = serializers.SerializerMethodField()
-    tags = TaggedItemDRFSerializer(many=True, read_only=True)
+    tags = TaggedItemSerializer(many=True, read_only=True)
 
     include_serializers = {
         'tags': 'example.serializers.TaggedItemSerializer',
@@ -63,7 +63,7 @@ class BlogDRFSerializer(drf_serilazers.ModelSerializer):
     DRF default serializer to test default DRF functionalities
     """
     copyright = serializers.SerializerMethodField()
-    tags = TaggedItemSerializer(many=True, read_only=True)
+    tags = TaggedItemDRFSerializer(many=True, read_only=True)
 
     def get_copyright(self, resource):
         return datetime.now().year
@@ -180,7 +180,6 @@ class EntryDRFSerializers(drf_serilazers.ModelSerializer):
         view_name='drf-entry-blog-detail',
         lookup_url_kwarg='entry_pk',
         read_only=True,
-        source='blog'
     )
 
     class Meta:
