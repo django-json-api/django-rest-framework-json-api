@@ -184,3 +184,45 @@ def test_get_object_deletes_correct_blog(client, entry):
     resp = client.delete(url)
 
     assert resp.status_code == 204
+
+
+@pytest.mark.django_db
+def test_get_entry_list_with_blogs(client, entry):
+    url = reverse('drf-entry-suggested', kwargs={'entry_pk': entry.id})
+    resp = client.get(url)
+
+    got = resp.json()
+
+    expected = {
+        'links': {
+            'first': 'http://testserver/drf-entries/1/suggested/?page=1',
+            'last': 'http://testserver/drf-entries/1/suggested/?page=1',
+            'next': None,
+            'prev': None
+        },
+        'data': [
+            {
+                'type': 'entries',
+                'id': '1',
+                'attributes': {},
+                'relationships': {
+                    'tags': {
+                        'data': []
+                    }
+                },
+                'links': {
+                    'self': 'http://testserver/drf-blogs/1'
+                }
+            }
+        ],
+        'meta': {
+            'pagination': {
+                'page': 1,
+                'pages': 1,
+                'count': 1
+            }
+        }
+    }
+
+    assert resp.status_code == 200
+    assert got == expected

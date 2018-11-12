@@ -21,6 +21,7 @@ from example.serializers import (
     BlogSerializer,
     CommentSerializer,
     CompanySerializer,
+    EntryDRFSerializers,
     EntrySerializer,
     ProjectSerializer,
     ProjectTypeSerializer
@@ -102,6 +103,20 @@ class EntryViewSet(ModelViewSet):
             return Entry.objects.exclude(pk=entry_pk).first()
 
         return super(EntryViewSet, self).get_object()
+
+
+class DRFEntryViewSet(viewsets.ModelViewSet):
+    queryset = Entry.objects.all()
+    serializer_class = EntryDRFSerializers
+    lookup_url_kwarg = 'entry_pk'
+
+    def get_object(self):
+        # Handle featured
+        entry_pk = self.kwargs.get(self.lookup_url_kwarg, None)
+        if entry_pk is not None:
+            return Entry.objects.exclude(pk=entry_pk).first()
+
+        return super(DRFEntryViewSet, self).get_object()
 
 
 class NoPagination(PageNumberPagination):
