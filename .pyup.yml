@@ -1,0 +1,5 @@
+search: False
+requirements:
+  - requirements-development.txt:
+      update: all
+      pin: True

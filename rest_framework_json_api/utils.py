@@ -133,7 +133,7 @@ def format_keys(obj, format_type=None):
 
         `format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be
         removed in the future.
-        Use `format_field_names` and `JSON_API_FIELD_NAMES` instead. Be aware that
+        Use `format_field_names` and `JSON_API_FORMAT_FIELD_NAMES` instead. Be aware that
         `format_field_names` only formats keys and preserves value.
 
     Takes either a dict or list and returns it with camelized keys only if
@@ -144,7 +144,7 @@ def format_keys(obj, format_type=None):
     warnings.warn(
         "`format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be "
         "removed in the future. "
-        "Use `format_field_names` and `JSON_API_FIELD_NAMES` instead. Be aware that "
+        "Use `format_field_names` and `JSON_API_FORMAT_FIELD_NAMES` instead. Be aware that "
         "`format_field_names` only formats keys and preserves value.",
         DeprecationWarning
     )

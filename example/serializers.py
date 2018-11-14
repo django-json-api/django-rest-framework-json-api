@@ -63,7 +63,7 @@ class BlogDRFSerializer(drf_serilazers.ModelSerializer):
     DRF default serializer to test default DRF functionalities
     """
     copyright = serializers.SerializerMethodField()
-    tags = TaggedItemSerializer(many=True, read_only=True)
+    tags = TaggedItemDRFSerializer(many=True, read_only=True)
 
     def get_copyright(self, resource):
         return datetime.now().year
@@ -171,6 +171,21 @@ class EntrySerializer(serializers.ModelSerializer):
 
     class JSONAPIMeta:
         included_resources = ['comments']
+
+
+class EntryDRFSerializers(drf_serilazers.ModelSerializer):
+
+    tags = TaggedItemDRFSerializer(many=True, read_only=True)
+    url = drf_serilazers.HyperlinkedIdentityField(
+        view_name='drf-entry-blog-detail',
+        lookup_url_kwarg='entry_pk',
+        read_only=True,
+    )
+
+    class Meta:
+        model = Entry
+        fields = ('tags', 'url',)
+        read_only_fields = ('tags',)
 
 
 class AuthorTypeSerializer(serializers.ModelSerializer):
