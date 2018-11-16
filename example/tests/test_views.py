@@ -325,11 +325,11 @@ class TestRelatedMixin(APITestCase):
         view.serializer_class.related_serializers = related_serializers
 
     def test_get_serializer_class_raises_error(self):
-        kwargs = {'pk': self.author.id, 'related_field': 'type'}
+        kwargs = {'pk': self.author.id, 'related_field': 'unknown'}
         view = self._get_view(kwargs)
         self.assertRaises(NotFound, view.get_serializer_class)
 
-    def test_retrieve_related_single(self):
+    def test_retrieve_related_single_reverse_lookup(self):
         url = reverse('author-related', kwargs={'pk': self.author.pk, 'related_field': 'bio'})
         resp = self.client.get(url)
         expected = {
@@ -339,6 +339,20 @@ class TestRelatedMixin(APITestCase):
                     'author': {'data': {'type': 'authors', 'id': str(self.author.id)}}},
                 'attributes': {
                     'body': str(self.author.bio.body)
+                },
+            }
+        }
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected)
+
+    def test_retrieve_related_single(self):
+        url = reverse('author-related', kwargs={'pk': self.author.type.pk, 'related_field': 'type'})
+        resp = self.client.get(url)
+        expected = {
+            'data': {
+                'type': 'authorTypes', 'id': str(self.author.type.id),
+                'attributes': {
+                    'name': str(self.author.type.name)
                 },
             }
         }

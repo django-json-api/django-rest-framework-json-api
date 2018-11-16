@@ -225,6 +225,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     }
     related_serializers = {
         'bio': 'example.serializers.AuthorBioSerializer',
+        'type': 'example.serializers.AuthorTypeSerializer',
         'entries': 'example.serializers.EntrySerializer',
         'first_entry': 'example.serializers.EntrySerializer'
     }

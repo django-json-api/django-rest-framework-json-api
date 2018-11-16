@@ -24,6 +24,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Pass context from `PolymorphicModelSerializer` to child serializers to support fields which require a `request` context such as `url`.
 * Avoid patch on `RelationshipView` deleting relationship instance when constraint would allow null ([#242](https://github.com/django-json-api/django-rest-framework-json-api/issues/242))
+* Avoid error with related urls when retrieving relationship which is referenced as `ForeignKey` on parent
 
 
 ## [2.6.0] - 2018-09-20
