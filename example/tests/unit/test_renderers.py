@@ -46,7 +46,7 @@ class ReadOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
 
 
 def render_dummy_test_serialized_view(view_class):
-    serializer = DummyTestSerializer(instance=Entry())
+    serializer = view_class.serializer_class(instance=Entry())
     renderer = JSONRenderer()
     return renderer.render(
         serializer.data,
