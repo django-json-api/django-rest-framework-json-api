@@ -46,7 +46,7 @@ class ReadOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
 
 
 def render_dummy_test_serialized_view(view_class):
-    serializer = DummyTestSerializer(instance=Entry())
+    serializer = view_class.serializer_class(instance=Entry())
     renderer = JSONRenderer()
     return renderer.render(
         serializer.data,
@@ -87,3 +87,33 @@ def test_render_format_keys(settings):
 
     result = json.loads(rendered.decode())
     assert result['data']['attributes']['json-field'] == {'json-key': 'JsonValue'}
+
+
+def test_writeonly_not_in_response(settings):
+    """Test that writeonly fields are not shown in list response"""
+
+    settings.JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
+
+    class WriteonlyTestSerializer(serializers.ModelSerializer):
+        '''Serializer for testing the absence of write_only fields'''
+        comments = serializers.ResourceRelatedField(
+            many=True,
+            write_only=True,
+            queryset=Comment.objects.all()
+        )
+
+        rating = serializers.IntegerField(write_only=True)
+
+        class Meta:
+            model = Entry
+            fields = ('comments', 'rating')
+
+    class WriteOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
+        queryset = Entry.objects.all()
+        serializer_class = WriteonlyTestSerializer
+
+    rendered = render_dummy_test_serialized_view(WriteOnlyDummyTestViewSet)
+    result = json.loads(rendered.decode())
+
+    assert 'rating' not in result['data']['attributes']
+    assert 'relationships' not in result['data']
