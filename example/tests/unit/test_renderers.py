@@ -112,9 +112,7 @@ def test_writeonly_not_in_response(settings):
         queryset = Entry.objects.all()
         serializer_class = WriteonlyTestSerializer
 
-
     rendered = render_dummy_test_serialized_view(WriteOnlyDummyTestViewSet)
-
     result = json.loads(rendered.decode())
 
     assert 'rating' not in result['data']['attributes']
