@@ -87,8 +87,8 @@ def test_pagination_with_single_entry(single_entry, client):
                 }
             }],
         "links": {
-            "first": "http://testserver/entries?page=1",
-            "last": "http://testserver/entries?page=1",
+            'first': 'http://testserver/entries?page%5Bnumber%5D=1',
+            'last': 'http://testserver/entries?page%5Bnumber%5D=1',
             "next": None,
             "prev": None,
         },

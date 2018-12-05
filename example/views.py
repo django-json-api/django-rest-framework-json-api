@@ -10,7 +10,7 @@ import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from rest_framework_json_api.django_filters import DjangoFilterBackend
 from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
-from rest_framework_json_api.pagination import PageNumberPagination
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
@@ -119,7 +119,7 @@ class DRFEntryViewSet(viewsets.ModelViewSet):
         return super(DRFEntryViewSet, self).get_object()
 
 
-class NoPagination(PageNumberPagination):
+class NoPagination(JsonApiPageNumberPagination):
     page_size = None
 
 
@@ -203,7 +203,7 @@ class CompanyViewset(ModelViewSet):
 
 
 class ProjectViewset(ModelViewSet):
-    queryset = Project.objects.all()
+    queryset = Project.objects.all().order_by('pk')
     serializer_class = ProjectSerializer
 
 

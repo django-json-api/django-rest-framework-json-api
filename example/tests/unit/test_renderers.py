@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
 
@@ -79,6 +81,7 @@ def test_render_format_field_names(settings):
     assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
 
 
+@pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
 def test_render_format_keys(settings):
     """Test that json field value keys are formated."""
     delattr(settings, 'JSON_API_FORMAT_FILED_NAMES')

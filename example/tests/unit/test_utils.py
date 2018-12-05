@@ -62,6 +62,7 @@ def test_get_resource_name():
     assert 'users' == utils.get_resource_name(context), 'derived from non-model serializer'
 
 
+@pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
 def test_format_keys():
     underscored = {
         'first_name': 'a',

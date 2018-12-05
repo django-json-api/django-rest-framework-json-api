@@ -1,6 +1,7 @@
 import json
 from io import BytesIO
 
+import pytest
 from django.test import TestCase, override_settings
 from rest_framework.exceptions import ParseError
 
@@ -34,6 +35,7 @@ class TestJSONParser(TestCase):
 
         self.string = json.dumps(data)
 
+    @pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
     @override_settings(JSON_API_FORMAT_KEYS='camelize')
     def test_parse_include_metadata_format_keys(self):
         parser = JSONParser()
