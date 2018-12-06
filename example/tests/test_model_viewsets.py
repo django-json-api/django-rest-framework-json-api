@@ -43,9 +43,9 @@ class ModelViewSetTests(TestBase):
                 }
             ],
             'links': {
-                'first': 'http://testserver/identities?page=1',
-                'last': 'http://testserver/identities?page=2',
-                'next': 'http://testserver/identities?page=2',
+                'first': 'http://testserver/identities?page%5Bnumber%5D=1',
+                'last': 'http://testserver/identities?page%5Bnumber%5D=2',
+                'next': 'http://testserver/identities?page%5Bnumber%5D=2',
                 'prev': None
             },
             'meta': {
@@ -63,7 +63,7 @@ class ModelViewSetTests(TestBase):
         """
         Ensure that the second page is reachable and is the correct data.
         """
-        response = self.client.get(self.list_url, {'page': 2})
+        response = self.client.get(self.list_url, {'page[number]': 2})
         self.assertEqual(response.status_code, 200)
 
         user = get_user_model().objects.all()[1]
@@ -80,10 +80,10 @@ class ModelViewSetTests(TestBase):
                 }
             ],
             'links': {
-                'first': 'http://testserver/identities?page=1',
-                'last': 'http://testserver/identities?page=2',
+                'first': 'http://testserver/identities?page%5Bnumber%5D=1',
+                'last': 'http://testserver/identities?page%5Bnumber%5D=2',
                 'next': None,
-                'prev': 'http://testserver/identities?page=1',
+                'prev': 'http://testserver/identities?page%5Bnumber%5D=1'
             },
             'meta': {
                 'pagination': {
@@ -102,7 +102,7 @@ class ModelViewSetTests(TestBase):
         tests pluralization as two objects means it converts ``user`` to
         ``users``.
         """
-        response = self.client.get(self.list_url, {'page_size': 2})
+        response = self.client.get(self.list_url, {'page[size]': 2})
         self.assertEqual(response.status_code, 200)
 
         users = get_user_model().objects.all()
@@ -128,8 +128,8 @@ class ModelViewSetTests(TestBase):
                 }
             ],
             'links': {
-                'first': 'http://testserver/identities?page=1&page_size=2',
-                'last': 'http://testserver/identities?page=1&page_size=2',
+                'first': 'http://testserver/identities?page%5Bnumber%5D=1&page%5Bsize%5D=2',
+                'last': 'http://testserver/identities?page%5Bnumber%5D=1&page%5Bsize%5D=2',
                 'next': None,
                 'prev': None
             },

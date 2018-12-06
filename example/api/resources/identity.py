@@ -11,19 +11,8 @@ from ..serializers.post import PostSerializer
 
 
 class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
-    queryset = auth_models.User.objects.all()
+    queryset = auth_models.User.objects.all().order_by('pk')
     serializer_class = IdentitySerializer
-
-    @list_route()
-    def empty_list(self, request):
-        """
-        This is a hack/workaround to return an empty result on a list
-        endpoint because the delete operation in the test_empty_pluralization
-        test doesn't prevent the /identities endpoint from still returning
-        records when called in the same test. Suggestions welcome.
-        """
-        self.queryset = self.queryset.filter(pk=None)
-        return super(Identity, self).list(request)
 
     # demonstrate sideloading data for use at app boot time
     @list_route()

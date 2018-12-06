@@ -68,6 +68,7 @@ def test_render_format_field_names(settings):
     assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
 
 
+@pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
 def test_render_format_keys(settings):
     """Test that json field value keys are formated."""
     delattr(settings, 'JSON_API_FORMAT_FILED_NAMES')
@@ -195,8 +196,8 @@ def test_get_entry_list_with_blogs(client, entry):
 
     expected = {
         'links': {
-            'first': 'http://testserver/drf-entries/1/suggested/?page=1',
-            'last': 'http://testserver/drf-entries/1/suggested/?page=1',
+            'first': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
+            'last': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
             'next': None,
             'prev': None
         },
