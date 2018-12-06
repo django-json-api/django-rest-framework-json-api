@@ -3,7 +3,7 @@ import json
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
 
-from example.models import Comment, Entry
+from example.models import Author, Comment, Entry
 
 
 # serializers
@@ -45,8 +45,8 @@ class ReadOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
     serializer_class = DummyTestSerializer
 
 
-def render_dummy_test_serialized_view(view_class):
-    serializer = view_class.serializer_class(instance=Entry())
+def render_dummy_test_serialized_view(view_class, instance):
+    serializer = view_class.serializer_class(instance=instance)
     renderer = JSONRenderer()
     return renderer.render(
         serializer.data,
@@ -58,14 +58,14 @@ def test_simple_reverse_relation_included_renderer():
     Test renderer when a single reverse fk relation is passed.
     '''
     rendered = render_dummy_test_serialized_view(
-        DummyTestViewSet)
+        DummyTestViewSet, Entry())
 
     assert rendered
 
 
 def test_simple_reverse_relation_included_read_only_viewset():
     rendered = render_dummy_test_serialized_view(
-        ReadOnlyDummyTestViewSet)
+        ReadOnlyDummyTestViewSet, Entry())
 
     assert rendered
 
@@ -73,7 +73,7 @@ def test_simple_reverse_relation_included_read_only_viewset():
 def test_render_format_field_names(settings):
     """Test that json field is kept untouched."""
     settings.JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
-    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet, Entry())
 
     result = json.loads(rendered.decode())
     assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
@@ -83,16 +83,14 @@ def test_render_format_keys(settings):
     """Test that json field value keys are formated."""
     delattr(settings, 'JSON_API_FORMAT_FILED_NAMES')
     settings.JSON_API_FORMAT_KEYS = 'dasherize'
-    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet, Entry())
 
     result = json.loads(rendered.decode())
     assert result['data']['attributes']['json-field'] == {'json-key': 'JsonValue'}
 
 
-def test_writeonly_not_in_response(settings):
+def test_writeonly_not_in_response():
     """Test that writeonly fields are not shown in list response"""
-
-    settings.JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
 
     class WriteonlyTestSerializer(serializers.ModelSerializer):
         '''Serializer for testing the absence of write_only fields'''
@@ -112,8 +110,27 @@ def test_writeonly_not_in_response(settings):
         queryset = Entry.objects.all()
         serializer_class = WriteonlyTestSerializer
 
-    rendered = render_dummy_test_serialized_view(WriteOnlyDummyTestViewSet)
+    rendered = render_dummy_test_serialized_view(WriteOnlyDummyTestViewSet, Entry())
     result = json.loads(rendered.decode())
 
     assert 'rating' not in result['data']['attributes']
     assert 'relationships' not in result['data']
+
+
+def test_render_empty_relationship_reverse_lookup():
+    """Test that empty relationships are rendered as None."""
+
+    class EmptyRelationshipSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Author
+            fields = ('bio', )
+
+    class EmptyRelationshipViewSet(views.ReadOnlyModelViewSet):
+        queryset = Author.objects.all()
+        serializer_class = EmptyRelationshipSerializer
+
+    rendered = render_dummy_test_serialized_view(EmptyRelationshipViewSet, Author())
+    result = json.loads(rendered.decode())
+    assert 'relationships' in result['data']
+    assert 'bio' in result['data']['relationships']
+    assert result['data']['relationships']['bio'] == {'data': None}
