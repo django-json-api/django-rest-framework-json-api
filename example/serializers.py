@@ -206,7 +206,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         self_link_view_name='author-relationships',
         queryset=AuthorBio.objects,
     )
-    entries = relations.ResourceRelatedField(
+    entries = relations.HyperlinkedRelatedField(
         related_link_view_name='author-related',
         self_link_view_name='author-relationships',
         queryset=Entry.objects,
