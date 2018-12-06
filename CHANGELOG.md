@@ -27,6 +27,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Avoid error with related urls when retrieving relationship which is referenced as `ForeignKey` on parent
 * Do not render `write_only` relations
 * Do not skip empty one-to-one relationships
+* Handle SkipField exception in RelateMixin
 
 
 ## [2.6.0] - 2018-09-20
