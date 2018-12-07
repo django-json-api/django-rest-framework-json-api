@@ -105,8 +105,8 @@ def test_polymorphism_on_polymorphic_model_w_included_serializers(client):
 def test_polymorphic_model_without_any_instance(client):
     expected = {
         "links": {
-            "first": "http://testserver/projects?page=1",
-            "last": "http://testserver/projects?page=1",
+            'first': 'http://testserver/projects?page%5Bnumber%5D=1',
+            'last': 'http://testserver/projects?page%5Bnumber%5D=1',
             "next": None,
             "prev": None
         },

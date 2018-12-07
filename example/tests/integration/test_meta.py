@@ -28,8 +28,8 @@ def test_top_level_meta_for_list_view(blog, client):
             },
         }],
         'links': {
-            'first': 'http://testserver/blogs?page=1',
-            'last': 'http://testserver/blogs?page=1',
+            'first': 'http://testserver/blogs?page%5Bnumber%5D=1',
+            'last': 'http://testserver/blogs?page%5Bnumber%5D=1',
             'next': None,
             'prev': None
         },

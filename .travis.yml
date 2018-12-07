@@ -100,4 +100,4 @@ script:
   - tox
 after_success:
   - pip install codecov
-  - codecov -e TOXENV
+  - codecov -e TOXENV --required

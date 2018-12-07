@@ -34,6 +34,7 @@ pip-delete-this-directory.txt
 
 # Coverage
 .coverage
+coverage.xml
 
 # Tox
 .tox/

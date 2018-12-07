@@ -4,14 +4,8 @@ from django.urls import reverse
 pytestmark = pytest.mark.django_db
 
 
-def test_default_included_data_on_list(multiple_entries, client):
-    return test_included_data_on_list(
-        multiple_entries=multiple_entries, client=client, query='?page_size=5'
-    )
-
-
-def test_included_data_on_list(multiple_entries, client, query='?include=comments&page_size=5'):
-    response = client.get(reverse("entry-list") + query)
+def test_included_data_on_list(multiple_entries, client):
+    response = client.get(reverse("entry-list"), data={'include': 'comments', 'page[size]': 5})
     included = response.json().get('included')
 
     assert len(response.json()['data']) == len(multiple_entries), (
@@ -79,7 +73,7 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
 
 def test_deep_included_data_on_list(multiple_entries, client):
     response = client.get(reverse("entry-list") + '?include=comments,comments.author,'
-                          'comments.author.bio,comments.writer&page_size=5')
+                          'comments.author.bio,comments.writer&page[size]=5')
     included = response.json().get('included')
 
     assert len(response.json()['data']) == len(multiple_entries), (
@@ -113,7 +107,7 @@ def test_deep_included_data_on_list(multiple_entries, client):
 
     # Also include entry authors
     response = client.get(reverse("entry-list") + '?include=authors,comments,comments.author,'
-                          'comments.author.bio&page_size=5')
+                          'comments.author.bio&page[size]=5')
     included = response.json().get('included')
 
     assert len(response.json()['data']) == len(multiple_entries), (
