@@ -27,6 +27,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Avoid error with related urls when retrieving relationship which is referenced as `ForeignKey` on parent
 * Do not render `write_only` relations
 * Do not skip empty one-to-one relationships
+* Allow `HyperlinkRelatedField` to be used with [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html?highlight=related%20links#related-urls)
 
 
 ## [2.6.0] - 2018-09-20

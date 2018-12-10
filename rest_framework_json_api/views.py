@@ -18,7 +18,7 @@ from rest_framework.fields import get_attribute
 from rest_framework.relations import PKOnlyObject
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.serializers import Serializer
+from rest_framework.serializers import Serializer, SkipField
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
@@ -166,10 +166,14 @@ class RelatedMixin(object):
         field = parent_serializer.fields.get(field_name, None)
 
         if field is not None:
-            instance = field.get_attribute(parent_obj)
-            if isinstance(instance, PKOnlyObject):
-                # need whole object
+            try:
+                instance = field.get_attribute(parent_obj)
+            except SkipField:
                 instance = get_attribute(parent_obj, field.source_attrs)
+            else:
+                if isinstance(instance, PKOnlyObject):
+                    # need whole object
+                    instance = get_attribute(parent_obj, field.source_attrs)
             return instance
         else:
             try:

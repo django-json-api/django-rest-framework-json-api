@@ -219,6 +219,12 @@ class AuthorSerializer(serializers.ModelSerializer):
         read_only=True,
         source='get_first_entry'
     )
+    comments = relations.HyperlinkedRelatedField(
+        related_link_view_name='author-related',
+        self_link_view_name='author-relationships',
+        queryset=Comment.objects,
+        many=True
+    )
     included_serializers = {
         'bio': AuthorBioSerializer,
         'type': AuthorTypeSerializer
@@ -226,13 +232,14 @@ class AuthorSerializer(serializers.ModelSerializer):
     related_serializers = {
         'bio': 'example.serializers.AuthorBioSerializer',
         'type': 'example.serializers.AuthorTypeSerializer',
+        'comments': 'example.serializers.CommentSerializer',
         'entries': 'example.serializers.EntrySerializer',
         'first_entry': 'example.serializers.EntrySerializer'
     }
 
     class Meta:
         model = Author
-        fields = ('name', 'email', 'bio', 'entries', 'first_entry', 'type')
+        fields = ('name', 'email', 'bio', 'entries', 'comments', 'first_entry', 'type')
 
     def get_first_entry(self, obj):
         return obj.entries.first()
