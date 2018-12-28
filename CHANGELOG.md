@@ -28,6 +28,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Do not render `write_only` relations
 * Do not skip empty one-to-one relationships
 * Allow `HyperlinkRelatedField` to be used with [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html?highlight=related%20links#related-urls)
+* Fix AutoPrefetchMixin when includes have a one to one relation
 
 
 ## [2.6.0] - 2018-09-20
