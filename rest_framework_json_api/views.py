@@ -92,7 +92,11 @@ class AutoPrefetchMixin(object):
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    model_field = field.field
+
+                    if issubclass(field_class, ReverseOneToOneDescriptor):
+                        model_field = field.related.field
+                    else:
+                        model_field = field.field
 
                     if is_forward_relation:
                         level_model = model_field.related_model
