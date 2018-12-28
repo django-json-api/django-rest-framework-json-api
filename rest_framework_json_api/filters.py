@@ -70,7 +70,7 @@ class QueryParameterValidationFilter(BaseFilterBackend):
     """
     #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters:
     #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
-    query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+    query_regex = re.compile(r'^(sort|include|format)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
 
     def validate_query_params(self, request):
         """
