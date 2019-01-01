@@ -160,3 +160,22 @@ def test_deep_included_data_on_detail(single_entry, client):
     author_bio_count = len([resource for resource in included if resource["type"] == "authorBios"])
     expected_author_bio_count = single_entry.comments.filter(author__bio__isnull=False).count()
     assert author_bio_count == expected_author_bio_count, 'Detail author bio count is incorrect'
+
+
+def test_data_resource_not_included_again(single_comment, client):
+    # This test makes sure that the resource which is in the data field is excluded
+    # from the included field.
+    response = client.get(reverse("comment-detail", kwargs={'pk': single_comment.pk}) +
+                          '?include=entry.comments')
+
+    included = response.json().get('included')
+
+    included_comments = [resource for resource in included if resource["type"] == "comments"]
+    assert single_comment.pk not in [int(x.get('id')) for x in included_comments], \
+        "Resource of the data field duplicated in included"
+
+    comment_count = len(included_comments)
+    expected_comment_count = single_comment.entry.comments.count()
+    # The comment in the data attribute must not be included again.
+    expected_comment_count -= 1
+    assert comment_count == expected_comment_count, "Comment count incorrect"

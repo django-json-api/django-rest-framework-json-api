@@ -644,6 +644,21 @@ class JSONRenderer(renderers.JSONRenderer):
             render_data['data'] = json_api_data
 
         if included_cache:
+            if isinstance(json_api_data, list):
+                objects = json_api_data
+            else:
+                objects = [json_api_data]
+
+            for object in objects:
+                obj_type = object.get('type')
+                obj_id = object.get('id')
+                if obj_type in included_cache and \
+                   obj_id in included_cache[obj_type]:
+                    del included_cache[obj_type][obj_id]
+                if not included_cache[obj_type]:
+                    del included_cache[obj_type]
+
+        if included_cache:
             render_data['included'] = list()
             for included_type in sorted(included_cache.keys()):
                 for included_id in sorted(included_cache[included_type].keys()):
