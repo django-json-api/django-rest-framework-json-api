@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from datetime import datetime
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
@@ -108,7 +109,7 @@ def test_blog_create(client):
             'attributes': {'name': blog.name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -129,7 +130,7 @@ def test_get_object_gives_correct_blog(client, blog, entry):
             'attributes': {'name': blog.name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -151,7 +152,7 @@ def test_get_object_patches_correct_blog(client, blog, entry):
             'attributes': {'name': new_name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -167,7 +168,7 @@ def test_get_object_patches_correct_blog(client, blog, entry):
             'attributes': {'name': new_name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
