@@ -197,7 +197,7 @@ class AuthorTypeSerializer(serializers.ModelSerializer):
 class AuthorBioSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthorBio
-        fields = ('author', 'body')
+        fields = ('author', 'body', 'metadata')
 
     included_serializers = {
         'metadata': 'example.serializers.AuthorBioMetadataSerializer',

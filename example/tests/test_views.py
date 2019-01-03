@@ -1,5 +1,6 @@
 import json
 
+from datetime import datetime
 from django.test import RequestFactory
 from django.utils import timezone
 from rest_framework.exceptions import NotFound
@@ -336,7 +337,10 @@ class TestRelatedMixin(APITestCase):
             'data': {
                 'type': 'authorBios', 'id': str(self.author.bio.id),
                 'relationships': {
-                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}}},
+                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}},
+                    'metadata': {'data': {'id': '1',
+                                          'type': 'authorBioMetadata'}}
+                },
                 'attributes': {
                     'body': str(self.author.bio.body)
                 },
@@ -466,7 +470,7 @@ class TestBlogViewSet(APITestCase):
                 'attributes': {'name': self.blog.name},
                 'id': '{}'.format(self.blog.id),
                 'links': {'self': 'http://testserver/blogs/{}'.format(self.blog.id)},
-                'meta': {'copyright': 2018},
+                'meta': {'copyright': datetime.now().year},
                 'relationships': {'tags': {'data': []}},
                 'type': 'blogs'
             },

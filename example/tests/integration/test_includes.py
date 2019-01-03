@@ -28,7 +28,11 @@ def test_included_data_on_list_with_one_to_one_relations(multiple_entries, clien
     assert len(response.json()['data']) == len(multiple_entries), (
         'Incorrect entry count'
     )
-    expected_include_types = ['authorBios', 'authorBios', 'authors', 'authors']
+    expected_include_types = [
+        'authorBioMetadata', 'authorBioMetadata',
+        'authorBios', 'authorBios',
+        'authors', 'authors'
+    ]
     include_types = [x.get('type') for x in included]
     assert include_types == expected_include_types, (
         'List included types are incorrect'
