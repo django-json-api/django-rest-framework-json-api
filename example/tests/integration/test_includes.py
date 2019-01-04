@@ -20,6 +20,25 @@ def test_included_data_on_list(multiple_entries, client):
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
 
 
+def test_included_data_on_list_with_one_to_one_relations(multiple_entries, client):
+    response = client.get(reverse("entry-list"),
+                          data={'include': 'authors.bio.metadata', 'page[size]': 5})
+    included = response.json().get('included')
+
+    assert len(response.json()['data']) == len(multiple_entries), (
+        'Incorrect entry count'
+    )
+    expected_include_types = [
+        'authorBioMetadata', 'authorBioMetadata',
+        'authorBios', 'authorBios',
+        'authors', 'authors'
+    ]
+    include_types = [x.get('type') for x in included]
+    assert include_types == expected_include_types, (
+        'List included types are incorrect'
+    )
+
+
 def test_default_included_data_on_detail(single_entry, client):
     return test_included_data_on_detail(single_entry=single_entry, client=client, query='')
 

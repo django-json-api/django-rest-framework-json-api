@@ -29,6 +29,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Do not skip empty one-to-one relationships
 * Allow `HyperlinkRelatedField` to be used with [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html?highlight=related%20links#related-urls)
 * Fixed hardcoded year 2018 in tests ([#539](https://github.com/django-json-api/django-rest-framework-json-api/issues/539))
+* Avoid exception in `AutoPrefetchMixin` when including a reverse one to one relation ([#537](https://github.com/django-json-api/django-rest-framework-json-api/issues/537))
 
 ## [2.6.0] - 2018-09-20
 

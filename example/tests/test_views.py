@@ -1,6 +1,6 @@
 import json
-
 from datetime import datetime
+
 from django.test import RequestFactory
 from django.utils import timezone
 from rest_framework.exceptions import NotFound
@@ -337,7 +337,10 @@ class TestRelatedMixin(APITestCase):
             'data': {
                 'type': 'authorBios', 'id': str(self.author.bio.id),
                 'relationships': {
-                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}}},
+                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}},
+                    'metadata': {'data': {'id': str(self.author.bio.metadata.id),
+                                          'type': 'authorBioMetadata'}}
+                },
                 'attributes': {
                     'body': str(self.author.bio.body)
                 },

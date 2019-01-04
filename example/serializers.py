@@ -16,8 +16,8 @@ from example.models import (
     Project,
     ProjectType,
     ResearchProject,
-    TaggedItem
-)
+    TaggedItem,
+    AuthorBioMetadata)
 
 
 class TaggedItemSerializer(serializers.ModelSerializer):
@@ -197,7 +197,17 @@ class AuthorTypeSerializer(serializers.ModelSerializer):
 class AuthorBioSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthorBio
-        fields = ('author', 'body')
+        fields = ('author', 'body', 'metadata')
+
+    included_serializers = {
+        'metadata': 'example.serializers.AuthorBioMetadataSerializer',
+    }
+
+
+class AuthorBioMetadataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuthorBioMetadata
+        fields = ('body',)
 
 
 class AuthorSerializer(serializers.ModelSerializer):

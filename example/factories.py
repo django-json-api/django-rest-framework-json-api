@@ -14,8 +14,8 @@ from example.models import (
     Entry,
     ProjectType,
     ResearchProject,
-    TaggedItem
-)
+    TaggedItem,
+    AuthorBioMetadata)
 
 faker = FakerFactory.create()
 faker.seed(983843)
@@ -51,6 +51,16 @@ class AuthorBioFactory(factory.django.DjangoModelFactory):
         model = AuthorBio
 
     author = factory.SubFactory(AuthorFactory)
+    body = factory.LazyAttribute(lambda x: faker.text())
+
+    metadata = factory.RelatedFactory('example.factories.AuthorBioMetadataFactory', 'bio')
+
+
+class AuthorBioMetadataFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AuthorBioMetadata
+
+    bio = factory.SubFactory(AuthorBioFactory)
     body = factory.LazyAttribute(lambda x: faker.text())
 
 
