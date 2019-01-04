@@ -7,5 +7,5 @@ Fixes #
 - [ ] PR only contains one change (considered splitting up PR)
 - [ ] unit-test added
 - [ ] documentation updated
-- [ ] changelog entry added to `CHANGELOG.md`
+- [ ] `CHANGELOG.md` updated (only for user relevant changes)
 - [ ] author name in `AUTHORS`
