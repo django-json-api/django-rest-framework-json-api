@@ -7,6 +7,7 @@ from example.models import (
     ArtProject,
     Author,
     AuthorBio,
+    AuthorBioMetadata,
     AuthorType,
     Blog,
     Comment,
@@ -14,8 +15,8 @@ from example.models import (
     Entry,
     ProjectType,
     ResearchProject,
-    TaggedItem,
-    AuthorBioMetadata)
+    TaggedItem
+)
 
 faker = FakerFactory.create()
 faker.seed(983843)
@@ -134,7 +135,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def future_projects(self, create, extracted, **kwargs):
-        if not create:
+        if not create:  # pragma: no cover
             return
         if extracted:
             for project in extracted:

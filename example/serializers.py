@@ -8,6 +8,7 @@ from example.models import (
     ArtProject,
     Author,
     AuthorBio,
+    AuthorBioMetadata,
     AuthorType,
     Blog,
     Comment,
@@ -16,8 +17,8 @@ from example.models import (
     Project,
     ProjectType,
     ResearchProject,
-    TaggedItem,
-    AuthorBioMetadata)
+    TaggedItem
+)
 
 
 class TaggedItemSerializer(serializers.ModelSerializer):
