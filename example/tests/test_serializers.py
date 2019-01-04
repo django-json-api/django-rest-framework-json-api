@@ -17,7 +17,7 @@ from example.serializers import BlogSerializer
 
 try:
     from unittest import mock
-except ImportError:
+except ImportError:  # pragma: no cover
     import mock
 
 request_factory = APIRequestFactory()

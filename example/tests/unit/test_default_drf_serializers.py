@@ -1,7 +1,7 @@
 import json
+from datetime import datetime
 
 import pytest
-from datetime import datetime
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
