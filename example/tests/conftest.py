@@ -51,6 +51,13 @@ def multiple_entries(blog_factory, author_factory, entry_factory, comment_factor
 
 
 @pytest.fixture
+def single_comment(blog, author, entry_factory, comment_factory):
+    entry = entry_factory(blog=blog, authors=(author,))
+    comment_factory(entry=entry)
+    return comment_factory(entry=entry)
+
+
+@pytest.fixture
 def single_company(art_project_factory, research_project_factory, company_factory):
     company = company_factory(future_projects=(research_project_factory(), art_project_factory()))
     return company
