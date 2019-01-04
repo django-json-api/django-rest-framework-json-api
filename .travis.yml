@@ -1,6 +1,4 @@
 language: python
-sudo: required
-cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
 matrix:
   allow_failures:
