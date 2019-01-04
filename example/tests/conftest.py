@@ -5,8 +5,8 @@ from rest_framework.test import APIClient
 from example.factories import (
     ArtProjectFactory,
     AuthorBioFactory,
-    AuthorFactory,
     AuthorBioMetadataFactory,
+    AuthorFactory,
     AuthorTypeFactory,
     BlogFactory,
     CommentFactory,

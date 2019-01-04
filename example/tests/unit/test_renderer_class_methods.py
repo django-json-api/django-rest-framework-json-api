@@ -145,9 +145,6 @@ def test_extract_root_meta_many():
 
 
 def test_extract_root_meta_invalid_meta():
-    def get_root_meta(resource, many):
-        return 'not a dict'
-
     serializer = InvalidExtractRootMetaResourceSerializer()
     with pytest.raises(AssertionError):
         JSONRenderer.extract_root_meta(serializer, {})
