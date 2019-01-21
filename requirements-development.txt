@@ -1,6 +1,6 @@
 -e .
 django-debug-toolbar==1.11
-django-filter==2.0.0
+django-filter==2.1.0
 django-polymorphic==2.0.3
 factory-boy==2.11.1
 Faker==1.0.1
