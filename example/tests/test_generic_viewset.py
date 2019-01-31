@@ -4,7 +4,6 @@ from django.urls import reverse
 from example.tests import TestBase
 
 
-@override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize')
 class GenericViewSet(TestBase):
     """
     Test expected responses coming from a Generic ViewSet
@@ -36,7 +35,8 @@ class GenericViewSet(TestBase):
         """
         url = reverse('user-manual-resource-name', kwargs={'pk': self.miles.pk})
 
-        response = self.client.get(url)
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
         expected = {
@@ -75,14 +75,15 @@ class GenericViewSet(TestBase):
                 }
             ]
         }
-        response = self.client.post('/identities', {
-            'data': {
-                'type': 'users',
-                'attributes': {
-                    'email': 'bar', 'first_name': 'alajflajaljalajlfjafljalj'
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.post('/identities', {
+                'data': {
+                    'type': 'users',
+                    'attributes': {
+                        'email': 'bar', 'first_name': 'alajflajaljalajlfjafljalj'
+                    }
                 }
-            }
-        })
+            })
 
         assert expected == response.json()
 
