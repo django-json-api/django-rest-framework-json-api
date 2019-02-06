@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import pytest
 from django.urls import reverse
@@ -68,6 +69,7 @@ def test_render_format_field_names(settings):
     assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
 
 
+@pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
 def test_render_format_keys(settings):
     """Test that json field value keys are formated."""
     delattr(settings, 'JSON_API_FORMAT_FILED_NAMES')
@@ -107,7 +109,7 @@ def test_blog_create(client):
             'attributes': {'name': blog.name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -128,7 +130,7 @@ def test_get_object_gives_correct_blog(client, blog, entry):
             'attributes': {'name': blog.name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -150,7 +152,7 @@ def test_get_object_patches_correct_blog(client, blog, entry):
             'attributes': {'name': new_name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -166,7 +168,7 @@ def test_get_object_patches_correct_blog(client, blog, entry):
             'attributes': {'name': new_name},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': 2018},
+            'meta': {'copyright': datetime.now().year},
             'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
@@ -195,8 +197,8 @@ def test_get_entry_list_with_blogs(client, entry):
 
     expected = {
         'links': {
-            'first': 'http://testserver/drf-entries/1/suggested/?page=1',
-            'last': 'http://testserver/drf-entries/1/suggested/?page=1',
+            'first': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
+            'last': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
             'next': None,
             'prev': None
         },

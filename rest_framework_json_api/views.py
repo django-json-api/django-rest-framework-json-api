@@ -14,9 +14,11 @@ from django.urls import NoReverseMatch
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import MethodNotAllowed, NotFound
+from rest_framework.fields import get_attribute
+from rest_framework.relations import PKOnlyObject
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.serializers import Serializer
+from rest_framework.serializers import Serializer, SkipField
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
@@ -90,7 +92,11 @@ class AutoPrefetchMixin(object):
                 if level == levels[-1]:
                     included_model = field
                 else:
-                    model_field = field.field
+
+                    if issubclass(field_class, ReverseOneToOneDescriptor):
+                        model_field = field.related.field
+                    else:
+                        model_field = field.field
 
                     if is_forward_relation:
                         level_model = model_field.related_model
@@ -164,7 +170,15 @@ class RelatedMixin(object):
         field = parent_serializer.fields.get(field_name, None)
 
         if field is not None:
-            return field.get_attribute(parent_obj)
+            try:
+                instance = field.get_attribute(parent_obj)
+            except SkipField:
+                instance = get_attribute(parent_obj, field.source_attrs)
+            else:
+                if isinstance(instance, PKOnlyObject):
+                    # need whole object
+                    instance = get_attribute(parent_obj, field.source_attrs)
+            return instance
         else:
             try:
                 return getattr(parent_obj, field_name)

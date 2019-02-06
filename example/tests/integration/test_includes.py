@@ -4,14 +4,8 @@ from django.urls import reverse
 pytestmark = pytest.mark.django_db
 
 
-def test_default_included_data_on_list(multiple_entries, client):
-    return test_included_data_on_list(
-        multiple_entries=multiple_entries, client=client, query='?page_size=5'
-    )
-
-
-def test_included_data_on_list(multiple_entries, client, query='?include=comments&page_size=5'):
-    response = client.get(reverse("entry-list") + query)
+def test_included_data_on_list(multiple_entries, client):
+    response = client.get(reverse("entry-list"), data={'include': 'comments', 'page[size]': 5})
     included = response.json().get('included')
 
     assert len(response.json()['data']) == len(multiple_entries), (
@@ -24,6 +18,25 @@ def test_included_data_on_list(multiple_entries, client, query='?include=comment
     comment_count = len([resource for resource in included if resource["type"] == "comments"])
     expected_comment_count = sum([entry.comments.count() for entry in multiple_entries])
     assert comment_count == expected_comment_count, 'List comment count is incorrect'
+
+
+def test_included_data_on_list_with_one_to_one_relations(multiple_entries, client):
+    response = client.get(reverse("entry-list"),
+                          data={'include': 'authors.bio.metadata', 'page[size]': 5})
+    included = response.json().get('included')
+
+    assert len(response.json()['data']) == len(multiple_entries), (
+        'Incorrect entry count'
+    )
+    expected_include_types = [
+        'authorBioMetadata', 'authorBioMetadata',
+        'authorBios', 'authorBios',
+        'authors', 'authors'
+    ]
+    include_types = [x.get('type') for x in included]
+    assert include_types == expected_include_types, (
+        'List included types are incorrect'
+    )
 
 
 def test_default_included_data_on_detail(single_entry, client):
@@ -79,7 +92,7 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
 
 def test_deep_included_data_on_list(multiple_entries, client):
     response = client.get(reverse("entry-list") + '?include=comments,comments.author,'
-                          'comments.author.bio,comments.writer&page_size=5')
+                          'comments.author.bio,comments.writer&page[size]=5')
     included = response.json().get('included')
 
     assert len(response.json()['data']) == len(multiple_entries), (
@@ -113,7 +126,7 @@ def test_deep_included_data_on_list(multiple_entries, client):
 
     # Also include entry authors
     response = client.get(reverse("entry-list") + '?include=authors,comments,comments.author,'
-                          'comments.author.bio&page_size=5')
+                          'comments.author.bio&page[size]=5')
     included = response.json().get('included')
 
     assert len(response.json()['data']) == len(multiple_entries), (
@@ -147,3 +160,22 @@ def test_deep_included_data_on_detail(single_entry, client):
     author_bio_count = len([resource for resource in included if resource["type"] == "authorBios"])
     expected_author_bio_count = single_entry.comments.filter(author__bio__isnull=False).count()
     assert author_bio_count == expected_author_bio_count, 'Detail author bio count is incorrect'
+
+
+def test_data_resource_not_included_again(single_comment, client):
+    # This test makes sure that the resource which is in the data field is excluded
+    # from the included field.
+    response = client.get(reverse("comment-detail", kwargs={'pk': single_comment.pk}) +
+                          '?include=entry.comments')
+
+    included = response.json().get('included')
+
+    included_comments = [resource for resource in included if resource["type"] == "comments"]
+    assert single_comment.pk not in [int(x.get('id')) for x in included_comments], \
+        "Resource of the data field duplicated in included"
+
+    comment_count = len(included_comments)
+    expected_comment_count = single_comment.entry.comments.count()
+    # The comment in the data attribute must not be included again.
+    expected_comment_count -= 1
+    assert comment_count == expected_comment_count, "Comment count incorrect"

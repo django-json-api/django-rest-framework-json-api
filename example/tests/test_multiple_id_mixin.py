@@ -39,9 +39,9 @@ class MultipleIDMixin(TestBase):
         links = json_content.get("links")
         meta = json_content.get("meta").get('pagination')
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
-        self.assertEquals(meta.get('count', 0), 1)
-        self.assertEquals(links.get("next"), None)
+        self.assertEqual(expected.get('user'), json_content.get('user'))
+        self.assertEqual(meta.get('count', 0), 1)
+        self.assertEqual(links.get("next"), None)
         self.assertEqual(meta.get("page"), 1)
 
     def test_multiple_ids_in_query_params(self):
@@ -69,11 +69,11 @@ class MultipleIDMixin(TestBase):
         links = json_content.get("links")
         meta = json_content.get("meta").get('pagination')
 
-        self.assertEquals(expected.get('user'), json_content.get('user'))
-        self.assertEquals(meta.get('count', 0), 2)
+        self.assertEqual(expected.get('user'), json_content.get('user'))
+        self.assertEqual(meta.get('count', 0), 2)
         self.assertEqual(
             sorted(
-                'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page=2'
+                'http://testserver/identities?ids%5B%5D=2&ids%5B%5D=1&page%5Bnumber%5D=2'
                 .split('?')[1].split('&')
             ),
             sorted(

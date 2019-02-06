@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from django.test import RequestFactory
 from django.utils import timezone
@@ -102,11 +103,11 @@ class TestRelationshipView(APITestCase):
         assert response.data == expected_data
 
     def test_get_to_many_relationship_self_link(self):
-        url = '/authors/{}/relationships/comment_set'.format(self.author.id)
+        url = '/authors/{}/relationships/comments'.format(self.author.id)
 
         response = self.client.get(url)
         expected_data = {
-            'links': {'self': 'http://testserver/authors/1/relationships/comment_set'},
+            'links': {'self': 'http://testserver/authors/1/relationships/comments'},
             'data': [{'id': str(self.second_comment.id), 'type': format_resource_type('Comment')}]
         }
         assert json.loads(response.content.decode('utf-8')) == expected_data
@@ -222,7 +223,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 409, response.content.decode()
 
     def test_delete_to_many_relationship_with_change(self):
-        url = '/authors/{}/relationships/comment_set'.format(self.author.id)
+        url = '/authors/{}/relationships/comments'.format(self.author.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -233,7 +234,7 @@ class TestRelationshipView(APITestCase):
         entry = EntryFactory(blog=self.blog, authors=(self.author,))
         comment = CommentFactory(entry=entry)
 
-        url = '/authors/{}/relationships/comment_set'.format(self.author.id)
+        url = '/authors/{}/relationships/comments'.format(self.author.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(comment.id)}, ]
         }
@@ -244,7 +245,7 @@ class TestRelationshipView(APITestCase):
                  }
             ],
             'links': {
-                'self': 'http://testserver/authors/{}/relationships/comment_set'.format(
+                'self': 'http://testserver/authors/{}/relationships/comments'.format(
                     self.author.id
                 )
             }
@@ -261,7 +262,7 @@ class TestRelationshipView(APITestCase):
                  }
             ],
             'links': {
-                'self': 'http://testserver/authors/{}/relationships/comment_set'.format(
+                'self': 'http://testserver/authors/{}/relationships/comments'.format(
                     self.author.id
                 )
             }
@@ -325,20 +326,37 @@ class TestRelatedMixin(APITestCase):
         view.serializer_class.related_serializers = related_serializers
 
     def test_get_serializer_class_raises_error(self):
-        kwargs = {'pk': self.author.id, 'related_field': 'type'}
+        kwargs = {'pk': self.author.id, 'related_field': 'unknown'}
         view = self._get_view(kwargs)
         self.assertRaises(NotFound, view.get_serializer_class)
 
-    def test_retrieve_related_single(self):
+    def test_retrieve_related_single_reverse_lookup(self):
         url = reverse('author-related', kwargs={'pk': self.author.pk, 'related_field': 'bio'})
         resp = self.client.get(url)
         expected = {
             'data': {
                 'type': 'authorBios', 'id': str(self.author.bio.id),
                 'relationships': {
-                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}}},
+                    'author': {'data': {'type': 'authors', 'id': str(self.author.id)}},
+                    'metadata': {'data': {'id': str(self.author.bio.metadata.id),
+                                          'type': 'authorBioMetadata'}}
+                },
                 'attributes': {
                     'body': str(self.author.bio.body)
+                },
+            }
+        }
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected)
+
+    def test_retrieve_related_single(self):
+        url = reverse('author-related', kwargs={'pk': self.author.type.pk, 'related_field': 'type'})
+        resp = self.client.get(url)
+        expected = {
+            'data': {
+                'type': 'authorTypes', 'id': str(self.author.type.id),
+                'attributes': {
+                    'name': str(self.author.type.name)
                 },
             }
         }
@@ -354,6 +372,16 @@ class TestRelatedMixin(APITestCase):
         self.assertTrue(isinstance(resp.json()['data'], list))
         self.assertEqual(len(resp.json()['data']), 1)
         self.assertEqual(resp.json()['data'][0]['id'], str(entry.id))
+
+    def test_retrieve_related_many_hyperlinked(self):
+        comment = CommentFactory(author=self.author)
+        url = reverse('author-related', kwargs={'pk': self.author.pk, 'related_field': 'comments'})
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(isinstance(resp.json()['data'], list))
+        self.assertEqual(len(resp.json()['data']), 1)
+        self.assertEqual(resp.json()['data'][0]['id'], str(comment.id))
 
     def test_retrieve_related_None(self):
         kwargs = {'pk': self.author.pk, 'related_field': 'first_entry'}
@@ -442,7 +470,7 @@ class TestBlogViewSet(APITestCase):
                 'attributes': {'name': self.blog.name},
                 'id': '{}'.format(self.blog.id),
                 'links': {'self': 'http://testserver/blogs/{}'.format(self.blog.id)},
-                'meta': {'copyright': 2018},
+                'meta': {'copyright': datetime.now().year},
                 'relationships': {'tags': {'data': []}},
                 'type': 'blogs'
             },

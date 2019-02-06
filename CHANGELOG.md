@@ -9,22 +9,23 @@ Note that in line with [Django REST Framework policy](http://www.django-rest-fra
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
 
-## [Unreleased]
+## [2.7.0] - 2019-01-14
 
 ### Added
 
 * Add support for Django 2.1, DRF 3.9 and Python 3.7. Please note:
   - Django >= 2.1 is not supported with Python < 3.5.
 
-### Deprecated
-
-### Changed
-
 ### Fixed
 
 * Pass context from `PolymorphicModelSerializer` to child serializers to support fields which require a `request` context such as `url`.
 * Avoid patch on `RelationshipView` deleting relationship instance when constraint would allow null ([#242](https://github.com/django-json-api/django-rest-framework-json-api/issues/242))
-
+* Avoid error with related urls when retrieving relationship which is referenced as `ForeignKey` on parent
+* Do not render `write_only` relations
+* Do not skip empty one-to-one relationships
+* Allow `HyperlinkRelatedField` to be used with [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html?highlight=related%20links#related-urls)
+* Avoid exception in `AutoPrefetchMixin` when including a reverse one to one relation ([#537](https://github.com/django-json-api/django-rest-framework-json-api/issues/537))
+* Avoid requested resource(s) to be added to included as well ([#524](https://github.com/django-json-api/django-rest-framework-json-api/issues/524))
 
 ## [2.6.0] - 2018-09-20
 

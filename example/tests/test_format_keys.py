@@ -36,9 +36,9 @@ class FormatKeysSetTests(TestBase):
                 }
             ],
             'links': {
-                'first': 'http://testserver/identities?page=1',
-                'last': 'http://testserver/identities?page=2',
-                'next': 'http://testserver/identities?page=2',
+                'first': 'http://testserver/identities?page%5Bnumber%5D=1',
+                'last': 'http://testserver/identities?page%5Bnumber%5D=2',
+                'next': 'http://testserver/identities?page%5Bnumber%5D=2',
                 'prev': None
             },
             'meta': {

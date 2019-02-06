@@ -7,6 +7,7 @@ from example.models import (
     ArtProject,
     Author,
     AuthorBio,
+    AuthorBioMetadata,
     AuthorType,
     Blog,
     Comment,
@@ -51,6 +52,16 @@ class AuthorBioFactory(factory.django.DjangoModelFactory):
         model = AuthorBio
 
     author = factory.SubFactory(AuthorFactory)
+    body = factory.LazyAttribute(lambda x: faker.text())
+
+    metadata = factory.RelatedFactory('example.factories.AuthorBioMetadataFactory', 'bio')
+
+
+class AuthorBioMetadataFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AuthorBioMetadata
+
+    bio = factory.SubFactory(AuthorBioFactory)
     body = factory.LazyAttribute(lambda x: faker.text())
 
 
@@ -124,7 +135,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def future_projects(self, create, extracted, **kwargs):
-        if not create:
+        if not create:  # pragma: no cover
             return
         if extracted:
             for project in extracted:

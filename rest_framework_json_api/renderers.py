@@ -99,6 +99,10 @@ class JSONRenderer(renderers.JSONRenderer):
             if field_name == api_settings.URL_FIELD_NAME:
                 continue
 
+            # don't output a key for write only fields
+            if fields[field_name].write_only:
+                continue
+
             # Skip fields without relations
             if not isinstance(
                 field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)
@@ -146,13 +150,6 @@ class JSONRenderer(renderers.JSONRenderer):
                 data.update({field_name: relation_data})
 
             if isinstance(field, (ResourceRelatedField, )):
-                relation_instance_id = getattr(resource_instance, source + "_id", None)
-                if not relation_instance_id:
-                    resolved, relation_instance = utils.get_relation_instance(resource_instance,
-                                                                              source, field.parent)
-                    if not resolved:
-                        continue
-
                 if not isinstance(field, SkipDataMixin):
                     relation_data.update({'data': resource.get(field_name)})
 
@@ -645,6 +642,21 @@ class JSONRenderer(renderers.JSONRenderer):
             render_data['links'] = json_api_data
         else:
             render_data['data'] = json_api_data
+
+        if included_cache:
+            if isinstance(json_api_data, list):
+                objects = json_api_data
+            else:
+                objects = [json_api_data]
+
+            for object in objects:
+                obj_type = object.get('type')
+                obj_id = object.get('id')
+                if obj_type in included_cache and \
+                   obj_id in included_cache[obj_type]:
+                    del included_cache[obj_type][obj_id]
+                if not included_cache[obj_type]:
+                    del included_cache[obj_type]
 
         if included_cache:
             render_data['included'] = list()

@@ -82,6 +82,21 @@ class AuthorBio(BaseModel):
 
 
 @python_2_unicode_compatible
+class AuthorBioMetadata(BaseModel):
+    """
+    Just a class to have a relation with author bio
+    """
+    bio = models.OneToOneField(AuthorBio, related_name='metadata', on_delete=models.CASCADE)
+    body = models.TextField()
+
+    def __str__(self):
+        return self.bio.author.name
+
+    class Meta:
+        ordering = ('id',)
+
+
+@python_2_unicode_compatible
 class Entry(BaseModel):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     headline = models.CharField(max_length=255)
@@ -110,6 +125,7 @@ class Comment(BaseModel):
         null=True,
         blank=True,
         on_delete=models.CASCADE,
+        related_name='comments',
     )
 
     def __str__(self):

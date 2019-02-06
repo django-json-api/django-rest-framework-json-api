@@ -5,6 +5,7 @@ from rest_framework.test import APIClient
 from example.factories import (
     ArtProjectFactory,
     AuthorBioFactory,
+    AuthorBioMetadataFactory,
     AuthorFactory,
     AuthorTypeFactory,
     BlogFactory,
@@ -18,6 +19,7 @@ from example.factories import (
 register(BlogFactory)
 register(AuthorFactory)
 register(AuthorBioFactory)
+register(AuthorBioMetadataFactory)
 register(AuthorTypeFactory)
 register(EntryFactory)
 register(CommentFactory)
@@ -46,6 +48,13 @@ def multiple_entries(blog_factory, author_factory, entry_factory, comment_factor
     comment_factory(entry=entries[0])
     comment_factory(entry=entries[1])
     return entries
+
+
+@pytest.fixture
+def single_comment(blog, author, entry_factory, comment_factory):
+    entry = entry_factory(blog=blog, authors=(author,))
+    comment_factory(entry=entry)
+    return comment_factory(entry=entry)
 
 
 @pytest.fixture
