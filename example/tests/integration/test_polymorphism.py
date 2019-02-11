@@ -25,10 +25,13 @@ def test_polymorphism_on_detail_relations(single_company, client):
 
 
 def test_polymorphism_on_included_relations(single_company, client):
-    response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}) +
-                          '?include=current_project,future_projects')
+    response = client.get(
+        reverse("company-detail", kwargs={'pk': single_company.pk}) +
+        '?include=current_project,future_projects,current_art_project,current_research_project')
     content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
+    assert content["data"]["relationships"]["currentArtProject"]["data"]["type"] == "artProjects"
+    assert content["data"]["relationships"]["currentResearchProject"]["data"] is None
     assert (
         set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) ==
         set(["researchProjects", "artProjects"])
