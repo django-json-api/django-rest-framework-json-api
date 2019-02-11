@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from rest_framework import serializers as drf_serilazers
+from rest_framework import serializers as drf_serilazers, fields as drf_fields
 
 from rest_framework_json_api import relations, serializers
 
@@ -318,15 +318,40 @@ class ProjectSerializer(serializers.PolymorphicModelSerializer):
         exclude = ('polymorphic_ctype',)
 
 
+class CurrentProjectRelatedField(relations.PolymorphicResourceRelatedField):
+    def get_attribute(self, instance):
+        obj = super(CurrentProjectRelatedField, self).get_attribute(instance)
+
+        is_art = (
+            self.field_name == 'current_art_project' and
+            isinstance(obj, ArtProject)
+        )
+        is_res = (
+            self.field_name == 'current_research_project' and
+            isinstance(obj, ResearchProject)
+        )
+
+        if is_art or is_res:
+            return obj
+
+        raise drf_fields.SkipField()
+
+
 class CompanySerializer(serializers.ModelSerializer):
     current_project = relations.PolymorphicResourceRelatedField(
         ProjectSerializer, queryset=Project.objects.all())
+    current_art_project = CurrentProjectRelatedField(
+        ProjectSerializer, source='current_project', read_only=True)
+    current_research_project = CurrentProjectRelatedField(
+        ProjectSerializer, source='current_project', read_only=True)
     future_projects = relations.PolymorphicResourceRelatedField(
         ProjectSerializer, queryset=Project.objects.all(), many=True)
 
     included_serializers = {
         'current_project': ProjectSerializer,
         'future_projects': ProjectSerializer,
+        'current_art_project': ProjectSerializer,
+        'current_research_project': ProjectSerializer
     }
 
     class Meta:

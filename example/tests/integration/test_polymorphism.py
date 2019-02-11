@@ -25,10 +25,13 @@ def test_polymorphism_on_detail_relations(single_company, client):
 
 
 def test_polymorphism_on_included_relations(single_company, client):
-    response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}) +
-                          '?include=current_project,future_projects')
+    response = client.get(
+        reverse("company-detail", kwargs={'pk': single_company.pk}) +
+        '?include=current_project,future_projects,current_art_project,current_research_project')
     content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
+    assert content["data"]["relationships"]["currentArtProject"]["data"]["type"] == "artProjects"
+    assert content["data"]["relationships"]["currentResearchProject"]["data"] is None
     assert (
         set([rel["type"] for rel in content["data"]["relationships"]["futureProjects"]["data"]]) ==
         set(["researchProjects", "artProjects"])
@@ -142,7 +145,7 @@ def test_invalid_type_on_polymorphic_model(client):
     response = client.post(url, data=data)
     assert response.status_code == 409
     content = response.json()
-    assert len(content["errors"]) is 1
+    assert len(content["errors"]) == 1
     assert content["errors"][0]["status"] == "409"
     try:
         assert content["errors"][0]["detail"] == \
@@ -188,7 +191,7 @@ def test_invalid_type_on_polymorphic_relation(single_company, research_project_f
                           data=content)
     assert response.status_code == 409
     content = response.json()
-    assert len(content["errors"]) is 1
+    assert len(content["errors"]) == 1
     assert content["errors"][0]["status"] == "409"
     try:
         assert content["errors"][0]["detail"] == \
