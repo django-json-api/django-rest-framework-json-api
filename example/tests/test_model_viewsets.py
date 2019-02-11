@@ -7,7 +7,6 @@ from django.utils import encoding
 from example.tests import TestBase
 
 
-@override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize')
 class ModelViewSetTests(TestBase):
     """
     Test usage with ModelViewSets, also tests pluralization, camelization,
@@ -26,7 +25,8 @@ class ModelViewSetTests(TestBase):
         """
         Ensure the result has a 'user' key since that is the name of the model
         """
-        response = self.client.get(self.list_url)
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, 200)
 
         user = get_user_model().objects.all()[0]
@@ -63,7 +63,8 @@ class ModelViewSetTests(TestBase):
         """
         Ensure that the second page is reachable and is the correct data.
         """
-        response = self.client.get(self.list_url, {'page[number]': 2})
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.get(self.list_url, {'page[number]': 2})
         self.assertEqual(response.status_code, 200)
 
         user = get_user_model().objects.all()[1]
@@ -102,7 +103,8 @@ class ModelViewSetTests(TestBase):
         tests pluralization as two objects means it converts ``user`` to
         ``users``.
         """
-        response = self.client.get(self.list_url, {'page[size]': 2})
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.get(self.list_url, {'page[size]': 2})
         self.assertEqual(response.status_code, 200)
 
         users = get_user_model().objects.all()
@@ -148,7 +150,8 @@ class ModelViewSetTests(TestBase):
         """
         Ensure the result has a 'user' key.
         """
-        response = self.client.get(self.detail_url)
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
 
         expected = {
@@ -199,7 +202,8 @@ class ModelViewSetTests(TestBase):
             }
         }
 
-        response = self.client.put(self.detail_url, data=data)
+        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+            response = self.client.put(self.detail_url, data=data)
 
         assert data == response.json()
 
