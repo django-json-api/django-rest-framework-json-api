@@ -375,7 +375,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 serializer_data = field.data
 
             if isinstance(field, relations.RelatedField):
-                if relation_instance is None:
+                if relation_instance is None or not serializer_data:
                     continue
 
                 many = field._kwargs.get('child_relation', None) is not None
