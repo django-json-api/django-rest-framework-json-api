@@ -145,7 +145,7 @@ def test_invalid_type_on_polymorphic_model(client):
     response = client.post(url, data=data)
     assert response.status_code == 409
     content = response.json()
-    assert len(content["errors"]) is 1
+    assert len(content["errors"]) == 1
     assert content["errors"][0]["status"] == "409"
     try:
         assert content["errors"][0]["detail"] == \
@@ -191,7 +191,7 @@ def test_invalid_type_on_polymorphic_relation(single_company, research_project_f
                           data=content)
     assert response.status_code == 409
     content = response.json()
-    assert len(content["errors"]) is 1
+    assert len(content["errors"]) == 1
     assert content["errors"][0]["status"] == "409"
     try:
         assert content["errors"][0]["detail"] == \
