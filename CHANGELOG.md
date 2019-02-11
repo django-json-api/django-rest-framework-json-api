@@ -12,7 +12,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Resource related fields can be blank, serializer/renderer should skip these.
+* Avoid exception when trying to include skipped relationship
 
 ## [2.7.0] - 2019-01-14
 
