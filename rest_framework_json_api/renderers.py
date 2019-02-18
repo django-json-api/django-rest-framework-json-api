@@ -487,9 +487,16 @@ class JSONRenderer(renderers.JSONRenderer):
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)
+
+        # Allow serializer `id` field to override model pk
+        if 'id' in resource:
+            resource_id = encoding.force_text(resource['id'])
+        else:
+            resource_id = encoding.force_text(resource_instance.pk) if resource_instance else None
+
         resource_data = [
             ('type', resource_name),
-            ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
+            ('id', resource_id),
             ('attributes', cls.extract_attributes(fields, resource)),
         ]
         relationships = cls.extract_relationships(fields, resource, resource_instance)

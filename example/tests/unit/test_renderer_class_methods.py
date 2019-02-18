@@ -41,6 +41,40 @@ def test_build_json_resource_obj():
         serializer.fields, resource, resource_instance, 'user') == output
 
 
+class PrefixedId(serializers.CharField):
+    def get_attribute(self, instance):
+        return 'my-id-' + str(instance.id)
+
+    def to_internal_value(self, data):
+        return int(data['id'].split('-')[-1])
+
+
+class ResourceWithIdSerializer(serializers.ModelSerializer):
+    id = PrefixedId(required=False)
+
+    class Meta:
+        fields = ('id', 'username',)
+        model = get_user_model()
+
+
+def test_build_json_resource_obj_respects_serializer_id():
+    serializer = ResourceWithIdSerializer(data={'username': 'Alice'})
+    serializer.is_valid()
+    resource_instance = serializer.save()
+    resource = serializer.data
+
+    output = {
+        'type': 'user',
+        'id': 'my-id-1',
+        'attributes': {
+            'username': 'Alice'
+        },
+    }
+
+    assert JSONRenderer.build_json_resource_obj(
+        serializer.fields, resource, resource_instance, 'user') == output
+
+
 def test_can_override_methods():
     """
     Make sure extract_attributes and extract_relationships can be overriden.
