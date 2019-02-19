@@ -4,7 +4,7 @@ django-filter==2.1.0
 django-polymorphic==2.0.3
 factory-boy==2.11.1
 Faker==1.0.2
-flake8==3.7.5
+flake8==3.7.6
 flake8-isort==2.6.0
 isort==4.3.4
 mock==2.0.0
