@@ -789,8 +789,9 @@ that are related to the primary resource.
 
 To make a Compound Document,
 you need to modify your `ModelSerializer`.
-The two required additions are `included_resources`
-and `included_serializers`.
+`included_serializers` is required to inform DJA of what and how you would like
+to include.
+`included_resources` tells DJA what you want to include by default.
 
 For example,
 suppose you are making an app to go on quests,
@@ -817,9 +818,6 @@ class QuestSerializer(serializers.ModelSerializer):
     class JSONAPIMeta:
         included_resources = ['knight']
 ```
-
-`included_resources` informs DJA of **what** you would like to include.
-`included_serializers` tells DJA **how** you want to include it.
 
 #### Performance improvements
 
