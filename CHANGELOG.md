@@ -63,6 +63,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Allow `HyperlinkRelatedField` to be used with [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html?highlight=related%20links#related-urls)
 * Avoid exception in `AutoPrefetchMixin` when including a reverse one to one relation ([#537](https://github.com/django-json-api/django-rest-framework-json-api/issues/537))
 * Avoid requested resource(s) to be added to included as well ([#524](https://github.com/django-json-api/django-rest-framework-json-api/issues/524))
+* Performance improvement when rendering included data
 
 ## [2.6.0] - 2018-09-20
 

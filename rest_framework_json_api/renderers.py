@@ -397,6 +397,10 @@ class JSONRenderer(renderers.JSONRenderer):
                             relation_type or
                             utils.get_resource_type_from_instance(nested_resource_instance)
                         )
+                        resource_id = encoding.force_text(nested_resource_instance.pk)
+                        if included_cache.get(resource_type, {}).get(resource_id):
+                            # Do not serialize if already included in the response
+                            continue
                         serializer_fields = utils.get_serializer_fields(
                             serializer.__class__(
                                 nested_resource_instance, context=serializer.context
@@ -421,7 +425,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, Serializer):
                 relation_type = utils.get_resource_type_from_serializer(field)
-
+                resource_id = encoding.force_text(relation_instance.pk)
+                if included_cache.get(relation_type, {}).get(resource_id):
+                    # Do not serialize if already included in the response
+                    continue
                 # Get the serializer fields
                 serializer_fields = utils.get_serializer_fields(field)
                 if serializer_data:
