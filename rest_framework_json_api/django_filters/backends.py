@@ -4,7 +4,6 @@ from django_filters import VERSION
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
-
 from rest_framework_json_api.utils import format_value
 
 
@@ -101,8 +100,8 @@ class DjangoFilterBackend(DjangoFilterBackend):
         """
         filter_keys = []
         # rewrite filter[field] query params to make DjangoFilterBackend work.
-        data = request.query_params.copy()
-        for qp, val in data.items():
+        data = {}
+        for qp, val in request.query_params.copy().items():
             m = self.filter_regex.match(qp)
             if m and (not m.groupdict()['assoc'] or
                       m.groupdict()['ldelim'] != '[' or m.groupdict()['rdelim'] != ']'):
@@ -116,7 +115,6 @@ class DjangoFilterBackend(DjangoFilterBackend):
                 key = format_value(key, 'underscore')
                 data[key] = val
                 filter_keys.append(key)
-                del data[qp]
         return {
             'data': data,
             'queryset': queryset,
