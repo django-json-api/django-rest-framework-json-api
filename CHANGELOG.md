@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Avoid exception when trying to include skipped relationship
+* Don't ignore `filter[]` params when there are many query params
 
 ## [2.7.0] - 2019-01-14
 
