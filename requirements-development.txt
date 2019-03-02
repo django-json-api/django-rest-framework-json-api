@@ -6,11 +6,11 @@ factory-boy==2.11.1
 Faker==1.0.2
 flake8==3.7.7
 flake8-isort==2.6.0
-isort==4.3.5
+isort==4.3.9
 mock==2.0.0
 pytest==4.3.0
 pytest-cov==2.6.1
-pytest-django==3.4.7
+pytest-django==3.4.8
 pytest-factoryboy==2.0.2
 recommonmark==0.5.0
 Sphinx==1.8.4
