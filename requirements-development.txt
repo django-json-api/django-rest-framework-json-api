@@ -6,7 +6,7 @@ factory-boy==2.11.1
 Faker==1.0.2
 flake8==3.7.6
 flake8-isort==2.6.0
-isort==4.3.5
+isort==4.3.9
 mock==2.0.0
 pytest==4.3.0
 pytest-cov==2.6.1
