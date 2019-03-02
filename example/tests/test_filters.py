@@ -503,3 +503,18 @@ class DJATestFilters(APITestCase):
         dja_response = response.json()
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "repeated query parameter not allowed: sort")
+
+    def test_many_params(self):
+        """
+        Test that filter params aren't ignored when many params are present
+        """
+        response = self.client.get(self.url,
+                                   data={'filter[headline.regex]': '^A',
+                                         'filter[body_text.regex]': '^IN',
+                                         'filter[blog.name]': 'ANTB',
+                                         'page[size]': 3})
+        self.assertEqual(response.status_code, 200,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+        self.assertEqual(len(dja_response['data']), 1)
+        self.assertEqual(dja_response['data'][0]['id'], '1')
