@@ -1,3 +1,4 @@
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
@@ -31,6 +32,13 @@ from rest_framework_json_api.utils import (
 
 
 class PrefetchForIncludesHelperMixin(object):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn("PrefetchForIncludesHelperMixin is deprecated. "
+                      "Use SelectAndPrefetchForIncludesMixin instead",
+                      DeprecationWarning)
+        super(PrefetchForIncludesHelperMixin, self).__init__(*args, **kwargs)
+
     def get_queryset(self):
         """
         This viewset provides a helper attribute to prefetch related models
@@ -62,10 +70,52 @@ class PrefetchForIncludesHelperMixin(object):
         return qs
 
 
+class SelectAndPrefetchForIncludesMixin(object):
+    """
+    This mixin provides a helper attributes to select or prefetch related models
+    based on the include specified in the URL.
+
+    __all__ can be used to specify a prefetch which should be done regardless of the include
+
+    .. code:: python
+
+    # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+    class MyViewSet(viewsets.ModelViewSet):
+        queryset = Book.objects.all()
+        prefetch_for_includes = {
+            '__all__': [],
+            'category.section': ['category']
+        }
+        select_for_includes = {
+            '__all__': [],
+            'author': ['author', 'author__authorbio'],
+        }
+    """
+    def get_queryset(self):
+        qs = super(SelectAndPrefetchForIncludesMixin, self).get_queryset()
+
+        includes = self.request.GET.get('include', '').split(',') + ['__all__']
+
+        if hasattr(self, 'select_for_includes'):
+            selects = [self.select_for_includes.get(inc) for inc in includes]
+            qs = qs.select_related(*selects)
+
+        if hasattr(self, 'prefetch_for_includes'):
+            prefetches = [self.prefetch_for_includes.get(inc) for inc in includes]
+            qs = qs.prefetch_related(*prefetches)
+
+        return qs
+
+
 class AutoPrefetchMixin(object):
     def get_queryset(self, *args, **kwargs):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
         qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
+
+        # Prefetch includes handled by another mixin, let's do not mix them
+        if hasattr(self, 'prefetch_for_includes'):
+            return qs
+
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
@@ -187,14 +237,14 @@ class RelatedMixin(object):
 
 
 class ModelViewSet(AutoPrefetchMixin,
-                   PrefetchForIncludesHelperMixin,
+                   SelectAndPrefetchForIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
     pass
 
 
 class ReadOnlyModelViewSet(AutoPrefetchMixin,
-                           PrefetchForIncludesHelperMixin,
+                           SelectAndPrefetchForIncludesMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
     pass
