@@ -111,11 +111,6 @@ class AutoPrefetchMixin(object):
     def get_queryset(self, *args, **kwargs):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
         qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
-
-        # Prefetch includes handled by another mixin, let's do not mix them
-        if hasattr(self, 'prefetch_for_includes'):
-            return qs
-
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
