@@ -70,7 +70,7 @@ class PrefetchForIncludesHelperMixin(object):
         return qs
 
 
-class SelectAndPrefetchForIncludesMixin(object):
+class PreloadIncludesMixin(object):
     """
     This mixin provides a helper attributes to select or prefetch related models
     based on the include specified in the URL.
@@ -92,7 +92,7 @@ class SelectAndPrefetchForIncludesMixin(object):
         }
     """
     def get_queryset(self):
-        qs = super(SelectAndPrefetchForIncludesMixin, self).get_queryset()
+        qs = super(PreloadIncludesMixin, self).get_queryset()
 
         includes = self.request.GET.get('include', '').split(',') + ['__all__']
 
@@ -237,14 +237,14 @@ class RelatedMixin(object):
 
 
 class ModelViewSet(AutoPrefetchMixin,
-                   SelectAndPrefetchForIncludesMixin,
+                   PreloadIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
     pass
 
 
 class ReadOnlyModelViewSet(AutoPrefetchMixin,
-                           SelectAndPrefetchForIncludesMixin,
+                           PreloadIncludesMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
     pass
