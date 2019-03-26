@@ -35,7 +35,7 @@ class PrefetchForIncludesHelperMixin(object):
 
     def __init__(self, *args, **kwargs):
         warnings.warn("PrefetchForIncludesHelperMixin is deprecated. "
-                      "Use SelectAndPrefetchForIncludesMixin instead",
+                      "Use PreloadIncludesMixin instead",
                       DeprecationWarning)
         super(PrefetchForIncludesHelperMixin, self).__init__(*args, **kwargs)
 
@@ -107,10 +107,10 @@ class PreloadIncludesMixin(object):
         return qs
 
 
-class AutoPrefetchMixin(object):
+class AutoPreloadMixin(object):
     def get_queryset(self, *args, **kwargs):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
-        qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
+        qs = super(AutoPreloadMixin, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
         for included in included_resources:
@@ -152,6 +152,15 @@ class AutoPrefetchMixin(object):
                 qs = qs.prefetch_related(included.replace('.', '__'))
 
         return qs
+
+
+class AutoPrefetchMixin(AutoPreloadMixin):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn("AutoPrefetchMixin is deprecated. "
+                      "Use AutoPreloadMixin instead",
+                      DeprecationWarning)
+        super(AutoPrefetchMixin, self).__init__(*args, **kwargs)
 
 
 class RelatedMixin(object):
@@ -231,14 +240,14 @@ class RelatedMixin(object):
                 raise NotFound
 
 
-class ModelViewSet(AutoPrefetchMixin,
+class ModelViewSet(AutoPreloadMixin,
                    PreloadIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
     pass
 
 
-class ReadOnlyModelViewSet(AutoPrefetchMixin,
+class ReadOnlyModelViewSet(AutoPreloadMixin,
                            PreloadIncludesMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
