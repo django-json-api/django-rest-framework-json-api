@@ -27,7 +27,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
 django.setup()
 
 # Auto-generate API documentation.
-from sphinx.apidoc import main
+from sphinx.ext.apidoc import main
 main(['sphinx-apidoc', '-e',  '-T',  '-M',  '-f',  '-o', 'apidoc', '../rest_framework_json_api'])
 
 # -- General configuration ------------------------------------------------
