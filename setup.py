@@ -7,7 +7,7 @@ import sys
 
 from setuptools import setup
 
-needs_mock = sys.version_info < (3, 3)
+needs_mock = sys.version_info < (3, 5)
 mock = ['mock'] if needs_mock else []
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 pytest_runner = ['pytest-runner'] if needs_pytest else []
@@ -89,7 +89,7 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
