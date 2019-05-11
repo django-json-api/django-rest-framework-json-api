@@ -1,4 +1,7 @@
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model

@@ -1,5 +1,8 @@
-import collections
 import json
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 from collections import OrderedDict
 
 import inflection
@@ -388,7 +391,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
 
     def to_representation(self, value):
-        if isinstance(value, collections.Iterable):
+        if isinstance(value, Iterable):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)

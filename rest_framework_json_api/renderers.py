@@ -2,7 +2,11 @@
 Renderers
 """
 import copy
-from collections import Iterable, OrderedDict, defaultdict
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
+from collections import OrderedDict, defaultdict
 
 import inflection
 from django.db.models import Manager
