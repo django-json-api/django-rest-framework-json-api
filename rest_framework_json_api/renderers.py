@@ -2,7 +2,7 @@
 Renderers
 """
 import copy
-from collections import Iterable, OrderedDict, defaultdict
+from collections import OrderedDict, defaultdict
 
 import inflection
 from django.db.models import Manager
@@ -13,6 +13,7 @@ from rest_framework.settings import api_settings
 
 import rest_framework_json_api
 from rest_framework_json_api import utils
+from rest_framework_json_api.compat import collections_abc
 from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedField, SkipDataMixin
 
 
@@ -196,7 +197,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 relation_data = {}
 
-                if isinstance(resource.get(field_name), Iterable):
+                if isinstance(resource.get(field_name), collections_abc.Iterable):
                     relation_data.update(
                         {
                             'meta': {'count': len(resource.get(field_name))}

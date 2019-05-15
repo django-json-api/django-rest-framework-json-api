@@ -1,4 +1,3 @@
-import collections
 import json
 from collections import OrderedDict
 
@@ -14,6 +13,7 @@ from rest_framework.relations import PrimaryKeyRelatedField, RelatedField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
 
+from rest_framework_json_api.compat import collections_abc
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import (
     Hyperlink,
@@ -388,7 +388,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
 
     def to_representation(self, value):
-        if isinstance(value, collections.Iterable):
+        if isinstance(value, collections_abc.Iterable):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
