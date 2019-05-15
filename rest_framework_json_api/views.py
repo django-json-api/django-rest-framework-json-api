@@ -1,7 +1,3 @@
-try:
-    from collections.abc import Iterable
-except ImportError:
-    from collections import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
@@ -23,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer, SkipField
 
+from rest_framework_json_api.compat import collections_abc
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import (
@@ -130,7 +127,7 @@ class RelatedMixin(object):
         if instance is None:
             return Response(data=None)
 
-        if isinstance(instance, Iterable):
+        if isinstance(instance, collections_abc.Iterable):
             serializer_kwargs['many'] = True
 
         serializer = self.get_serializer(instance, **serializer_kwargs)
