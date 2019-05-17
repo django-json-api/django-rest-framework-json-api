@@ -823,7 +823,9 @@ class QuestSerializer(serializers.ModelSerializer):
 
 Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m\*(n+1) queries.
 
-A viewset helper was designed to allow for greater flexibility and it is automatically available when subclassing
+A viewset helper was designed to allow for greater flexibility and it is automatically available when subclassing.
+You can also define your custom queryset for `select` or `prefetch` related for each `include` that comes from the url.
+It has a priority over automatically added preloads.
 `rest_framework_json_api.views.ModelViewSet`:
 ```python
 from rest_framework_json_api import views
@@ -831,9 +833,12 @@ from rest_framework_json_api import views
 # When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
 class MyViewSet(views.ModelViewSet):
     queryset = Book.objects.all()
+    select_for_includes = {
+        'author': ['author__bio'],
+    }
     prefetch_for_includes = {
         '__all__': [],
-        'author': ['author', 'author__bio'],
+        'all_authors': [Prefetch('all_authors', queryset=Author.objects.select_related('bio'))],
         'category.section': ['category']
     }
 ```
