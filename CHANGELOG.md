@@ -16,6 +16,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
+* Added `select_for_includes` handling. [PR](https://github.com/django-json-api/django-rest-framework-json-api/pull/600). [Docs](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#performance-improvements).
 * Avoid exception when trying to include skipped relationship
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
