@@ -203,6 +203,9 @@ class CommentViewSet(ModelViewSet):
 class CompanyViewset(ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
+    prefetch_for_includes = {
+        'current_project': ['current_project'],
+    }
 
 
 class ProjectViewset(ModelViewSet):
