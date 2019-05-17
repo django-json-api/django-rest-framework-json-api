@@ -184,6 +184,9 @@ class AuthorViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    select_for_includes = {
+        'writer': ['author__bio']
+    }
     prefetch_for_includes = {
         '__all__': [],
         'author': ['author__bio', 'author__entries'],
