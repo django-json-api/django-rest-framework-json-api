@@ -119,6 +119,8 @@ class AutoPreloadMixin(object):
             included_model = None
             levels = included.split('.')
             level_model = qs.model
+            # Suppose we can do select_related by default
+            can_select_related = True
             for level in levels:
                 if not hasattr(level_model, level):
                     break
@@ -126,15 +128,19 @@ class AutoPreloadMixin(object):
                 field_class = field.__class__
 
                 is_forward_relation = (
-                    issubclass(field_class, ForwardManyToOneDescriptor) or
-                    issubclass(field_class, ManyToManyDescriptor)
+                    issubclass(field_class, (ForwardManyToOneDescriptor, ManyToManyDescriptor))
                 )
                 is_reverse_relation = (
-                    issubclass(field_class, ReverseManyToOneDescriptor) or
-                    issubclass(field_class, ReverseOneToOneDescriptor)
+                    issubclass(field_class, (ReverseManyToOneDescriptor, ReverseOneToOneDescriptor))
                 )
                 if not (is_forward_relation or is_reverse_relation):
                     break
+
+                # Figuring out if relation should be select related rather than prefetch_related
+                # If at least one relation in the chain is not "selectable" then use "prefetch"
+                can_select_related &= (
+                    issubclass(field_class, (ForwardManyToOneDescriptor, ReverseOneToOneDescriptor))
+                )
 
                 if level == levels[-1]:
                     included_model = field
@@ -151,7 +157,10 @@ class AutoPreloadMixin(object):
                         level_model = model_field.model
 
             if included_model is not None:
-                qs = qs.prefetch_related(included.replace('.', '__'))
+                if can_select_related:
+                    qs = qs.select_related(included.replace('.', '__'))
+                else:
+                    qs = qs.prefetch_related(included.replace('.', '__'))
 
         return qs
 

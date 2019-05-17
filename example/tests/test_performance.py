@@ -58,7 +58,7 @@ class PerformanceTestCase(APITestCase):
             self.assertEqual(len(response.data['results']), 25)
 
     def test_query_select_related_entry(self):
-        """ We expect a list view with an include have three queries:
+        """ We expect a list view with an include have two queries:
 
         1. Primary resource COUNT query
         2. Primary resource SELECT + SELECT RELATED writer(author) and bio
