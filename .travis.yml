@@ -11,6 +11,9 @@ matrix:
     - env: TOXENV=py35-df20-django21-drfmaster
     - env: TOXENV=py36-df20-django21-drfmaster
     - env: TOXENV=py37-df20-django21-drfmaster
+    - env: TOXENV=py35-df20-django22-drfmaster
+    - env: TOXENV=py36-df20-django22-drfmaster
+    - env: TOXENV=py37-df20-django22-drfmaster
 
   include:
     - python: 3.6
@@ -58,6 +61,12 @@ matrix:
       env: TOXENV=py35-df20-django21-drf39
     - python: 3.5
       env: TOXENV=py35-df20-django21-drfmaster
+    - python: 3.5
+      dist: xenial
+      env: TOXENV=py35-df20-django22-drf39
+    - python: 3.5
+      dist: xenial
+      env: TOXENV=py35-df20-django22-drfmaster
 
     - python: 3.6
       env: TOXENV=py36-df20-django111-drf36
@@ -77,6 +86,12 @@ matrix:
       env: TOXENV=py36-df20-django21-drf39
     - python: 3.6
       env: TOXENV=py36-df20-django21-drfmaster
+    - python: 3.6
+      dist: xenial
+      env: TOXENV=py36-df20-django22-drf39
+    - python: 3.6
+      dist: xenial
+      env: TOXENV=py36-df20-django22-drfmaster
 
     - python: 3.7
       dist: xenial
@@ -94,6 +109,14 @@ matrix:
       dist: xenial
       sudo: required
       env: TOXENV=py37-df20-django21-drfmaster
+    - python: 3.7
+      dist: xenial
+      sudo: required
+      env: TOXENV=py37-df20-django22-drf39
+    - python: 3.7
+      dist: xenial
+      sudo: required
+      env: TOXENV=py37-df20-django22-drfmaster
 install:
   - pip install tox
 script:
