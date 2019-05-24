@@ -29,10 +29,8 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
 
     def __init__(self, *args, **kwargs):
         self.model_class = kwargs.pop('model_class', self.model_class)
-        if 'instance' not in kwargs and not self.model_class:
-            raise RuntimeError(
-                'ResourceIdentifierObjectsSerializer must be initialized with a model class.'
-            )
+        # this has no fields but assumptions are made elsewhere that self.fields exists.
+        self.fields = {}
         super(ResourceIdentifierObjectSerializer, self).__init__(*args, **kwargs)
 
     def to_representation(self, instance):

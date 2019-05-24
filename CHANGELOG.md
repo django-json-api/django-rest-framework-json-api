@@ -15,6 +15,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Avoid exception when trying to include skipped relationship
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
+* Allow OPTIONS request to be used on RelationshipView.
 
 ## [2.7.0] - 2019-01-14
 
