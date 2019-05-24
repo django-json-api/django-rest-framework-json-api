@@ -35,7 +35,7 @@ class PrefetchForIncludesHelperMixin(object):
 
     def __init__(self, *args, **kwargs):
         warnings.warn("PrefetchForIncludesHelperMixin is deprecated. "
-                      "Use AutoPreloadMixin instead",
+                      "Use PreloadIncludesMixin instead",
                       DeprecationWarning)
         super(PrefetchForIncludesHelperMixin, self).__init__(*args, **kwargs)
 
@@ -70,7 +70,7 @@ class PrefetchForIncludesHelperMixin(object):
         return qs
 
 
-class AutoPreloadMixin(object):
+class PreloadIncludesMixin(object):
     """
     This mixin provides a helper attributes to select or prefetch related models
     based on the include specified in the URL.
@@ -99,22 +99,30 @@ class AutoPreloadMixin(object):
         return getattr(self, 'prefetch_for_includes', {}).get(include, None)
 
     def get_queryset(self, *args, **kwargs):
+        qs = super(PreloadIncludesMixin, self).get_queryset(*args, **kwargs)
+
+        included_resources = get_included_resources(self.request)
+        for included in included_resources + ['__all__']:
+
+            select_related = self.get_select_related(included)
+            if select_related is not None:
+                qs = qs.select_related(*select_related)
+
+            prefetch_related = self.get_prefetch_related(included)
+            if prefetch_related is not None:
+                qs = qs.prefetch_related(*prefetch_related)
+
+        return qs
+
+
+class AutoPreloadMixin(object):
+
+    def get_queryset(self, *args, **kwargs):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
         qs = super(AutoPreloadMixin, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
         for included in included_resources + ['__all__']:
-            # Custom defined "select_related" and "prefetch_related" is a priority
-            select_related = self.get_select_related(included)
-            if select_related is not None:
-                qs = qs.select_related(*select_related)
-                continue
-
-            prefetch_related = self.get_prefetch_related(included)
-            if prefetch_related is not None:
-                qs = qs.prefetch_related(*prefetch_related)
-                continue
-
             # If include was not defined, trying to resolve it automatically
             included_model = None
             levels = included.split('.')
@@ -252,6 +260,7 @@ class RelatedMixin(object):
 
 
 class ModelViewSet(AutoPreloadMixin,
+                   PreloadIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
     pass
