@@ -274,6 +274,39 @@ class TestRelationshipView(APITestCase):
 
         assert Comment.objects.filter(id=self.second_comment.id).exists()
 
+    def test_options_entry_relationship_blog(self):
+        url = reverse(
+            'entry-relationships', kwargs={'pk': self.first_entry.id, 'related_field': 'blog'}
+        )
+        response = self.client.options(url)
+        expected_data = {
+            "data": {
+                "name": "Entry Relationship",
+                "description": "",
+                "renders": [
+                    "application/vnd.api+json",
+                    "text/html"
+                ],
+                "parses": [
+                    "application/vnd.api+json",
+                    "application/x-www-form-urlencoded",
+                    "multipart/form-data"
+                ],
+                "allowed_methods": [
+                    "GET",
+                    "POST",
+                    "PATCH",
+                    "DELETE",
+                    "HEAD",
+                    "OPTIONS"
+                ],
+                "actions": {
+                    "POST": {}
+                }
+            }
+        }
+        assert response.json() == expected_data
+
 
 class TestRelatedMixin(APITestCase):
 
