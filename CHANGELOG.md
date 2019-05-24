@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Add support for Django 2.2
+
 ### Fixed
 
 * Avoid exception when trying to include skipped relationship
