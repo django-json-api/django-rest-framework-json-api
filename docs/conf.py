@@ -28,7 +28,7 @@ django.setup()
 
 # Auto-generate API documentation.
 from sphinx.ext.apidoc import main
-main(['sphinx-apidoc', '-e',  '-T',  '-M',  '-f',  '-o', 'apidoc', '../rest_framework_json_api'])
+main(['-o', 'apidoc', '-f', '-e', '-T', '-M', '../rest_framework_json_api'])
 
 # -- General configuration ------------------------------------------------
 
