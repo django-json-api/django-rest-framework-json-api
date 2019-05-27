@@ -21,7 +21,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sessions',
     'django.contrib.auth',
-    'django.contrib.admin',
     'rest_framework',
     'polymorphic',
     'example',
