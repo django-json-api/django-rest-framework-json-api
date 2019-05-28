@@ -25,6 +25,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
 * Allow OPTIONS request to be used on RelationshipView
+* Use DRF code when extracting relation instance. [PR](https://github.com/django-json-api/django-rest-framework-json-api/pull/632)
 
 ### Deprecated
 

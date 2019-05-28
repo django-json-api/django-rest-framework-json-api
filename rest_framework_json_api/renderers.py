@@ -299,7 +299,7 @@ class JSONRenderer(renderers.JSONRenderer):
         return utils._format_object(data)
 
     @classmethod
-    def extract_relation_instance(cls, field_name, field, resource_instance, serializer):
+    def extract_relation_instance(cls, field, resource_instance):
         """
         Determines what instance represents given relation and extracts it.
 
@@ -351,7 +351,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
             relation_instance = cls.extract_relation_instance(
-                field_name, field, resource_instance, current_serializer
+                field, resource_instance
             )
             if isinstance(relation_instance, Manager):
                 relation_instance = relation_instance.all()
