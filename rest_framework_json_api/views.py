@@ -243,13 +243,13 @@ class ModelViewSet(AutoPrefetchMixin,
                    PreloadIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
-    pass
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
 
 class ReadOnlyModelViewSet(AutoPrefetchMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
-    pass
+    http_method_names = ['get', 'head', 'options']
 
 
 class RelationshipView(generics.GenericAPIView):
@@ -257,6 +257,7 @@ class RelationshipView(generics.GenericAPIView):
     self_link_view_name = None
     related_link_view_name = None
     field_name_mapping = {}
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
     def get_serializer_class(self):
         if getattr(self, 'action', False) is None:

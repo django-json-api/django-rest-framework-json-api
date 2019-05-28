@@ -168,13 +168,28 @@ def test_polymorphism_relations_update(single_company, research_project_factory,
         "type": "researchProjects",
         "id": research_project.pk
     }
-    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
-                          data=content)
+    response = client.patch(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                            data=content)
     assert response.status_code == 200
     content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "researchProjects"
     assert int(content["data"]["relationships"]["currentProject"]["data"]["id"]) == \
         research_project.pk
+
+
+def test_polymorphism_relations_put_405(single_company, research_project_factory, client):
+    response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
+    content = response.json()
+    assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
+
+    research_project = research_project_factory()
+    content["data"]["relationships"]["currentProject"]["data"] = {
+        "type": "researchProjects",
+        "id": research_project.pk
+    }
+    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                          data=content)
+    assert response.status_code == 405
 
 
 def test_invalid_type_on_polymorphic_relation(single_company, research_project_factory, client):
@@ -187,8 +202,8 @@ def test_invalid_type_on_polymorphic_relation(single_company, research_project_f
         "type": "invalidProjects",
         "id": research_project.pk
     }
-    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
-                          data=content)
+    response = client.patch(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                            data=content)
     assert response.status_code == 409
     content = response.json()
     assert len(content["errors"]) == 1
