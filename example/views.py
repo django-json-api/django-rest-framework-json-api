@@ -12,7 +12,7 @@ from rest_framework_json_api.django_filters import DjangoFilterBackend
 from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
-from rest_framework_json_api.views import ModelViewSet, RelationshipView
+from rest_framework_json_api.views import ModelViewSet, RelationshipView, PreloadIncludesMixin
 
 from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
 from example.serializers import (
@@ -184,6 +184,9 @@ class AuthorViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    select_for_includes = {
+        'writer': ['author__bio']
+    }
     prefetch_for_includes = {
         '__all__': [],
         'author': ['author__bio', 'author__entries'],
@@ -197,9 +200,12 @@ class CommentViewSet(ModelViewSet):
         return super(CommentViewSet, self).get_queryset()
 
 
-class CompanyViewset(ModelViewSet):
+class CompanyViewset(PreloadIncludesMixin, viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
+    prefetch_for_includes = {
+        'current_project': ['current_project'],
+    }
 
 
 class ProjectViewset(ModelViewSet):

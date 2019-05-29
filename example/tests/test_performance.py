@@ -53,6 +53,16 @@ class PerformanceTestCase(APITestCase):
         4. Author types prefetched
         5. Entries prefetched
         """
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             response = self.client.get('/comments?include=author&page[size]=25')
+            self.assertEqual(len(response.data['results']), 25)
+
+    def test_query_select_related_entry(self):
+        """ We expect a list view with an include have two queries:
+
+        1. Primary resource COUNT query
+        2. Primary resource SELECT + SELECT RELATED writer(author) and bio
+        """
+        with self.assertNumQueries(2):
+            response = self.client.get('/comments?include=writer&page[size]=25')
             self.assertEqual(len(response.data['results']), 25)

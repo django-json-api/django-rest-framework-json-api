@@ -823,7 +823,10 @@ class QuestSerializer(serializers.ModelSerializer):
 
 Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m\*(n+1) queries.
 
-A viewset helper was designed to allow for greater flexibility and it is automatically available when subclassing
+A viewset helper was therefore designed to automatically preload data when possible. Such is automatically available when subclassing `ModelViewSet`.
+
+It also allows to define custom `select_related` and `prefetch_related` for each requested `include` when needed in special cases:
+
 `rest_framework_json_api.views.ModelViewSet`:
 ```python
 from rest_framework_json_api import views
@@ -831,9 +834,12 @@ from rest_framework_json_api import views
 # When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
 class MyViewSet(views.ModelViewSet):
     queryset = Book.objects.all()
+    select_for_includes = {
+        'author': ['author__bio'],
+    }
     prefetch_for_includes = {
         '__all__': [],
-        'author': ['author', 'author__bio'],
+        'all_authors': [Prefetch('all_authors', queryset=Author.objects.select_related('bio'))],
         'category.section': ['category']
     }
 ```
@@ -848,7 +854,7 @@ class MyReadOnlyViewSet(views.ReadOnlyModelViewSet):
 
 The special keyword `__all__` can be used to specify a prefetch which should be done regardless of the include, similar to making the prefetch yourself on the QuerySet.
 
-Using the helper to prefetch, rather than attempting to minimise queries via select_related might give you better performance depending on the characteristics of your data and database.
+Using the helper to prefetch, rather than attempting to minimise queries via `select_related` might give you better performance depending on the characteristics of your data and database.
 
 For example:
 
@@ -861,11 +867,11 @@ a) 1 query via selected_related, e.g. SELECT * FROM books LEFT JOIN author LEFT 
 b) 4 small queries via prefetch_related.
 
 If you have 1M books, 50k authors, 10k categories, 10k copyrightholders
-in the select_related scenario, you've just created a in-memory table
+in the `select_related` scenario, you've just created a in-memory table
 with 1e18 rows which will likely exhaust any available memory and
 slow your database to crawl.
 
-The prefetch_related case will issue 4 queries, but they will be small and fast queries.
+The `prefetch_related` case will issue 4 queries, but they will be small and fast queries.
 <!--
 ### Relationships
 ### Errors

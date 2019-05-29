@@ -1,3 +1,4 @@
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
@@ -31,6 +32,13 @@ from rest_framework_json_api.utils import (
 
 
 class PrefetchForIncludesHelperMixin(object):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn("PrefetchForIncludesHelperMixin is deprecated. "
+                      "Use PreloadIncludesMixin instead",
+                      DeprecationWarning)
+        super(PrefetchForIncludesHelperMixin, self).__init__(*args, **kwargs)
+
     def get_queryset(self):
         """
         This viewset provides a helper attribute to prefetch related models
@@ -62,16 +70,65 @@ class PrefetchForIncludesHelperMixin(object):
         return qs
 
 
-class AutoPrefetchMixin(object):
+class PreloadIncludesMixin(object):
+    """
+    This mixin provides a helper attributes to select or prefetch related models
+    based on the include specified in the URL.
+
+    __all__ can be used to specify a prefetch which should be done regardless of the include
+
+    .. code:: python
+
+    # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+    class MyViewSet(viewsets.ModelViewSet):
+        queryset = Book.objects.all()
+        prefetch_for_includes = {
+            '__all__': [],
+            'category.section': ['category']
+        }
+        select_for_includes = {
+            '__all__': [],
+            'author': ['author', 'author__authorbio'],
+        }
+    """
+
+    def get_select_related(self, include):
+        return getattr(self, 'select_for_includes', {}).get(include, None)
+
+    def get_prefetch_related(self, include):
+        return getattr(self, 'prefetch_for_includes', {}).get(include, None)
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(PreloadIncludesMixin, self).get_queryset(*args, **kwargs)
+
+        included_resources = get_included_resources(self.request)
+        for included in included_resources + ['__all__']:
+
+            select_related = self.get_select_related(included)
+            if select_related is not None:
+                qs = qs.select_related(*select_related)
+
+            prefetch_related = self.get_prefetch_related(included)
+            if prefetch_related is not None:
+                qs = qs.prefetch_related(*prefetch_related)
+
+        return qs
+
+
+class AutoPreloadMixin(object):
+
     def get_queryset(self, *args, **kwargs):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
-        qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
+        qs = super(AutoPreloadMixin, self).get_queryset(*args, **kwargs)
         included_resources = get_included_resources(self.request)
 
-        for included in included_resources:
+        for included in included_resources + ['__all__']:
+            # If include was not defined, trying to resolve it automatically
             included_model = None
             levels = included.split('.')
             level_model = qs.model
+            # Suppose we can do select_related by default
+            can_select_related = True
             for level in levels:
                 if not hasattr(level_model, level):
                     break
@@ -79,15 +136,19 @@ class AutoPrefetchMixin(object):
                 field_class = field.__class__
 
                 is_forward_relation = (
-                    issubclass(field_class, ForwardManyToOneDescriptor) or
-                    issubclass(field_class, ManyToManyDescriptor)
+                    issubclass(field_class, (ForwardManyToOneDescriptor, ManyToManyDescriptor))
                 )
                 is_reverse_relation = (
-                    issubclass(field_class, ReverseManyToOneDescriptor) or
-                    issubclass(field_class, ReverseOneToOneDescriptor)
+                    issubclass(field_class, (ReverseManyToOneDescriptor, ReverseOneToOneDescriptor))
                 )
                 if not (is_forward_relation or is_reverse_relation):
                     break
+
+                # Figuring out if relation should be select related rather than prefetch_related
+                # If at least one relation in the chain is not "selectable" then use "prefetch"
+                can_select_related &= (
+                    issubclass(field_class, (ForwardManyToOneDescriptor, ReverseOneToOneDescriptor))
+                )
 
                 if level == levels[-1]:
                     included_model = field
@@ -104,9 +165,21 @@ class AutoPrefetchMixin(object):
                         level_model = model_field.model
 
             if included_model is not None:
-                qs = qs.prefetch_related(included.replace('.', '__'))
+                if can_select_related:
+                    qs = qs.select_related(included.replace('.', '__'))
+                else:
+                    qs = qs.prefetch_related(included.replace('.', '__'))
 
         return qs
+
+
+class AutoPrefetchMixin(AutoPreloadMixin):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn("AutoPrefetchMixin is deprecated. "
+                      "Use AutoPreloadMixin instead",
+                      DeprecationWarning)
+        super(AutoPrefetchMixin, self).__init__(*args, **kwargs)
 
 
 class RelatedMixin(object):
@@ -186,15 +259,14 @@ class RelatedMixin(object):
                 raise NotFound
 
 
-class ModelViewSet(AutoPrefetchMixin,
-                   PrefetchForIncludesHelperMixin,
+class ModelViewSet(AutoPreloadMixin,
+                   PreloadIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
     pass
 
 
-class ReadOnlyModelViewSet(AutoPrefetchMixin,
-                           PrefetchForIncludesHelperMixin,
+class ReadOnlyModelViewSet(AutoPreloadMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
     pass
