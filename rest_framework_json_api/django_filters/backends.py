@@ -1,4 +1,5 @@
 import re
+import warnings
 
 from django_filters import VERSION
 from django_filters.rest_framework import DjangoFilterBackend
@@ -142,3 +143,31 @@ class DjangoFilterBackend(DjangoFilterBackend):
             return filter_class(kwargs['data'], queryset=queryset, request=request).qs
 
         return queryset
+
+    def get_schema_operation_parameters(self, view):
+        """
+        Return Open API query parameter schema.
+        """
+        # TODO: Update this to extend the upstream django-filter implemntation if and when that gets merged.
+        # see https://github.com/carltongibson/django-filter/pull/1086
+
+        try:
+            queryset = view.get_queryset()
+        except Exception:
+            queryset = None
+            warnings.warn(
+                "{} is not compatible with schema generation".format(view.__class__)
+            )
+
+        filterset_class = self.get_filterset_class(view, queryset)
+        return [] if not filterset_class else [
+            ({
+                'name': 'filter[{}]'.format(field_name.replace('__', '.')),
+                'required': field.extra['required'],
+                'in': 'query',
+                'description': field.label if field.label is not None else field_name,
+                'schema': {
+                    'type': 'string',
+                },
+            }) for field_name, field in filterset_class.base_filters.items()
+        ]
