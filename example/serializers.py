@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from rest_framework import serializers as drf_serilazers, fields as drf_fields
+from rest_framework import fields as drf_fields
+from rest_framework import serializers as drf_serilazers
 
 from rest_framework_json_api import relations, serializers
 

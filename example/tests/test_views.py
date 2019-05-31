@@ -10,8 +10,8 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 
 from rest_framework_json_api.utils import format_resource_type
 
-from . import TestBase
 from .. import views
+from . import TestBase
 from example.factories import AuthorFactory, CommentFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
