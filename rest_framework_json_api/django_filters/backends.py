@@ -4,6 +4,7 @@ from django_filters import VERSION
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
+
 from rest_framework_json_api.utils import format_value
 
 
