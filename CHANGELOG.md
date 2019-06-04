@@ -18,6 +18,8 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Allow to define `select_related` per include using [select_for_includes](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#performance-improvements)
 * Reduce number of queries to calculate includes by using `select_related` when possible
+* Use REST framework serializer functionality to extract includes. This adds support like using
+  dotted notations in source attribute in `ResourceRelatedField`.
 
 ### Fixed
 
