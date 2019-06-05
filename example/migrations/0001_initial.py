@@ -61,6 +61,7 @@ class Migration(migrations.Migration):
                 ('modified_at', models.DateTimeField(auto_now=True)),
                 ('body', models.TextField()),
                 ('author', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='example.Author')),
+                ('meta', models.CharField(max_length=50)),
             ],
             options={
                 'abstract': False,

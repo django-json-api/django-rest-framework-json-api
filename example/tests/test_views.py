@@ -205,6 +205,21 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 200, response.content.decode()
         assert response.data['author'] is None
 
+    def test_patch_meta(self):
+        url = '/comments/{}'.format(self.second_comment.id)
+        request_data = {
+            'data': {
+                'type': 'comments',
+                'id': self.second_comment.id,
+                'attributes': {
+                    'meta': "test"
+                }
+            }
+        }
+        response = self.client.patch(url, data=request_data)
+        assert response.status_code == 200, response.content.decode()
+        assert response.data['meta'] == "test"
+
     def test_delete_to_many_relationship_with_no_change(self):
         url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
