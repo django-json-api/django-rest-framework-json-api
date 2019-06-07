@@ -115,11 +115,11 @@ class PreloadIncludesMixin(object):
         return qs
 
 
-class AutoPreloadMixin(object):
-
+class AutoPrefetchMixin(object):
     def get_queryset(self, *args, **kwargs):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
-        qs = super(AutoPreloadMixin, self).get_queryset(*args, **kwargs)
+        qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
+
         included_resources = get_included_resources(self.request)
 
         for included in included_resources + ['__all__']:
@@ -127,8 +127,6 @@ class AutoPreloadMixin(object):
             included_model = None
             levels = included.split('.')
             level_model = qs.model
-            # Suppose we can do select_related by default
-            can_select_related = True
             for level in levels:
                 if not hasattr(level_model, level):
                     break
@@ -143,12 +141,6 @@ class AutoPreloadMixin(object):
                 )
                 if not (is_forward_relation or is_reverse_relation):
                     break
-
-                # Figuring out if relation should be select related rather than prefetch_related
-                # If at least one relation in the chain is not "selectable" then use "prefetch"
-                can_select_related &= (
-                    issubclass(field_class, (ForwardManyToOneDescriptor, ReverseOneToOneDescriptor))
-                )
 
                 if level == levels[-1]:
                     included_model = field
@@ -165,21 +157,9 @@ class AutoPreloadMixin(object):
                         level_model = model_field.model
 
             if included_model is not None:
-                if can_select_related:
-                    qs = qs.select_related(included.replace('.', '__'))
-                else:
-                    qs = qs.prefetch_related(included.replace('.', '__'))
+                qs = qs.prefetch_related(included.replace('.', '__'))
 
         return qs
-
-
-class AutoPrefetchMixin(AutoPreloadMixin):
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn("AutoPrefetchMixin is deprecated. "
-                      "Use AutoPreloadMixin instead",
-                      DeprecationWarning)
-        super(AutoPrefetchMixin, self).__init__(*args, **kwargs)
 
 
 class RelatedMixin(object):
@@ -259,14 +239,14 @@ class RelatedMixin(object):
                 raise NotFound
 
 
-class ModelViewSet(AutoPreloadMixin,
+class ModelViewSet(AutoPrefetchMixin,
                    PreloadIncludesMixin,
                    RelatedMixin,
                    viewsets.ModelViewSet):
     pass
 
 
-class ReadOnlyModelViewSet(AutoPreloadMixin,
+class ReadOnlyModelViewSet(AutoPrefetchMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
     pass
