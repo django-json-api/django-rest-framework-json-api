@@ -11,3 +11,5 @@ pytz
 six
 sqlparse
 django-filter>=2.0
+PyYAML>=5.1.1
+coreapi>=2.3.3

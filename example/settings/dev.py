@@ -1,5 +1,9 @@
 import os
 
+from rest_framework import VERSION as DRFVERSION
+
+drf_version = tuple(int(x) for x in DRFVERSION.split('.'))
+
 SITE_ID = 1
 DEBUG = True
 
@@ -21,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sessions',
     'django.contrib.auth',
+    'rest_framework_json_api',
     'rest_framework',
     'polymorphic',
     'example',
@@ -99,3 +104,6 @@ REST_FRAMEWORK = {
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'vnd.api+json'
 }
+
+if drf_version >= (3, 10):
+    REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'rest_framework_json_api.schemas.openapi.AutoSchema'
