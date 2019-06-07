@@ -8,6 +8,8 @@ import inflection
 from django.db.models import Manager
 from django.utils import encoding, six
 from rest_framework import relations, renderers
+from rest_framework.fields import SkipField, get_attribute
+from rest_framework.relations import PKOnlyObject
 from rest_framework.serializers import BaseSerializer, ListSerializer, Serializer
 from rest_framework.settings import api_settings
 
@@ -297,34 +299,20 @@ class JSONRenderer(renderers.JSONRenderer):
         return utils._format_object(data)
 
     @classmethod
-    def extract_relation_instance(cls, field_name, field, resource_instance, serializer):
+    def extract_relation_instance(cls, field, resource_instance):
         """
         Determines what instance represents given relation and extracts it.
 
-        Relation instance is determined by given field_name or source configured on
-        field. As fallback is a serializer method called with name of field's source.
+        Relation instance is determined exactly same way as it determined
+        in parent serializer
         """
-        relation_instance = None
-
         try:
-            relation_instance = getattr(resource_instance, field_name)
-        except AttributeError:
-            try:
-                # For ManyRelatedFields if `related_name` is not set
-                # we need to access `foo_set` from `source`
-                relation_instance = getattr(resource_instance, field.child_relation.source)
-            except AttributeError:
-                if hasattr(serializer, field.source):
-                    serializer_method = getattr(serializer, field.source)
-                    relation_instance = serializer_method(resource_instance)
-                else:
-                    # case when source is a simple remap on resource_instance
-                    try:
-                        relation_instance = getattr(resource_instance, field.source)
-                    except AttributeError:
-                        pass
-
-        return relation_instance
+            res = field.get_attribute(resource_instance)
+            if isinstance(res, PKOnlyObject):
+                return get_attribute(resource_instance, field.source_attrs)
+            return res
+        except SkipField:
+            return None
 
     @classmethod
     def extract_included(cls, fields, resource, resource_instance, included_resources,
@@ -363,7 +351,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     continue
 
             relation_instance = cls.extract_relation_instance(
-                field_name, field, resource_instance, current_serializer
+                field, resource_instance
             )
             if isinstance(relation_instance, Manager):
                 relation_instance = relation_instance.all()

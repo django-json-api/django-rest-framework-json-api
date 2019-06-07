@@ -10,9 +10,11 @@ from example.models import Author, Comment, Entry
 
 # serializers
 class RelatedModelSerializer(serializers.ModelSerializer):
+    blog = serializers.ReadOnlyField(source='entry.blog')
+
     class Meta:
         model = Comment
-        fields = ('id',)
+        fields = ('id', 'blog')
 
 
 class DummyTestSerializer(serializers.ModelSerializer):
@@ -137,3 +139,13 @@ def test_render_empty_relationship_reverse_lookup():
     assert 'relationships' in result['data']
     assert 'bio' in result['data']['relationships']
     assert result['data']['relationships']['bio'] == {'data': None}
+
+
+@pytest.mark.django_db
+def test_extract_relation_instance(comment):
+    serializer = RelatedModelSerializer(instance=comment)
+
+    got = JSONRenderer.extract_relation_instance(
+        field=serializer.fields['blog'], resource_instance=comment
+    )
+    assert got == comment.entry.blog
