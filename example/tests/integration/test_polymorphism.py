@@ -2,6 +2,7 @@ import random
 
 import pytest
 from django.urls import reverse
+from rest_framework import status
 
 from example.factories import ArtProjectFactory, ProjectTypeFactory
 
@@ -57,6 +58,22 @@ def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, clie
     assert new_content['data']['type'] == "artProjects"
     assert new_content['data']['attributes']['topic'] == test_topic
     assert new_content['data']['attributes']['artist'] == test_artist
+
+
+def test_patch_on_polymorphic_model_without_including_required_field(single_art_project, client):
+    url = reverse("project-detail", kwargs={'pk': single_art_project.pk})
+    data = {
+        'data': {
+            'id': single_art_project.pk,
+            'type': 'artProjects',
+            'attributes': {
+                'description': 'New description'
+            }
+        }
+    }
+    response = client.patch(url, data)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['data']['attributes']['description'] == 'New description'
 
 
 def test_polymorphism_on_polymorphic_model_list_post(client):

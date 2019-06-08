@@ -26,6 +26,8 @@ any parts of the framework not mentioned in the documentation should generally b
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
 * Allow OPTIONS request to be used on RelationshipView
+* Avoid raising validation error for missing fields on a PATCH
+  request for polymorphic serializers
 
 ### Deprecated
 

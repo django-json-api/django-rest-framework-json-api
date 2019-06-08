@@ -153,6 +153,7 @@ class Project(PolymorphicModel):
 
 class ArtProject(Project):
     artist = models.CharField(max_length=30)
+    description = models.CharField(max_length=100, null=True)
 
 
 class ResearchProject(Project):
