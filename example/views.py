@@ -2,7 +2,6 @@ import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
-from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 
 import rest_framework_json_api.metadata
@@ -42,7 +41,7 @@ class BlogViewSet(ModelViewSet):
         return super(BlogViewSet, self).get_object()
 
 
-class DRFBlogViewSet(viewsets.ModelViewSet):
+class DRFBlogViewSet(ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogDRFSerializer
     lookup_url_kwarg = 'entry_pk'
@@ -105,7 +104,7 @@ class EntryViewSet(ModelViewSet):
         return super(EntryViewSet, self).get_object()
 
 
-class DRFEntryViewSet(viewsets.ModelViewSet):
+class DRFEntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
     serializer_class = EntryDRFSerializers
     lookup_url_kwarg = 'entry_pk'

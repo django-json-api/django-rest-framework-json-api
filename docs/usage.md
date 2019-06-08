@@ -322,7 +322,7 @@ Possible values:
 * underscore
 
 Note: due to the way the inflector works `address_1` can camelize to `address1`
-on output but it cannot convert `address1` back to `address_1` on POST or PUT. Keep
+on output but it cannot convert `address1` back to `address_1` on POST or PATCH. Keep
 this in mind when naming fields with numbers in them.
 
 
