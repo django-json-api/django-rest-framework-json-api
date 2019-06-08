@@ -25,9 +25,10 @@ any parts of the framework not mentioned in the documentation should generally b
 * Avoid exception when trying to include skipped relationship
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
-* Allow OPTIONS request to be used on RelationshipView.
-* Remove non-JSONAPI methods (PUT and TRACE) from ModelViewSet and RelationshipView. This is a **BREAKING CHANGE** if
-  your clients are incorrectly using PUT instead of PATCH.
+* Allow OPTIONS request to be used on RelationshipView
+* Remove non-JSONAPI methods (PUT and TRACE) from ModelViewSet and RelationshipView.
+  This fix might be a **BREAKING CHANGE** if your clients are incorrectly using PUT instead of PATCH.
+* Avoid validation error for missing fields on a PATCH request using polymorphic serializers
 
 ### Deprecated
 
