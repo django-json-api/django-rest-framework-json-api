@@ -152,7 +152,8 @@ class DjangoFilterBackend(DjangoFilterBackend):
         # see https://github.com/carltongibson/django-filter/pull/1086
 
         try:
-            queryset = view.get_queryset()
+            #queryset = view.get_queryset()
+            queryset = view.queryset
         except Exception:
             queryset = None
             warnings.warn(
