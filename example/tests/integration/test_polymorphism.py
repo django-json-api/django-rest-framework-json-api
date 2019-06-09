@@ -2,6 +2,7 @@ import random
 
 import pytest
 from django.urls import reverse
+from rest_framework import status
 
 from example.factories import ArtProjectFactory, ProjectTypeFactory
 
@@ -57,6 +58,22 @@ def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, clie
     assert new_content['data']['type'] == "artProjects"
     assert new_content['data']['attributes']['topic'] == test_topic
     assert new_content['data']['attributes']['artist'] == test_artist
+
+
+def test_patch_on_polymorphic_model_without_including_required_field(single_art_project, client):
+    url = reverse("project-detail", kwargs={'pk': single_art_project.pk})
+    data = {
+        'data': {
+            'id': single_art_project.pk,
+            'type': 'artProjects',
+            'attributes': {
+                'description': 'New description'
+            }
+        }
+    }
+    response = client.patch(url, data)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['data']['attributes']['description'] == 'New description'
 
 
 def test_polymorphism_on_polymorphic_model_list_post(client):
@@ -168,13 +185,28 @@ def test_polymorphism_relations_update(single_company, research_project_factory,
         "type": "researchProjects",
         "id": research_project.pk
     }
-    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
-                          data=content)
+    response = client.patch(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                            data=content)
     assert response.status_code == 200
     content = response.json()
     assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "researchProjects"
     assert int(content["data"]["relationships"]["currentProject"]["data"]["id"]) == \
         research_project.pk
+
+
+def test_polymorphism_relations_put_405(single_company, research_project_factory, client):
+    response = client.get(reverse("company-detail", kwargs={'pk': single_company.pk}))
+    content = response.json()
+    assert content["data"]["relationships"]["currentProject"]["data"]["type"] == "artProjects"
+
+    research_project = research_project_factory()
+    content["data"]["relationships"]["currentProject"]["data"] = {
+        "type": "researchProjects",
+        "id": research_project.pk
+    }
+    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                          data=content)
+    assert response.status_code == 405
 
 
 def test_invalid_type_on_polymorphic_relation(single_company, research_project_factory, client):
@@ -187,8 +219,8 @@ def test_invalid_type_on_polymorphic_relation(single_company, research_project_f
         "type": "invalidProjects",
         "id": research_project.pk
     }
-    response = client.put(reverse("company-detail", kwargs={'pk': single_company.pk}),
-                          data=content)
+    response = client.patch(reverse("company-detail", kwargs={'pk': single_company.pk}),
+                            data=content)
     assert response.status_code == 409
     content = response.json()
     assert len(content["errors"]) == 1

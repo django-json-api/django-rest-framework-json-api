@@ -17,7 +17,6 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Allow to define `select_related` per include using [select_for_includes](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#performance-improvements)
-* Reduce number of queries to calculate includes by using `select_related` when possible
 * Use REST framework serializer functionality to extract includes. This adds support like using
   dotted notations in source attribute in `ResourceRelatedField`.
 
@@ -27,11 +26,13 @@ any parts of the framework not mentioned in the documentation should generally b
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
 * Allow OPTIONS request to be used on RelationshipView
+* Remove non-JSONAPI methods (PUT and TRACE) from ModelViewSet and RelationshipView.
+  This fix might be a **BREAKING CHANGE** if your clients are incorrectly using PUT instead of PATCH.
+* Avoid validation error for missing fields on a PATCH request using polymorphic serializers
 
 ### Deprecated
 
 * Deprecate `PrefetchForIncludesHelperMixin` use `PreloadIncludesMixin` instead
-* Deprecate `AutoPrefetchMixin` use `AutoPreloadMixin` instead
 
 ## [2.7.0] - 2019-01-14
 

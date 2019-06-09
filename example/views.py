@@ -2,7 +2,6 @@ import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
-from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 
 import rest_framework_json_api.metadata
@@ -12,7 +11,7 @@ from rest_framework_json_api.django_filters import DjangoFilterBackend
 from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
-from rest_framework_json_api.views import ModelViewSet, PreloadIncludesMixin, RelationshipView
+from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
 from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
 from example.serializers import (
@@ -42,7 +41,7 @@ class BlogViewSet(ModelViewSet):
         return super(BlogViewSet, self).get_object()
 
 
-class DRFBlogViewSet(viewsets.ModelViewSet):
+class DRFBlogViewSet(ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogDRFSerializer
     lookup_url_kwarg = 'entry_pk'
@@ -105,7 +104,7 @@ class EntryViewSet(ModelViewSet):
         return super(EntryViewSet, self).get_object()
 
 
-class DRFEntryViewSet(viewsets.ModelViewSet):
+class DRFEntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
     serializer_class = EntryDRFSerializers
     lookup_url_kwarg = 'entry_pk'
@@ -200,12 +199,9 @@ class CommentViewSet(ModelViewSet):
         return super(CommentViewSet, self).get_queryset()
 
 
-class CompanyViewset(PreloadIncludesMixin, viewsets.ModelViewSet):
+class CompanyViewset(ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    prefetch_for_includes = {
-        'current_project': ['current_project'],
-    }
 
 
 class ProjectViewset(ModelViewSet):
