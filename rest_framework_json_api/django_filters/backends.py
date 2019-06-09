@@ -148,11 +148,8 @@ class DjangoFilterBackend(DjangoFilterBackend):
         """
         Return Open API query parameter schema.
         """
-        # TODO: Update this to extend the upstream django-filter implemntation if and when that gets merged.
-        # see https://github.com/carltongibson/django-filter/pull/1086
-
         try:
-            #queryset = view.get_queryset()
+            # queryset = view.get_queryset()
             queryset = view.queryset
         except Exception:
             queryset = None
