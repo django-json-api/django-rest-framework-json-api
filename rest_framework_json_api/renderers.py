@@ -7,7 +7,7 @@ from collections.abc import Iterable
 
 import inflection
 from django.db.models import Manager
-from django.utils import encoding, six
+from django.utils import encoding
 from rest_framework import relations, renderers
 from rest_framework.fields import SkipField, get_attribute
 from rest_framework.relations import PKOnlyObject
@@ -55,7 +55,7 @@ class JSONRenderer(renderers.JSONRenderer):
         Builds the `attributes` object of the JSON API resource object.
         """
         data = OrderedDict()
-        for field_name, field in six.iteritems(fields):
+        for field_name, field in iter(fields.items()):
             # ID is always provided in the root of JSON API so remove it from attributes
             if field_name == 'id':
                 continue
@@ -97,7 +97,7 @@ class JSONRenderer(renderers.JSONRenderer):
         if resource_instance is None:
             return
 
-        for field_name, field in six.iteritems(fields):
+        for field_name, field in iter(fields.items()):
             # Skip URL field
             if field_name == api_settings.URL_FIELD_NAME:
                 continue
@@ -331,7 +331,7 @@ class JSONRenderer(renderers.JSONRenderer):
         included_resources = copy.copy(included_resources)
         included_resources = [inflection.underscore(value) for value in included_resources]
 
-        for field_name, field in six.iteritems(fields):
+        for field_name, field in iter(fields.items()):
             # Skip URL field
             if field_name == api_settings.URL_FIELD_NAME:
                 continue

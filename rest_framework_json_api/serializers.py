@@ -1,5 +1,4 @@
 import inflection
-import six
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError
@@ -257,8 +256,7 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
         return new_class
 
 
-@six.add_metaclass(PolymorphicSerializerMetaclass)
-class PolymorphicModelSerializer(ModelSerializer):
+class PolymorphicModelSerializer(ModelSerializer, metaclass=PolymorphicSerializerMetaclass):
     """
     A serializer for polymorphic models.
     Useful for "lazy" parent models. Leaves should be represented with a regular serializer.

@@ -96,7 +96,6 @@ setup(
         'inflection>=0.3.0',
         'djangorestframework>=3.9',
         'django>=1.11',
-        'six',
     ],
     setup_requires=pytest_runner + sphinx + wheel,
     tests_require=[

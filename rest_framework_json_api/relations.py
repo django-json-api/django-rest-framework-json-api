@@ -3,7 +3,6 @@ from collections import OrderedDict
 from collections.abc import Iterable
 
 import inflection
-import six
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
@@ -210,7 +209,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
         raise Conflict(message_string)
 
     def to_internal_value(self, data):
-        if isinstance(data, six.text_type):
+        if isinstance(data, str):
             try:
                 data = json.loads(data)
             except ValueError:
@@ -324,7 +323,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
         return False
 
     def to_internal_value(self, data):
-        if isinstance(data, six.text_type):
+        if isinstance(data, str):
             try:
                 data = json.loads(data)
             except ValueError:
