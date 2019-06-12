@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [2.8.0] - 2019-06-13
+
+This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST Framework <=3.8 and Django 2.0.
 
 ### Added
 
