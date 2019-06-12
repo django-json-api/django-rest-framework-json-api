@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from polymorphic.models import PolymorphicModel
 
 
@@ -32,7 +31,6 @@ class TaggedItem(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class Blog(BaseModel):
     name = models.CharField(max_length=100)
     tagline = models.TextField()
@@ -45,7 +43,6 @@ class Blog(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class AuthorType(BaseModel):
     name = models.CharField(max_length=50)
 
@@ -56,7 +53,6 @@ class AuthorType(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class Author(BaseModel):
     name = models.CharField(max_length=50)
     email = models.EmailField()
@@ -69,7 +65,6 @@ class Author(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class AuthorBio(BaseModel):
     author = models.OneToOneField(Author, related_name='bio', on_delete=models.CASCADE)
     body = models.TextField()
@@ -81,7 +76,6 @@ class AuthorBio(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class AuthorBioMetadata(BaseModel):
     """
     Just a class to have a relation with author bio
@@ -96,7 +90,6 @@ class AuthorBioMetadata(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class Entry(BaseModel):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     headline = models.CharField(max_length=255)
@@ -116,7 +109,6 @@ class Entry(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class Comment(BaseModel):
     entry = models.ForeignKey(Entry, related_name='comments', on_delete=models.CASCADE)
     body = models.TextField()
@@ -135,7 +127,6 @@ class Comment(BaseModel):
         ordering = ('id',)
 
 
-@python_2_unicode_compatible
 class ProjectType(BaseModel):
     name = models.CharField(max_length=50)
 
@@ -160,7 +151,6 @@ class ResearchProject(Project):
     supervisor = models.CharField(max_length=30)
 
 
-@python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=100)
     current_project = models.ForeignKey(

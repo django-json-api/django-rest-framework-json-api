@@ -16,14 +16,8 @@ from django.utils.module_loading import import_string as import_class_from_dotte
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
-from rest_framework.serializers import ManyRelatedField  # noqa: F401
 
 from .settings import json_api_settings
-
-try:
-    from rest_framework_nested.relations import HyperlinkedRouterField
-except ImportError:
-    HyperlinkedRouterField = object()
 
 # Generic relation descriptor from django.contrib.contenttypes.
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover

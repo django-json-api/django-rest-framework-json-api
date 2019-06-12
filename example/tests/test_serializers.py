@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from django.test import TestCase
 from django.urls import reverse
@@ -14,11 +16,6 @@ from rest_framework_json_api.utils import format_resource_type
 
 from example.models import Author, Blog, Entry
 from example.serializers import BlogSerializer
-
-try:
-    from unittest import mock
-except ImportError:  # pragma: no cover
-    import mock
 
 request_factory = APIRequestFactory()
 pytestmark = pytest.mark.django_db
