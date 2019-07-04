@@ -1,8 +1,8 @@
 import json
 from collections import OrderedDict
+from collections.abc import Iterable
 
 import inflection
-import six
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
@@ -13,7 +13,6 @@ from rest_framework.relations import PrimaryKeyRelatedField, RelatedField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import Serializer
 
-from rest_framework_json_api.compat import collections_abc
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import (
     Hyperlink,
@@ -210,7 +209,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
         raise Conflict(message_string)
 
     def to_internal_value(self, data):
-        if isinstance(data, six.text_type):
+        if isinstance(data, str):
             try:
                 data = json.loads(data)
             except ValueError:
@@ -324,7 +323,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
         return False
 
     def to_internal_value(self, data):
-        if isinstance(data, six.text_type):
+        if isinstance(data, str):
             try:
                 data = json.loads(data)
             except ValueError:
@@ -388,7 +387,7 @@ class SerializerMethodResourceRelatedField(ResourceRelatedField):
         return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
 
     def to_representation(self, value):
-        if isinstance(value, collections_abc.Iterable):
+        if isinstance(value, Iterable):
             base = super(SerializerMethodResourceRelatedField, self)
             return [base.to_representation(x) for x in value]
         return super(SerializerMethodResourceRelatedField, self).to_representation(value)
