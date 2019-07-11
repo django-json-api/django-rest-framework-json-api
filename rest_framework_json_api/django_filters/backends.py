@@ -1,6 +1,5 @@
 import re
 
-from django_filters import VERSION
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
@@ -123,22 +122,3 @@ class DjangoFilterBackend(DjangoFilterBackend):
             'request': request,
             'filter_keys': filter_keys,
         }
-
-    def filter_queryset(self, request, queryset, view):
-        """
-        This is backwards compatibility to django-filter 1.1 (required for Python 2.7).
-        In 1.1 `filter_queryset` does not call `get_filterset` or `get_filterset_kwargs`.
-        """
-        # TODO: remove when Python 2.7 support is deprecated
-        if VERSION >= (2, 0, 0):
-            return super(DjangoFilterBackend, self).filter_queryset(request, queryset, view)
-
-        filter_class = self.get_filter_class(view, queryset)
-
-        kwargs = self.get_filterset_kwargs(request, queryset, view)
-        self._validate_filter(kwargs.pop('filter_keys'), filter_class)
-
-        if filter_class:
-            return filter_class(kwargs['data'], queryset=queryset, request=request).qs
-
-        return queryset

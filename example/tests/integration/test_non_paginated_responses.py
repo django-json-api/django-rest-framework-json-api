@@ -1,10 +1,7 @@
+from unittest import mock
+
 import pytest
 from django.urls import reverse
-
-try:
-    from unittest import mock
-except ImportError:  # pragma: no cover
-    import mock
 
 pytestmark = pytest.mark.django_db
 

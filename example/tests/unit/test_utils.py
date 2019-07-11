@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
 from django.test import override_settings
-from django.utils import six
 from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -130,7 +129,7 @@ def test_get_included_serializers_against_class():
         'comments': CommentSerializer,
         'self': klass
     }
-    assert six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers), (
+    assert included_serializers.keys() == klass.included_serializers.keys(), (
         'the keys must be preserved'
     )
 
@@ -147,7 +146,7 @@ def test_get_included_serializers_against_instance():
         'comments': CommentSerializer,
         'self': klass
     }
-    assert six.viewkeys(included_serializers) == six.viewkeys(klass.included_serializers), (
+    assert included_serializers.keys() == klass.included_serializers.keys(), (
         'the keys must be preserved'
     )
 
