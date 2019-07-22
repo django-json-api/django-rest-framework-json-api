@@ -2,7 +2,7 @@
 django-debug-toolbar==1.11
 django-filter==2.1.0
 django-polymorphic==2.1.2
-Faker==1.0.7
+Faker==2.0.0
 factory-boy==2.12.0
 flake8==3.7.7
 flake8-isort==2.7.0
