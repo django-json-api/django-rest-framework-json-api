@@ -1,4 +1,5 @@
 import warnings
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.db.models.fields import related_descriptors as rd
@@ -308,7 +309,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         # Only generate the path prefix for paths that will be included
         if not paths:
             return None
-        prefix = self.determine_path_prefix(paths)
 
         #: `expanded_endpoints` is like view_endpoints with one extra field tacked on:
         #: - 'action' copy of current view.action (list/fetch) as this gets reset for each request.
@@ -329,6 +329,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
             # kludge to preserve view.action as it changes "globally" for the same ViewSet
             # whether it is used for a collection, item or related serializer. _expand_related
             # sets it based on whether the related field is a toMany collection or toOne item.
+            current_action = None
             if hasattr(view, 'action'):
                 current_action = view.action
                 view.action = action
@@ -338,9 +339,13 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
             operation['description'] = operation['operationId']  # TODO: kludge
             if 'responses' in operation and '200' in operation['responses']:
                 operation['responses']['200']['description'] = operation['operationId']  # TODO:!
-            subpath = path[len(prefix):]
-            result.setdefault(subpath, {})
-            result[subpath][method.lower()] = operation
+            # Normalise path for any provided mount url.
+            if path.startswith('/'):
+                path = path[1:]
+            path = urljoin(self.url or '/', path)
+
+            result.setdefault(path, {})
+            result[path][method.lower()] = operation
             if hasattr(view.schema, 'openapi_schema'):
                 # TODO: shallow or deep merge?
                 self.openapi_schema = {**self.openapi_schema, **view.schema.openapi_schema}
