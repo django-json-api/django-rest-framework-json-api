@@ -1,7 +1,6 @@
 """
 Parsers
 """
-from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
@@ -121,7 +120,7 @@ class JSONParser(parsers.JSONParser):
         if request.method in ('PUT', 'POST', 'PATCH'):
             resource_name = utils.get_resource_name(
                 parser_context, expand_polymorphic_types=True)
-            if isinstance(resource_name, six.string_types):
+            if isinstance(resource_name, str):
                 if data.get('type') != resource_name:
                     raise exceptions.Conflict(
                         "The resource object's type ({data_type}) is not the type that "
