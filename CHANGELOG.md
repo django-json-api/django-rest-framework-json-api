@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Add support for Django REST framework 3.10.
+
 ### Removed
 
 * Removed support for Python 2.7 and 3.4.
@@ -17,10 +21,6 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed obsolete dependency six.
 * Removed support for Django REST Framework <=3.8.
 * Removed support for Django 2.0.
-
-### Added
-
-* Add support for Django REST framework 3.10.
 
 ## [2.8.0] - 2019-06-13
 
