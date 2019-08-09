@@ -63,4 +63,14 @@ def test_filters_get_schema_params():
     for c, expected in filters:
         f = c()
         result = f.get_schema_operation_parameters(view)
-        assert result == expected
+        assert len(result) == len(expected)
+        if len(result) == 0:
+            return
+        # py35: the result list/dict ordering isn't guaranteed
+        for res_item in result:
+            assert 'name' in res_item
+            for exp_item in expected:
+                if res_item['name'] == exp_item['name']:
+                    assert res_item == exp_item
+                    return
+        assert False
