@@ -18,9 +18,13 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-django111-drf39
     - python: 3.5
+      env: TOXENV=py35-django111-drf310
+    - python: 3.5
       env: TOXENV=py35-django111-drfmaster
     - python: 3.5
       env: TOXENV=py35-django21-drf39
+    - python: 3.5
+      env: TOXENV=py35-django21-drf310
     - python: 3.5
       env: TOXENV=py35-django21-drfmaster
     - python: 3.5
@@ -28,19 +32,29 @@ matrix:
       env: TOXENV=py35-django22-drf39
     - python: 3.5
       dist: xenial
+      env: TOXENV=py35-django22-drf310
+    - python: 3.5
+      dist: xenial
       env: TOXENV=py35-django22-drfmaster
 
     - python: 3.6
       env: TOXENV=py36-django111-drf39
     - python: 3.6
+      env: TOXENV=py36-django111-drf310
+    - python: 3.6
       env: TOXENV=py36-django111-drfmaster
     - python: 3.6
       env: TOXENV=py36-django21-drf39
+    - python: 3.6
+      env: TOXENV=py36-django21-drf310
     - python: 3.6
       env: TOXENV=py36-django21-drfmaster
     - python: 3.6
       dist: xenial
       env: TOXENV=py36-django22-drf39
+    - python: 3.6
+      dist: xenial
+      env: TOXENV=py36-django22-drf310
     - python: 3.6
       dist: xenial
       env: TOXENV=py36-django22-drfmaster
@@ -52,11 +66,19 @@ matrix:
     - python: 3.7
       dist: xenial
       sudo: required
+      env: TOXENV=py37-django21-drf310
+    - python: 3.7
+      dist: xenial
+      sudo: required
       env: TOXENV=py37-django21-drfmaster
     - python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=py37-django22-drf39
+    - python: 3.7
+      dist: xenial
+      sudo: required
+      env: TOXENV=py37-django22-drf310
     - python: 3.7
       dist: xenial
       sudo: required
