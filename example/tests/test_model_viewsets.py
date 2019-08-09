@@ -213,9 +213,6 @@ class ModelViewSetTests(TestBase):
             'miles@trumpet.org')
 
     def test_404_error_pointer(self):
-        """
-        Ensure 404 uses '/data' pointer
-        """
         self.client.login(username='miles', password='pw')
         not_found_url = reverse('user-detail', kwargs={'pk': 12345})
         errors = {
@@ -224,9 +221,7 @@ class ModelViewSetTests(TestBase):
             ]
         }
 
-        with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
-            response = self.client.get(not_found_url)
-
+        response = self.client.get(not_found_url)
         assert 404 == response.status_code
         assert errors == response.json()
 
