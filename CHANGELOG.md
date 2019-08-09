@@ -18,6 +18,11 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Django REST Framework <=3.8.
 * Removed support for Django 2.0.
 
+### Fixed
+
+* Avoid printing invalid pointer when api returns 404
+
+
 ## [2.8.0] - 2019-06-13
 
 This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST Framework <=3.8 and Django 2.0.
