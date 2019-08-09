@@ -4,8 +4,6 @@ cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
 matrix:
   allow_failures:
-    - env: TOXENV=py35-django111-drfmaster
-    - env: TOXENV=py36-django111-drfmaster
     - env: TOXENV=py35-django21-drfmaster
     - env: TOXENV=py36-django21-drfmaster
     - env: TOXENV=py37-django21-drfmaster
