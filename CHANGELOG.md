@@ -20,7 +20,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Added
 
-* Add support for DJANGO REST Framework 3.10.
+* Add support for Django REST framework 3.10.
 
 ## [2.8.0] - 2019-06-13
 
