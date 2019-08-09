@@ -123,9 +123,9 @@ class DjangoFilterBackend(DjangoFilterBackend):
             'filter_keys': filter_keys,
         }
 
-    def get_schema_operation_parameters(self,view):
+    def get_schema_operation_parameters(self, view):
         # wrap query parameters in 'filter[{}]'.format(name)
         result = super(DjangoFilterBackend, self).get_schema_operation_parameters(view)
         for field in result:
-            field['name'] ='filter[{}]'.format(field['name'])
+            field['name'] = 'filter[{}]'.format(field['name'])
         return result
