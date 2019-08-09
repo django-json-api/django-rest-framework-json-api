@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Add support for Django REST framework 3.10.
+
 ### Removed
 
 * Removed support for Python 2.7 and 3.4.
