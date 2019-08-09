@@ -140,7 +140,7 @@ installed and activated:
 
 ::
 
-    $ pip install -r requirements-development.txt
+    $ pip install -Ur requirements-development.txt
     $ flake8
     $ pytest
 
