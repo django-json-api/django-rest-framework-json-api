@@ -1,7 +1,5 @@
-import sys
 from collections import OrderedDict
 
-import pytest
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from rest_framework.utils.urls import replace_query_param
@@ -78,72 +76,3 @@ class TestLimitOffset:
 
         assert queryset == list(range(offset + 1, next_offset + 1))
         assert content == expected_content
-
-    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
-    def test_limit_offset_deprecation(self):
-        with pytest.warns(DeprecationWarning) as record:
-            pagination.LimitOffsetPagination()
-        assert len(record) == 1
-        assert 'LimitOffsetPagination is deprecated' in str(record[0].message)
-
-    class MyInheritedLimitOffsetPagination(pagination.LimitOffsetPagination):
-        """
-        Inherit the default values
-        """
-        pass
-
-    class MyOverridenLimitOffsetPagination(pagination.LimitOffsetPagination):
-        """
-        Explicitly set max_limit to the "old" values.
-        """
-        max_limit = None
-
-    def test_my_limit_offset_deprecation(self):
-        with pytest.warns(DeprecationWarning) as record:
-            self.MyInheritedLimitOffsetPagination()
-        assert len(record) == 1
-        assert 'LimitOffsetPagination is deprecated' in str(record[0].message)
-
-        with pytest.warns(None) as record:
-            self.MyOverridenLimitOffsetPagination()
-        assert len(record) == 0
-
-
-class TestPageNumber:
-    """
-    Unit tests for `pagination.JsonApiPageNumberPagination`.
-    """
-
-    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
-    def test_page_number_deprecation(self):
-        with pytest.warns(DeprecationWarning) as record:
-            pagination.PageNumberPagination()
-        assert len(record) == 1
-        assert 'PageNumberPagination is deprecated' in str(record[0].message)
-
-    class MyInheritedPageNumberPagination(pagination.PageNumberPagination):
-        """
-        Inherit the default values
-        """
-        pass
-
-    class MyOverridenPageNumberPagination(pagination.PageNumberPagination):
-        """
-        Explicitly set page_query_param and page_size_query_param to the "old" values.
-        """
-        page_query_param = "page"
-        page_size_query_param = "page_size"
-
-    @pytest.mark.xfail((sys.version_info.major, sys.version_info.minor) == (2, 7),
-                       reason="python2.7 fails to generate DeprecationWarrning for unknown reason")
-    def test_my_page_number_deprecation(self):
-        with pytest.warns(DeprecationWarning) as record:
-            self.MyInheritedPageNumberPagination()
-        assert len(record) == 1
-        assert 'PageNumberPagination is deprecated' in str(record[0].message)
-
-        with pytest.warns(None) as record:
-            self.MyOverridenPageNumberPagination()
-        assert len(record) == 0

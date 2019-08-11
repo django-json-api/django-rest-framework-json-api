@@ -10,6 +10,13 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+This release is not backwards compatible. For easy migration best upgrade first to version
+2.8.0 and resolve all deprecation warnings before updating to 3.0.0
+
+### Added
+
+* Add support for Django REST framework 3.10.
+
 ### Removed
 
 * Removed support for Python 2.7 and 3.4.
@@ -17,6 +24,16 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed obsolete dependency six.
 * Removed support for Django REST Framework <=3.8.
 * Removed support for Django 2.0.
+* Removed obsolete mixins `MultipleIDMixin` and `PrefetchForIncludesHelperMixin`
+* Removed obsolete settings `JSON_API_FORMAT_KEYS`, `JSON_API_FORMAT_RELATION_KEYS` and
+  `JSON_API_PLURALIZE_RELATION_TYPE`
+* Removed obsolete util methods `format_keys` and `format_relation_name`
+* Removed obsolete pagination classes `PageNumberPagination` and `LimitOffsetPagination`
+
+### Fixed
+
+* Avoid printing invalid pointer when api returns 404
+
 
 ### Added
 

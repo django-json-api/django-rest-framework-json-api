@@ -1,7 +1,6 @@
 """
 Pagination fields
 """
-import warnings
 from collections import OrderedDict
 
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
@@ -102,65 +101,3 @@ class JsonApiLimitOffsetPagination(LimitOffsetPagination):
                 ('prev', self.get_previous_link())
             ])
         })
-
-
-class PageNumberPagination(JsonApiPageNumberPagination):
-    """
-    .. warning::
-
-        PageNumberPagination is deprecated. Use JsonApiPageNumberPagination instead.
-        If you want to retain current defaults you will need to implement custom
-        pagination class explicitly setting `page_query_param = "page"` and
-        `page_size_query_param = "page_size"`.
-        See changelog for more details.
-
-    A paginator that uses non-JSON:API query parameters (default:
-    'page' and 'page_size' instead of 'page[number]' and 'page[size]').
-    """
-    page_query_param = 'page'
-    page_size_query_param = 'page_size'
-
-    def __init__(self):
-        if type(self) == PageNumberPagination:
-            warn = self.page_query_param == 'page' or self.page_size_query_param == 'page_size'
-        else:  # inherited class doesn't override the attributes?
-            warn = ('page_query_param' not in type(self).__dict__ or
-                    'page_size_query_param' not in type(self).__dict__)
-        if warn:
-            warnings.warn(
-                'PageNumberPagination is deprecated. Use JsonApiPageNumberPagination instead. '
-                'If you want to retain current defaults you will need to implement custom '
-                'pagination class explicitly setting `page_query_param = "page"` and '
-                '`page_size_query_param = "page_size"`. '
-                'See changelog for more details.',
-                DeprecationWarning)
-
-        super(PageNumberPagination, self).__init__()
-
-
-class LimitOffsetPagination(JsonApiLimitOffsetPagination):
-    """
-    .. warning::
-
-        LimitOffsetPagination is deprecated. Use JsonApiLimitOffsetPagination instead.
-        If you want to retain current defaults you will need to implement custom
-        pagination class explicitly setting `max_limit = None`.
-        See changelog for more details.
-
-    A paginator that uses a different max_limit from `JsonApiLimitOffsetPagination`.
-    """
-    max_limit = None
-
-    def __init__(self):
-        if type(self) == LimitOffsetPagination:
-            warn = self.max_limit is None
-        else:
-            warn = 'max_limit' not in type(self).__dict__
-        if warn:
-            warnings.warn(
-                'LimitOffsetPagination is deprecated. Use JsonApiLimitOffsetPagination instead. '
-                'If you want to retain current defaults you will need to implement custom '
-                'pagination class explicitly setting `max_limit = None`. '
-                'See changelog for more details.',
-                DeprecationWarning)
-        super(LimitOffsetPagination, self).__init__()

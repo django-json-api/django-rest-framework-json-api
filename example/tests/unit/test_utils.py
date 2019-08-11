@@ -61,30 +61,6 @@ def test_get_resource_name():
     assert 'users' == utils.get_resource_name(context), 'derived from non-model serializer'
 
 
-@pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
-def test_format_keys():
-    underscored = {
-        'first_name': 'a',
-        'last_name': 'b',
-    }
-
-    output = {'firstName': 'a', 'lastName': 'b'}
-    result = pytest.deprecated_call(utils.format_keys, underscored, 'camelize')
-    assert result == output
-
-    output = {'FirstName': 'a', 'LastName': 'b'}
-    assert utils.format_keys(underscored, 'capitalize') == output
-
-    output = {'first-name': 'a', 'last-name': 'b'}
-    assert utils.format_keys(underscored, 'dasherize') == output
-
-    new_input = {'firstName': 'a', 'lastName': 'b'}
-    assert utils.format_keys(new_input, 'underscore') == underscored
-
-    output = [{'first-name': 'a', 'last-name': 'b'}]
-    assert utils.format_keys([underscored], 'dasherize') == output
-
-
 @pytest.mark.parametrize("format_type,output", [
     ('camelize', {'fullName': {'last-name': 'a', 'first-name': 'b'}}),
     ('capitalize', {'FullName': {'last-name': 'a', 'first-name': 'b'}}),
