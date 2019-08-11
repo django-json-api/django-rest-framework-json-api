@@ -1,4 +1,3 @@
-import warnings
 from collections.abc import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
@@ -29,45 +28,6 @@ from rest_framework_json_api.utils import (
     get_included_resources,
     get_resource_type_from_instance
 )
-
-
-class PrefetchForIncludesHelperMixin(object):
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn("PrefetchForIncludesHelperMixin is deprecated. "
-                      "Use PreloadIncludesMixin instead",
-                      DeprecationWarning)
-        super(PrefetchForIncludesHelperMixin, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        """
-        This viewset provides a helper attribute to prefetch related models
-        based on the include specified in the URL.
-
-        __all__ can be used to specify a prefetch which should be done regardless of the include
-
-        .. code:: python
-
-            # When MyViewSet is called with ?include=author it will prefetch author and authorbio
-            class MyViewSet(viewsets.ModelViewSet):
-                queryset = Book.objects.all()
-                prefetch_for_includes = {
-                    '__all__': [],
-                    'author': ['author', 'author__authorbio'],
-                    'category.section': ['category']
-                }
-        """
-        qs = super(PrefetchForIncludesHelperMixin, self).get_queryset()
-        if not hasattr(self, 'prefetch_for_includes'):
-            return qs
-
-        includes = self.request.GET.get('include', '').split(',')
-        for inc in includes + ['__all__']:
-            prefetches = self.prefetch_for_includes.get(inc)
-            if prefetches:
-                qs = qs.prefetch_related(*prefetches)
-
-        return qs
 
 
 class PreloadIncludesMixin(object):

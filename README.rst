@@ -89,7 +89,7 @@ Requirements
 
 1. Python (3.5, 3.6, 3.7)
 2. Django (1.11, 2.1, 2.2)
-3. Django REST Framework (3.9)
+3. Django REST Framework (3.9, 3.10)
 
 ------------
 Installation
@@ -140,7 +140,7 @@ installed and activated:
 
 ::
 
-    $ pip install -r requirements-development.txt
+    $ pip install -Ur requirements-development.txt
     $ flake8
     $ pytest
 
