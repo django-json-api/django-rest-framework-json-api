@@ -69,17 +69,6 @@ def test_render_format_field_names(settings):
     assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
 
 
-@pytest.mark.filterwarnings("ignore:`format_keys` function and `JSON_API_FORMAT_KEYS`")
-def test_render_format_keys(settings):
-    """Test that json field value keys are formated."""
-    delattr(settings, 'JSON_API_FORMAT_FILED_NAMES')
-    settings.JSON_API_FORMAT_KEYS = 'dasherize'
-    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
-
-    result = json.loads(rendered.decode())
-    assert result['data']['attributes']['json-field'] == {'json-key': 'JsonValue'}
-
-
 @pytest.mark.django_db
 def test_blog_create(client):
 
