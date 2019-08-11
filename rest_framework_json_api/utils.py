@@ -1,7 +1,6 @@
 import copy
 import inspect
 import operator
-import warnings
 from collections import OrderedDict
 
 import inflection
@@ -113,71 +112,9 @@ def format_field_names(obj, format_type=None):
     return obj
 
 
-def _format_object(obj, format_type=None):
-    """Depending on settings calls either `format_keys` or `format_field_names`"""
-
-    if json_api_settings.FORMAT_KEYS is not None:
-        return format_keys(obj, format_type)
-
-    return format_field_names(obj, format_type)
-
-
-def format_keys(obj, format_type=None):
-    """
-    .. warning::
-
-        `format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be
-        removed in the future.
-        Use `format_field_names` and `JSON_API_FORMAT_FIELD_NAMES` instead. Be aware that
-        `format_field_names` only formats keys and preserves value.
-
-    Takes either a dict or list and returns it with camelized keys only if
-    JSON_API_FORMAT_KEYS is set.
-
-    :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
-    """
-    warnings.warn(
-        "`format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be "
-        "removed in the future. "
-        "Use `format_field_names` and `JSON_API_FORMAT_FIELD_NAMES` instead. Be aware that "
-        "`format_field_names` only formats keys and preserves value.",
-        DeprecationWarning
-    )
-
-    if format_type is None:
-        format_type = json_api_settings.FORMAT_KEYS
-
-    if format_type in ('dasherize', 'camelize', 'underscore', 'capitalize'):
-
-        if isinstance(obj, dict):
-            formatted = OrderedDict()
-            for key, value in obj.items():
-                if format_type == 'dasherize':
-                    # inflection can't dasherize camelCase
-                    key = inflection.underscore(key)
-                    formatted[inflection.dasherize(key)] \
-                        = format_keys(value, format_type)
-                elif format_type == 'camelize':
-                    formatted[inflection.camelize(key, False)] \
-                        = format_keys(value, format_type)
-                elif format_type == 'capitalize':
-                    formatted[inflection.camelize(key)] \
-                        = format_keys(value, format_type)
-                elif format_type == 'underscore':
-                    formatted[inflection.underscore(key)] \
-                        = format_keys(value, format_type)
-            return formatted
-        if isinstance(obj, list):
-            return [format_keys(item, format_type) for item in obj]
-        else:
-            return obj
-    else:
-        return obj
-
-
 def format_value(value, format_type=None):
     if format_type is None:
-        format_type = json_api_settings.format_type
+        format_type = json_api_settings.FORMAT_FIELD_NAMES
     if format_type == 'dasherize':
         # inflection can't dasherize camelCase
         value = inflection.underscore(value)
@@ -189,26 +126,6 @@ def format_value(value, format_type=None):
     elif format_type == 'underscore':
         value = inflection.underscore(value)
     return value
-
-
-def format_relation_name(value, format_type=None):
-    """
-    .. warning::
-
-        The 'format_relation_name' function has been renamed 'format_resource_type' and the
-        settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of
-        'JSON_API_FORMAT_RELATION_KEYS' and 'JSON_API_PLURALIZE_RELATION_TYPE'
-    """
-    warnings.warn(
-        "The 'format_relation_name' function has been renamed 'format_resource_type' and the "
-        "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of "
-        "'JSON_API_FORMAT_RELATION_KEYS' and 'JSON_API_PLURALIZE_RELATION_TYPE'",
-        DeprecationWarning
-    )
-    if format_type is None:
-        format_type = json_api_settings.FORMAT_RELATION_KEYS
-    pluralize = json_api_settings.PLURALIZE_RELATION_TYPE
-    return format_resource_type(value, format_type, pluralize)
 
 
 def format_resource_type(value, format_type=None, pluralize=None):

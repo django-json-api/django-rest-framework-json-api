@@ -81,7 +81,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 field_name: resource.get(field_name)
             })
 
-        return utils._format_object(data)
+        return utils.format_field_names(data)
 
     @classmethod
     def extract_relationships(cls, fields, resource, resource_instance):
@@ -296,7 +296,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-        return utils._format_object(data)
+        return utils.format_field_names(data)
 
     @classmethod
     def extract_relation_instance(cls, field, resource_instance):
@@ -410,7 +410,7 @@ class JSONRenderer(renderers.JSONRenderer):
                             getattr(serializer, '_poly_force_type_resolution', False)
                         )
                         included_cache[new_item['type']][new_item['id']] = \
-                            utils._format_object(new_item)
+                            utils.format_field_names(new_item)
                         cls.extract_included(
                             serializer_fields,
                             serializer_resource,
@@ -432,7 +432,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         relation_type,
                         getattr(field, '_poly_force_type_resolution', False)
                     )
-                    included_cache[new_item['type']][new_item['id']] = utils._format_object(
+                    included_cache[new_item['type']][new_item['id']] = utils.format_field_names(
                         new_item
                     )
                     cls.extract_included(
@@ -596,7 +596,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     )
                     meta = self.extract_meta(serializer, resource)
                     if meta:
-                        json_resource_obj.update({'meta': utils._format_object(meta)})
+                        json_resource_obj.update({'meta': utils.format_field_names(meta)})
                     json_api_data.append(json_resource_obj)
 
                     self.extract_included(
@@ -613,7 +613,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 meta = self.extract_meta(serializer, serializer_data)
                 if meta:
-                    json_api_data.update({'meta': utils._format_object(meta)})
+                    json_api_data.update({'meta': utils.format_field_names(meta)})
 
                 self.extract_included(
                     fields, serializer_data, resource_instance, included_resources, included_cache
@@ -654,7 +654,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     render_data['included'].append(included_cache[included_type][included_id])
 
         if json_api_meta:
-            render_data['meta'] = utils._format_object(json_api_meta)
+            render_data['meta'] = utils.format_field_names(json_api_meta)
 
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context

@@ -4,13 +4,13 @@ from rest_framework import generics, parsers, renderers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from rest_framework_json_api import mixins, utils
+from rest_framework_json_api import utils
 
 from ..serializers.identity import IdentitySerializer
 from ..serializers.post import PostSerializer
 
 
-class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
+class Identity(viewsets.ModelViewSet):
     queryset = auth_models.User.objects.all().order_by('pk')
     serializer_class = IdentitySerializer
 

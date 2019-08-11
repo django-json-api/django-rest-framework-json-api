@@ -14,11 +14,6 @@ DEFAULTS = {
     'FORMAT_TYPES': False,
     'PLURALIZE_TYPES': False,
     'UNIFORM_EXCEPTIONS': False,
-
-    # deprecated settings to be removed in the future
-    'FORMAT_KEYS': None,
-    'FORMAT_RELATION_KEYS': None,
-    'PLURALIZE_RELATION_TYPE': None,
 }
 
 
@@ -41,13 +36,6 @@ class JSONAPISettings(object):
         # Cache the result
         setattr(self, attr, value)
         return value
-
-    @property
-    def format_type(self):
-        if self.FORMAT_KEYS is not None:
-            return self.FORMAT_KEYS
-
-        return self.FORMAT_FIELD_NAMES
 
 
 json_api_settings = JSONAPISettings()
