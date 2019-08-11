@@ -11,7 +11,7 @@ pytest==5.0.0
 pytest-cov==2.7.1
 pytest-django==3.5.1
 pytest-factoryboy==2.0.3
-recommonmark==0.5.0
+recommonmark==0.6.0
 Sphinx==2.1.2
 sphinx_rtd_theme==0.4.3
 twine==1.13.0
