@@ -1,4 +1,4 @@
-
+`
 # Usage
 
 The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
@@ -32,6 +32,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer'
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.QueryParameterValidationFilter',
         'rest_framework_json_api.filters.OrderingFilter',
@@ -876,3 +877,97 @@ The `prefetch_related` case will issue 4 queries, but they will be small and fas
 ### Relationships
 ### Errors
 -->
+
+## Generating an OpenAPI Specification (OAS) 3.0 schema document
+
+DRF 3.10 added a new management command: `generateschema` which can generate an
+[OAS 3.0 schema](https://www.openapis.org/) as a YAML or JSON file.
+
+### Settings needed
+
+In order to produce an OAS schema that properly represents the JSON:API structure,
+DJA has this same command as an override of DRF's. In order to make sure the DJA
+version of the command is used, you must add DJA **ahead of** DRF in the
+`INSTALLED_APPS` settings as in this example:
+```python
+INSTALLED_APPS = [
+    'django.contrib.contenttypes',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.sessions',
+    'django.contrib.auth',
+    'rest_framework_json_api',
+    'rest_framework',
+    'polymorphic',
+    'example',
+    'debug_toolbar',
+    'django_filters',
+]
+```
+
+You'll also need to make sure you are using the DJA AutoSchema class, either as the default schema class or
+explicitly as a view's `schema`:
+
+### Default schema class
+
+```python
+REST_FRAMEWORK = {
+    # ...
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
+}
+```
+
+### View-based
+
+You can explicitly use DJA's AutoSchema in your view definition, optionally including an OAS schema document
+initializer:
+
+```python
+from rest_framework_json_api.schemas.openapi import AutoSchema
+
+openapi_schema = {
+    'info': {
+        'version': '1.0',
+        'title': 'my demo API',
+        'description': 'A demonstration of [OAS 3.0](https://www.openapis.org) AutoSchema',
+        'contact': {
+            'name': 'my name'
+        },
+        'license': {
+            'name': 'BSD 2 clause',
+            'url': 'https://github.com/django-json-api/django-rest-framework-json-api/blob/master/LICENSE',
+        }
+    },
+    'servers': [
+        {'url': 'https://localhost/v1', 'description': 'local docker'},
+        {'url': 'http://localhost:8000/v1', 'description': 'local dev'},
+        {'url': 'https://api.example.com/v1', 'description': 'demo server'},
+        {'url': '{serverURL}', 'description': 'provide your server URL',
+         'variables': {'serverURL': {'default': 'http://localhost:8000/v1'}}}
+    ]
+}
+
+
+class MyViewSet(ModelViewSet):
+    schema = AutoSchema(openapi_schema=openapi_schema)
+```
+
+To generate an OAS schema document, use something like:
+
+```text
+$ django-admin generateschema --settings=example.settings >myschema.yaml
+```
+
+You can then use any number of OAS tools such as
+[swagger-ui-watcher](https://www.npmjs.com/package/swagger-ui-watcher)
+to render the schema:
+```text
+$ swagger-ui-watcher myschema.yaml
+```
+
+Note: Swagger-ui-watcher will complain that "DELETE operations cannot have a requestBody"
+but it will still work. This 
+[error](https://github.com/OAI/OpenAPI-Specification/pull/1937)
+in the OAS specification is expected to be fixed soon.
+([swagger-ui](https://www.npmjs.com/package/swagger-ui) will work silently.)
+

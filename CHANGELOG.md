@@ -16,6 +16,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 ### Added
 
 * Add support for Django REST framework 3.10.
+* Add support for `generateschema` management command.
 
 ### Removed
 

@@ -15,3 +15,6 @@ recommonmark==0.6.0
 Sphinx==2.1.2
 sphinx_rtd_theme==0.4.3
 twine==1.13.0
+coreapi==2.3.3
+pyyaml==5.1.2
+snapshottest==0.5.1
