@@ -4,8 +4,12 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.db.models.fields import related_descriptors as rd
 from django.utils.module_loading import import_string as import_class_from_dotted_path
-from oauth2_provider.contrib.rest_framework.authentication import OAuth2Authentication
-from oauth2_provider.contrib.rest_framework.permissions import TokenMatchesOASRequirements
+try:
+    from oauth2_provider.contrib.rest_framework.authentication import OAuth2Authentication
+    from oauth2_provider.contrib.rest_framework.permissions import TokenMatchesOASRequirements
+except ImportError:
+    OAuth2Authentication = None
+    TokenMatchesOASRequirements = None
 from rest_framework import exceptions
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.relations import ManyRelatedField
@@ -507,7 +511,7 @@ class AutoSchema(drf_openapi.AutoSchema):
             if issubclass(auth_class, SessionAuthentication):
                 continue                # TODO: can this be represented?
             # TODO: how to do this? needs permission_classes, etc. and is not super-consistent.
-            if issubclass(auth_class, OAuth2Authentication):
+            if OAuth2Authentication and issubclass(auth_class, OAuth2Authentication):
                 content += self._get_oauth_security(path, method)
                 continue
         return content
@@ -555,7 +559,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         # TODO: add JWT and SAML2 bearer
         content = []
         for perm_class in self.view.permission_classes:
-            if issubclass(perm_class.perms_or_conds[0], TokenMatchesOASRequirements):
+            if TokenMatchesOASRequirements and issubclass(perm_class.perms_or_conds[0], TokenMatchesOASRequirements):
                 alt_scopes = self.view.required_alternate_scopes
                 if method not in alt_scopes:
                     continue
