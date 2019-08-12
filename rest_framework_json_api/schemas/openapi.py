@@ -4,12 +4,6 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.db.models.fields import related_descriptors as rd
 from django.utils.module_loading import import_string as import_class_from_dotted_path
-try:
-    from oauth2_provider.contrib.rest_framework.authentication import OAuth2Authentication
-    from oauth2_provider.contrib.rest_framework.permissions import TokenMatchesOASRequirements
-except ImportError:
-    OAuth2Authentication = None
-    TokenMatchesOASRequirements = None
 from rest_framework import exceptions
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.relations import ManyRelatedField
@@ -18,6 +12,13 @@ from rest_framework.schemas.utils import is_list_view
 
 from rest_framework_json_api import serializers
 from rest_framework_json_api.views import RelationshipView
+
+try:
+    from oauth2_provider.contrib.rest_framework.authentication import OAuth2Authentication
+    from oauth2_provider.contrib.rest_framework.permissions import TokenMatchesOASRequirements
+except ImportError:
+    OAuth2Authentication = None
+    TokenMatchesOASRequirements = None
 
 #: static OAS 3.0 component definitions that are referenced by AutoSchema.
 JSONAPI_COMPONENTS = {
@@ -559,7 +560,8 @@ class AutoSchema(drf_openapi.AutoSchema):
         # TODO: add JWT and SAML2 bearer
         content = []
         for perm_class in self.view.permission_classes:
-            if TokenMatchesOASRequirements and issubclass(perm_class.perms_or_conds[0], TokenMatchesOASRequirements):
+            if (TokenMatchesOASRequirements and
+                    issubclass(perm_class.perms_or_conds[0], TokenMatchesOASRequirements)):
                 alt_scopes = self.view.required_alternate_scopes
                 if method not in alt_scopes:
                     continue
