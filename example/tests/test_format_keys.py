@@ -58,5 +58,6 @@ def test_options_format_field_names(db, client):
     response = client.options(reverse('author-list'))
     assert response.status_code == status.HTTP_200_OK
     data = response.json()['data']
-    expected_keys = {'name', 'email', 'bio', 'entries', 'firstEntry', 'type', 'comments'}
+    expected_keys = {'name', 'email', 'bio', 'entries', 'firstEntry', 'type',
+                     'comments', 'secrets', 'defaults'}
     assert expected_keys == data['actions']['POST'].keys()

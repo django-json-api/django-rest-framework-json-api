@@ -1,4 +1,3 @@
-
 # Usage
 
 The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
@@ -32,6 +31,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer'
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.QueryParameterValidationFilter',
         'rest_framework_json_api.filters.OrderingFilter',
@@ -944,3 +944,118 @@ The `prefetch_related` case will issue 4 queries, but they will be small and fas
 ### Relationships
 ### Errors
 -->
+
+## Generating an OpenAPI Specification (OAS) 3.0 schema document
+
+DRF >= 3.12 has a [new OAS schema functionality](https://www.django-rest-framework.org/api-guide/schemas/) to generate an
+[OAS 3.0 schema](https://www.openapis.org/) as a YAML or JSON file.
+
+DJA extends DRF's schema support to generate an OAS schema in the JSON:API format.
+
+### AutoSchema Settings
+
+In order to produce an OAS schema that properly represents the JSON:API structure
+you have to either add a `schema` attribute to each view class or set the `REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS']`
+to DJA's version of AutoSchema.
+
+You can also extend the OAS schema with additional static content (a feature not available in DRF at this time).
+
+#### View-based
+
+```python
+from rest_framework_json_api.schemas.openapi import AutoSchema
+
+class MyViewset(ModelViewSet):
+    schema = AutoSchema
+    ...
+```
+
+#### Default schema class
+
+```python
+REST_FRAMEWORK = {
+    # ...
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
+}
+```
+
+### Adding static OAS schema content
+
+You can optionally include an OAS schema document initialization by subclassing `SchemaGenerator`
+and setting `schema_init`.
+
+Here's an example that fills out OAS `info` and `servers` objects.
+
+```python
+# views.py
+
+from rest_framework_json_api.schemas.openapi import SchemaGenerator as JSONAPISchemaGenerator
+
+
+class MySchemaGenerator(JSONAPISchemaGenerator):
+    """
+    Describe my OAS schema info in detail (overriding what DRF put in) and list the servers where it can be found.
+    """
+    def get_schema(self, request, public):
+        schema = super().get_schema(request, public)
+        schema['info'] = {
+            'version': '1.0',
+            'title': 'my demo API',
+            'description': 'A demonstration of [OAS 3.0](https://www.openapis.org)',
+            'contact': {
+                'name': 'my name'
+            },
+            'license': {
+                'name': 'BSD 2 clause',
+                'url': 'https://github.com/django-json-api/django-rest-framework-json-api/blob/master/LICENSE',
+            }
+        }
+        schema['servers'] = [
+            {'url': 'https://localhost/v1', 'description': 'local docker'},
+            {'url': 'http://localhost:8000/v1', 'description': 'local dev'},
+            {'url': 'https://api.example.com/v1', 'description': 'demo server'},
+            {'url': '{serverURL}', 'description': 'provide your server URL',
+             'variables': {'serverURL': {'default': 'http://localhost:8000/v1'}}}
+        ]
+        return schema
+```
+
+### Generate a Static Schema on Command Line
+
+See [DRF documentation for generateschema](https://www.django-rest-framework.org/api-guide/schemas/#generating-a-static-schema-with-the-generateschema-management-command)
+To generate an OAS schema document, use something like:
+
+```text
+$ django-admin generateschema --settings=example.settings \
+                              --generator_class myapp.views.MySchemaGenerator >myschema.yaml
+```
+
+You can then use any number of OAS tools such as
+[swagger-ui-watcher](https://www.npmjs.com/package/swagger-ui-watcher)
+to render the schema:
+```text
+$ swagger-ui-watcher myschema.yaml
+```
+
+Note: Swagger-ui-watcher will complain that "DELETE operations cannot have a requestBody"
+but it will still work. This [error](https://github.com/OAI/OpenAPI-Specification/pull/2117)
+in the OAS specification will be fixed when [OAS 3.1.0](https://www.openapis.org/blog/2020/06/18/openapi-3-1-0-rc0-its-here)
+is published.
+
+([swagger-ui](https://www.npmjs.com/package/swagger-ui) will work silently.)
+
+### Generate a Dynamic Schema in a View
+
+See [DRF documentation for a Dynamic Schema](https://www.django-rest-framework.org/api-guide/schemas/#generating-a-dynamic-schema-with-schemaview).
+You will need to pass in your custom SchemaGenerator if you've created one.
+
+```python
+from rest_framework.schemas import get_schema_view
+from views import MySchemaGenerator
+
+urlpatterns = [
+    path('openapi', get_schema_view(generator_class=MySchemaGenerator), name='openapi-schema'),
+    ...
+]
+```
+
