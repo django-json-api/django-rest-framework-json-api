@@ -3,8 +3,8 @@ Test rest_framework_json_api's utils functions.
 """
 from rest_framework_json_api import utils
 
-from ..serializers import AuthorSerializer, EntrySerializer
-from ..tests import TestBase
+from example.serializers import AuthorSerializer, EntrySerializer
+from example.tests import TestBase
 
 
 class GetRelatedResourceTests(TestBase):

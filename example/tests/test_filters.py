@@ -1,7 +1,7 @@
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from ..models import Blog, Entry
+from example.models import Blog, Entry
 
 
 class DJATestFilters(APITestCase):
