@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from rest_framework_json_api import utils
 
-from ..serializers.identity import IdentitySerializer
-from ..serializers.post import PostSerializer
+from example.api.serializers.identity import IdentitySerializer
+from example.api.serializers.post import PostSerializer
 
 
 class Identity(viewsets.ModelViewSet):
