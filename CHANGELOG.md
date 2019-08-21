@@ -22,7 +22,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Removed support for Python 2.7 and 3.4.
 * Removed support for Django Filter 1.1.
 * Removed obsolete dependency six.
-* Removed support for Django REST Framework <=3.8.
+* Removed support for Django REST Framework <=3.9.
 * Removed support for Django 2.0.
 * Removed obsolete mixins `MultipleIDMixin` and `PrefetchForIncludesHelperMixin`
 * Removed obsolete settings `JSON_API_FORMAT_KEYS`, `JSON_API_FORMAT_RELATION_KEYS` and
