@@ -1,4 +1,5 @@
 import inflection
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ParseError

@@ -33,6 +33,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 ### Fixed
 
 * Avoid printing invalid pointer when api returns 404
+* Avoid exception when using `ResourceIdentifierObjectSerializer` with unexisting primary key
 
 
 ## [2.8.0] - 2019-06-13
