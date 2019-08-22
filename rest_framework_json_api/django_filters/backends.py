@@ -122,3 +122,18 @@ class DjangoFilterBackend(DjangoFilterBackend):
             'request': request,
             'filter_keys': filter_keys,
         }
+
+    def get_schema_operation_parameters(self, view):
+        """
+        Convert backend filter `name` to JSON:API-style `filter[name]`.
+        For filters that are relationship paths, rewrite ORM-style `__` to our preferred `.`.
+        For example: `blog__name__contains` becomes `filter[blog.name.contains]`.
+
+        This is basically the reverse of `get_filterset_kwargs` above.
+        """
+        result = []
+        for res in super(DjangoFilterBackend, self).get_schema_operation_parameters(view):
+            if 'name' in res:
+                res['name'] = 'filter[{}]'.format(res['name']).replace('__', '.')
+            result.append(res)
+        return result

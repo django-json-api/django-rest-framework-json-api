@@ -1,5 +1,3 @@
-import pytest
-from rest_framework import VERSION as DRFVERSION
 from rest_framework import filters as drf_filters
 
 from rest_framework_json_api import filters as dja_filters
@@ -13,17 +11,14 @@ class DummyEntryViewSet(EntryViewSet):
                        backends.DjangoFilterBackend, drf_filters.SearchFilter)
     filterset_fields = {
         'id': ('exact',),
-        'headline': ('exact',),
+        'headline': ('exact', 'contains'),
+        'blog__name': ('contains', ),
     }
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         # dummy up self.request since PreloadIncludesMixin expects it to be defined
         self.request = None
-
-
-#  get_schema_operation_parameters is only available in DRF >= 3.10
-drf_version = tuple(int(x) for x in DRFVERSION.split('.'))
-pytestmark = pytest.mark.skipif(drf_version < (3, 10), reason="requires DRF 3.10 or higher")
+        super(DummyEntryViewSet, self).__init__(**kwargs)
 
 
 def test_filters_get_schema_params():
@@ -41,7 +36,15 @@ def test_filters_get_schema_params():
             {
                 'name': 'filter[headline]', 'required': False, 'in': 'query',
                 'description': 'headline', 'schema': {'type': 'string'}
-            }
+            },
+            {
+                'name': 'filter[headline.contains]', 'required': False, 'in': 'query',
+                'description': 'headline__contains', 'schema': {'type': 'string'}
+            },
+            {
+                'name': 'filter[blog.name.contains]', 'required': False, 'in': 'query',
+                'description': 'blog__name__contains', 'schema': {'type': 'string'}
+            },
         ]),
         (dja_filters.OrderingFilter, [
             {
@@ -65,12 +68,10 @@ def test_filters_get_schema_params():
         result = f.get_schema_operation_parameters(view)
         assert len(result) == len(expected)
         if len(result) == 0:
-            return
+            continue
         # py35: the result list/dict ordering isn't guaranteed
         for res_item in result:
             assert 'name' in res_item
             for exp_item in expected:
                 if res_item['name'] == exp_item['name']:
                     assert res_item == exp_item
-                    return
-        assert False
