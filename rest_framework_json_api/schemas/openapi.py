@@ -312,12 +312,13 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         #       instead of doing it here.
         expanded_endpoints = []
         for path, method, view in view_endpoints:
+            action = view.action if hasattr(view, 'action') else None
             if isinstance(view, RelationshipView):
                 expanded_endpoints += self._expand_relationships(path, method, view)
-            elif view.action == 'retrieve_related':
+            elif action == 'retrieve_related':
                 expanded_endpoints += self._expand_related(path, method, view, view_endpoints)
             else:
-                expanded_endpoints.append((path, method, view, view.action))
+                expanded_endpoints.append((path, method, view, action))
 
         for path, method, view, action in expanded_endpoints:
             if not self.has_view_permissions(path, method, view):
@@ -379,12 +380,15 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         """
         result = []
         serializer = view.get_serializer()
+        # It's not obvious if it's allowed to have both included_ and related_ serializers,
+        # so just merge both dicts.
+        serializers = {}
+        if hasattr(serializer, 'included_serializers'):
+            serializers = {**serializers, **serializer.included_serializers}
         if hasattr(serializer, 'related_serializers'):
-            related_fields = [fs for fs in serializer.related_serializers.items()]
-        elif hasattr(serializer, 'included_serializers'):
-            related_fields = [fs for fs in serializer.included_serializers.items()]
-        else:
-            related_fields = []
+            serializers = {**serializers, **serializer.related_serializers}
+        related_fields = [fs for fs in serializers.items()]
+
         for field, related_serializer in related_fields:
             related_view = self._find_related_view(view_endpoints, related_serializer, view)
             if related_view:
