@@ -44,7 +44,7 @@ urlpatterns = [
     url(r'^', include(router.urls)),
 
     # old tests
-    url(r'identities/default/(?P<pk>\d+)',
+    url(r'identities/default/(?P<pk>\d+)/',
         GenericIdentity.as_view(), name='user-default'),
 
 
@@ -75,16 +75,16 @@ urlpatterns = [
         AuthorViewSet.as_view({'get': 'retrieve_related'}),
         name='author-related'),
 
-    url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+    url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)/$',
         EntryRelationshipView.as_view(),
         name='entry-relationships'),
-    url(r'^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+    url(r'^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)/$',
         BlogRelationshipView.as_view(),
         name='blog-relationships'),
-    url(r'^comments/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+    url(r'^comments/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)/$',
         CommentRelationshipView.as_view(),
         name='comment-relationships'),
-    url(r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)',
+    url(r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)/$',
         AuthorRelationshipView.as_view(),
         name='author-relationships'),
 ]
