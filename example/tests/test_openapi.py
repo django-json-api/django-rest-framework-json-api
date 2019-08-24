@@ -137,6 +137,9 @@ class TestSchemaRelatedField(TestBase):
         """
         Confirm that paths are generated for related fields. For example:
         url path '/authors/{pk}/{related_field>}/' generates:
+            /authors/{id}/relationships/comments/
+            /authors/{id}/relationships/entries/
+            /authors/{id}/relationships/first_entry/ -- Maybe?
             /authors/{id}/comments/
             /authors/{id}/entries/
             /authors/{id}/first_entry/
@@ -145,6 +148,12 @@ class TestSchemaRelatedField(TestBase):
         generator = SchemaGenerator()
         request = create_request('/')
         schema = generator.get_schema(request=request)
+        # make sure the path's relationship and related {related_field}'s got expanded
+        assert '/authors/{id}/relationships/entries/' in schema['paths']
+        assert '/authors/{id}/relationships/comments/' in schema['paths']
+        # first_entry is a weird case (SerializerMethodRelatedField)
+        # TODO: '/authors/{id}/relationships/first_entry' supposed to be there?
+        # assert '/authors/{id}/relationships/first_entry/' in schema['paths']
         assert '/authors/{id}/comments/' in schema['paths']
         assert '/authors/{id}/entries/' in schema['paths']
         assert '/authors/{id}/first_entry/' in schema['paths']
@@ -153,25 +162,3 @@ class TestSchemaRelatedField(TestBase):
         first_props = first_schema['properties']['data']['properties']['attributes']['properties']
         assert 'headline' in first_props
         assert first_props['headline'] == {'type': 'string', 'maxLength': 255}
-
-    # def test_retrieve_relationships(self):
-    #     path = '/authors/{id}/relationships/bio/'
-    #     method = 'GET'
-    #
-    #     view = create_view_with_kw(
-    #         views.AuthorViewSet,
-    #         method,
-    #         create_request(path),
-    #         {'get': 'retrieve_related'}
-    #     )
-    #     inspector = AutoSchema()
-    #     inspector.view = view
-    #
-    #     operation = inspector.get_operation(path, method)
-    #     assert 'responses' in operation
-    #     assert '200' in operation['responses']
-    #     resp = operation['responses']['200']['content']
-    #     data = resp['application/vnd.api+json']['schema']['properties']['data']
-    #     assert data['type'] == 'object'
-    #     assert data['required'] == ['type', 'id']
-    #     assert data['properties']['type'] == {'$ref': '#/components/schemas/type'}

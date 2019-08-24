@@ -355,7 +355,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         :return:list[tuple(path, method, view, action)]
         """
         queryset = view.get_queryset()
-        if not queryset or not queryset.model:
+        if not queryset.model:
             return [(path, method, view, getattr(view, 'action', '')), ]
         result = []
         m = queryset.model
