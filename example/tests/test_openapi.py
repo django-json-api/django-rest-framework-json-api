@@ -151,8 +151,9 @@ class TestSchemaRelatedField(TestBase):
         # make sure the path's relationship and related {related_field}'s got expanded
         assert '/authors/{id}/relationships/entries/' in schema['paths']
         assert '/authors/{id}/relationships/comments/' in schema['paths']
-        # first_entry is a weird case (SerializerMethodRelatedField)
+        # first_entry is a special case (SerializerMethodRelatedField)
         # TODO: '/authors/{id}/relationships/first_entry' supposed to be there?
+        # It fails when doing the actual GET, so this schema excluding it is OK.
         # assert '/authors/{id}/relationships/first_entry/' in schema['paths']
         assert '/authors/{id}/comments/' in schema['paths']
         assert '/authors/{id}/entries/' in schema['paths']

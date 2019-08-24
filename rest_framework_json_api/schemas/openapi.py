@@ -358,6 +358,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         if not queryset.model:
             return [(path, method, view, getattr(view, 'action', '')), ]
         result = []
+        # TODO what about serializer-only (non-model) fields?
         m = queryset.model
         for field in [f for f in dir(m) if not f.startswith('_')]:
             attr = getattr(m, field)
