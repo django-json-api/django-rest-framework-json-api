@@ -177,7 +177,7 @@ class TestHyperlinkedRelatedField(TestHyperlinkedFieldBase):
         self.assertRaises(SkipField, field.get_attribute, self.entry)
 
         links_expected = {
-            'self': 'http://testserver/entries/{}/relationships/blog/'.format(self.entry.pk),
+            'self': 'http://testserver/entries/{}/relationships/blog'.format(self.entry.pk),
             'related': 'http://testserver/entries/{}/blog'.format(self.entry.pk)
         }
         got = field.get_links(self.entry)
@@ -198,7 +198,7 @@ class TestHyperlinkedRelatedField(TestHyperlinkedFieldBase):
         self.assertRaises(SkipField, field.get_attribute, self.entry)
 
         links_expected = {
-            'self': 'http://testserver/entries/{}/relationships/comments/'.format(self.entry.pk),
+            'self': 'http://testserver/entries/{}/relationships/comments'.format(self.entry.pk),
             'related': 'http://testserver/entries/{}/comments'.format(self.entry.pk)
         }
         got = field.child_relation.get_links(self.entry)
@@ -221,7 +221,7 @@ class TestSerializerMethodHyperlinkedRelatedField(TestHyperlinkedFieldBase):
         self.assertRaises(SkipField, field.get_attribute, self.entry)
 
         expected = {
-            'self': 'http://testserver/entries/{}/relationships/blog/'.format(self.entry.pk),
+            'self': 'http://testserver/entries/{}/relationships/blog'.format(self.entry.pk),
             'related': 'http://testserver/entries/{}/blog'.format(self.entry.pk)
         }
         got = field.get_links(self.entry)
@@ -241,7 +241,7 @@ class TestSerializerMethodHyperlinkedRelatedField(TestHyperlinkedFieldBase):
         self.assertRaises(SkipField, field.get_attribute, self.entry)
 
         expected = {
-            'self': 'http://testserver/entries/{}/relationships/comments/'.format(self.entry.pk),
+            'self': 'http://testserver/entries/{}/relationships/comments'.format(self.entry.pk),
             'related': 'http://testserver/entries/{}/comments'.format(self.entry.pk)
         }
         got = field.get_links(self.entry)

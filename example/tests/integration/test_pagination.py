@@ -35,7 +35,7 @@ def test_pagination_with_single_entry(single_entry, client):
                     "blogHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/blog",
-                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked/",
+                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked",
                         }
                     },
                     "authors": {
@@ -49,27 +49,27 @@ def test_pagination_with_single_entry(single_entry, client):
                     "commentsHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/comments",
-                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked/"  # noqa: E501
+                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked"
                         }
                     },
                     "suggested": {
                         "data": [],
                         "links": {
                             "related": "http://testserver/entries/1/suggested/",
-                            "self": "http://testserver/entries/1/relationships/suggested/"
+                            "self": "http://testserver/entries/1/relationships/suggested"
                         }
                     },
                     "suggestedHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/suggested/",
                             "self": "http://testserver/entries/1"
-                                    "/relationships/suggested_hyperlinked/"
+                                    "/relationships/suggested_hyperlinked"
                         }
                     },
                     "featuredHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/featured",
-                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked/"  # noqa: E501
+                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked"
                         }
                     },
                     "tags": {

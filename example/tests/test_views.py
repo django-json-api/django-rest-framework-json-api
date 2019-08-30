@@ -68,24 +68,24 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 404
 
     def test_get_blog_relationship_entry_set(self):
-        response = self.client.get('/blogs/{}/relationships/entry_set/'.format(self.blog.id))
+        response = self.client.get('/blogs/{}/relationships/entry_set'.format(self.blog.id))
         expected_data = [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)},
                          {'type': format_resource_type('Entry'), 'id': str(self.second_entry.id)}]
 
         assert response.data == expected_data
 
     def test_put_entry_relationship_blog_returns_405(self):
-        url = '/entries/{}/relationships/blog/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         response = self.client.put(url, data={})
         assert response.status_code == 405
 
     def test_patch_invalid_entry_relationship_blog_returns_400(self):
-        url = '/entries/{}/relationships/blog/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         response = self.client.patch(url, data={'data': {'invalid': ''}})
         assert response.status_code == 400
 
     def test_relationship_view_errors_format(self):
-        url = '/entries/{}/relationships/blog/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         response = self.client.patch(url, data={'data': {'invalid': ''}})
         assert response.status_code == 400
 
@@ -95,24 +95,24 @@ class TestRelationshipView(APITestCase):
         assert 'errors' in result
 
     def test_get_empty_to_one_relationship(self):
-        url = '/comments/{}/relationships/author/'.format(self.first_entry.id)
+        url = '/comments/{}/relationships/author'.format(self.first_entry.id)
         response = self.client.get(url)
         expected_data = None
 
         assert response.data == expected_data
 
     def test_get_to_many_relationship_self_link(self):
-        url = '/authors/{}/relationships/comments/'.format(self.author.id)
+        url = '/authors/{}/relationships/comments'.format(self.author.id)
 
         response = self.client.get(url)
         expected_data = {
-            'links': {'self': 'http://testserver/authors/1/relationships/comments/'},
+            'links': {'self': 'http://testserver/authors/1/relationships/comments'},
             'data': [{'id': str(self.second_comment.id), 'type': format_resource_type('Comment')}]
         }
         assert json.loads(response.content.decode('utf-8')) == expected_data
 
     def test_patch_to_one_relationship(self):
-        url = '/entries/{}/relationships/blog/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
@@ -124,7 +124,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == request_data['data']
 
     def test_patch_one_to_many_relationship(self):
-        url = '/blogs/{}/relationships/entry_set/'.format(self.first_entry.id)
+        url = '/blogs/{}/relationships/entry_set'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Entry'), 'id': str(self.first_entry.id)}, ]
         }
@@ -136,7 +136,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == request_data['data']
 
     def test_patch_many_to_many_relationship(self):
-        url = '/entries/{}/relationships/authors/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/authors'.format(self.first_entry.id)
         request_data = {
             'data': [
                 {
@@ -153,7 +153,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == request_data['data']
 
     def test_post_to_one_relationship_should_fail(self):
-        url = '/entries/{}/relationships/blog/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
@@ -161,7 +161,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 405, response.content.decode()
 
     def test_post_to_many_relationship_with_no_change(self):
-        url = '/entries/{}/relationships/comments/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
@@ -170,7 +170,7 @@ class TestRelationshipView(APITestCase):
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_post_to_many_relationship_with_change(self):
-        url = '/entries/{}/relationships/comments/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -180,7 +180,7 @@ class TestRelationshipView(APITestCase):
         assert request_data['data'][0] in response.data
 
     def test_delete_to_one_relationship_should_fail(self):
-        url = '/entries/{}/relationships/blog/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
             'data': {'type': format_resource_type('Blog'), 'id': str(self.other_blog.id)}
         }
@@ -205,7 +205,7 @@ class TestRelationshipView(APITestCase):
         assert response.data['author'] is None
 
     def test_delete_to_many_relationship_with_no_change(self):
-        url = '/entries/{}/relationships/comments/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -214,7 +214,7 @@ class TestRelationshipView(APITestCase):
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_delete_one_to_many_relationship_with_not_null_constraint(self):
-        url = '/entries/{}/relationships/comments/'.format(self.first_entry.id)
+        url = '/entries/{}/relationships/comments'.format(self.first_entry.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.first_comment.id)}, ]
         }
@@ -222,7 +222,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 409, response.content.decode()
 
     def test_delete_to_many_relationship_with_change(self):
-        url = '/authors/{}/relationships/comments/'.format(self.author.id)
+        url = '/authors/{}/relationships/comments'.format(self.author.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(self.second_comment.id)}, ]
         }
@@ -233,7 +233,7 @@ class TestRelationshipView(APITestCase):
         entry = EntryFactory(blog=self.blog, authors=(self.author,))
         comment = CommentFactory(entry=entry)
 
-        url = '/authors/{}/relationships/comments/'.format(self.author.id)
+        url = '/authors/{}/relationships/comments'.format(self.author.id)
         request_data = {
             'data': [{'type': format_resource_type('Comment'), 'id': str(comment.id)}, ]
         }
@@ -244,7 +244,7 @@ class TestRelationshipView(APITestCase):
                  }
             ],
             'links': {
-                'self': 'http://testserver/authors/{}/relationships/comments/'.format(
+                'self': 'http://testserver/authors/{}/relationships/comments'.format(
                     self.author.id
                 )
             }
@@ -261,7 +261,7 @@ class TestRelationshipView(APITestCase):
                  }
             ],
             'links': {
-                'self': 'http://testserver/authors/{}/relationships/comments/'.format(
+                'self': 'http://testserver/authors/{}/relationships/comments'.format(
                     self.author.id
                 )
             }
@@ -557,7 +557,7 @@ class TestEntryViewSet(APITestCase):
                             'related': 'http://testserver/entries/{}'
                                        '/blog'.format(self.second_entry.id),
                             'self': 'http://testserver/entries/{}'
-                                    '/relationships/blog_hyperlinked/'.format(self.second_entry.id)
+                                    '/relationships/blog_hyperlinked'.format(self.second_entry.id)
                         }
                     },
                     'comments': {
@@ -569,7 +569,7 @@ class TestEntryViewSet(APITestCase):
                             'related': 'http://testserver/entries/{}'
                                        '/comments'.format(self.second_entry.id),
                             'self': 'http://testserver/entries/{}/relationships'
-                                    '/comments_hyperlinked/'.format(self.second_entry.id)
+                                    '/comments_hyperlinked'.format(self.second_entry.id)
                         }
                     },
                     'featuredHyperlinked': {
@@ -577,7 +577,7 @@ class TestEntryViewSet(APITestCase):
                             'related': 'http://testserver/entries/{}'
                                        '/featured'.format(self.second_entry.id),
                             'self': 'http://testserver/entries/{}/relationships'
-                                    '/featured_hyperlinked/'.format(self.second_entry.id)
+                                    '/featured_hyperlinked'.format(self.second_entry.id)
                         }
                     },
                     'suggested': {
@@ -586,7 +586,7 @@ class TestEntryViewSet(APITestCase):
                             'related': 'http://testserver/entries/{}'
                                        '/suggested/'.format(self.second_entry.id),
                             'self': 'http://testserver/entries/{}'
-                                    '/relationships/suggested/'.format(self.second_entry.id)
+                                    '/relationships/suggested'.format(self.second_entry.id)
                         }
                     },
                     'suggestedHyperlinked': {
@@ -594,7 +594,7 @@ class TestEntryViewSet(APITestCase):
                             'related': 'http://testserver/entries/{}'
                                        '/suggested/'.format(self.second_entry.id),
                             'self': 'http://testserver/entries/{}/relationships'
-                                    '/suggested_hyperlinked/'.format(self.second_entry.id)
+                                    '/suggested_hyperlinked'.format(self.second_entry.id)
                         }
                     },
                     'tags': {'data': []}},

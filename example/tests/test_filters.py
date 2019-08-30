@@ -362,7 +362,7 @@ class DJATestFilters(APITestCase):
                         },
                         'blogHyperlinked': {
                             'links': {
-                                'self': 'http://testserver/entries/7/relationships/blog_hyperlinked/',  # noqa: E501
+                                'self': 'http://testserver/entries/7/relationships/blog_hyperlinked',  # noqa: E501
                                 'related': 'http://testserver/entries/7/blog'}
                         },
                         'authors': {
@@ -379,13 +379,13 @@ class DJATestFilters(APITestCase):
                         },
                         'commentsHyperlinked': {
                             'links': {
-                                'self': 'http://testserver/entries/7/relationships/comments_hyperlinked/',  # noqa: E501
+                                'self': 'http://testserver/entries/7/relationships/comments_hyperlinked',  # noqa: E501
                                 'related': 'http://testserver/entries/7/comments'
                             }
                         },
                         'suggested': {
                             'links': {
-                                'self': 'http://testserver/entries/7/relationships/suggested/',
+                                'self': 'http://testserver/entries/7/relationships/suggested',
                                 'related': 'http://testserver/entries/7/suggested/'
                             },
                             'data': [
@@ -404,7 +404,7 @@ class DJATestFilters(APITestCase):
                         },
                         'suggestedHyperlinked': {
                             'links': {
-                                'self': 'http://testserver/entries/7/relationships/suggested_hyperlinked/',  # noqa: E501
+                                'self': 'http://testserver/entries/7/relationships/suggested_hyperlinked',  # noqa: E501
                                 'related': 'http://testserver/entries/7/suggested/'}
                         },
                         'tags': {
@@ -412,7 +412,7 @@ class DJATestFilters(APITestCase):
                         },
                         'featuredHyperlinked': {
                             'links': {
-                                'self': 'http://testserver/entries/7/relationships/featured_hyperlinked/',  # noqa: E501
+                                'self': 'http://testserver/entries/7/relationships/featured_hyperlinked',  # noqa: E501
                                 'related': 'http://testserver/entries/7/featured'
                             }
                         }
