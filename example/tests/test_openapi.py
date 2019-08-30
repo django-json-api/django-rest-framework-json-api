@@ -149,8 +149,8 @@ class TestSchemaRelatedField(TestBase):
         request = create_request('/')
         schema = generator.get_schema(request=request)
         # make sure the path's relationship and related {related_field}'s got expanded
-        assert '/authors/{id}/relationships/entries/' in schema['paths']
-        assert '/authors/{id}/relationships/comments/' in schema['paths']
+        assert '/authors/{id}/relationships/entries' in schema['paths']
+        assert '/authors/{id}/relationships/comments' in schema['paths']
         # first_entry is a special case (SerializerMethodRelatedField)
         # TODO: '/authors/{id}/relationships/first_entry' supposed to be there?
         # It fails when doing the actual GET, so this schema excluding it is OK.
