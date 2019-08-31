@@ -29,7 +29,6 @@ This release is not backwards compatible. For easy migration best upgrade first 
   `JSON_API_PLURALIZE_RELATION_TYPE`
 * Removed obsolete util methods `format_keys` and `format_relation_name`
 * Removed obsolete pagination classes `PageNumberPagination` and `LimitOffsetPagination`
-* Added `$` anchor to example urls to use the best practice of having a full URL match.
 
 ### Fixed
 
