@@ -16,6 +16,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 ### Added
 
 * Add support for Django REST framework 3.10.
+* Add code from ErrorDetail into the JSON:API error object
 
 ### Removed
 

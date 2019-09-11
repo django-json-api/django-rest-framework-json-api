@@ -65,6 +65,7 @@ class GenericViewSet(TestBase):
                         'pointer': '/data/attributes/email',
                     },
                     'detail': 'Enter a valid email address.',
+                    'code': 'invalid',
                 },
                 {
                     'status': '400',
@@ -72,6 +73,7 @@ class GenericViewSet(TestBase):
                         'pointer': '/data/attributes/first-name',
                     },
                     'detail': 'There\'s a problem with first name',
+                    'code': 'invalid',
                 }
             ]
         }
@@ -104,6 +106,7 @@ class GenericViewSet(TestBase):
                         'pointer': '/data/attributes/email',
                     },
                     'detail': 'Enter a valid email address.',
+                    'code': 'invalid',
                 },
             ]
         }

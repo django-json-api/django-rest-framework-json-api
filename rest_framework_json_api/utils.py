@@ -308,13 +308,7 @@ def format_drf_errors(response, context, exc):
     # handle generic errors. ValidationError('test') in a view for example
     if isinstance(response.data, list):
         for message in response.data:
-            errors.append({
-                'detail': message,
-                'source': {
-                    'pointer': '/data',
-                },
-                'status': encoding.force_text(response.status_code),
-            })
+            errors.append(format_error_object(message, '/data', response))
     # handle all errors thrown from serializers
     else:
         for field, error in response.data.items():
@@ -325,44 +319,38 @@ def format_drf_errors(response, context, exc):
                 errors.append(error)
             elif isinstance(exc, Http404) and isinstance(error, str):
                 # 404 errors don't have a pointer
-                errors.append({
-                    'detail': error,
-                    'status': encoding.force_text(response.status_code),
-                })
+                errors.append(format_error_object(error, None, response))
             elif isinstance(error, str):
                 classes = inspect.getmembers(exceptions, inspect.isclass)
                 # DRF sets the `field` to 'detail' for its own exceptions
                 if isinstance(exc, tuple(x[1] for x in classes)):
                     pointer = '/data'
-                errors.append({
-                    'detail': error,
-                    'source': {
-                        'pointer': pointer,
-                    },
-                    'status': encoding.force_text(response.status_code),
-                })
+                errors.append(format_error_object(error, pointer, response))
             elif isinstance(error, list):
                 for message in error:
-                    errors.append({
-                        'detail': message,
-                        'source': {
-                            'pointer': pointer,
-                        },
-                        'status': encoding.force_text(response.status_code),
-                    })
+                    errors.append(format_error_object(message, pointer, response))
             else:
-                errors.append({
-                    'detail': error,
-                    'source': {
-                        'pointer': pointer,
-                    },
-                    'status': encoding.force_text(response.status_code),
-                })
+                errors.append(format_error_object(error, pointer, response))
 
     context['view'].resource_name = 'errors'
     response.data = errors
 
     return response
+
+
+def format_error_object(message, pointer, response):
+    error_obj = {
+        'detail': message,
+        'status': encoding.force_text(response.status_code),
+    }
+    if pointer is not None:
+        error_obj['source'] = {
+            'pointer': pointer,
+        }
+    code = getattr(message, "code", None)
+    if code is not None:
+        error_obj['code'] = code
+    return error_obj
 
 
 def format_errors(data):
