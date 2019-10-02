@@ -14,10 +14,14 @@
 # serve to show the default.
 
 import datetime
-import sys
 import os
 import shlex
+import sys
+
 import django
+from sphinx.ext.apidoc import main
+
+from rest_framework_json_api import VERSION
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -27,8 +31,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
 django.setup()
 
 # Auto-generate API documentation.
-from sphinx.ext.apidoc import main
-main(['-o', 'apidoc', '-f', '-e', '-T', '-M', '../rest_framework_json_api'])
+main(['-o', '_build/apidoc', '-f', '-e', '-T', '-M', '../rest_framework_json_api'])
 
 # -- General configuration ------------------------------------------------
 
@@ -38,17 +41,13 @@ main(['-o', 'apidoc', '-f', '-e', '-T', '-M', '../rest_framework_json_api'])
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'recommonmark']
 autodoc_member_order = 'bysource'
 autodoc_inherit_docstrings = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-from recommonmark.parser import CommonMarkParser
-source_parsers = {
-    '.md': CommonMarkParser,
-}
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
@@ -71,7 +70,6 @@ author = 'Django REST Framework JSON API contributors'
 # built documents.
 #
 # The short X.Y version.
-from rest_framework_json_api import VERSION
 version = VERSION
 # The full version, including alpha/beta/rc tags.
 release = VERSION
@@ -91,7 +89,7 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'pull_request_template.md']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

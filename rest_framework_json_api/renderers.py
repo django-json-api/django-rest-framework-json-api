@@ -26,24 +26,21 @@ class JSONRenderer(renderers.JSONRenderer):
 
     Render a JSON response per the JSON API spec:
 
-    .. code:: json
+    .. code-block:: json
 
         {
-            "data": [{
-                "type": "companies",
-                "id": 1,
-                "attributes": {
-                    "name": "Mozilla",
-                    "slug": "mozilla",
-                    "date-created": "2014-03-13 16:33:37"
-                }
-            }, {
-                "type": "companies",
-                "id": 2,
-                ...
-            }]
+          "data": [
+            {
+              "type": "companies",
+              "id": 1,
+              "attributes": {
+                "name": "Mozilla",
+                "slug": "mozilla",
+                "date-created": "2014-03-13 16:33:37"
+              }
+            }
+          ]
         }
-
     """
 
     media_type = 'application/vnd.api+json'
