@@ -37,19 +37,20 @@ class PreloadIncludesMixin(object):
 
     __all__ can be used to specify a prefetch which should be done regardless of the include
 
+
     .. code:: python
 
-    # When MyViewSet is called with ?include=author it will prefetch author and authorbio
-    class MyViewSet(viewsets.ModelViewSet):
-        queryset = Book.objects.all()
-        prefetch_for_includes = {
-            '__all__': [],
-            'category.section': ['category']
-        }
-        select_for_includes = {
-            '__all__': [],
-            'author': ['author', 'author__authorbio'],
-        }
+        # When MyViewSet is called with ?include=author it will prefetch author and authorbio
+        class MyViewSet(viewsets.ModelViewSet):
+            queryset = Book.objects.all()
+            prefetch_for_includes = {
+                '__all__': [],
+                'category.section': ['category']
+            }
+            select_for_includes = {
+                '__all__': [],
+                'author': ['author', 'author__authorbio'],
+            }
     """
 
     def get_select_related(self, include):
