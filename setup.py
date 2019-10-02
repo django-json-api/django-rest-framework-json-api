@@ -94,7 +94,7 @@ setup(
     ],
     install_requires=[
         'inflection>=0.3.0',
-        'djangorestframework>=3.9',
+        'djangorestframework>=3.10',
         'django>=1.11',
     ],
     setup_requires=pytest_runner + sphinx + wheel,

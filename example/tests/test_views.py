@@ -432,7 +432,8 @@ class TestValidationErrorResponses(TestBase):
         expected = [{
             'detail': 'Received document does not contain primary data',
             'status': '400',
-            'source': {'pointer': '/data'}
+            'source': {'pointer': '/data'},
+            'code': 'parse_error',
         }]
         self.assertEqual(expected, response.data)
 
@@ -443,7 +444,8 @@ class TestValidationErrorResponses(TestBase):
         expected = [{
             'status': '400',
             'detail': 'This field is required.',
-            'source': {'pointer': '/data/attributes/name'}
+            'source': {'pointer': '/data/attributes/name'},
+            'code': 'required',
         }]
         self.assertEqual(expected, response.data)
 
@@ -457,7 +459,8 @@ class TestValidationErrorResponses(TestBase):
                 "represented by the endpoint (blogs)."
             ),
             'source': {'pointer': '/data'},
-            'status': '409'
+            'status': '409',
+            'code': 'error',
         }]
         self.assertEqual(expected, response.data)
 

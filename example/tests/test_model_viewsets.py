@@ -217,7 +217,7 @@ class ModelViewSetTests(TestBase):
         not_found_url = reverse('user-detail', kwargs={'pk': 12345})
         errors = {
             'errors': [
-                {'detail': 'Not found.', 'status': '404'}
+                {'detail': 'Not found.', 'status': '404', 'code': 'not_found'}
             ]
         }
 

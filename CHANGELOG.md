@@ -16,13 +16,14 @@ This release is not backwards compatible. For easy migration best upgrade first 
 ### Added
 
 * Add support for Django REST framework 3.10.
+* Add code from ErrorDetail into the JSON:API error object
 
 ### Removed
 
 * Removed support for Python 2.7 and 3.4.
 * Removed support for Django Filter 1.1.
 * Removed obsolete dependency six.
-* Removed support for Django REST Framework <=3.8.
+* Removed support for Django REST Framework <=3.9.
 * Removed support for Django 2.0.
 * Removed obsolete mixins `MultipleIDMixin` and `PrefetchForIncludesHelperMixin`
 * Removed obsolete settings `JSON_API_FORMAT_KEYS`, `JSON_API_FORMAT_RELATION_KEYS` and
@@ -33,6 +34,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 ### Fixed
 
 * Avoid printing invalid pointer when api returns 404
+* Avoid exception when using `ResourceIdentifierObjectSerializer` with unexisting primary key
 
 
 ## [2.8.0] - 2019-06-13

@@ -119,6 +119,20 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         self.assertTrue(serializer.is_valid(), msg=serializer.errors)
         assert serializer.validated_data == self.blog
 
+    def test_deserialize_primitive_data_blog_with_unexisting_pk(self):
+        unexisting_pk = self.blog.id
+        self.blog.delete()
+        assert not Blog.objects.filter(id=unexisting_pk).exists()
+
+        initial_data = {
+            'type': format_resource_type('Blog'),
+            'id': str(unexisting_pk)
+        }
+        serializer = ResourceIdentifierObjectSerializer(data=initial_data, model_class=Blog)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(serializer.errors[0].code, 'does_not_exist')
+
     def test_data_in_correct_format_when_instantiated_with_queryset(self):
         qs = Author.objects.all()
         serializer = ResourceIdentifierObjectSerializer(instance=qs, many=True)
