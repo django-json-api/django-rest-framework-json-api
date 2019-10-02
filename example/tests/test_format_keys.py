@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import encoding
+from rest_framework import status
 
 from example.tests import TestBase
 
@@ -51,3 +52,11 @@ class FormatKeysSetTests(TestBase):
         }
 
         assert expected == response.json()
+
+
+def test_options_format_field_names(db, client):
+    response = client.options(reverse('author-list'))
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()['data']
+    expected_keys = {'name', 'email', 'bio', 'entries', 'firstEntry', 'type', 'comments'}
+    assert expected_keys == data['actions']['POST'].keys()

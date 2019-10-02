@@ -35,6 +35,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 * Avoid printing invalid pointer when api returns 404
 * Avoid exception when using `ResourceIdentifierObjectSerializer` with unexisting primary key
+* Format metadata field names correctly for OPTIONS request
 
 
 ## [2.8.0] - 2019-06-13
