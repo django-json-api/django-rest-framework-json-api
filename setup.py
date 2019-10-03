@@ -90,6 +90,10 @@ setup(
         'djangorestframework>=3.10',
         'django>=1.11',
     ],
+    extras_require={
+        'django-polymorphic': ['django-polymorphic>=2.0'],
+        'django-filter': ['django-filter>=2.0']
+    },
     python_requires=">=3.5",
     zip_safe=False,
 )

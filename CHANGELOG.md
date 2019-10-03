@@ -18,6 +18,15 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Add support for Django REST framework 3.10.
 * Add code from ErrorDetail into the JSON:API error object
 
+### Changed
+
+* Moved dependency definition for `django-polymorphic` and `django-filter` into extra requires.
+  Hence dependencies of each optional module can be installed with pip using
+   ```
+  pip install djangorestframework-jsonapi['django-polymorphic']
+  pip install djangorestframework-jsonapi['django-filter']`
+   ```
+
 ### Removed
 
 * Removed support for Python 2.7 and 3.4.

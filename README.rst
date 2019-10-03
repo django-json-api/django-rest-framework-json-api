@@ -101,6 +101,9 @@ From PyPI
 ::
 
     $ pip install djangorestframework-jsonapi
+    $ # for optional package integrations
+    $ pip install djangorestframework-jsonapi['django-filter']
+    $ pip install djangorestframework-jsonapi['django-polymorphic']
 
 
 From Source
