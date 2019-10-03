@@ -4,7 +4,7 @@
 The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
-Many features of the [JSON:API](http://jsonapi.org/format) format standard have been implemented using 
+Many features of the [JSON:API](http://jsonapi.org/format) format standard have been implemented using
 Mixin classes in `serializers.py`.
 The easiest way to make use of those features is to import ModelSerializer variants
 from `rest_framework_json_api` instead of the usual `rest_framework`
@@ -108,7 +108,8 @@ class MyLimitPagination(JsonApiLimitOffsetPagination):
 Following are descriptions of JSON:API-specific filter backends and documentation on suggested usage
 for a standard DRF keyword-search filter backend that makes it consistent with JSON:API.
 
-#### `QueryParameterValidationFilter`
+#### QueryParameterValidationFilter
+
 `QueryParameterValidationFilter` validates query parameters to be one of the defined JSON:API query parameters
 (sort, include, filter, fields, page) and returns a `400 Bad Request` if a non-matching query parameter
 is used. This can help the client identify misspelled query parameters, for example.
@@ -131,7 +132,8 @@ class MyQPValidator(QueryValidationFilter):
 If you don't care if non-JSON:API query parameters are allowed (and potentially silently ignored),
 simply don't use this filter backend.
 
-#### `OrderingFilter`
+#### OrderingFilter
+
 `OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
 DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
 
@@ -155,7 +157,8 @@ field name and the other two are not valid:
 If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
 `ordering_param` to `sort`.
 
-#### `DjangoFilterBackend`
+#### DjangoFilterBackend
+
 `DjangoFilterBackend` implements a Django ORM-style [JSON:API `filter`](http://jsonapi.org/format/#fetching-filtering)
 using the [django-filter](https://django-filter.readthedocs.io/) package.
 
@@ -178,13 +181,6 @@ Filters can be:
 - A related resource path can be used:
     `?filter[inventory.item.partNum]=123456` (where `inventory.item` is the relationship path)
 
-If you are also using [`SearchFilter`](#searchfilter)
-(which performs single parameter searches across multiple fields) you'll want to customize the name of the query
-parameter for searching to make sure it doesn't conflict with a field name defined in the filterset.
-The recommended value is: `search_param="filter[search]"` but just make sure it's
-`filter[_something_]` to comply with the JSON:API spec requirement to use the filter
-keyword. The default is `REST_FRAMEWORK['SEARCH_PARAM']` unless overriden.
-
 The filter returns a `400 Bad Request` error for invalid filter query parameters as in this example
 for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 ```json
@@ -201,7 +197,11 @@ for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 }
 ```
 
-#### `SearchFilter`
+As this feature depends on `django-filter` you need to run
+
+    pip install djangorestframework-jsonapi['django-filter']
+
+#### SearchFilter
 
 To comply with JSON:API query parameter naming standards, DRF's
 [SearchFilter](https://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter) should
@@ -211,12 +211,11 @@ adding the `.search_param` attribute to a custom class derived from `SearchFilte
 use [`DjangoFilterBackend`](#djangofilterbackend), make sure you set the same values for both classes.
 
 
-
 #### Configuring Filter Backends
 
 You can configure the filter backends either by setting the `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` as shown
 in the [example settings](#configuration) or individually add them as `.filter_backends` View attributes:
- 
+
  ```python
 from rest_framework_json_api import filters
 from rest_framework_json_api import django_filters
@@ -698,6 +697,10 @@ have both kinds at the same URL.
 DJA tests its polymorphic support against [django-polymorphic](https://django-polymorphic.readthedocs.io/en/stable/).
 The polymorphic feature should also work with other popular libraries like
 django-polymodels or django-typed-models.
+
+As this feature depends on `django-polymorphic` you need to run
+
+    pip install djangorestframework-jsonapi['django-polymorphic']
 
 #### Writing polymorphic resources
 
