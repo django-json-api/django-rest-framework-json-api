@@ -7,7 +7,7 @@ from rest_framework.metadata import SimpleMetadata
 from rest_framework.settings import api_settings
 from rest_framework.utils.field_mapping import ClassLookupDict
 
-from rest_framework_json_api.utils import get_related_resource_type
+from rest_framework_json_api.utils import format_value, get_related_resource_type
 
 
 class JSONAPIMetadata(SimpleMetadata):
@@ -83,7 +83,7 @@ class JSONAPIMetadata(SimpleMetadata):
         serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
         return OrderedDict([
-            (field_name, self.get_field_info(field))
+            (format_value(field_name), self.get_field_info(field))
             for field_name, field in serializer.fields.items()
         ])
 
