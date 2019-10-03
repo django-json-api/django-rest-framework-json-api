@@ -14,4 +14,3 @@ pytest-factoryboy==2.0.3
 recommonmark==0.6.0
 Sphinx==2.2.0
 sphinx_rtd_theme==0.4.3
-twine==2.0.0

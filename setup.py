@@ -7,13 +7,6 @@ import sys
 
 from setuptools import setup
 
-needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
-pytest_runner = ['pytest-runner'] if needs_pytest else []
-needs_sphinx = {'build_sphinx', 'upload_docs'}.intersection(sys.argv)
-sphinx = ['sphinx'] if needs_sphinx else []
-needs_wheel = {'bdist_wheel'}.intersection(sys.argv)
-wheel = ['wheel'] if needs_wheel else []
-
 
 def read(*paths):
     """
@@ -97,16 +90,6 @@ setup(
         'djangorestframework>=3.10',
         'django>=1.11',
     ],
-    setup_requires=pytest_runner + sphinx + wheel,
-    tests_require=[
-        'pytest-factoryboy',
-        'factory-boy',
-        'pytest-django',
-        'pytest',
-        'pytest-cov',
-        'django-polymorphic>=2.0',
-        'django-filter>=2.0',
-        'django-debug-toolbar==1.11'
-    ],
+    python_requires=">=3.5",
     zip_safe=False,
 )
