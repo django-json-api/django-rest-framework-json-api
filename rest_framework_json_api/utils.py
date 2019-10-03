@@ -1,7 +1,6 @@
 import copy
 import inspect
 import operator
-import warnings
 from collections import OrderedDict
 
 import inflection
@@ -11,19 +10,14 @@ from django.db.models.fields.related_descriptors import (
     ManyToManyDescriptor,
     ReverseManyToOneDescriptor
 )
-from django.utils import encoding, six
+from django.http import Http404
+from django.utils import encoding
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
-from rest_framework.serializers import ManyRelatedField  # noqa: F401
 
 from .settings import json_api_settings
-
-try:
-    from rest_framework_nested.relations import HyperlinkedRouterField
-except ImportError:
-    HyperlinkedRouterField = object()
 
 # Generic relation descriptor from django.contrib.contenttypes.
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:  # pragma: no cover
@@ -69,7 +63,7 @@ def get_resource_name(context, expand_polymorphic_types=False):
             except AttributeError:
                 resource_name = view.__class__.__name__
 
-            if not isinstance(resource_name, six.string_types):
+            if not isinstance(resource_name, str):
                 # The resource name is not a string - return as is
                 return resource_name
 
@@ -118,71 +112,9 @@ def format_field_names(obj, format_type=None):
     return obj
 
 
-def _format_object(obj, format_type=None):
-    """Depending on settings calls either `format_keys` or `format_field_names`"""
-
-    if json_api_settings.FORMAT_KEYS is not None:
-        return format_keys(obj, format_type)
-
-    return format_field_names(obj, format_type)
-
-
-def format_keys(obj, format_type=None):
-    """
-    .. warning::
-
-        `format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be
-        removed in the future.
-        Use `format_field_names` and `JSON_API_FORMAT_FIELD_NAMES` instead. Be aware that
-        `format_field_names` only formats keys and preserves value.
-
-    Takes either a dict or list and returns it with camelized keys only if
-    JSON_API_FORMAT_KEYS is set.
-
-    :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
-    """
-    warnings.warn(
-        "`format_keys` function and `JSON_API_FORMAT_KEYS` setting are deprecated and will be "
-        "removed in the future. "
-        "Use `format_field_names` and `JSON_API_FORMAT_FIELD_NAMES` instead. Be aware that "
-        "`format_field_names` only formats keys and preserves value.",
-        DeprecationWarning
-    )
-
-    if format_type is None:
-        format_type = json_api_settings.FORMAT_KEYS
-
-    if format_type in ('dasherize', 'camelize', 'underscore', 'capitalize'):
-
-        if isinstance(obj, dict):
-            formatted = OrderedDict()
-            for key, value in obj.items():
-                if format_type == 'dasherize':
-                    # inflection can't dasherize camelCase
-                    key = inflection.underscore(key)
-                    formatted[inflection.dasherize(key)] \
-                        = format_keys(value, format_type)
-                elif format_type == 'camelize':
-                    formatted[inflection.camelize(key, False)] \
-                        = format_keys(value, format_type)
-                elif format_type == 'capitalize':
-                    formatted[inflection.camelize(key)] \
-                        = format_keys(value, format_type)
-                elif format_type == 'underscore':
-                    formatted[inflection.underscore(key)] \
-                        = format_keys(value, format_type)
-            return formatted
-        if isinstance(obj, list):
-            return [format_keys(item, format_type) for item in obj]
-        else:
-            return obj
-    else:
-        return obj
-
-
 def format_value(value, format_type=None):
     if format_type is None:
-        format_type = json_api_settings.format_type
+        format_type = json_api_settings.FORMAT_FIELD_NAMES
     if format_type == 'dasherize':
         # inflection can't dasherize camelCase
         value = inflection.underscore(value)
@@ -194,26 +126,6 @@ def format_value(value, format_type=None):
     elif format_type == 'underscore':
         value = inflection.underscore(value)
     return value
-
-
-def format_relation_name(value, format_type=None):
-    """
-    .. warning::
-
-        The 'format_relation_name' function has been renamed 'format_resource_type' and the
-        settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of
-        'JSON_API_FORMAT_RELATION_KEYS' and 'JSON_API_PLURALIZE_RELATION_TYPE'
-    """
-    warnings.warn(
-        "The 'format_relation_name' function has been renamed 'format_resource_type' and the "
-        "settings are now 'JSON_API_FORMAT_TYPES' and 'JSON_API_PLURALIZE_TYPES' instead of "
-        "'JSON_API_FORMAT_RELATION_KEYS' and 'JSON_API_PLURALIZE_RELATION_TYPE'",
-        DeprecationWarning
-    )
-    if format_type is None:
-        format_type = json_api_settings.FORMAT_RELATION_KEYS
-    pluralize = json_api_settings.PLURALIZE_RELATION_TYPE
-    return format_resource_type(value, format_type, pluralize)
 
 
 def format_resource_type(value, format_type=None, pluralize=None):
@@ -343,7 +255,7 @@ def get_default_included_resources_from_serializer(serializer):
 def get_included_serializers(serializer):
     included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
 
-    for name, value in six.iteritems(included_serializers):
+    for name, value in iter(included_serializers.items()):
         if not isinstance(value, type):
             if value == 'self':
                 included_serializers[name] = (
@@ -373,7 +285,7 @@ def get_relation_instance(resource_instance, source, serializer):
     return True, relation_instance
 
 
-class Hyperlink(six.text_type):
+class Hyperlink(str):
     """
     A string like object that additionally has an associated name.
     We use this for hyperlinked URLs that may render as a named link
@@ -384,7 +296,7 @@ class Hyperlink(six.text_type):
     """
 
     def __new__(self, url, name):
-        ret = six.text_type.__new__(self, url)
+        ret = str.__new__(self, url)
         ret.name = name
         return ret
 
@@ -396,13 +308,7 @@ def format_drf_errors(response, context, exc):
     # handle generic errors. ValidationError('test') in a view for example
     if isinstance(response.data, list):
         for message in response.data:
-            errors.append({
-                'detail': message,
-                'source': {
-                    'pointer': '/data',
-                },
-                'status': encoding.force_text(response.status_code),
-            })
+            errors.append(format_error_object(message, '/data', response))
     # handle all errors thrown from serializers
     else:
         for field, error in response.data.items():
@@ -411,40 +317,40 @@ def format_drf_errors(response, context, exc):
             # see if they passed a dictionary to ValidationError manually
             if isinstance(error, dict):
                 errors.append(error)
-            elif isinstance(error, six.string_types):
+            elif isinstance(exc, Http404) and isinstance(error, str):
+                # 404 errors don't have a pointer
+                errors.append(format_error_object(error, None, response))
+            elif isinstance(error, str):
                 classes = inspect.getmembers(exceptions, inspect.isclass)
                 # DRF sets the `field` to 'detail' for its own exceptions
                 if isinstance(exc, tuple(x[1] for x in classes)):
                     pointer = '/data'
-                errors.append({
-                    'detail': error,
-                    'source': {
-                        'pointer': pointer,
-                    },
-                    'status': encoding.force_text(response.status_code),
-                })
+                errors.append(format_error_object(error, pointer, response))
             elif isinstance(error, list):
                 for message in error:
-                    errors.append({
-                        'detail': message,
-                        'source': {
-                            'pointer': pointer,
-                        },
-                        'status': encoding.force_text(response.status_code),
-                    })
+                    errors.append(format_error_object(message, pointer, response))
             else:
-                errors.append({
-                    'detail': error,
-                    'source': {
-                        'pointer': pointer,
-                    },
-                    'status': encoding.force_text(response.status_code),
-                })
+                errors.append(format_error_object(error, pointer, response))
 
     context['view'].resource_name = 'errors'
     response.data = errors
 
     return response
+
+
+def format_error_object(message, pointer, response):
+    error_obj = {
+        'detail': message,
+        'status': encoding.force_text(response.status_code),
+    }
+    if pointer is not None:
+        error_obj['source'] = {
+            'pointer': pointer,
+        }
+    code = getattr(message, "code", None)
+    if code is not None:
+        error_obj['code'] = code
+    return error_obj
 
 
 def format_errors(data):

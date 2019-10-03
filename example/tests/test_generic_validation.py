@@ -25,7 +25,8 @@ class GenericValidationTest(TestBase):
                 'source': {
                     'pointer': '/data'
                 },
-                'detail': 'Oh nohs!'
+                'detail': 'Oh nohs!',
+                'code': 'invalid',
             }]
         }
 

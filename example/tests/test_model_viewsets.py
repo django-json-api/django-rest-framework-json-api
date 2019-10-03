@@ -212,6 +212,19 @@ class ModelViewSetTests(TestBase):
             get_user_model().objects.get(pk=self.miles.pk).email,
             'miles@trumpet.org')
 
+    def test_404_error_pointer(self):
+        self.client.login(username='miles', password='pw')
+        not_found_url = reverse('user-detail', kwargs={'pk': 12345})
+        errors = {
+            'errors': [
+                {'detail': 'Not found.', 'status': '404', 'code': 'not_found'}
+            ]
+        }
+
+        response = self.client.get(not_found_url)
+        assert 404 == response.status_code
+        assert errors == response.json()
+
 
 @pytest.mark.django_db
 def test_patch_allow_field_type(author, author_type_factory, client):

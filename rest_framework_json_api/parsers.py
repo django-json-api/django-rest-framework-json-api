@@ -1,7 +1,6 @@
 """
 Parsers
 """
-from django.utils import six
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
@@ -38,26 +37,26 @@ class JSONParser(parsers.JSONParser):
     @staticmethod
     def parse_attributes(data):
         attributes = data.get('attributes')
-        uses_format_translation = json_api_settings.format_type
+        uses_format_translation = json_api_settings.FORMAT_FIELD_NAMES
 
         if not attributes:
             return dict()
         elif uses_format_translation:
             # convert back to python/rest_framework's preferred underscore format
-            return utils._format_object(attributes, 'underscore')
+            return utils.format_field_names(attributes, 'underscore')
         else:
             return attributes
 
     @staticmethod
     def parse_relationships(data):
-        uses_format_translation = json_api_settings.format_type
+        uses_format_translation = json_api_settings.FORMAT_FIELD_NAMES
         relationships = data.get('relationships')
 
         if not relationships:
             relationships = dict()
         elif uses_format_translation:
             # convert back to python/rest_framework's preferred underscore format
-            relationships = utils._format_object(relationships, 'underscore')
+            relationships = utils.format_field_names(relationships, 'underscore')
 
         # Parse the relationships
         parsed_relationships = dict()
@@ -121,7 +120,7 @@ class JSONParser(parsers.JSONParser):
         if request.method in ('PUT', 'POST', 'PATCH'):
             resource_name = utils.get_resource_name(
                 parser_context, expand_polymorphic_types=True)
-            if isinstance(resource_name, six.string_types):
+            if isinstance(resource_name, str):
                 if data.get('type') != resource_name:
                     raise exceptions.Conflict(
                         "The resource object's type ({data_type}) is not the type that "

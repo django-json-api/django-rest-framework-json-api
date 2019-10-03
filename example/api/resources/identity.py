@@ -1,21 +1,21 @@
 from django.contrib.auth import models as auth_models
 from django.utils import encoding
 from rest_framework import generics, parsers, renderers, serializers, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from rest_framework_json_api import mixins, utils
+from rest_framework_json_api import utils
 
-from ..serializers.identity import IdentitySerializer
-from ..serializers.post import PostSerializer
+from example.api.serializers.identity import IdentitySerializer
+from example.api.serializers.post import PostSerializer
 
 
-class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
+class Identity(viewsets.ModelViewSet):
     queryset = auth_models.User.objects.all().order_by('pk')
     serializer_class = IdentitySerializer
 
     # demonstrate sideloading data for use at app boot time
-    @list_route()
+    @action(detail=False)
     def posts(self, request):
         self.resource_name = False
 
@@ -28,12 +28,12 @@ class Identity(mixins.MultipleIDMixin, viewsets.ModelViewSet):
         }
         return Response(utils.format_field_names(data, format_type='camelize'))
 
-    @detail_route()
+    @action(detail=True)
     def manual_resource_name(self, request, *args, **kwargs):
         self.resource_name = 'data'
         return super(Identity, self).retrieve(request, args, kwargs)
 
-    @detail_route()
+    @action(detail=True)
     def validation(self, request, *args, **kwargs):
         raise serializers.ValidationError('Oh nohs!')
 

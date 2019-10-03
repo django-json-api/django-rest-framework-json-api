@@ -3,10 +3,11 @@ Renderers
 """
 import copy
 from collections import OrderedDict, defaultdict
+from collections.abc import Iterable
 
 import inflection
 from django.db.models import Manager
-from django.utils import encoding, six
+from django.utils import encoding
 from rest_framework import relations, renderers
 from rest_framework.fields import SkipField, get_attribute
 from rest_framework.relations import PKOnlyObject
@@ -15,7 +16,6 @@ from rest_framework.settings import api_settings
 
 import rest_framework_json_api
 from rest_framework_json_api import utils
-from rest_framework_json_api.compat import collections_abc
 from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedField, SkipDataMixin
 
 
@@ -26,24 +26,21 @@ class JSONRenderer(renderers.JSONRenderer):
 
     Render a JSON response per the JSON API spec:
 
-    .. code:: json
+    .. code-block:: json
 
         {
-            "data": [{
-                "type": "companies",
-                "id": 1,
-                "attributes": {
-                    "name": "Mozilla",
-                    "slug": "mozilla",
-                    "date-created": "2014-03-13 16:33:37"
-                }
-            }, {
-                "type": "companies",
-                "id": 2,
-                ...
-            }]
+          "data": [
+            {
+              "type": "companies",
+              "id": 1,
+              "attributes": {
+                "name": "Mozilla",
+                "slug": "mozilla",
+                "date-created": "2014-03-13 16:33:37"
+              }
+            }
+          ]
         }
-
     """
 
     media_type = 'application/vnd.api+json'
@@ -55,7 +52,7 @@ class JSONRenderer(renderers.JSONRenderer):
         Builds the `attributes` object of the JSON API resource object.
         """
         data = OrderedDict()
-        for field_name, field in six.iteritems(fields):
+        for field_name, field in iter(fields.items()):
             # ID is always provided in the root of JSON API so remove it from attributes
             if field_name == 'id':
                 continue
@@ -81,7 +78,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 field_name: resource.get(field_name)
             })
 
-        return utils._format_object(data)
+        return utils.format_field_names(data)
 
     @classmethod
     def extract_relationships(cls, fields, resource, resource_instance):
@@ -97,7 +94,7 @@ class JSONRenderer(renderers.JSONRenderer):
         if resource_instance is None:
             return
 
-        for field_name, field in six.iteritems(fields):
+        for field_name, field in iter(fields.items()):
             # Skip URL field
             if field_name == api_settings.URL_FIELD_NAME:
                 continue
@@ -199,7 +196,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 relation_data = {}
 
-                if isinstance(resource.get(field_name), collections_abc.Iterable):
+                if isinstance(resource.get(field_name), Iterable):
                     relation_data.update(
                         {
                             'meta': {'count': len(resource.get(field_name))}
@@ -296,7 +293,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-        return utils._format_object(data)
+        return utils.format_field_names(data)
 
     @classmethod
     def extract_relation_instance(cls, field, resource_instance):
@@ -331,7 +328,7 @@ class JSONRenderer(renderers.JSONRenderer):
         included_resources = copy.copy(included_resources)
         included_resources = [inflection.underscore(value) for value in included_resources]
 
-        for field_name, field in six.iteritems(fields):
+        for field_name, field in iter(fields.items()):
             # Skip URL field
             if field_name == api_settings.URL_FIELD_NAME:
                 continue
@@ -410,7 +407,7 @@ class JSONRenderer(renderers.JSONRenderer):
                             getattr(serializer, '_poly_force_type_resolution', False)
                         )
                         included_cache[new_item['type']][new_item['id']] = \
-                            utils._format_object(new_item)
+                            utils.format_field_names(new_item)
                         cls.extract_included(
                             serializer_fields,
                             serializer_resource,
@@ -432,7 +429,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         relation_type,
                         getattr(field, '_poly_force_type_resolution', False)
                     )
-                    included_cache[new_item['type']][new_item['id']] = utils._format_object(
+                    included_cache[new_item['type']][new_item['id']] = utils.format_field_names(
                         new_item
                     )
                     cls.extract_included(
@@ -596,7 +593,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     )
                     meta = self.extract_meta(serializer, resource)
                     if meta:
-                        json_resource_obj.update({'meta': utils._format_object(meta)})
+                        json_resource_obj.update({'meta': utils.format_field_names(meta)})
                     json_api_data.append(json_resource_obj)
 
                     self.extract_included(
@@ -613,7 +610,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 meta = self.extract_meta(serializer, serializer_data)
                 if meta:
-                    json_api_data.update({'meta': utils._format_object(meta)})
+                    json_api_data.update({'meta': utils.format_field_names(meta)})
 
                 self.extract_included(
                     fields, serializer_data, resource_instance, included_resources, included_cache
@@ -654,7 +651,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     render_data['included'].append(included_cache[included_type][included_id])
 
         if json_api_meta:
-            render_data['meta'] = utils._format_object(json_api_meta)
+            render_data['meta'] = utils.format_field_names(json_api_meta)
 
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context

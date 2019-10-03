@@ -10,12 +10,11 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 
 from rest_framework_json_api.utils import format_resource_type
 
-from .. import views
-from . import TestBase
 from example.factories import AuthorFactory, CommentFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
 from example.serializers import AuthorBioSerializer, AuthorTypeSerializer, EntrySerializer
-from example.views import AuthorViewSet
+from example.tests import TestBase
+from example.views import AuthorViewSet, BlogViewSet
 
 
 class TestRelationshipView(APITestCase):
@@ -427,29 +426,31 @@ class TestRelatedMixin(APITestCase):
 
 class TestValidationErrorResponses(TestBase):
     def test_if_returns_error_on_empty_post(self):
-        view = views.BlogViewSet.as_view({'post': 'create'})
+        view = BlogViewSet.as_view({'post': 'create'})
         response = self._get_create_response("{}", view)
         self.assertEqual(400, response.status_code)
         expected = [{
             'detail': 'Received document does not contain primary data',
             'status': '400',
-            'source': {'pointer': '/data'}
+            'source': {'pointer': '/data'},
+            'code': 'parse_error',
         }]
         self.assertEqual(expected, response.data)
 
     def test_if_returns_error_on_missing_form_data_post(self):
-        view = views.BlogViewSet.as_view({'post': 'create'})
+        view = BlogViewSet.as_view({'post': 'create'})
         response = self._get_create_response('{"data":{"attributes":{},"type":"blogs"}}', view)
         self.assertEqual(400, response.status_code)
         expected = [{
             'status': '400',
             'detail': 'This field is required.',
-            'source': {'pointer': '/data/attributes/name'}
+            'source': {'pointer': '/data/attributes/name'},
+            'code': 'required',
         }]
         self.assertEqual(expected, response.data)
 
     def test_if_returns_error_on_bad_endpoint_name(self):
-        view = views.BlogViewSet.as_view({'post': 'create'})
+        view = BlogViewSet.as_view({'post': 'create'})
         response = self._get_create_response('{"data":{"attributes":{},"type":"bad"}}', view)
         self.assertEqual(409, response.status_code)
         expected = [{
@@ -458,7 +459,8 @@ class TestValidationErrorResponses(TestBase):
                 "represented by the endpoint (blogs)."
             ),
             'source': {'pointer': '/data'},
-            'status': '409'
+            'status': '409',
+            'code': 'error',
         }]
         self.assertEqual(expected, response.data)
 
