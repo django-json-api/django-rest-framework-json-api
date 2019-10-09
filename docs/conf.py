@@ -31,7 +31,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
 django.setup()
 
 # Auto-generate API documentation.
-main(['-o', '_build/apidoc', '-f', '-e', '-T', '-M', '../rest_framework_json_api'])
+main(['-o', 'apidoc', '-f', '-e', '-T', '-M', '../rest_framework_json_api'])
 
 # -- General configuration ------------------------------------------------
 
