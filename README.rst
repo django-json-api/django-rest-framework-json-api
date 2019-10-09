@@ -91,6 +91,8 @@ Requirements
 2. Django (1.11, 2.1, 2.2)
 3. Django REST Framework (3.10)
 
+We **highly** recommend and only officially support the latest patch release of each Python, Django and REST Framework series.
+
 ------------
 Installation
 ------------
