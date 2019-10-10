@@ -1,5 +1,17 @@
 search: False
 requirements:
-  - requirements-development.txt:
+  - requirements/requirements-codestyle.txt:
+      update: all
+      pin: True
+  - requirements/requirements-documentation.txt:
+      update: all
+      pin: True
+  - requirements/requirements-optionals.txt:
+      update: all
+      pin: True
+  - requirements/requirements-packaging.txt:
+      update: all
+      pin: True
+  - requirements/requirements-testing.txt:
       update: all
       pin: True

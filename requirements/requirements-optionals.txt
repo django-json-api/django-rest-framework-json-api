@@ -1,0 +1,2 @@
+django-filter==2.2.0
+django-polymorphic==2.1.2

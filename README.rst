@@ -128,8 +128,7 @@ installed and activated:
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     $ cd django-rest-framework-json-api
-    $ pip install -r example/requirements.txt
-    $ pip install -e .
+    $ pip install -U -e . -r requirements.txt
     $ django-admin migrate --settings=example.settings
     $ django-admin loaddata drf_example --settings=example.settings
     $ django-admin runserver --settings=example.settings
@@ -145,7 +144,7 @@ installed and activated:
 
 ::
 
-    $ pip install -Ur requirements-development.txt
+    $ pip install -Ur requirements.txt
     $ flake8
     $ pytest
 
