@@ -7,6 +7,9 @@ import sys
 
 from setuptools import setup
 
+needs_wheel = {'bdist_wheel'}.intersection(sys.argv)
+wheel = ['wheel'] if needs_wheel else []
+
 
 def read(*paths):
     """
@@ -94,6 +97,7 @@ setup(
         'django-polymorphic': ['django-polymorphic>=2.0'],
         'django-filter': ['django-filter>=2.0']
     },
+    setup_requires=wheel,
     python_requires=">=3.5",
     zip_safe=False,
 )
