@@ -8,24 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [3.0.0] - 2019-10-14
 
 This release is not backwards compatible. For easy migration best upgrade first to version
 2.8.0 and resolve all deprecation warnings before updating to 3.0.0
 
 ### Added
 
-* Add support for Django REST framework 3.10.
-* Add code from ErrorDetail into the JSON:API error object
+* Added support for Django REST framework 3.10.
+* Added code from `ErrorDetail` into the JSON:API error object.
 
 ### Changed
 
 * Moved dependency definition for `django-polymorphic` and `django-filter` into extra requires.
   Hence dependencies of each optional module can be installed with pip using
-   ```
+  ```
   pip install djangorestframework-jsonapi['django-polymorphic']
-  pip install djangorestframework-jsonapi['django-filter']`
-   ```
+  pip install djangorestframework-jsonapi['django-filter']
+  ```
 
 ### Removed
 
@@ -42,14 +42,14 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ### Fixed
 
-* Avoid printing invalid pointer when api returns 404
-* Avoid exception when using `ResourceIdentifierObjectSerializer` with unexisting primary key
-* Format metadata field names correctly for OPTIONS request
+* Avoid printing invalid pointer when api returns 404.
+* Avoid exception when using `ResourceIdentifierObjectSerializer` with unexisting primary key.
+* Format metadata field names correctly for OPTIONS request.
 
 
 ## [2.8.0] - 2019-06-13
 
-This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST Framework <=3.8 and Django 2.0.
+This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST Framework <=3.9 and Django 2.0.
 
 ### Added
 
