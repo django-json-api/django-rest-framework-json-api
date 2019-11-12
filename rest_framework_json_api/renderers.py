@@ -301,15 +301,20 @@ class JSONRenderer(renderers.JSONRenderer):
         Determines what instance represents given relation and extracts it.
 
         Relation instance is determined exactly same way as it determined
-        in parent serializer
+        in parent serializer, but if it is "skipped" on the serializer
+        it still should be returned via include
         """
-        try:
-            res = field.get_attribute(resource_instance)
-            if isinstance(res, PKOnlyObject):
-                return get_attribute(resource_instance, field.source_attrs)
-            return res
-        except SkipField:
-            return None
+        if isinstance(field, SkipDataMixin):
+            res = super(SkipDataMixin, field).get_attribute(resource_instance)
+        else:
+            try:
+                res = field.get_attribute(resource_instance)
+            except SkipField:
+                res = None
+
+        if isinstance(res, PKOnlyObject):
+            return get_attribute(resource_instance, field.source_attrs)
+        return res
 
     @classmethod
     def extract_included(cls, fields, resource, resource_instance, included_resources,
