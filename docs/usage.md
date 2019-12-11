@@ -123,9 +123,9 @@ query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])
 For example:
 ```python
 import re
-from rest_framework_json_api.filters import QueryValidationFilter
+from rest_framework_json_api.filters import QueryParameterValidationFilter
 
-class MyQPValidator(QueryValidationFilter):
+class MyQPValidator(QueryParameterValidationFilter):
     query_regex = re.compile(r'^(sort|include|page|page_size)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
 ```
 
