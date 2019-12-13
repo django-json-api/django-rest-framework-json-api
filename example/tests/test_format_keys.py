@@ -28,7 +28,7 @@ class FormatKeysSetTests(TestBase):
             'data': [
                 {
                     'type': 'users',
-                    'id': encoding.force_text(user.pk),
+                    'id': encoding.force_str(user.pk),
                     'attributes': {
                         'firstName': user.first_name,
                         'lastName': user.last_name,
