@@ -141,7 +141,7 @@ class JSONParser(parsers.JSONParser):
 
         if request.method in ('PATCH', 'PUT') and data.get('id') != view.kwargs[view.lookup_field]:
             raise exceptions.Conflict(
-                "The resource object's id ({data_id}) does not match url ({url_id})}".format(
+                "The resource object's id ({data_id}) does not match url ({url_id})".format(
                     data_id=data.get('id'),
                     url_id=view.kwargs[view.lookup_field]
                 )
