@@ -52,3 +52,21 @@ class TestJSONParser(TestCase):
 
         with self.assertRaises(ParseError):
             parser.parse(stream, None, self.parser_context)
+
+    def test_parse_invalid_data_key(self):
+        parser = JSONParser()
+
+        string = json.dumps({
+            'data': [{
+                'id': 123,
+                'type': 'Blog',
+                'attributes': {
+                    'json-value': {'JsonKey': 'JsonValue'}
+                },
+            }]
+        })
+        stream = BytesIO(string.encode('utf-8'))
+
+        with self.assertRaises(ParseError):
+            parser.parse(stream, None, self.parser_context)
+
