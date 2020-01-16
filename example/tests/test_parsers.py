@@ -69,4 +69,3 @@ class TestJSONParser(TestCase):
 
         with self.assertRaises(ParseError):
             parser.parse(stream, None, self.parser_context)
-
