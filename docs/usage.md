@@ -682,10 +682,9 @@ Also we can override `related_field` in the url. Let's say we want the url to be
 dict to the class:
 ```python
 field_name_mapping = {
-        'line_items': 'order_items'
+        'order_items': 'line_items'
     }
 ```
-
 
 ### Working with polymorphic resources
 

@@ -34,7 +34,7 @@ class ModelViewSetTests(TestBase):
             'data': [
                 {
                     'type': 'users',
-                    'id': encoding.force_text(user.pk),
+                    'id': encoding.force_str(user.pk),
                     'attributes': {
                         'first-name': user.first_name,
                         'last-name': user.last_name,
@@ -72,7 +72,7 @@ class ModelViewSetTests(TestBase):
             'data': [
                 {
                     'type': 'users',
-                    'id': encoding.force_text(user.pk),
+                    'id': encoding.force_str(user.pk),
                     'attributes': {
                         'first-name': user.first_name,
                         'last-name': user.last_name,
@@ -112,7 +112,7 @@ class ModelViewSetTests(TestBase):
             'data': [
                 {
                     'type': 'users',
-                    'id': encoding.force_text(users[0].pk),
+                    'id': encoding.force_str(users[0].pk),
                     'attributes': {
                         'first-name': users[0].first_name,
                         'last-name': users[0].last_name,
@@ -121,7 +121,7 @@ class ModelViewSetTests(TestBase):
                 },
                 {
                     'type': 'users',
-                    'id': encoding.force_text(users[1].pk),
+                    'id': encoding.force_str(users[1].pk),
                     'attributes': {
                         'first-name': users[1].first_name,
                         'last-name': users[1].last_name,
@@ -157,7 +157,7 @@ class ModelViewSetTests(TestBase):
         expected = {
             'data': {
                 'type': 'users',
-                'id': encoding.force_text(self.miles.pk),
+                'id': encoding.force_str(self.miles.pk),
                 'attributes': {
                     'first-name': self.miles.first_name,
                     'last-name': self.miles.last_name,
@@ -211,7 +211,7 @@ class ModelViewSetTests(TestBase):
         data = {
             'data': {
                 'type': 'users',
-                'id': encoding.force_text(self.miles.pk),
+                'id': encoding.force_str(self.miles.pk),
                 'attributes': {
                     'first-name': self.miles.first_name,
                     'last-name': self.miles.last_name,
