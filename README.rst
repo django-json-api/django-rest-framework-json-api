@@ -87,9 +87,9 @@ As a Django REST Framework JSON API (short DJA) we are trying to address followi
 Requirements
 ------------
 
-1. Python (3.5, 3.6, 3.7)
-2. Django (1.11, 2.1, 2.2)
-3. Django REST Framework (3.10)
+1. Python (3.5, 3.6, 3.7, 3.8)
+2. Django (1.11, 2.1, 2.2, 3.0)
+3. Django REST Framework (3.10, 3.11)
 
 We **highly** recommend and only officially support the latest patch release of each Python, Django and REST Framework series.
 

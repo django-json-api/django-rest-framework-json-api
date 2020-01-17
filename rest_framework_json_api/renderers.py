@@ -129,7 +129,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     relation_data.append(
                         OrderedDict([
                             ('type', relation_type),
-                            ('id', encoding.force_text(related_object.pk))
+                            ('id', encoding.force_str(related_object.pk))
                         ])
                     )
 
@@ -168,7 +168,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 relation_data = {
                     'data': (
                         OrderedDict([
-                            ('type', relation_type), ('id', encoding.force_text(relation_id))
+                            ('type', relation_type), ('id', encoding.force_str(relation_id))
                         ])
                         if relation_id is not None else None)
                 }
@@ -231,7 +231,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                     relation_data.append(OrderedDict([
                         ('type', nested_resource_instance_type),
-                        ('id', encoding.force_text(nested_resource_instance.pk))
+                        ('id', encoding.force_str(nested_resource_instance.pk))
                     ]))
                 data.update({
                     field_name: {
@@ -264,7 +264,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
                         relation_data.append(OrderedDict([
                             ('type', nested_resource_instance_type),
-                            ('id', encoding.force_text(nested_resource_instance.pk))
+                            ('id', encoding.force_str(nested_resource_instance.pk))
                         ]))
 
                     data.update({field_name: {'data': relation_data}})
@@ -287,7 +287,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         'data': (
                             OrderedDict([
                                 ('type', relation_type),
-                                ('id', encoding.force_text(relation_instance_id))
+                                ('id', encoding.force_str(relation_instance_id))
                             ]) if resource.get(field_name) else None)
                     }
                 })
@@ -486,7 +486,7 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_name = utils.get_resource_type_from_instance(resource_instance)
         resource_data = [
             ('type', resource_name),
-            ('id', encoding.force_text(resource_instance.pk) if resource_instance else None),
+            ('id', encoding.force_str(resource_instance.pk) if resource_instance else None),
             ('attributes', cls.extract_attributes(fields, resource)),
         ]
         relationships = cls.extract_relationships(fields, resource, resource_instance)
