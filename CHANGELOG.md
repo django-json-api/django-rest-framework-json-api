@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased]
+
+### Added
+
+* Added support for Python 3.8
+* Added support for Django REST framework 3.11
+* Added support for Django 3.0
+
 ## [3.0.0] - 2019-10-14
 
 This release is not backwards compatible. For easy migration best upgrade first to version

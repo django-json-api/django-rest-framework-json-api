@@ -25,5 +25,5 @@ class SideloadResourceTest(TestBase):
 
         self.assertEqual(
             sorted(content.keys()),
-            [encoding.force_text('identities'),
-             encoding.force_text('posts')])
+            [encoding.force_str('identities'),
+             encoding.force_str('posts')])

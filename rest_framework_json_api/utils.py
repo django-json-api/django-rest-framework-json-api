@@ -13,7 +13,7 @@ from django.db.models.fields.related_descriptors import (
 from django.http import Http404
 from django.utils import encoding
 from django.utils.module_loading import import_string as import_class_from_dotted_path
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
 
@@ -341,7 +341,7 @@ def format_drf_errors(response, context, exc):
 def format_error_object(message, pointer, response):
     error_obj = {
         'detail': message,
-        'status': encoding.force_text(response.status_code),
+        'status': encoding.force_str(response.status_code),
     }
     if pointer is not None:
         error_obj['source'] = {
