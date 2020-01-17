@@ -139,13 +139,15 @@ class JSONParser(parsers.JSONParser):
         if not data.get('id') and request.method in ('PATCH', 'PUT'):
             raise ParseError("The resource identifier object must contain an 'id' member")
 
-        if request.method in ('PATCH', 'PUT') and data.get('id') != view.kwargs[view.lookup_field]:
-            raise exceptions.Conflict(
-                "The resource object's id ({data_id}) does not match url ({url_id})".format(
-                    data_id=data.get('id'),
-                    url_id=view.kwargs[view.lookup_field]
+        if request.method in ('PATCH', 'PUT'):
+            kwarg_name = view.lookup_url_kwarg if view.lookup_url_kwarg else view.lookup_field
+            if str(data.get('id')) != str(view.kwargs[kwarg_name]):
+                raise exceptions.Conflict(
+                    "The resource object's id ({data_id}) does not match url ({url_id})".format(
+                        data_id=data.get('id'),
+                        url_id=view.kwargs[view.lookup_field]
+                    )
                 )
-            )
 
         # Construct the return data
         serializer_class = getattr(view, 'serializer_class', None)
