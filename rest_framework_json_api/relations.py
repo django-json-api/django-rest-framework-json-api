@@ -5,7 +5,7 @@ from collections.abc import Iterable
 import inflection
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import MISSING_ERROR_MESSAGE, SkipField
 from rest_framework.relations import MANY_RELATION_KWARGS
 from rest_framework.relations import ManyRelatedField as DRFManyRelatedField
