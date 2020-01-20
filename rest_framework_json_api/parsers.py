@@ -140,10 +140,10 @@ class JSONParser(parsers.JSONParser):
             raise ParseError("The resource identifier object must contain an 'id' member")
 
         if request.method in ('PATCH', 'PUT'):
-            kwarg_name = view.lookup_url_kwarg if view.lookup_url_kwarg else view.lookup_field
-            if str(data.get('id')) != str(view.kwargs[kwarg_name]):
+            lookup_url_kwarg = view.lookup_url_kwarg or view.lookup_field
+            if str(data.get('id')) != str(view.kwargs[lookup_url_kwarg]):
                 raise exceptions.Conflict(
-                    "The resource object's id ({data_id}) does not match url ({url_id})".format(
+                    "The resource object's id ({data_id}) does not match url's lookup id ({url_id})".format(
                         data_id=data.get('id'),
                         url_id=view.kwargs[view.lookup_field]
                     )

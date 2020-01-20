@@ -187,12 +187,12 @@ class ModelViewSetTests(TestBase):
 
     def test_patch_requires_correct_id(self):
         """
-        Verify that 'id' is required to be passed in an update request.
+        Verify that 'id' is the same then in url
         """
         data = {
             'data': {
                 'type': 'users',
-                'id': 3,
+                'id': self.miles.pk + 1,
                 'attributes': {
                     'first-name': 'DifferentName'
                 }
