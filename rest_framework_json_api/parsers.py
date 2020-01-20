@@ -143,7 +143,8 @@ class JSONParser(parsers.JSONParser):
             lookup_url_kwarg = view.lookup_url_kwarg or view.lookup_field
             if str(data.get('id')) != str(view.kwargs[lookup_url_kwarg]):
                 raise exceptions.Conflict(
-                    "The resource object's id ({data_id}) does not match url's lookup id ({url_id})".format(
+                    "The resource object's id ({data_id}) does not match url's "
+                    "lookup id ({url_id})".format(
                         data_id=data.get('id'),
                         url_id=view.kwargs[view.lookup_field]
                     )
