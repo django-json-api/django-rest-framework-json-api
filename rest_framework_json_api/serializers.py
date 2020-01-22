@@ -352,5 +352,5 @@ class PolymorphicModelSerializer(ModelSerializer, metaclass=PolymorphicSerialize
                     expected_types=', '.join(expected_types), received_type=received_type))
         serializer_class = self.get_polymorphic_serializer_for_type(received_type)
         self.__class__ = serializer_class
-        return serializer_class(data, context=self.context,
+        return serializer_class(self.instance, data, context=self.context,
                                 partial=self.partial).to_internal_value(data)
