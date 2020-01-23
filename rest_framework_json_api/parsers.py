@@ -116,6 +116,10 @@ class JSONParser(parsers.JSONParser):
 
         request = parser_context.get('request')
 
+        # Sanity check
+        if not isinstance(data, dict):
+            raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
+
         # Check for inconsistencies
         if request.method in ('PUT', 'POST', 'PATCH'):
             resource_name = utils.get_resource_name(
