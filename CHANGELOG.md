@@ -19,6 +19,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Ensure that `409 Conflict` is returned when processing a `PATCH` request in which the resource object’s type and id do not match the server’s endpoint properly as outlined in [JSON:API](https://jsonapi.org/format/#crud-updating-responses-409) spec.
+* Properly return parser error when primary data is of invalid type
 
 ## [3.0.0] - 2019-10-14
 
