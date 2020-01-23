@@ -207,20 +207,21 @@ class TestPolymorphicModelSerializer(TestCase):
     def test_polymorphic_model_serializer_passes_instance_to_child(self):
         """
         Ensure that `PolymorphicModelSerializer` is passing the instance to the
-        child serializer when initializing it in `to_internal_value`
+        child serializer when initializing them
         """
         # Arrange
-        def to_internal_value(serializer_self, data):
+        self.serializer_instance = None
+
+        def save(serializer_self):
             """
-            Override `ArtProjectSerializer.to_internal_value` to get the
-            instance serializer, which is later used assertion
+            Override `ArtProjectSerializer.save` to get the instance serializer,
+            which is later used assertion
             """
             self.serializer_instance = serializer_self.instance
-            return super(ArtProjectSerializer,
-                         serializer_self).to_internal_value(data)
+            return super(ArtProjectSerializer, serializer_self).save()
 
-        # Override `to_internal_value` with our own method
-        ArtProjectSerializer.to_internal_value = to_internal_value
+        # Override `save` with our own method
+        ArtProjectSerializer.save = save
 
         # Initialize a serializer that would partially update a model instance
         data = {"artist": "Mark Bishop", "type": "artProjects"}
@@ -228,8 +229,6 @@ class TestPolymorphicModelSerializer(TestCase):
             instance=self.project, data=data, partial=True
         )
         serializer.is_valid(raise_exception=True)
-
-        self.serializer_instance = None
 
         # Act
         serializer.save()
