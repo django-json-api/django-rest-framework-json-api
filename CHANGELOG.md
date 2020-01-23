@@ -16,6 +16,10 @@ any parts of the framework not mentioned in the documentation should generally b
 * Added support for Django REST framework 3.11
 * Added support for Django 3.0
 
+### Fixed
+
+* Ensure that `409 Conflict` is returned when processing a `PATCH` request in which the resource object’s type and id do not match the server’s endpoint properly as outlined in [JSON:API](https://jsonapi.org/format/#crud-updating-responses-409) spec.
+
 ## [3.0.0] - 2019-10-14
 
 This release is not backwards compatible. For easy migration best upgrade first to version

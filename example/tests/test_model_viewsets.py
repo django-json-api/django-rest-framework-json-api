@@ -185,6 +185,24 @@ class ModelViewSetTests(TestBase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_patch_requires_correct_id(self):
+        """
+        Verify that 'id' is the same then in url
+        """
+        data = {
+            'data': {
+                'type': 'users',
+                'id': self.miles.pk + 1,
+                'attributes': {
+                    'first-name': 'DifferentName'
+                }
+            }
+        }
+
+        response = self.client.patch(self.detail_url, data=data)
+
+        self.assertEqual(response.status_code, 409)
+
     def test_key_in_post(self):
         """
         Ensure a key is in the post.
