@@ -7,6 +7,7 @@ from django.utils import timezone
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
+from example.factories import ArtProjectFactory
 from rest_framework_json_api.serializers import (
     DateField,
     ModelSerializer,
@@ -15,7 +16,11 @@ from rest_framework_json_api.serializers import (
 from rest_framework_json_api.utils import format_resource_type
 
 from example.models import Author, Blog, Entry
-from example.serializers import BlogSerializer
+from example.serializers import (
+    BlogSerializer,
+    ProjectSerializer,
+    ArtProjectSerializer,
+)
 
 request_factory = APIRequestFactory()
 pytestmark = pytest.mark.django_db
@@ -193,3 +198,41 @@ class TestModelSerializer(object):
 
         assert response.status_code == 200
         assert expected == response.json()
+
+
+class TestPolymorphicModelSerializer(TestCase):
+    def setUp(self):
+        self.project = ArtProjectFactory.create()
+
+    def test_polymorphic_model_serializer_passes_instance_to_child(self):
+        """
+        Ensure that `PolymorphicModelSerializer` is passing the instance to the
+        child serializer when initializing it in `to_internal_value`
+        """
+        # Arrange
+        def to_internal_value(serializer_self, data):
+            """
+            Override `ArtProjectSerializer.to_internal_value` to get the
+            instance serializer, which is later used assertion
+            """
+            self.serializer_instance = serializer_self.instance
+            return super(ArtProjectSerializer,
+                         serializer_self).to_internal_value(data)
+
+        # Override `to_internal_value` with our own method
+        ArtProjectSerializer.to_internal_value = to_internal_value
+
+        # Initialize a serializer that would partially update a model instance
+        data = {"artist": "Mark Bishop", "type": "artProjects"}
+        serializer = ProjectSerializer(
+            instance=self.project, data=data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+
+        self.serializer_instance = None
+
+        # Act
+        serializer.save()
+
+        # Assert
+        assert self.serializer_instance is not None
