@@ -11,7 +11,8 @@ from example.factories import ArtProjectFactory
 from rest_framework_json_api.serializers import (
     DateField,
     ModelSerializer,
-    ResourceIdentifierObjectSerializer
+    ResourceIdentifierObjectSerializer,
+    empty,
 )
 from rest_framework_json_api.utils import format_resource_type
 
@@ -209,29 +210,33 @@ class TestPolymorphicModelSerializer(TestCase):
         Ensure that `PolymorphicModelSerializer` is passing the instance to the
         child serializer when initializing them
         """
-        # Arrange
-        self.serializer_instance = None
-
-        def save(serializer_self):
-            """
-            Override `ArtProjectSerializer.save` to get the instance serializer,
-            which is later used assertion
-            """
-            self.serializer_instance = serializer_self.instance
-            return super(ArtProjectSerializer, serializer_self).save()
-
-        # Override `save` with our own method
-        ArtProjectSerializer.save = save
-
         # Initialize a serializer that would partially update a model instance
-        data = {"artist": "Mark Bishop", "type": "artProjects"}
-        serializer = ProjectSerializer(
-            instance=self.project, data=data, partial=True
+        initial_data = {"artist": "Mark Bishop", "type": "artProjects"}
+        parent_serializer = ProjectSerializer(
+            instance=self.project, data=initial_data, partial=True
         )
-        serializer.is_valid(raise_exception=True)
 
-        # Act
-        serializer.save()
+        # Override `__init__` with our own method
+        def init_with_asserts(child_self, instance=None, data=empty, **kwargs):
+            """
+            Override `ArtProjectSerializer.__init__` with the same signature that
+            `BaseSerializer.__init__` has to assert that it receives the parameters
+            that `BaseSerializer` expects
+            """
+            assert instance == self.project
+            assert data == initial_data
+            assert kwargs.get("partial", False) == parent_serializer.partial
+            assert kwargs.get("context", {}) == parent_serializer.context
 
-        # Assert
-        assert self.serializer_instance is not None
+            return super(ArtProjectSerializer, child_self).__init__(
+                instance, data, **kwargs
+            )
+
+        ArtProjectSerializer.__init__ = init_with_asserts
+
+        parent_serializer.is_valid(raise_exception=True)
+
+        # Run save to force `ProjectSerializer` to init `ArtProjectSerializer`
+        parent_serializer.save()
+
+        # Asserts in the overridden `__init__` method declared above
