@@ -232,6 +232,7 @@ class TestPolymorphicModelSerializer(TestCase):
                 instance, data, **kwargs
             )
 
+        original_init = ArtProjectSerializer.__init__
         ArtProjectSerializer.__init__ = init_with_asserts
 
         parent_serializer.is_valid(raise_exception=True)
@@ -240,3 +241,6 @@ class TestPolymorphicModelSerializer(TestCase):
         parent_serializer.save()
 
         # Asserts in the overridden `__init__` method declared above
+
+        # Restore original init to avoid affecting other tests
+        ArtProjectSerializer.__init__ = original_init
