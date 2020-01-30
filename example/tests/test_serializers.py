@@ -204,6 +204,27 @@ class TestModelSerializer(object):
 class TestPolymorphicModelSerializer(TestCase):
     def setUp(self):
         self.project = ArtProjectFactory.create()
+        self.child_init_args = {}
+
+        # Override `__init__` with our own method
+        def overridden_init(child_self, instance=None, data=empty, **kwargs):
+            """
+            Override `ArtProjectSerializer.__init__` with the same signature that
+            `BaseSerializer.__init__` has to assert that it receives the parameters
+            that `BaseSerializer` expects
+            """
+            self.child_init_args = dict(instance=instance, data=data, **kwargs)
+
+            return super(ArtProjectSerializer, child_self).__init__(
+                instance, data, **kwargs
+            )
+
+        self.child_serializer_init = ArtProjectSerializer.__init__
+        ArtProjectSerializer.__init__ = overridden_init
+
+    def tearDown(self):
+        # Restore original init to avoid affecting other tests
+        ArtProjectSerializer.__init__ = self.child_serializer_init
 
     def test_polymorphic_model_serializer_passes_instance_to_child(self):
         """
@@ -216,31 +237,13 @@ class TestPolymorphicModelSerializer(TestCase):
             instance=self.project, data=initial_data, partial=True
         )
 
-        # Override `__init__` with our own method
-        def init_with_asserts(child_self, instance=None, data=empty, **kwargs):
-            """
-            Override `ArtProjectSerializer.__init__` with the same signature that
-            `BaseSerializer.__init__` has to assert that it receives the parameters
-            that `BaseSerializer` expects
-            """
-            assert instance == self.project
-            assert data == initial_data
-            assert kwargs.get("partial", False) == parent_serializer.partial
-            assert kwargs.get("context", {}) == parent_serializer.context
-
-            return super(ArtProjectSerializer, child_self).__init__(
-                instance, data, **kwargs
-            )
-
-        original_init = ArtProjectSerializer.__init__
-        ArtProjectSerializer.__init__ = init_with_asserts
-
         parent_serializer.is_valid(raise_exception=True)
 
         # Run save to force `ProjectSerializer` to init `ArtProjectSerializer`
         parent_serializer.save()
 
-        # Asserts in the overridden `__init__` method declared above
-
-        # Restore original init to avoid affecting other tests
-        ArtProjectSerializer.__init__ = original_init
+        # Assert that child init received the expected arguments
+        assert self.child_init_args["instance"] == self.project
+        assert self.child_init_args["data"] == initial_data
+        assert self.child_init_args["partial"] == parent_serializer.partial
+        assert self.child_init_args["context"] == parent_serializer.context
