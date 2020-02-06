@@ -143,6 +143,7 @@ def format_resource_type(value, format_type=None, pluralize=None):
 
 
 def get_related_resource_type(relation):
+    from rest_framework_json_api.serializers import PolymorphicModelSerializer
     try:
         return get_resource_type_from_serializer(relation)
     except AttributeError:
@@ -165,7 +166,10 @@ def get_related_resource_type(relation):
     else:
         parent_serializer = relation.parent
         parent_model = None
-        if hasattr(parent_serializer, 'Meta'):
+        if isinstance(parent_serializer, PolymorphicModelSerializer):
+            parent_model = parent_serializer.get_polymorphic_serializer_for_instance(
+                parent_serializer.instance).Meta.model
+        elif hasattr(parent_serializer, 'Meta'):
             parent_model = getattr(parent_serializer.Meta, 'model', None)
         elif hasattr(parent_serializer, 'parent') and hasattr(parent_serializer.parent, 'Meta'):
             parent_model = getattr(parent_serializer.parent.Meta, 'model', None)
