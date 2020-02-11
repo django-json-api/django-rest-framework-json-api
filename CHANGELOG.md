@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [3.1.0] - 2020-02-08
 
 ### Added
 
@@ -18,10 +18,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Ensure that `409 Conflict` is returned when processing a `PATCH` request in which the resource object’s type and id do not match the server’s endpoint properly as outlined in [JSON:API](https://jsonapi.org/format/#crud-updating-responses-409) spec.
+* Ensured that `409 Conflict` is returned when processing a `PATCH` request in which the resource object’s type and id do not match the server’s endpoint as outlined in [JSON:API](https://jsonapi.org/format/#crud-updating-responses-409) spec.
 * Properly return parser error when primary data is of invalid type
-* Pass instance to child serializer when `PolymorphicModelSerializer` inits it in `to_internal_value`
-* Handle serialization of related resources on inherited polymorphic models that are absent on the base model
+* Pass instance to child serializers when using `PolymorphicModelSerializer`
+* Properly resolve related resource type when using `PolymorphicModelSerializer`
 
 ## [3.0.0] - 2019-10-14
 
