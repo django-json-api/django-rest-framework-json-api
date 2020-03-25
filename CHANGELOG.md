@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [3.2.0] - pending
+
+### Added
+
+* Added support for serializiing complex structures as attributes. For details please reffer to #769
+
 ## [3.1.0] - 2020-02-08
 
 ### Added
