@@ -18,7 +18,8 @@ from example.views import (
     NoFiltersetEntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
-    ProjectViewset
+    ProjectViewset,
+    AuthorWithNestedFieldsViewSet
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -32,6 +33,7 @@ router.register(r'nopage-entries', NonPaginatedEntryViewSet, 'nopage-entry')
 router.register(r'filterset-entries', FiltersetEntryViewSet, 'filterset-entry')
 router.register(r'nofilterset-entries', NoFiltersetEntryViewSet, 'nofilterset-entry')
 router.register(r'authors', AuthorViewSet)
+router.register(r'authors-nested', AuthorWithNestedFieldsViewSet, 'authors-nested')
 router.register(r'comments', CommentViewSet)
 router.register(r'companies', CompanyViewset)
 router.register(r'projects', ProjectViewset)

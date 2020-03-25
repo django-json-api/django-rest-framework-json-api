@@ -23,8 +23,8 @@ from example.serializers import (
     EntryDRFSerializers,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer
-)
+    ProjectTypeSerializer,
+    AuthorWithNestedFieldsSerializer)
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
 
@@ -173,6 +173,11 @@ class NoFiltersetEntryViewSet(EntryViewSet):
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+
+
+class AuthorWithNestedFieldsViewSet(ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorWithNestedFieldsSerializer
 
 
 class CommentViewSet(ModelViewSet):

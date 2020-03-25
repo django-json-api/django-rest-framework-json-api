@@ -15,6 +15,7 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_serializer
 )
 
+from rest_framework_json_api.settings import json_api_settings, RELATIONS_RENDERING_STRATEGY
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
     default_error_messages = {
@@ -195,7 +196,8 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
         is_included = field.source in get_included_resources(request)
         if not is_included and \
                 isinstance(field, ModelSerializer) and \
-                hasattr(instance, field.source + '_id'):
+                hasattr(instance, field.source + '_id') and \
+                json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY == RELATIONS_RENDERING_STRATEGY:
             attribute = getattr(instance, field.source + '_id')
 
             if attribute is None:
