@@ -15,6 +15,7 @@ from example.models import (
     Comment,
     Company,
     Entry,
+    LabResults,
     Project,
     ProjectType,
     ResearchProject,
@@ -303,9 +304,18 @@ class ArtProjectSerializer(BaseProjectSerializer):
 
 
 class ResearchProjectSerializer(BaseProjectSerializer):
+    # testing exclusive related field on inherited polymorphic model
+    lab_results = relations.ResourceRelatedField(many=True, read_only=True)
+
     class Meta:
         model = ResearchProject
         exclude = ('polymorphic_ctype',)
+
+
+class LabResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabResults
+        fields = ('date', 'measurements')
 
 
 class ProjectSerializer(serializers.PolymorphicModelSerializer):

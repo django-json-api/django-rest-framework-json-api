@@ -116,6 +116,10 @@ class JSONParser(parsers.JSONParser):
 
         request = parser_context.get('request')
 
+        # Sanity check
+        if not isinstance(data, dict):
+            raise ParseError('Received data is not a valid JSONAPI Resource Identifier Object')
+
         # Check for inconsistencies
         if request.method in ('PUT', 'POST', 'PATCH'):
             resource_name = utils.get_resource_name(
@@ -138,6 +142,17 @@ class JSONParser(parsers.JSONParser):
                             resource_types=", ".join(resource_name)))
         if not data.get('id') and request.method in ('PATCH', 'PUT'):
             raise ParseError("The resource identifier object must contain an 'id' member")
+
+        if request.method in ('PATCH', 'PUT'):
+            lookup_url_kwarg = view.lookup_url_kwarg or view.lookup_field
+            if str(data.get('id')) != str(view.kwargs[lookup_url_kwarg]):
+                raise exceptions.Conflict(
+                    "The resource object's id ({data_id}) does not match url's "
+                    "lookup id ({url_id})".format(
+                        data_id=data.get('id'),
+                        url_id=view.kwargs[view.lookup_field]
+                    )
+                )
 
         # Construct the return data
         serializer_class = getattr(view, 'serializer_class', None)
