@@ -1,18 +1,20 @@
 from __future__ import absolute_import
 
+import pytest
 from django.utils import timezone
 from rest_framework.reverse import reverse
 
+from rest_framework_json_api.settings import JSONAPISettings
 from . import TestBase
 from example.models import Author, Blog, Comment, Entry
 from django.test import override_settings
 
 
-class TestResourceRelatedField(TestBase):
+class TestRenderingStrategy(TestBase):
     list_url = reverse('authors-nested-list')
 
     def setUp(self):
-        super(TestResourceRelatedField, self).setUp()
+        super(TestRenderingStrategy, self).setUp()
         self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
         self.entry = Entry.objects.create(
             blog=self.blog,
@@ -76,3 +78,16 @@ class TestResourceRelatedField(TestBase):
             }
         }
         assert expected == response.json()
+
+
+class TestRenderingStrategySettings(TestBase):
+
+    def test_deprecation(self):
+        with pytest.deprecated_call():
+            JSONAPISettings()
+
+    def test_invalid_strategy(self):
+        class Settings:
+            JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY = 'SOME_INVALID_STRATEGY'
+        with pytest.raises(AttributeError):
+            JSONAPISettings(user_settings=Settings())
