@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-import json
-
 from django.utils import timezone
 from rest_framework.reverse import reverse
 

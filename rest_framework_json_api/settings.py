@@ -38,10 +38,11 @@ class JSONAPISettings(object):
             self.defaults['NESTED_SERIALIZERS_RENDERING_STRATEGY'])
 
         if value not in (RELATIONS_RENDERING_STRATEGY, ATTRIBUTE_RENDERING_STRATEGY):
-            raise AttributeError("Invalid value '%s' for JSON API setting NESTED_SERIALIZERS_RENDERING_STRATEGY" %
-                                 value)
+            raise AttributeError("Invalid value '%s' for JSON API setting "
+                                 "NESTED_SERIALIZERS_RENDERING_STRATEGY" % value)
         if value == RELATIONS_RENDERING_STRATEGY and \
-                not hasattr(self.user_settings, JSON_API_SETTINGS_PREFIX + 'NESTED_SERIALIZERS_RENDERING_STRATEGY'):
+                not hasattr(self.user_settings,
+                            JSON_API_SETTINGS_PREFIX + 'NESTED_SERIALIZERS_RENDERING_STRATEGY'):
             warnings.warn(DeprecationWarning(
                 "Rendering nested serializers in relations by default is deprecated and will be "
                 "changed in future releases. Please, use ResourceRelatedField or set "

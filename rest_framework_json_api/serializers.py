@@ -17,6 +17,7 @@ from rest_framework_json_api.utils import (
 
 from rest_framework_json_api.settings import json_api_settings, RELATIONS_RENDERING_STRATEGY
 
+
 class ResourceIdentifierObjectSerializer(BaseSerializer):
     default_error_messages = {
         'incorrect_model_type': _(
@@ -194,10 +195,11 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     def _get_field_representation(self, field, instance):
         request = self.context.get('request')
         is_included = field.source in get_included_resources(request)
+        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
         if not is_included and \
                 isinstance(field, ModelSerializer) and \
                 hasattr(instance, field.source + '_id') and \
-                json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY == RELATIONS_RENDERING_STRATEGY:
+                rendering_strategy == RELATIONS_RENDERING_STRATEGY:
             attribute = getattr(instance, field.source + '_id')
 
             if attribute is None:

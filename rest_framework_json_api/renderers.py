@@ -53,7 +53,7 @@ class JSONRenderer(renderers.JSONRenderer):
         Builds the `attributes` object of the JSON API resource object.
         """
         data = OrderedDict()
-        nested_serializers_rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
         for field_name, field in iter(fields.items()):
             # ID is always provided in the root of JSON API so remove it from attributes
             if field_name == 'id':
@@ -68,9 +68,9 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             if isinstance(field, BaseSerializer):
-                if nested_serializers_rendering_strategy == RELATIONS_RENDERING_STRATEGY:
+                if rendering_strategy == RELATIONS_RENDERING_STRATEGY:
                     continue
-                elif nested_serializers_rendering_strategy == ATTRIBUTE_RENDERING_STRATEGY:
+                elif rendering_strategy == ATTRIBUTE_RENDERING_STRATEGY:
                     pass
 
             # Skip read_only attribute fields when `resource` is an empty
@@ -97,7 +97,7 @@ class JSONRenderer(renderers.JSONRenderer):
         from rest_framework_json_api.relations import ResourceRelatedField
 
         data = OrderedDict()
-        nested_serializers_rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
 
         # Don't try to extract relationships from a non-existent resource
         if resource_instance is None:
@@ -252,7 +252,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-            if nested_serializers_rendering_strategy == RELATIONS_RENDERING_STRATEGY:
+            if rendering_strategy == RELATIONS_RENDERING_STRATEGY:
                 if isinstance(field, ListSerializer):
                     resolved, relation_instance = utils.get_relation_instance(
                         resource_instance, source, field.parent
@@ -337,7 +337,7 @@ class JSONRenderer(renderers.JSONRenderer):
         included_serializers = utils.get_included_serializers(current_serializer)
         included_resources = copy.copy(included_resources)
         included_resources = [inflection.underscore(value) for value in included_resources]
-        nested_serializers_rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
 
         for field_name, field in iter(fields.items()):
             # Skip URL field
@@ -392,7 +392,7 @@ class JSONRenderer(renderers.JSONRenderer):
                                       for key in included_resources
                                       if field_name == key.split('.')[0]]
 
-            if nested_serializers_rendering_strategy == RELATIONS_RENDERING_STRATEGY:
+            if rendering_strategy == RELATIONS_RENDERING_STRATEGY:
                 if isinstance(field, ListSerializer):
                     serializer = field.child
                     relation_type = utils.get_resource_type_from_serializer(serializer)
