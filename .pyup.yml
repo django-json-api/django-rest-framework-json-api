@@ -1,4 +1,5 @@
 search: False
+schedule: "every two weeks"
 requirements:
   - requirements/requirements-codestyle.txt:
       update: all

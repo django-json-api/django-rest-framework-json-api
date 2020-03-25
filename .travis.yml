@@ -1,4 +1,5 @@
 language: python
+dist: xenial
 sudo: required
 cache: pip
 # Favor explicit over implicit and use an explicit build matrix.
@@ -12,6 +13,10 @@ matrix:
     - env: TOXENV=py35-django22-drfmaster
     - env: TOXENV=py36-django22-drfmaster
     - env: TOXENV=py37-django22-drfmaster
+    - env: TOXENV=py38-django22-drfmaster
+    - env: TOXENV=py36-django30-drfmaster
+    - env: TOXENV=py37-django30-drfmaster
+    - env: TOXENV=py38-django30-drfmaster
 
   include:
     - python: 3.6
@@ -22,49 +27,71 @@ matrix:
     - python: 3.5
       env: TOXENV=py35-django111-drf310
     - python: 3.5
+      env: TOXENV=py35-django111-drf311
+    - python: 3.5
       env: TOXENV=py35-django111-drfmaster
     - python: 3.5
       env: TOXENV=py35-django21-drf310
     - python: 3.5
+      env: TOXENV=py35-django21-drf311
+    - python: 3.5
       env: TOXENV=py35-django21-drfmaster
     - python: 3.5
-      dist: xenial
       env: TOXENV=py35-django22-drf310
     - python: 3.5
-      dist: xenial
+      env: TOXENV=py35-django22-drf311
+    - python: 3.5
       env: TOXENV=py35-django22-drfmaster
 
     - python: 3.6
       env: TOXENV=py36-django111-drf310
     - python: 3.6
+      env: TOXENV=py36-django111-drf311
+    - python: 3.6
       env: TOXENV=py36-django111-drfmaster
     - python: 3.6
       env: TOXENV=py36-django21-drf310
     - python: 3.6
+      env: TOXENV=py36-django21-drf311
+    - python: 3.6
       env: TOXENV=py36-django21-drfmaster
     - python: 3.6
-      dist: xenial
       env: TOXENV=py36-django22-drf310
     - python: 3.6
-      dist: xenial
+      env: TOXENV=py36-django22-drf311
+    - python: 3.6
       env: TOXENV=py36-django22-drfmaster
+    - python: 3.6
+      env: TOXENV=py36-django30-drf311
+    - python: 3.6
+      env: TOXENV=py36-django30-drfmaster
 
     - python: 3.7
-      dist: xenial
-      sudo: required
       env: TOXENV=py37-django21-drf310
     - python: 3.7
-      dist: xenial
-      sudo: required
+      env: TOXENV=py37-django21-drf311
+    - python: 3.7
       env: TOXENV=py37-django21-drfmaster
     - python: 3.7
-      dist: xenial
-      sudo: required
       env: TOXENV=py37-django22-drf310
     - python: 3.7
-      dist: xenial
-      sudo: required
+      env: TOXENV=py37-django22-drf311
+    - python: 3.7
       env: TOXENV=py37-django22-drfmaster
+    - python: 3.7
+      env: TOXENV=py37-django30-drf311
+    - python: 3.7
+      env: TOXENV=py37-django30-drfmaster
+
+    - python: 3.8
+      env: TOXENV=py38-django22-drf311
+    - python: 3.8
+      env: TOXENV=py38-django22-drfmaster
+    - python: 3.8
+      env: TOXENV=py38-django30-drf311
+    - python: 3.8
+      env: TOXENV=py38-django30-drfmaster
+
 install:
   - pip install tox
 script:

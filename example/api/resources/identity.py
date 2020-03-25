@@ -23,8 +23,8 @@ class Identity(viewsets.ModelViewSet):
         posts = [{'id': 1, 'title': 'Test Blog Post'}]
 
         data = {
-            encoding.force_text('identities'): IdentitySerializer(identities, many=True).data,
-            encoding.force_text('posts'): PostSerializer(posts, many=True).data,
+            encoding.force_str('identities'): IdentitySerializer(identities, many=True).data,
+            encoding.force_str('posts'): PostSerializer(posts, many=True).data,
         }
         return Response(utils.format_field_names(data, format_type='camelize'))
 

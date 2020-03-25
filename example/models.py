@@ -151,6 +151,13 @@ class ResearchProject(Project):
     supervisor = models.CharField(max_length=30)
 
 
+class LabResults(models.Model):
+    research_project = models.ForeignKey(
+        ResearchProject, related_name='lab_results', on_delete=models.CASCADE)
+    date = models.DateField()
+    measurements = models.TextField()
+
+
 class Company(models.Model):
     name = models.CharField(max_length=100)
     current_project = models.ForeignKey(
