@@ -40,7 +40,8 @@ class TestRenderingStrategy(TestBase):
         )
 
     def test_attribute_rendering_strategy(self):
-        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=ATTRIBUTE_RENDERING_STRATEGY):
+        with override_settings(
+                JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=ATTRIBUTE_RENDERING_STRATEGY):
             response = self.client.get(self.list_url)
 
         expected = {
@@ -81,7 +82,8 @@ class TestRenderingStrategy(TestBase):
         assert expected == response.json()
 
     def test_relations_rendering_strategy(self):
-        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=RELATIONS_RENDERING_STRATEGY):
+        with override_settings(
+                JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=RELATIONS_RENDERING_STRATEGY):
             response = self.client.get(self.list_url)
 
         expected = {
@@ -122,14 +124,15 @@ class TestRenderingStrategy(TestBase):
         assert expected == response.json()
 
     def test_relations_rendering_strategy_included(self):
-        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=RELATIONS_RENDERING_STRATEGY):
+        with override_settings(
+                JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=RELATIONS_RENDERING_STRATEGY):
             response = self.client.get(self.list_url, data={'include': 'comments,comments.entry'})
 
         expected = {
             "links": {
-                "first": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=1",
-                "last": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=5",
-                "next": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=2",
+                "first": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=1",  # NoQA
+                "last": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=5",  # NoQA
+                "next": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=2",  # NoQA
                 "prev": None
             },
             "data": [
