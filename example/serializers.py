@@ -261,6 +261,10 @@ class AuthorSerializer(serializers.ModelSerializer):
 class CommentWithNestedFieldsSerializer(serializers.ModelSerializer):
     entry = EntryDRFSerializers()
 
+    included_serializers = {
+        'entry': 'example.serializers.EntryDRFSerializers'
+    }
+
     class Meta:
         model = Comment
         exclude = ('created_at', 'modified_at', 'author')
@@ -269,6 +273,10 @@ class CommentWithNestedFieldsSerializer(serializers.ModelSerializer):
 
 class AuthorWithNestedFieldsSerializer(serializers.ModelSerializer):
     comments = CommentWithNestedFieldsSerializer(many=True)
+
+    included_serializers = {
+        'comments': 'example.serializers.CommentWithNestedFieldsSerializer'
+    }
 
     class Meta:
         model = Author

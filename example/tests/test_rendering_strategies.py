@@ -4,7 +4,8 @@ import pytest
 from django.utils import timezone
 from rest_framework.reverse import reverse
 
-from rest_framework_json_api.settings import JSONAPISettings
+from rest_framework_json_api.settings import JSONAPISettings, \
+    ATTRIBUTE_RENDERING_STRATEGY, RELATIONS_RENDERING_STRATEGY
 from . import TestBase
 from example.models import Author, Blog, Comment, Entry
 from django.test import override_settings
@@ -39,7 +40,7 @@ class TestRenderingStrategy(TestBase):
         )
 
     def test_attribute_rendering_strategy(self):
-        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY='ATTRIBUTE'):
+        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=ATTRIBUTE_RENDERING_STRATEGY):
             response = self.client.get(self.list_url)
 
         expected = {
@@ -66,6 +67,118 @@ class TestRenderingStrategy(TestBase):
                                 "body": "testing one two three"
                             }
                         ]
+                    }
+                }
+            ],
+            "meta": {
+                "pagination": {
+                    "page": 1,
+                    "pages": 5,
+                    "count": 5
+                }
+            }
+        }
+        assert expected == response.json()
+
+    def test_relations_rendering_strategy(self):
+        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=RELATIONS_RENDERING_STRATEGY):
+            response = self.client.get(self.list_url)
+
+        expected = {
+            "links": {
+                "first": "http://testserver/authors-nested?page%5Bnumber%5D=1",
+                "last": "http://testserver/authors-nested?page%5Bnumber%5D=5",
+                "next": "http://testserver/authors-nested?page%5Bnumber%5D=2",
+                "prev": None
+            },
+            "data": [
+                {
+                    "type": "authors",
+                    "id": "1",
+                    "attributes": {
+                        "name": "some_author1",
+                        "email": "some_author1@example.org"
+                    },
+                    "relationships": {
+                        "comments": {
+                            "data": [
+                                {
+                                    "type": "comments",
+                                    "id": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "meta": {
+                "pagination": {
+                    "page": 1,
+                    "pages": 5,
+                    "count": 5
+                }
+            }
+        }
+        assert expected == response.json()
+
+    def test_relations_rendering_strategy_included(self):
+        with override_settings(JSON_API_NESTED_SERIALIZERS_RENDERING_STRATEGY=RELATIONS_RENDERING_STRATEGY):
+            response = self.client.get(self.list_url, data={'include': 'comments,comments.entry'})
+
+        expected = {
+            "links": {
+                "first": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=1",
+                "last": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=5",
+                "next": "http://testserver/authors-nested?include=comments%2Ccomments.entry&page%5Bnumber%5D=2",
+                "prev": None
+            },
+            "data": [
+                {
+                    "type": "authors",
+                    "id": "1",
+                    "attributes": {
+                        "name": "some_author1",
+                        "email": "some_author1@example.org"
+                    },
+                    "relationships": {
+                        "comments": {
+                            "data": [
+                                {
+                                    "type": "comments",
+                                    "id": "1"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "included": [
+                {
+                    "type": "comments",
+                    "id": "1",
+                    "attributes": {
+                        "body": "testing one two three"
+                    },
+                    "relationships": {
+                        "entry": {
+                            "data": {
+                                "type": "entries",
+                                "id": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "entries",
+                    "id": "1",
+                    "attributes": {},
+                    "relationships": {
+                        "tags": {
+                            "data": []
+                        }
+                    },
+                    "links": {
+                        "self": "http://testserver/drf-blogs/1"
                     }
                 }
             ],
