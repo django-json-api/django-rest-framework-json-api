@@ -150,7 +150,7 @@ class JSONParser(parsers.JSONParser):
                     "The resource object's id ({data_id}) does not match url's "
                     "lookup id ({url_id})".format(
                         data_id=data.get('id'),
-                        url_id=view.kwargs[view.lookup_field]
+                        url_id=view.kwargs[lookup_url_kwarg]
                     )
                 )
 
