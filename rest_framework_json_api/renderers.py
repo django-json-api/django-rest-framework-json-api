@@ -114,7 +114,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             # Skip fields without relations
             if not isinstance(
-                field, (relations.RelatedField, relations.ManyRelatedField)
+                field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)
             ):
                 continue
 
@@ -349,7 +349,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             # Skip fields without relations
             if not isinstance(
-                field, (relations.RelatedField, relations.ManyRelatedField)
+                field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)
             ):
                 continue
 
