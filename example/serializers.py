@@ -258,31 +258,6 @@ class AuthorSerializer(serializers.ModelSerializer):
         return obj.entries.first()
 
 
-class CommentWithNestedFieldsSerializer(serializers.ModelSerializer):
-    entry = EntryDRFSerializers()
-
-    included_serializers = {
-        'entry': 'example.serializers.EntryDRFSerializers'
-    }
-
-    class Meta:
-        model = Comment
-        exclude = ('created_at', 'modified_at', 'author')
-        # fields = ('entry', 'body', 'author',)
-
-
-class AuthorWithNestedFieldsSerializer(serializers.ModelSerializer):
-    comments = CommentWithNestedFieldsSerializer(many=True)
-
-    included_serializers = {
-        'comments': 'example.serializers.CommentWithNestedFieldsSerializer'
-    }
-
-    class Meta:
-        model = Author
-        fields = ('name', 'email', 'comments')
-
-
 class WriterSerializer(serializers.ModelSerializer):
     included_serializers = {
         'bio': AuthorBioSerializer

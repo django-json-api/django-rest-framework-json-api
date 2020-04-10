@@ -53,7 +53,7 @@ class JSONRenderer(renderers.JSONRenderer):
         Builds the `attributes` object of the JSON API resource object.
         """
         data = OrderedDict()
-        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
         for field_name, field in iter(fields.items()):
             # ID is always provided in the root of JSON API so remove it from attributes
             if field_name == 'id':
@@ -67,11 +67,8 @@ class JSONRenderer(renderers.JSONRenderer):
             ):
                 continue
 
-            if isinstance(field, BaseSerializer):
-                if rendering_strategy == RELATIONS_RENDERING_STRATEGY:
-                    continue
-                elif rendering_strategy == ATTRIBUTE_RENDERING_STRATEGY:
-                    pass
+            if isinstance(field, BaseSerializer) and not render_nested_as_attribute:
+                continue
 
             # Skip read_only attribute fields when `resource` is an empty
             # serializer. Prevents the "Raw Data" form of the browsable API
@@ -97,7 +94,7 @@ class JSONRenderer(renderers.JSONRenderer):
         from rest_framework_json_api.relations import ResourceRelatedField
 
         data = OrderedDict()
-        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
 
         # Don't try to extract relationships from a non-existent resource
         if resource_instance is None:
@@ -118,8 +115,7 @@ class JSONRenderer(renderers.JSONRenderer):
             ):
                 continue
 
-            if isinstance(field, BaseSerializer) and \
-                    rendering_strategy == ATTRIBUTE_RENDERING_STRATEGY:
+            if isinstance(field, BaseSerializer) and render_nested_as_attribute:
                 continue
 
             source = field.source
@@ -340,7 +336,7 @@ class JSONRenderer(renderers.JSONRenderer):
         included_serializers = utils.get_included_serializers(current_serializer)
         included_resources = copy.copy(included_resources)
         included_resources = [inflection.underscore(value) for value in included_resources]
-        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
 
         for field_name, field in iter(fields.items()):
             # Skip URL field
@@ -353,8 +349,7 @@ class JSONRenderer(renderers.JSONRenderer):
             ):
                 continue
 
-            if isinstance(field, BaseSerializer) and \
-                    rendering_strategy == ATTRIBUTE_RENDERING_STRATEGY:
+            if isinstance(field, BaseSerializer) and render_nested_as_attribute:
                 continue
 
             try:

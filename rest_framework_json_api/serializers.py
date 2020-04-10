@@ -195,11 +195,11 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     def _get_field_representation(self, field, instance):
         request = self.context.get('request')
         is_included = field.source in get_included_resources(request)
-        rendering_strategy = json_api_settings.NESTED_SERIALIZERS_RENDERING_STRATEGY
+        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
         if not is_included and \
                 isinstance(field, ModelSerializer) and \
                 hasattr(instance, field.source + '_id') and \
-                rendering_strategy == RELATIONS_RENDERING_STRATEGY:
+                not render_nested_as_attribute:
             attribute = getattr(instance, field.source + '_id')
 
             if attribute is None:
