@@ -10,9 +10,6 @@ import warnings
 
 JSON_API_SETTINGS_PREFIX = 'JSON_API_'
 
-RELATIONS_RENDERING_STRATEGY = 'RELATIONS'
-ATTRIBUTE_RENDERING_STRATEGY = 'ATTRIBUTE'
-
 DEFAULTS = {
     'FORMAT_FIELD_NAMES': False,
     'FORMAT_TYPES': False,
@@ -32,12 +29,14 @@ class JSONAPISettings(object):
         self.defaults = defaults
         self.user_settings = user_settings
 
+        field_name = JSON_API_SETTINGS_PREFIX + 'SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'
+
         value = getattr(
             self.user_settings,
-            JSON_API_SETTINGS_PREFIX + 'SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE',
+            field_name,
             self.defaults['SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'])
 
-        if not value and not hasattr(self.user_settings, JSON_API_SETTINGS_PREFIX + 'SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'):
+        if not value and not hasattr(self.user_settings, field_name):
             warnings.warn(DeprecationWarning(
                 "Rendering nested serializers in relations by default is deprecated and will be "
                 "changed in future releases. Please, use ResourceRelatedField or set "

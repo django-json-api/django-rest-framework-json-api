@@ -15,7 +15,7 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_serializer
 )
 
-from rest_framework_json_api.settings import json_api_settings, RELATIONS_RENDERING_STRATEGY
+from rest_framework_json_api.settings import json_api_settings
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
