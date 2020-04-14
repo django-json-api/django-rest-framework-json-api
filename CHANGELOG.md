@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+### Fixed
+
+* Shadowed AttributeError for PUT and PATCH methods in `APIView` 
+
 ## [3.1.0] - 2020-02-08
 
 ### Added
