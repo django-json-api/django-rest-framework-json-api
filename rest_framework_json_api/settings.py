@@ -29,19 +29,6 @@ class JSONAPISettings(object):
         self.defaults = defaults
         self.user_settings = user_settings
 
-        field_name = JSON_API_SETTINGS_PREFIX + 'SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'
-
-        value = getattr(
-            self.user_settings,
-            field_name,
-            self.defaults['SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'])
-
-        if not value and not hasattr(self.user_settings, field_name):
-            warnings.warn(DeprecationWarning(
-                "Rendering nested serializers in relations by default is deprecated and will be "
-                "changed in future releases. Please, use ResourceRelatedField or set "
-                "JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE to False"))
-
     def __getattr__(self, attr):
         if attr not in self.defaults:
             raise AttributeError("Invalid JSON API setting: '%s'" % attr)

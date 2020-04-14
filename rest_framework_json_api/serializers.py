@@ -1,3 +1,5 @@
+import warnings
+
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
@@ -117,8 +119,41 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
+class SerializerMetaclass(SerializerMetaclass):
+
+    @classmethod
+    def _get_declared_fields(cls, bases, attrs):
+        fields = super()._get_declared_fields(bases, attrs)
+        setting_name = 'JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'
+        for field_name, field in fields.items():
+            if isinstance(field, BaseSerializer) and \
+                    not json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE and \
+                    not hasattr(json_api_settings.user_settings, setting_name):
+                clazz = '{}.{}'.format(attrs['__module__'], attrs['__qualname__'])
+                if isinstance(field, ListSerializer):
+                    nested_class = type(field.child).__name__
+                else:
+                    nested_class = type(field).__name__
+
+                warnings.warn(DeprecationWarning(
+                    "Rendering nested serializers in relations by default is deprecated and will "
+                    "be changed in future releases. Please, use ResourceRelatedField instead of "
+                    "{} in serializer {} or set JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE"
+                    " to False".format(nested_class, clazz)))
+        return fields
+
+
+# If user imports serializer from here we can catch class definition and check
+# nested serializers for depricated use. Probably it is not bad idea to add
+# sparse and included mixins to this definition, in case people want to use
+# DRF-JA without models underlying.
+class Serializer(Serializer, metaclass=SerializerMetaclass):
+    pass
+
+
 class HyperlinkedModelSerializer(
-        IncludedResourcesValidationMixin, SparseFieldsetsMixin, HyperlinkedModelSerializer
+        IncludedResourcesValidationMixin, SparseFieldsetsMixin, HyperlinkedModelSerializer,
+        metaclass=SerializerMetaclass
 ):
     """
     A type of `ModelSerializer` that uses hyperlinked relationships instead
@@ -134,7 +169,8 @@ class HyperlinkedModelSerializer(
     """
 
 
-class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, ModelSerializer):
+class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, ModelSerializer,
+                      metaclass=SerializerMetaclass):
     """
     A `ModelSerializer` is just a regular `Serializer`, except that:
 

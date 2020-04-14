@@ -57,7 +57,6 @@ urlpatterns = [
 
 
 @override_settings(ROOT_URLCONF=__name__)
-@pytest.mark.filterwarnings('ignore:Rendering nested')
 class TestNestedErrors(TestBase):
 
     def setUp(self):
@@ -200,3 +199,18 @@ class TestNestedErrors(TestBase):
         }
 
         self.perform_error_test(data, '/data/attributes/comments/0/attachment/data')
+
+
+@pytest.mark.filterwarning('default::DeprecationWarning:rest_framework_json_api.serializers')
+def test_deprecation_warning(recwarn):
+    class DummyNestedSerializer(serializers.Serializer):
+        field = serializers.CharField()
+
+    class DummySerializer(serializers.Serializer):
+        nested = DummyNestedSerializer(many=True)
+
+    assert len(recwarn) == 1
+    warning = recwarn.pop(DeprecationWarning)
+    assert warning
+    assert str(warning.message).startswith('Rendering')
+
