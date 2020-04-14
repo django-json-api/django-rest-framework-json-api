@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework import views, status
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
+from rest_framework.test import APITestCase
 
 from rest_framework_json_api import serializers
 from rest_framework_json_api.parsers import JSONParser
@@ -107,7 +108,7 @@ urlpatterns = [
 ]
 
 
-class TestParserOnAPIView(TestCase):
+class TestParserOnAPIView(APITestCase):
 
     def setUp(self):
         class MockRequest(object):
@@ -145,7 +146,7 @@ class TestParserOnAPIView(TestCase):
         url = reverse('repeater')
         data = self.data
         data['data']['type'] = 'dummy'
-        response = self.client.patch(url, data, content_type='application/vnd.api+json')
+        response = self.client.patch(url, data=data)
         data = response.json()
 
         assert data['data']['id'] == str(123)
