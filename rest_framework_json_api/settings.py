@@ -6,7 +6,6 @@ the defaults.
 
 from django.conf import settings
 from django.core.signals import setting_changed
-import warnings
 
 JSON_API_SETTINGS_PREFIX = 'JSON_API_'
 

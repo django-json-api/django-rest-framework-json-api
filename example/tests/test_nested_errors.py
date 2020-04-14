@@ -1,11 +1,8 @@
-import json
-
 import pytest
 from django.conf.urls import url
 from django.test import override_settings
 from django.urls import reverse
 
-# from example import urls_test
 from example.models import Blog
 from example.tests import TestBase
 from rest_framework_json_api import serializers
@@ -213,4 +210,3 @@ def test_deprecation_warning(recwarn):
     warning = recwarn.pop(DeprecationWarning)
     assert warning
     assert str(warning.message).startswith('Rendering')
-

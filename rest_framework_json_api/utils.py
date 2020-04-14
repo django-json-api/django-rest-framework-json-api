@@ -351,7 +351,7 @@ def format_error_object(message, pointer, response):
     errors = []
     if isinstance(message, dict):
         for k, v in message.items():
-            errors.extend(format_error_object(v,  pointer + '/{}'.format(k), response))
+            errors.extend(format_error_object(v, pointer + '/{}'.format(k), response))
     elif isinstance(message, list):
         for num, error in enumerate(message):
             if isinstance(error, (list, dict)):
