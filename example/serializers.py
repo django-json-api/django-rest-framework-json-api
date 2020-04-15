@@ -126,30 +126,24 @@ class EntrySerializer(serializers.ModelSerializer):
         related_link_view_name='entry-suggested',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
-        source='get_suggested',
         model=Entry,
         many=True,
-        read_only=True
     )
     # many related hyperlinked from serializer
     suggested_hyperlinked = relations.SerializerMethodHyperlinkedRelatedField(
         related_link_view_name='entry-suggested',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
-        source='get_suggested',
         model=Entry,
         many=True,
-        read_only=True
     )
     # single related from serializer
-    featured = relations.SerializerMethodResourceRelatedField(
-        source='get_featured', model=Entry, read_only=True)
+    featured = relations.SerializerMethodResourceRelatedField(model=Entry)
     # single related hyperlinked from serializer
     featured_hyperlinked = relations.SerializerMethodHyperlinkedRelatedField(
         related_link_view_name='entry-featured',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
-        source='get_featured',
         model=Entry,
         read_only=True
     )
@@ -229,8 +223,6 @@ class AuthorSerializer(serializers.ModelSerializer):
         related_link_view_name='author-related',
         self_link_view_name='author-relationships',
         model=Entry,
-        read_only=True,
-        source='get_first_entry'
     )
     comments = relations.HyperlinkedRelatedField(
         related_link_view_name='author-related',
