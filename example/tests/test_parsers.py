@@ -4,7 +4,7 @@ from io import BytesIO
 from django.conf.urls import url
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from rest_framework import views, status
+from rest_framework import status, views
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
