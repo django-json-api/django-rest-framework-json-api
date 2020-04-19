@@ -4,7 +4,6 @@ import pytest
 from django.test import override_settings
 from django.utils import timezone
 
-from example.tests import TestBase
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
 
