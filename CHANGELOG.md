@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for serializiing complex structures as attributes. For details please reffer to #769
+* Avoid `AttributeError` for PUT and PATCH methods when using `APIView`
 
 ## [3.1.0] - 2020-02-08
 
