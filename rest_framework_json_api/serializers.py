@@ -124,11 +124,9 @@ class SerializerMetaclass(SerializerMetaclass):
     @classmethod
     def _get_declared_fields(cls, bases, attrs):
         fields = super()._get_declared_fields(bases, attrs)
-        setting_name = 'JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE'
         for field_name, field in fields.items():
             if isinstance(field, BaseSerializer) and \
-                    not json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE and \
-                    not hasattr(json_api_settings.user_settings, setting_name):
+                    not json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE:
                 clazz = '{}.{}'.format(attrs['__module__'], attrs['__qualname__'])
                 if isinstance(field, ListSerializer):
                     nested_class = type(field.child).__name__
@@ -136,18 +134,20 @@ class SerializerMetaclass(SerializerMetaclass):
                     nested_class = type(field).__name__
 
                 warnings.warn(DeprecationWarning(
-                    "Rendering nested serializers in relations by default is deprecated and will "
-                    "be changed in future releases. Please, use ResourceRelatedField instead of "
-                    "{} in serializer {} or set JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE"
-                    " to False".format(nested_class, clazz)))
+                    "Rendering nested serializer as relationship is deprecated. "
+                    "Use `ResourceRelatedField` instead if {} in serializer {} should remain "
+                    "a relationship. Otherwise set "
+                    "JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE to True to render nested "
+                    "serializer as nested json attribute".format(nested_class, clazz)))
         return fields
 
 
 # If user imports serializer from here we can catch class definition and check
-# nested serializers for depricated use. Probably it is not bad idea to add
-# sparse and included mixins to this definition, in case people want to use
-# DRF-JA without models underlying.
-class Serializer(Serializer, metaclass=SerializerMetaclass):
+# nested serializers for depricated use.
+class Serializer(
+    IncludedResourcesValidationMixin, SparseFieldsetsMixin, Serializer,
+    metaclass=SerializerMetaclass
+):
     pass
 
 

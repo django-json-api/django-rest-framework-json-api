@@ -174,55 +174,52 @@ def test_extract_relation_instance(comment):
     assert got == comment.entry.blog
 
 
-class TestRenderingStrategy(TestBase):
+def test_attribute_rendering_strategy(db):
+    # setting up
+    blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+    entry = Entry.objects.create(
+        blog=blog,
+        headline='headline',
+        body_text='body_text',
+        pub_date=timezone.now(),
+        mod_date=timezone.now(),
+        n_comments=0,
+        n_pingbacks=0,
+        rating=3
+    )
 
-    def setUp(self):
-        super(TestRenderingStrategy, self).setUp()
-        self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
-        self.entry = Entry.objects.create(
-            blog=self.blog,
-            headline='headline',
-            body_text='body_text',
-            pub_date=timezone.now(),
-            mod_date=timezone.now(),
-            n_comments=0,
-            n_pingbacks=0,
-            rating=3
-        )
+    author = Author.objects.create(name='some_author', email='some_author@example.org')
+    entry.authors.add(author)
 
-        self.author = Author.objects.create(name='some_author', email='some_author@example.org')
-        self.entry.authors.add(self.author)
+    Comment.objects.create(
+        entry=entry,
+        body='testing one two three',
+        author=Author.objects.first()
+    )
 
-        self.comment = Comment.objects.create(
-            entry=self.entry,
-            body='testing one two three',
-            author=Author.objects.first()
-        )
+    with override_settings(
+            JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE=True):
+        rendered = render_dummy_test_serialized_view(AuthorWithNestedFieldsViewSet, author)
+        result = json.loads(rendered.decode())
 
-    def test_attribute_rendering_strategy(self):
-        with override_settings(
-                JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE=True):
-            rendered = render_dummy_test_serialized_view(AuthorWithNestedFieldsViewSet, self.author)
-            result = json.loads(rendered.decode())
-
-        expected = {
-            "data": {
-                "type": "authors",
-                "id": "1",
-                "attributes": {
-                    "name": "some_author",
-                    "email": "some_author@example.org",
-                    "comments": [
-                        {
-                            "id": 1,
-                            "entry": {
-                                'headline': 'headline',
-                                'body_text': 'body_text',
-                            },
-                            "body": "testing one two three"
-                        }
-                    ]
-                }
+    expected = {
+        "data": {
+            "type": "authors",
+            "id": "1",
+            "attributes": {
+                "name": "some_author",
+                "email": "some_author@example.org",
+                "comments": [
+                    {
+                        "id": 1,
+                        "entry": {
+                            'headline': 'headline',
+                            'body_text': 'body_text',
+                        },
+                        "body": "testing one two three"
+                    }
+                ]
             }
         }
-        self.assertDictEqual(expected, result)
+    }
+    assert expected == result
