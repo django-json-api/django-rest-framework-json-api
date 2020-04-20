@@ -101,19 +101,19 @@ class DjangoFilterBackend(DjangoFilterBackend):
         filter_keys = []
         # rewrite filter[field] query params to make DjangoFilterBackend work.
         data = request.query_params.copy()
-        for qp, val in request.query_params.items():
+        for qp, val in request.query_params.lists():
             m = self.filter_regex.match(qp)
             if m and (not m.groupdict()['assoc'] or
                       m.groupdict()['ldelim'] != '[' or m.groupdict()['rdelim'] != ']'):
                 raise ValidationError("invalid query parameter: {}".format(qp))
             if m and qp != self.search_param:
-                if not val:
+                if not val[0]:
                     raise ValidationError("missing {} test value".format(qp))
                 # convert jsonapi relationship path to Django ORM's __ notation
                 key = m.groupdict()['assoc'].replace('.', '__')
                 # undo JSON_API_FORMAT_FIELD_NAMES conversion:
                 key = format_value(key, 'underscore')
-                data[key] = val
+                data.setlist(key, val)
                 filter_keys.append(key)
                 del data[qp]
         return {
