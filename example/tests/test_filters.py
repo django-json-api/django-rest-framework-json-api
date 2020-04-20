@@ -337,6 +337,60 @@ class DJATestFilters(APITestCase):
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "missing filter[headline] test value")
 
+    def test_filter_single_relation(self):
+        """
+        test for filter with a single relation
+        e.g. filterset-entries?filter[authors.id]=1
+        looks for entries written by (at least) author.id=1
+        """
+        response = self.client.get(self.fs_url, data={'filter[authors.id]': 1})
+
+        self.assertEqual(response.status_code, 200,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+
+        ids = [k['id'] for k in dja_response['data']]
+
+        expected_ids = [str(k.id) for k in self.entries.filter(authors__id=1)]
+
+        self.assertEqual(set(ids), set(expected_ids))
+
+    def test_filter_repeated_relations(self):
+        """
+        test for filters with repeated relations
+        e.g. filterset-entries?filter[authors.id]=1&filter[authors.id]=2
+        looks for entries written by (at least) author.id=1 AND author.id=2
+        """
+        response = self.client.get(self.fs_url, data={'filter[authors.id]': [1, 2]})
+
+        self.assertEqual(response.status_code, 200,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+
+        ids = [k['id'] for k in dja_response['data']]
+
+        expected_ids = [str(k.id) for k in self.entries.filter(authors__id=1).filter(authors__id=2)]
+
+        self.assertEqual(set(ids), set(expected_ids))
+
+    def test_filter_in(self):
+        """
+        test for the in filter
+        e.g. filterset-entries?filter[authors.id.in]=1,2
+        looks for entries written by (at least) author.id=1 OR author.id=2
+        """
+        response = self.client.get(self.fs_url, data={'filter[authors.id.in]': '1,2'})
+
+        self.assertEqual(response.status_code, 200,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+
+        ids = [k['id'] for k in dja_response['data']]
+
+        expected_ids = [str(k.id) for k in self.entries.filter(authors__id__in=[1, 2])]
+
+        self.assertEqual(set(ids), set(expected_ids))
+
     def test_search_keywords(self):
         """
         test for `filter[search]="keywords"` where some of the keywords are in the entry and
@@ -488,7 +542,7 @@ class DJATestFilters(APITestCase):
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "invalid query parameter: garbage")
 
-    def test_param_duplicate(self):
+    def test_param_duplicate_sort(self):
         """
         Test a duplicated query parameter:
         `?sort=headline&page[size]=3&sort=bodyText` is not allowed.
@@ -503,6 +557,17 @@ class DJATestFilters(APITestCase):
         dja_response = response.json()
         self.assertEqual(dja_response['errors'][0]['detail'],
                          "repeated query parameter not allowed: sort")
+
+    def test_param_duplicate_page(self):
+        """
+        test a duplicated page[size] query parameter
+        """
+        response = self.client.get(self.fs_url, data={'page[size]': [1, 2]})
+        self.assertEqual(response.status_code, 400,
+                         msg=response.content.decode("utf-8"))
+        dja_response = response.json()
+        self.assertEqual(dja_response['errors'][0]['detail'],
+                         "repeated query parameter not allowed: page[size]")
 
     def test_many_params(self):
         """

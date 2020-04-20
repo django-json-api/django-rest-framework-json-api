@@ -147,9 +147,21 @@ class EntryFilter(filters.FilterSet):
     bname = filters.CharFilter(field_name="blog__name",
                                lookup_expr="exact")
 
+    authors__id = filters.ModelMultipleChoiceFilter(
+        field_name='authors',
+        to_field_name='id',
+        conjoined=True,  # to "and" the ids
+        queryset=Author.objects.all(),
+    )
+
     class Meta:
         model = Entry
-        fields = ['id', 'headline', 'body_text']
+        fields = {
+            'id': ('exact',),
+            'headline': ('exact',),
+            'body_text': ('exact',),
+            'authors__id': ('in',),
+        }
 
 
 class FiltersetEntryViewSet(EntryViewSet):
@@ -159,6 +171,7 @@ class FiltersetEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = EntryFilter
+    filter_backends = (QueryParameterValidationFilter, DjangoFilterBackend,)
 
 
 class NoFiltersetEntryViewSet(EntryViewSet):
