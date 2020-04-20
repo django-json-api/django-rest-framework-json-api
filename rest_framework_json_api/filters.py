@@ -70,7 +70,7 @@ class QueryParameterValidationFilter(BaseFilterBackend):
     """
     #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters:
     #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
-    query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+    query_regex = re.compile(r'^(sort|include)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$')
 
     def validate_query_params(self, request):
         """
@@ -82,9 +82,10 @@ class QueryParameterValidationFilter(BaseFilterBackend):
         # TODO: For jsonapi error object conformance, must set jsonapi errors "parameter" for
         # the ValidationError. This requires extending DRF/DJA Exceptions.
         for qp in request.query_params.keys():
-            if not self.query_regex.match(qp):
+            m = self.query_regex.match(qp)
+            if not m:
                 raise ValidationError('invalid query parameter: {}'.format(qp))
-            if len(request.query_params.getlist(qp)) > 1:
+            if not m.group('type') == 'filter' and len(request.query_params.getlist(qp)) > 1:
                 raise ValidationError(
                     'repeated query parameter not allowed: {}'.format(qp))
 
