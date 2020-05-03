@@ -7,21 +7,17 @@ from django.utils import timezone
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
-from example.factories import ArtProjectFactory
 from rest_framework_json_api.serializers import (
     DateField,
     ModelSerializer,
     ResourceIdentifierObjectSerializer,
-    empty,
+    empty
 )
 from rest_framework_json_api.utils import format_resource_type
 
+from example.factories import ArtProjectFactory
 from example.models import Author, Blog, Entry
-from example.serializers import (
-    BlogSerializer,
-    ProjectSerializer,
-    ArtProjectSerializer,
-)
+from example.serializers import ArtProjectSerializer, BlogSerializer, ProjectSerializer
 
 request_factory = APIRequestFactory()
 pytestmark = pytest.mark.django_db
