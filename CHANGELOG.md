@@ -15,6 +15,16 @@ any parts of the framework not mentioned in the documentation should generally b
 * Added support for serializiing complex structures as attributes. For details please reffer to #769
 * Avoid `AttributeError` for PUT and PATCH methods when using `APIView`
 
+### Changed
+
+* `SerializerMethodResourceRelatedField` is now consistent with DRF `SerializerMethodField`:
+   * Pass `method_name` argument to specify method name. If no value is provided, it defaults to `get_{field_name}`
+
+### Deprecated
+
+* Deprecate `source` argument of `SerializerMethodResourceRelatedField`, use `method_name` instead
+
+
 ## [3.1.0] - 2020-02-08
 
 ### Added
