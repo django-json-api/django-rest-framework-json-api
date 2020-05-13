@@ -1,7 +1,6 @@
 import pytest
-from django.conf.urls import url
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import reverse, path
 
 from example.models import Blog
 from rest_framework_json_api import serializers
@@ -20,6 +19,7 @@ class CommentAttachmentSerializer(serializers.Serializer):
 class CommentSerializer(serializers.Serializer):
     attachments = CommentAttachmentSerializer(many=True, required=False)
     attachment = CommentAttachmentSerializer(required=False)
+    one_more_attachment = CommentAttachmentSerializer(required=False)
     body = serializers.CharField(allow_null=False, required=True)
 
 
@@ -47,8 +47,8 @@ class DummyTestView(views.APIView):
 
 
 urlpatterns = [
-    url(r'^entries-nested/$', DummyTestView.as_view(),
-        name='entries-nested-list')
+    path(r'^entries-nested/$', DummyTestView.as_view(),
+         name='entries-nested-list')
 ]
 
 
@@ -57,7 +57,7 @@ def some_blog(db):
     return Blog.objects.create(name='Some Blog', tagline="It's a blog")
 
 
-def perform_error_test(client, data, expected_pointer):
+def perform_error_test(client, data, expected_pointer, errors_count=1):
     with override_settings(
             JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE=True,
             ROOT_URLCONF=__name__
@@ -67,7 +67,7 @@ def perform_error_test(client, data, expected_pointer):
 
     errors = response.data
 
-    assert len(errors) == 1
+    assert len(errors) == errors_count
     assert errors[0]['source']['pointer'] == expected_pointer
 
 
@@ -202,6 +202,26 @@ def test_third_level_dict_error(client, some_blog):
     }
 
     perform_error_test(client, data, '/data/attributes/comments/0/attachment/data')
+
+
+def test_many_third_level_dict_errors(client, some_blog):
+    data = {
+        'data': {
+            'type': 'entries',
+            'attributes': {
+                'blog': some_blog.pk,
+                'body_text': 'body_text',
+                'headline': 'headline',
+                'comments': [
+                    {
+                        'attachment': {}
+                    }
+                ]
+            }
+        }
+    }
+
+    perform_error_test(client, data, '/data/attributes/comments/0/body', 2)
 
 
 @pytest.mark.filterwarning('default::DeprecationWarning:rest_framework_json_api.serializers')

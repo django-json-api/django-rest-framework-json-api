@@ -318,16 +318,7 @@ def format_drf_errors(response, context, exc):
         for field, error in response.data.items():
             field = format_value(field)
             pointer = '/data/attributes/{}'.format(field)
-            # see if they passed a dictionary to ValidationError manually
-            # The bit tricky problem is here. It is may be nested drf thing in format
-            # name: error_object, or it may be custom error thrown by user. I guess,
-            # if it is drf error, dict will always have single key
-            if isinstance(error, dict):
-                if len(error) > 1:
-                    errors.append(error)
-                else:
-                    errors.extend(format_error_object(error, pointer, response))
-            elif isinstance(exc, Http404) and isinstance(error, str):
+            if isinstance(exc, Http404) and isinstance(error, str):
                 # 404 errors don't have a pointer
                 errors.extend(format_error_object(error, None, response))
             elif isinstance(error, str):
@@ -350,8 +341,18 @@ def format_drf_errors(response, context, exc):
 def format_error_object(message, pointer, response):
     errors = []
     if isinstance(message, dict):
-        for k, v in message.items():
-            errors.extend(format_error_object(v, pointer + '/{}'.format(k), response))
+        links = message.pop('links', None)
+        source = message.pop('source', None)
+        is_custom_error = all([isinstance(x, str) for x in message.values()])
+        if links is not None:
+            message['links'] = links
+        if source is not None:
+            message['source'] = source
+        if is_custom_error:
+            errors.append(message)
+        else:
+            for k, v in message.items():
+                errors.extend(format_error_object(v, pointer + '/{}'.format(k), response))
     elif isinstance(message, list):
         for num, error in enumerate(message):
             if isinstance(error, (list, dict)):
