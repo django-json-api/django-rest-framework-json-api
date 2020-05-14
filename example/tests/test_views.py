@@ -152,6 +152,13 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
+        response = self.client.patch(url, data=request_data)
+        assert response.status_code == 200, response.content.decode()
+        assert response.data == request_data['data']
+
+        response = self.client.get(url)
+        assert response.data == request_data['data']
+
     def test_post_to_one_relationship_should_fail(self):
         url = '/entries/{}/relationships/blog'.format(self.first_entry.id)
         request_data = {
