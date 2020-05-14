@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Changed
+
+* Allowed repeated filter query parameters.
+
 ### Fixed
 
 * Avoid `AttributeError` for PUT and PATCH methods when using `APIView` 
