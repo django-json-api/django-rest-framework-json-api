@@ -135,6 +135,13 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
+        response = self.client.patch(url, data=request_data)
+        assert response.status_code == 200, response.content.decode()
+        assert response.data == request_data['data']
+
+        response = self.client.get(url)
+        assert response.data == request_data['data']
+
     def test_patch_many_to_many_relationship(self):
         url = '/entries/{}/relationships/authors'.format(self.first_entry.id)
         request_data = {
