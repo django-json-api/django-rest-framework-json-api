@@ -10,9 +10,13 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Added support for serializing nested serializers as attribute json value introducing setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE`
+
 ### Fixed
 
-* Avoid `AttributeError` for PUT and PATCH methods when using `APIView` 
+* Avoid `AttributeError` for PUT and PATCH methods when using `APIView`
 
 ### Changed
 
@@ -22,6 +26,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Deprecated
 
 * Deprecate `source` argument of `SerializerMethodResourceRelatedField`, use `method_name` instead
+* Rendering nested serializers as relationships is deprecated. Use `ResourceRelatedField` instead
 
 
 ## [3.1.0] - 2020-02-08

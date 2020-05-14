@@ -1,3 +1,5 @@
+import warnings
+
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
@@ -14,6 +16,8 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_model,
     get_resource_type_from_serializer
 )
+
+from rest_framework_json_api.settings import json_api_settings
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -115,8 +119,41 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
+class SerializerMetaclass(SerializerMetaclass):
+
+    @classmethod
+    def _get_declared_fields(cls, bases, attrs):
+        fields = super()._get_declared_fields(bases, attrs)
+        for field_name, field in fields.items():
+            if isinstance(field, BaseSerializer) and \
+                    not json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE:
+                clazz = '{}.{}'.format(attrs['__module__'], attrs['__qualname__'])
+                if isinstance(field, ListSerializer):
+                    nested_class = type(field.child).__name__
+                else:
+                    nested_class = type(field).__name__
+
+                warnings.warn(DeprecationWarning(
+                    "Rendering nested serializer as relationship is deprecated. "
+                    "Use `ResourceRelatedField` instead if {} in serializer {} should remain "
+                    "a relationship. Otherwise set "
+                    "JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE to True to render nested "
+                    "serializer as nested json attribute".format(nested_class, clazz)))
+        return fields
+
+
+# If user imports serializer from here we can catch class definition and check
+# nested serializers for depricated use.
+class Serializer(
+    IncludedResourcesValidationMixin, SparseFieldsetsMixin, Serializer,
+    metaclass=SerializerMetaclass
+):
+    pass
+
+
 class HyperlinkedModelSerializer(
-        IncludedResourcesValidationMixin, SparseFieldsetsMixin, HyperlinkedModelSerializer
+        IncludedResourcesValidationMixin, SparseFieldsetsMixin, HyperlinkedModelSerializer,
+        metaclass=SerializerMetaclass
 ):
     """
     A type of `ModelSerializer` that uses hyperlinked relationships instead
@@ -132,7 +169,8 @@ class HyperlinkedModelSerializer(
     """
 
 
-class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, ModelSerializer):
+class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, ModelSerializer,
+                      metaclass=SerializerMetaclass):
     """
     A `ModelSerializer` is just a regular `Serializer`, except that:
 
@@ -193,9 +231,11 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
     def _get_field_representation(self, field, instance):
         request = self.context.get('request')
         is_included = field.source in get_included_resources(request)
+        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
         if not is_included and \
                 isinstance(field, ModelSerializer) and \
-                hasattr(instance, field.source + '_id'):
+                hasattr(instance, field.source + '_id') and \
+                not render_nested_as_attribute:
             attribute = getattr(instance, field.source + '_id')
 
             if attribute is None:
