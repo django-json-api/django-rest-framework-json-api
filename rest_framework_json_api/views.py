@@ -286,6 +286,8 @@ class RelationshipView(generics.GenericAPIView):
             for obj in instance_manager.all():
                 setattr(obj, field_object.name, None)
                 obj.save()
+        elif hasattr(instance_manager, 'clear'):
+            instance_manager.clear()
         else:
             instance_manager.all().delete()
 
