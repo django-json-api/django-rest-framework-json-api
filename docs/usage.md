@@ -64,17 +64,17 @@ You can configure fixed values for the page size or limit -- or allow the client
 via query parameters.
 
 Two pagination classes are available:
-- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size 
+- `JsonApiPageNumberPagination` breaks a response up into pages that start at a given page number with a given size
   (number of items per page). It can be configured with the following attributes:
   - `page_query_param` (default `page[number]`)
-  - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client 
+  - `page_size_query_param` (default `page[size]`) Set this to `None` if you don't want to allow the client
      to specify the size.
   - `page_size` (default `REST_FRAMEWORK['PAGE_SIZE']`) default number of items per page unless overridden by
      `page_size_query_param`.
   - `max_page_size` (default `100`) enforces an upper bound on the `page_size_query_param`.
      Set it to `None` if you don't want to enforce an upper bound.
 
-- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for 
+- `JsonApiLimitOffsetPagination` breaks a response up into pages that start from an item's offset in the viewset for
   a given number of items (the limit).
   It can be configured with the following attributes:
   - `offset_query_param` (default `page[offset]`).
@@ -177,7 +177,8 @@ Filters can be:
 - Membership in a list of values:
     `?filter[name.in]=abc,123,zzz (name in ['abc','123','zzz'])`
 - Filters can be combined for intersection (AND):
-    `?filter[qty]=123&filter[name.in]=abc,123,zzz&filter[...]`
+    `?filter[qty]=123&filter[name.in]=abc,123,zzz&filter[...]` or
+    `?filter[authors.id]=1&filter[authors.id]=2`
 - A related resource path can be used:
     `?filter[inventory.item.partNum]=123456` (where `inventory.item` is the relationship path)
 

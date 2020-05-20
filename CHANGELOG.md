@@ -22,6 +22,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * `SerializerMethodResourceRelatedField` is now consistent with DRF `SerializerMethodField`:
    * Pass `method_name` argument to specify method name. If no value is provided, it defaults to `get_{field_name}`
+* Allowed repeated filter query parameters.
 
 ### Deprecated
 

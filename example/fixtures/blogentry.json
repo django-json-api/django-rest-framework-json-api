@@ -70,6 +70,28 @@
   }
 },
 {
+  "model": "example.author",
+  "pk": 1,
+  "fields": {
+    "created_at": "2016-05-02T10:09:48.277",
+    "modified_at": "2016-05-02T10:09:48.277",
+    "name": "Alice",
+    "email": "alice@example.com",
+    "type": null
+  }
+},
+{
+  "model": "example.author",
+  "pk": 2,
+  "fields": {
+    "created_at": "2016-05-02T10:09:57.133",
+    "modified_at": "2016-05-02T10:09:57.133",
+    "name": "Bob",
+    "email": "bob@example.com",
+    "type": null
+  }
+},
+{
   "model": "example.entry",
   "pk": 1,
   "fields": {
@@ -83,7 +105,7 @@
     "n_comments": 0,
     "n_pingbacks": 0,
     "rating": 0,
-    "authors": []
+    "authors": [1]
   }
 },
 {
@@ -100,7 +122,7 @@
     "n_comments": 0,
     "n_pingbacks": 0,
     "rating": 0,
-    "authors": []
+    "authors": [2]
   }
 },
 {
@@ -117,7 +139,7 @@
     "n_comments": 0,
     "n_pingbacks": 0,
     "rating": 0,
-    "authors": []
+    "authors": [2]
   }
 },
 {
@@ -134,7 +156,7 @@
     "n_comments": 0,
     "n_pingbacks": 0,
     "rating": 0,
-    "authors": []
+    "authors": [1,2]
   }
 },
 {
@@ -151,7 +173,7 @@
     "n_comments": 0,
     "n_pingbacks": 0,
     "rating": 0,
-    "authors": []
+    "authors": [1,2]
   }
 },
 {
@@ -168,7 +190,7 @@
     "n_comments": 0,
     "n_pingbacks": 0,
     "rating": 0,
-    "authors": []
+    "authors": [1,2]
   }
 },
 {
