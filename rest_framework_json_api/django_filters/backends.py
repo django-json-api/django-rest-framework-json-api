@@ -107,9 +107,8 @@ class DjangoFilterBackend(DjangoFilterBackend):
                       m.groupdict()['ldelim'] != '[' or m.groupdict()['rdelim'] != ']'):
                 raise ValidationError("invalid query parameter: {}".format(qp))
             if m and qp != self.search_param:
-                for v in val:
-                    if not v:
-                        raise ValidationError("missing value for query parameter {}".format(qp))
+                if not all(val):
+                    raise ValidationError("missing value for query parameter {}".format(qp))
                 # convert jsonapi relationship path to Django ORM's __ notation
                 key = m.groupdict()['assoc'].replace('.', '__')
                 # undo JSON_API_FORMAT_FIELD_NAMES conversion:
