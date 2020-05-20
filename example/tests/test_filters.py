@@ -323,7 +323,7 @@ class DJATestFilters(APITestCase):
                          msg=response.content.decode("utf-8"))
         dja_response = response.json()
         self.assertEqual(dja_response['errors'][0]['detail'],
-                         "missing filter[headline] test value")
+                         "missing value for query parameter filter[headline]")
 
     def test_filter_missing_rvalue_equal(self):
         """
@@ -335,7 +335,7 @@ class DJATestFilters(APITestCase):
                          msg=response.content.decode("utf-8"))
         dja_response = response.json()
         self.assertEqual(dja_response['errors'][0]['detail'],
-                         "missing filter[headline] test value")
+                         "missing value for query parameter filter[headline]")
 
     def test_filter_single_relation(self):
         """
