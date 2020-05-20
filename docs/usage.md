@@ -587,9 +587,67 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
 #### HyperlinkedRelatedField
 
-`HyperlinkedRelatedField` has same functionality as `ResourceRelatedField` but does
+`relations.HyperlinkedRelatedField` has same functionality as `ResourceRelatedField` but does
 not render `data`. Use this in case you only need links of relationships and want to lower payload
 and increase performance.
+
+#### SerializerMethodResourceRelatedField
+
+`relations.SerializerMethodResourceRelatedField` combines behaviour of DRF `SerializerMethodField` and 
+`ResourceRelatedField`, so it accepts `method_name` together with `model` and links-related arguments.
+`data` is rendered in `ResourceRelatedField` manner.
+
+```python
+from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import SerializerMethodResourceRelatedField
+
+from myapp.models import Order, LineItem
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+
+    line_items = SerializerMethodResourceRelatedField(
+        model=LineItem,
+        many=True,
+        method_name='get_big_line_items'
+    )
+
+    small_line_items = SerializerMethodResourceRelatedField(
+        model=LineItem,
+        many=True,
+        # default to method_name='get_small_line_items'
+    )
+
+    def get_big_line_items(self, instance):
+        return LineItem.objects.filter(order=instance).filter(amount__gt=1000)
+
+    def get_small_line_items(self, instance):
+        return LineItem.objects.filter(order=instance).filter(amount__lte=1000)
+
+```
+
+or using `related_link_*` with `HyperlinkedModelSerializer`
+
+```python
+class OrderSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Order
+
+    line_items = SerializerMethodResourceRelatedField(
+        model=LineItem,
+        many=True,
+        method_name='get_big_line_items',
+        related_link_view_name='order-lineitems-list',
+        related_link_url_kwarg='order_pk',
+    )
+
+    def get_big_line_items(self, instance):
+        return LineItem.objects.filter(order=instance).filter(amount__gt=1000)
+
+```
+
 
 #### Related urls
 

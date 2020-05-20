@@ -1,11 +1,13 @@
 import json
 
 import pytest
+from django.test import override_settings
+from django.utils import timezone
 
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
 
-from example.models import Author, Comment, Entry
+from example.models import Author, Comment, Entry, Blog
 
 
 # serializers
@@ -38,6 +40,31 @@ class DummyTestSerializer(serializers.ModelSerializer):
         included_resources = ('related_models',)
 
 
+class EntryDRFSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Entry
+        fields = ('headline', 'body_text')
+        read_only_fields = ('tags',)
+
+
+class CommentWithNestedFieldsSerializer(serializers.ModelSerializer):
+    entry = EntryDRFSerializers()
+
+    class Meta:
+        model = Comment
+        exclude = ('created_at', 'modified_at', 'author')
+        # fields = ('entry', 'body', 'author',)
+
+
+class AuthorWithNestedFieldsSerializer(serializers.ModelSerializer):
+    comments = CommentWithNestedFieldsSerializer(many=True)
+
+    class Meta:
+        model = Author
+        fields = ('name', 'email', 'comments')
+
+
 # views
 class DummyTestViewSet(views.ModelViewSet):
     queryset = Entry.objects.all()
@@ -47,6 +74,12 @@ class DummyTestViewSet(views.ModelViewSet):
 class ReadOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
     queryset = Entry.objects.all()
     serializer_class = DummyTestSerializer
+
+
+class AuthorWithNestedFieldsViewSet(views.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorWithNestedFieldsSerializer
+    resource_name = 'authors'
 
 
 def render_dummy_test_serialized_view(view_class, instance):
@@ -138,3 +171,54 @@ def test_extract_relation_instance(comment):
         field=serializer.fields['blog'], resource_instance=comment
     )
     assert got == comment.entry.blog
+
+
+def test_attribute_rendering_strategy(db):
+    # setting up
+    blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+    entry = Entry.objects.create(
+        blog=blog,
+        headline='headline',
+        body_text='body_text',
+        pub_date=timezone.now(),
+        mod_date=timezone.now(),
+        n_comments=0,
+        n_pingbacks=0,
+        rating=3
+    )
+
+    author = Author.objects.create(name='some_author', email='some_author@example.org')
+    entry.authors.add(author)
+
+    Comment.objects.create(
+        entry=entry,
+        body='testing one two three',
+        author=Author.objects.first()
+    )
+
+    with override_settings(
+            JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE=True):
+        rendered = render_dummy_test_serialized_view(AuthorWithNestedFieldsViewSet, author)
+        result = json.loads(rendered.decode())
+
+    expected = {
+        "data": {
+            "type": "authors",
+            "id": "1",
+            "attributes": {
+                "name": "some_author",
+                "email": "some_author@example.org",
+                "comments": [
+                    {
+                        "id": 1,
+                        "entry": {
+                            'headline': 'headline',
+                            'body_text': 'body_text',
+                        },
+                        "body": "testing one two three"
+                    }
+                ]
+            }
+        }
+    }
+    assert expected == result

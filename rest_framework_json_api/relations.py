@@ -1,12 +1,12 @@
 import json
+import warnings
 from collections import OrderedDict
-from collections.abc import Iterable
 
 import inflection
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
-from rest_framework.fields import MISSING_ERROR_MESSAGE, SkipField
+from rest_framework.fields import MISSING_ERROR_MESSAGE, Field, SkipField
 from rest_framework.relations import MANY_RELATION_KWARGS
 from rest_framework.relations import ManyRelatedField as DRFManyRelatedField
 from rest_framework.relations import PrimaryKeyRelatedField, RelatedField
@@ -347,51 +347,63 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
         return super(ResourceRelatedField, self).to_internal_value(data['id'])
 
 
-class SerializerMethodResourceRelatedField(ResourceRelatedField):
+class SerializerMethodFieldBase(Field):
+    def __init__(self, method_name=None, **kwargs):
+        if not method_name and kwargs.get('source'):
+            method_name = kwargs.pop('source')
+            warnings.warn(DeprecationWarning(
+                "'source' argument of {cls} is deprecated, use 'method_name' "
+                "as in SerializerMethodField".format(cls=self.__class__.__name__)), stacklevel=3)
+        self.method_name = method_name
+        kwargs['source'] = '*'
+        kwargs['read_only'] = True
+        super().__init__(**kwargs)
+
+    def bind(self, field_name, parent):
+        default_method_name = 'get_{field_name}'.format(field_name=field_name)
+        if self.method_name is None:
+            self.method_name = default_method_name
+        super().bind(field_name, parent)
+
+    def get_attribute(self, instance):
+        serializer_method = getattr(self.parent, self.method_name)
+        return serializer_method(instance)
+
+
+class ManySerializerMethodResourceRelatedField(SerializerMethodFieldBase, ResourceRelatedField):
+    def __init__(self, child_relation=None, *args, **kwargs):
+        assert child_relation is not None, '`child_relation` is a required argument.'
+        self.child_relation = child_relation
+        super().__init__(**kwargs)
+        self.child_relation.bind(field_name='', parent=self)
+
+    def to_representation(self, value):
+        return [self.child_relation.to_representation(item) for item in value]
+
+
+class SerializerMethodResourceRelatedField(SerializerMethodFieldBase, ResourceRelatedField):
     """
     Allows us to use serializer method RelatedFields
     with return querysets
     """
-    def __new__(cls, *args, **kwargs):
-        """
-        We override this because getting serializer methods
-        fails at the base class when many=True
-        """
-        if kwargs.pop('many', False):
-            return cls.many_init(*args, **kwargs)
-        return super(ResourceRelatedField, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, child_relation=None, *args, **kwargs):
-        model = kwargs.pop('model', None)
-        if child_relation is not None:
-            self.child_relation = child_relation
-        if model:
-            self.model = model
-        super(SerializerMethodResourceRelatedField, self).__init__(*args, **kwargs)
+    many_kwargs = [*MANY_RELATION_KWARGS, *LINKS_PARAMS, 'method_name', 'model']
+    many_cls = ManySerializerMethodResourceRelatedField
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        list_kwargs = {k: kwargs.pop(k) for k in LINKS_PARAMS if k in kwargs}
-        list_kwargs['child_relation'] = cls(*args, **kwargs)
-        for key in kwargs.keys():
-            if key in ('model',) + MANY_RELATION_KWARGS:
+        list_kwargs = {'child_relation': cls(**kwargs)}
+        for key in kwargs:
+            if key in cls.many_kwargs:
                 list_kwargs[key] = kwargs[key]
-        return cls(**list_kwargs)
-
-    def get_attribute(self, instance):
-        # check for a source fn defined on the serializer instead of the model
-        if self.source and hasattr(self.parent, self.source):
-            serializer_method = getattr(self.parent, self.source)
-            if hasattr(serializer_method, '__call__'):
-                return serializer_method(instance)
-        return super(SerializerMethodResourceRelatedField, self).get_attribute(instance)
-
-    def to_representation(self, value):
-        if isinstance(value, Iterable):
-            base = super(SerializerMethodResourceRelatedField, self)
-            return [base.to_representation(x) for x in value]
-        return super(SerializerMethodResourceRelatedField, self).to_representation(value)
+        return cls.many_cls(**list_kwargs)
 
 
-class SerializerMethodHyperlinkedRelatedField(SkipDataMixin, SerializerMethodResourceRelatedField):
+class ManySerializerMethodHyperlinkedRelatedField(SkipDataMixin,
+                                                  ManySerializerMethodResourceRelatedField):
     pass
+
+
+class SerializerMethodHyperlinkedRelatedField(SkipDataMixin,
+                                              SerializerMethodResourceRelatedField):
+    many_cls = ManySerializerMethodHyperlinkedRelatedField

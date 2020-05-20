@@ -290,16 +290,12 @@ class EntryModelSerializerWithHyperLinks(serializers.ModelSerializer):
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
         many=True,
-        read_only=True,
-        source='get_blog'
     )
     comments = SerializerMethodHyperlinkedRelatedField(
         related_link_view_name='entry-comments',
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
         many=True,
-        read_only=True,
-        source='get_comments'
     )
 
     class Meta:
