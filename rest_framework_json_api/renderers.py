@@ -13,11 +13,11 @@ from rest_framework.fields import SkipField, get_attribute
 from rest_framework.relations import PKOnlyObject
 from rest_framework.serializers import BaseSerializer, ListSerializer, Serializer
 from rest_framework.settings import api_settings
-from .settings import json_api_settings
 
 import rest_framework_json_api
 from rest_framework_json_api import utils
 from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedField, SkipDataMixin
+from rest_framework_json_api.settings import json_api_settings
 
 
 class JSONRenderer(renderers.JSONRenderer):
