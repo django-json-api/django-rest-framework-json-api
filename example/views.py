@@ -23,7 +23,8 @@ from example.serializers import (
     EntryDRFSerializers,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer)
+    ProjectTypeSerializer
+)
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
 

@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.renderers import JSONRenderer
 
-from example.models import Author, Comment, Entry, Blog
+from example.models import Author, Blog, Comment, Entry
 
 
 # serializers

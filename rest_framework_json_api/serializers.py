@@ -9,6 +9,7 @@ from rest_framework.serializers import *  # noqa: F403
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
+from rest_framework_json_api.settings import json_api_settings
 from rest_framework_json_api.utils import (
     get_included_resources,
     get_included_serializers,
@@ -16,8 +17,6 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_model,
     get_resource_type_from_serializer
 )
-
-from rest_framework_json_api.settings import json_api_settings
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
