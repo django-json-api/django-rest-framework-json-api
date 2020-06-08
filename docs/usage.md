@@ -370,7 +370,7 @@ Example - With format conversion set to `dasherize`:
 
 #### Types
 
-A similar option to JSON\_API\_FORMAT\_KEYS can be set for the types:
+A similar option to `JSON_API_FORMAT_FIELD_NAMES` can be set for the types:
 
 ``` python
 JSON_API_FORMAT_TYPES = 'dasherize'
