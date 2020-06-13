@@ -17,6 +17,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Avoid `AttributeError` for PUT and PATCH methods when using `APIView`
+* Clear many-to-many relationships instead of deleting related objects during PATCH on `RelationshipView`
 
 ### Changed
 
