@@ -143,6 +143,18 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
+    def test_patch_one_to_many_relaitonship_with_none(self):
+        url = '/blogs/{}/relationships/entry_set'.format(self.first_entry.id)
+        request_data = {
+            'data': None
+        }
+        response = self.client.patch(url, data=request_data)
+        assert response.status_code == 200, response.content.decode()
+        assert response.data == []
+
+        response = self.client.get(url)
+        assert response.data == []
+
     def test_patch_many_to_many_relationship(self):
         url = '/entries/{}/relationships/authors'.format(self.first_entry.id)
         request_data = {
