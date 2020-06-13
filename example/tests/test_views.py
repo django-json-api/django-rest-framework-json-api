@@ -135,6 +135,7 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
+        # retry a second time should end up with same result
         response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
@@ -159,6 +160,7 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data['data']
 
+        # retry a second time should end up with same result
         response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
         assert response.data == request_data['data']
