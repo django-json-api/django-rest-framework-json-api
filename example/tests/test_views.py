@@ -3,11 +3,15 @@ from datetime import datetime
 
 from django.test import RequestFactory
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
+from rest_framework_json_api import serializers, views
 from rest_framework_json_api.utils import format_resource_type
 
 from example.factories import AuthorFactory, CommentFactory, EntryFactory
@@ -634,3 +638,79 @@ class TestEntryViewSet(APITestCase):
         }
         got = resp.json()
         self.assertEqual(got, expected)
+
+
+class BasicAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ('name',)
+
+
+class ReadOnlyViewSetWithCustomActions(views.ReadOnlyModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = BasicAuthorSerializer
+
+    @action(detail=False, methods=['get', 'post', 'patch', 'delete'])
+    def group_action(self, request):
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['get', 'post', 'patch', 'delete'])
+    def item_action(self, request, pk):
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TestReadonlyModelViewSet(TestBase):
+    """
+        Test if ReadOnlyModelViewSet allows to have custom actions with POST, PATCH, DELETE methods
+    """
+    factory = RequestFactory()
+    viewset_class = ReadOnlyViewSetWithCustomActions
+    media_type = 'application/vnd.api+json'
+
+    def test_group_action_allows_get(self):
+        view = self.viewset_class.as_view({'get': 'group_action'})
+        request = self.factory.get('/')
+        response = view(request)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_group_action_allows_post(self):
+        view = self.viewset_class.as_view({'post': 'group_action'})
+        request = self.factory.post('/', '{}', content_type=self.media_type)
+        response = view(request)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_group_action_allows_patch(self):
+        view = self.viewset_class.as_view({'patch': 'group_action'})
+        request = self.factory.patch('/', '{}', content_type=self.media_type)
+        response = view(request)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_group_action_allows_delete(self):
+        view = self.viewset_class.as_view({'delete': 'group_action'})
+        request = self.factory.delete('/', '{}', content_type=self.media_type)
+        response = view(request)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_item_action_allows_get(self):
+        view = self.viewset_class.as_view({'get': 'item_action'})
+        request = self.factory.get('/')
+        response = view(request, pk='1')
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_item_action_allows_post(self):
+        view = self.viewset_class.as_view({'post': 'item_action'})
+        request = self.factory.post('/', '{}', content_type=self.media_type)
+        response = view(request, pk='1')
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_item_action_allows_patch(self):
+        view = self.viewset_class.as_view({'patch': 'item_action'})
+        request = self.factory.patch('/', '{}', content_type=self.media_type)
+        response = view(request, pk='1')
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_item_action_allows_delete(self):
+        view = self.viewset_class.as_view({'delete': 'item_action'})
+        request = self.factory.delete('/', '{}', content_type=self.media_type)
+        response = view(request, pk='1')
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
