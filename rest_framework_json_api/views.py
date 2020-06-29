@@ -210,7 +210,7 @@ class ModelViewSet(AutoPrefetchMixin,
 class ReadOnlyModelViewSet(AutoPrefetchMixin,
                            RelatedMixin,
                            viewsets.ReadOnlyModelViewSet):
-    http_method_names = ['get', 'head', 'options']
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
 
 class RelationshipView(generics.GenericAPIView):

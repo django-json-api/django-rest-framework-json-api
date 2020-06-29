@@ -18,6 +18,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Avoid `AttributeError` for PUT and PATCH methods when using `APIView`
 * Clear many-to-many relationships instead of deleting related objects during PATCH on `RelationshipView`
+* Allow POST, PATCH, DELETE for actions in `ReadOnlyModelViewSet`. It was problematic since 2.8.0.
 
 ### Changed
 
