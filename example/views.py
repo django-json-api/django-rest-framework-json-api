@@ -8,7 +8,10 @@ import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from rest_framework_json_api.django_filters import DjangoFilterBackend
-from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
+from rest_framework_json_api.filters import (
+    OrderingFilter,
+    QueryParameterValidationFilter,
+)
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
@@ -23,7 +26,7 @@ from example.serializers import (
     EntryDRFSerializers,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer
+    ProjectTypeSerializer,
 )
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
@@ -60,6 +63,7 @@ class JsonApiViewSet(ModelViewSet):
     within a class. It allows using DRF-jsonapi alongside
     vanilla DRF API views.
     """
+
     parser_classes = [
         rest_framework_json_api.parsers.JSONParser,
         rest_framework.parsers.FormParser,
@@ -126,13 +130,26 @@ class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     # override the default filter backends in order to test QueryParameterValidationFilter without
     # breaking older usage of non-standard query params like `page_size`.
-    filter_backends = (QueryParameterValidationFilter, OrderingFilter,
-                       DjangoFilterBackend, SearchFilter)
+    filter_backends = (
+        QueryParameterValidationFilter,
+        OrderingFilter,
+        DjangoFilterBackend,
+        SearchFilter,
+    )
     ordering_fields = ('headline', 'body_text', 'blog__name', 'blog__id')
-    rels = ('exact', 'iexact',
-            'contains', 'icontains',
-            'gt', 'gte', 'lt', 'lte',
-            'in', 'regex', 'isnull',)
+    rels = (
+        'exact',
+        'iexact',
+        'contains',
+        'icontains',
+        'gt',
+        'gte',
+        'lt',
+        'lte',
+        'in',
+        'regex',
+        'isnull',
+    )
     filterset_fields = {
         'id': ('exact', 'in'),
         'headline': rels,
@@ -144,8 +161,7 @@ class NonPaginatedEntryViewSet(EntryViewSet):
 
 
 class EntryFilter(filters.FilterSet):
-    bname = filters.CharFilter(field_name="blog__name",
-                               lookup_expr="exact")
+    bname = filters.CharFilter(field_name="blog__name", lookup_expr="exact")
 
     authors__id = filters.ModelMultipleChoiceFilter(
         field_name='authors',
@@ -168,16 +184,18 @@ class FiltersetEntryViewSet(EntryViewSet):
     """
     like above but use filterset_class instead of filterset_fields
     """
+
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = EntryFilter
-    filter_backends = (QueryParameterValidationFilter, DjangoFilterBackend,)
+    filter_backends = (QueryParameterValidationFilter, DjangoFilterBackend)
 
 
 class NoFiltersetEntryViewSet(EntryViewSet):
     """
     like above but no filtersets
     """
+
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = None
@@ -191,9 +209,7 @@ class AuthorViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    select_for_includes = {
-        'writer': ['author__bio']
-    }
+    select_for_includes = {'writer': ['author__bio']}
     prefetch_for_includes = {
         '__all__': [],
         'author': ['author__bio', 'author__entries'],
@@ -228,6 +244,7 @@ class EntryRelationshipView(RelationshipView):
 
 class BlogRelationshipView(RelationshipView):
     queryset = Blog.objects.all()
+    field_name_mapping = {'entrySet': 'entry_set'}
 
 
 class CommentRelationshipView(RelationshipView):

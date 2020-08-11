@@ -18,7 +18,7 @@ from example.views import (
     NoFiltersetEntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
-    ProjectViewset
+    ProjectViewset,
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -42,49 +42,70 @@ router.register(r'identities', Identity)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-
     # old tests
-    url(r'identities/default/(?P<pk>\d+)$',
-        GenericIdentity.as_view(), name='user-default'),
-
-
-    url(r'^entries/(?P<entry_pk>[^/.]+)/blog$',
+    url(
+        r'identities/default/(?P<pk>\d+)$',
+        GenericIdentity.as_view(),
+        name='user-default',
+    ),
+    url(
+        r'^entries/(?P<entry_pk>[^/.]+)/blog$',
         BlogViewSet.as_view({'get': 'retrieve'}),
-        name='entry-blog'
-        ),
-    url(r'^entries/(?P<entry_pk>[^/.]+)/comments$',
+        name='entry-blog',
+    ),
+    url(
+        r'^entries/(?P<entry_pk>[^/.]+)/comments$',
         CommentViewSet.as_view({'get': 'list'}),
-        name='entry-comments'
-        ),
-    url(r'^entries/(?P<entry_pk>[^/.]+)/suggested/$',
+        name='entry-comments',
+    ),
+    url(
+        r'^entries/(?P<entry_pk>[^/.]+)/suggested/$',
         EntryViewSet.as_view({'get': 'list'}),
-        name='entry-suggested'
-        ),
-    url(r'^drf-entries/(?P<entry_pk>[^/.]+)/suggested/$',
+        name='entry-suggested',
+    ),
+    url(
+        r'^drf-entries/(?P<entry_pk>[^/.]+)/suggested/$',
         DRFEntryViewSet.as_view({'get': 'list'}),
-        name='drf-entry-suggested'
-        ),
-    url(r'entries/(?P<entry_pk>[^/.]+)/authors$',
+        name='drf-entry-suggested',
+    ),
+    url(
+        r'entries/(?P<entry_pk>[^/.]+)/authors$',
         AuthorViewSet.as_view({'get': 'list'}),
-        name='entry-authors'),
-    url(r'entries/(?P<entry_pk>[^/.]+)/featured$',
+        name='entry-authors',
+    ),
+    url(
+        r'entries/(?P<entry_pk>[^/.]+)/featured$',
         EntryViewSet.as_view({'get': 'retrieve'}),
-        name='entry-featured'),
-
-    url(r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+        name='entry-featured',
+    ),
+    url(
+        r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
         AuthorViewSet.as_view({'get': 'retrieve_related'}),
-        name='author-related'),
-
-    url(r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
+        name='author-related',
+    ),
+    url(
+        r'^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
         EntryRelationshipView.as_view(),
-        name='entry-relationships'),
-    url(r'^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
+        name='entry-relationships',
+    ),
+    url(
+        r'^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
         BlogRelationshipView.as_view(),
-        name='blog-relationships'),
-    url(r'^comments/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
+        name='blog-relationships',
+    ),
+    url(
+        r'^blogs/(?P<pk>[^/.]+)/(?P<related_field>\w+)$',
+        BlogRelationshipView.as_view(),
+        name='blog-related',
+    ),
+    url(
+        r'^comments/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
         CommentRelationshipView.as_view(),
-        name='comment-relationships'),
-    url(r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
+        name='comment-relationships',
+    ),
+    url(
+        r'^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$',
         AuthorRelationshipView.as_view(),
-        name='author-relationships'),
+        name='author-relationships',
+    ),
 ]

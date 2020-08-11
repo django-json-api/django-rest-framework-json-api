@@ -19,7 +19,7 @@ from example.models import (
     Project,
     ProjectType,
     ResearchProject,
-    TaggedItem
+    TaggedItem,
 )
 
 
@@ -33,6 +33,7 @@ class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
     """
     DRF default serializer to test default DRF functionalities
     """
+
     class Meta:
         model = TaggedItem
         fields = ('tag',)
@@ -41,22 +42,28 @@ class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
 class BlogSerializer(serializers.ModelSerializer):
     copyright = serializers.SerializerMethodField()
     tags = TaggedItemSerializer(many=True, read_only=True)
+    entry_set = relations.ResourceRelatedField(
+        related_link_view_name='blog-related',
+        self_link_view_name='blog-relationships',
+        queryset=Entry.objects,
+        many=True,
+        required=False,
+    )
 
-    include_serializers = {
+    included_serializers = {
         'tags': 'example.serializers.TaggedItemSerializer',
+        'entry_set': 'example.serializers.EntrySerializer',
     }
 
     def get_copyright(self, resource):
         return datetime.now().year
 
     def get_root_meta(self, resource, many):
-        return {
-            'api_docs': '/docs/api/blogs'
-        }
+        return {'api_docs': '/docs/api/blogs'}
 
     class Meta:
         model = Blog
-        fields = ('name', 'url', 'tags')
+        fields = ('name', 'url', 'tags', 'entry_set')
         read_only_fields = ('tags',)
         meta_fields = ('copyright',)
 
@@ -65,6 +72,7 @@ class BlogDRFSerializer(drf_serilazers.ModelSerializer):
     """
     DRF default serializer to test default DRF functionalities
     """
+
     copyright = serializers.SerializerMethodField()
     tags = TaggedItemDRFSerializer(many=True, read_only=True)
 
@@ -72,9 +80,7 @@ class BlogDRFSerializer(drf_serilazers.ModelSerializer):
         return datetime.now().year
 
     def get_root_meta(self, resource, many):
-        return {
-            'api_docs': '/docs/api/blogs'
-        }
+        return {'api_docs': '/docs/api/blogs'}
 
     class Meta:
         model = Blog
@@ -107,11 +113,10 @@ class EntrySerializer(serializers.ModelSerializer):
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
         read_only=True,
-        source='blog'
+        source='blog',
     )
     # many related from model
-    comments = relations.ResourceRelatedField(
-        many=True, read_only=True)
+    comments = relations.ResourceRelatedField(many=True, read_only=True)
     # many related hyperlinked from model
     comments_hyperlinked = relations.HyperlinkedRelatedField(
         related_link_view_name='entry-comments',
@@ -119,7 +124,7 @@ class EntrySerializer(serializers.ModelSerializer):
         self_link_view_name='entry-relationships',
         many=True,
         read_only=True,
-        source='comments'
+        source='comments',
     )
     # many related from serializer
     suggested = relations.SerializerMethodResourceRelatedField(
@@ -145,7 +150,7 @@ class EntrySerializer(serializers.ModelSerializer):
         related_link_url_kwarg='entry_pk',
         self_link_view_name='entry-relationships',
         model=Entry,
-        read_only=True
+        read_only=True,
     )
     tags = TaggedItemSerializer(many=True, read_only=True)
 
@@ -160,9 +165,22 @@ class EntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Entry
-        fields = ('blog', 'blog_hyperlinked', 'headline', 'body_text', 'pub_date', 'mod_date',
-                  'authors', 'comments', 'comments_hyperlinked', 'featured', 'suggested',
-                  'suggested_hyperlinked', 'tags', 'featured_hyperlinked')
+        fields = (
+            'blog',
+            'blog_hyperlinked',
+            'headline',
+            'body_text',
+            'pub_date',
+            'mod_date',
+            'authors',
+            'comments',
+            'comments_hyperlinked',
+            'featured',
+            'suggested',
+            'suggested_hyperlinked',
+            'tags',
+            'featured_hyperlinked',
+        )
         read_only_fields = ('tags',)
         meta_fields = ('body_format',)
 
@@ -174,21 +192,19 @@ class EntryDRFSerializers(drf_serilazers.ModelSerializer):
 
     tags = TaggedItemDRFSerializer(many=True, read_only=True)
     url = drf_serilazers.HyperlinkedIdentityField(
-        view_name='drf-entry-blog-detail',
-        lookup_url_kwarg='entry_pk',
-        read_only=True,
+        view_name='drf-entry-blog-detail', lookup_url_kwarg='entry_pk', read_only=True
     )
 
     class Meta:
         model = Entry
-        fields = ('tags', 'url',)
+        fields = ('tags', 'url')
         read_only_fields = ('tags',)
 
 
 class AuthorTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthorType
-        fields = ('name', )
+        fields = ('name',)
 
 
 class AuthorBioSerializer(serializers.ModelSerializer):
@@ -197,7 +213,7 @@ class AuthorBioSerializer(serializers.ModelSerializer):
         fields = ('author', 'body', 'metadata')
 
     included_serializers = {
-        'metadata': 'example.serializers.AuthorBioMetadataSerializer',
+        'metadata': 'example.serializers.AuthorBioMetadataSerializer'
     }
 
 
@@ -217,7 +233,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         related_link_view_name='author-related',
         self_link_view_name='author-relationships',
         queryset=Entry.objects,
-        many=True
+        many=True,
     )
     first_entry = relations.SerializerMethodResourceRelatedField(
         related_link_view_name='author-related',
@@ -228,18 +244,15 @@ class AuthorSerializer(serializers.ModelSerializer):
         related_link_view_name='author-related',
         self_link_view_name='author-relationships',
         queryset=Comment.objects,
-        many=True
+        many=True,
     )
-    included_serializers = {
-        'bio': AuthorBioSerializer,
-        'type': AuthorTypeSerializer
-    }
+    included_serializers = {'bio': AuthorBioSerializer, 'type': AuthorTypeSerializer}
     related_serializers = {
         'bio': 'example.serializers.AuthorBioSerializer',
         'type': 'example.serializers.AuthorTypeSerializer',
         'comments': 'example.serializers.CommentSerializer',
         'entries': 'example.serializers.EntrySerializer',
-        'first_entry': 'example.serializers.EntrySerializer'
+        'first_entry': 'example.serializers.EntrySerializer',
     }
 
     class Meta:
@@ -251,9 +264,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class WriterSerializer(serializers.ModelSerializer):
-    included_serializers = {
-        'bio': AuthorBioSerializer
-    }
+    included_serializers = {'bio': AuthorBioSerializer}
 
     class Meta:
         model = Author
@@ -268,25 +279,23 @@ class CommentSerializer(serializers.ModelSerializer):
     included_serializers = {
         'entry': EntrySerializer,
         'author': AuthorSerializer,
-        'writer': WriterSerializer
+        'writer': WriterSerializer,
     }
 
     class Meta:
         model = Comment
-        exclude = ('created_at', 'modified_at',)
+        exclude = ('created_at', 'modified_at')
         # fields = ('entry', 'body', 'author',)
 
 
 class ProjectTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectType
-        fields = ('name', 'url',)
+        fields = ('name', 'url')
 
 
 class BaseProjectSerializer(serializers.ModelSerializer):
-    included_serializers = {
-        'project_type': ProjectTypeSerializer,
-    }
+    included_serializers = {'project_type': ProjectTypeSerializer}
 
 
 class ArtProjectSerializer(BaseProjectSerializer):
@@ -311,9 +320,7 @@ class LabResultsSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.PolymorphicModelSerializer):
-    included_serializers = {
-        'project_type': ProjectTypeSerializer,
-    }
+    included_serializers = {'project_type': ProjectTypeSerializer}
     polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
 
     class Meta:
@@ -325,13 +332,11 @@ class CurrentProjectRelatedField(relations.PolymorphicResourceRelatedField):
     def get_attribute(self, instance):
         obj = super(CurrentProjectRelatedField, self).get_attribute(instance)
 
-        is_art = (
-            self.field_name == 'current_art_project' and
-            isinstance(obj, ArtProject)
+        is_art = self.field_name == 'current_art_project' and isinstance(
+            obj, ArtProject
         )
-        is_res = (
-            self.field_name == 'current_research_project' and
-            isinstance(obj, ResearchProject)
+        is_res = self.field_name == 'current_research_project' and isinstance(
+            obj, ResearchProject
         )
 
         if is_art or is_res:
@@ -342,19 +347,23 @@ class CurrentProjectRelatedField(relations.PolymorphicResourceRelatedField):
 
 class CompanySerializer(serializers.ModelSerializer):
     current_project = relations.PolymorphicResourceRelatedField(
-        ProjectSerializer, queryset=Project.objects.all())
+        ProjectSerializer, queryset=Project.objects.all()
+    )
     current_art_project = CurrentProjectRelatedField(
-        ProjectSerializer, source='current_project', read_only=True)
+        ProjectSerializer, source='current_project', read_only=True
+    )
     current_research_project = CurrentProjectRelatedField(
-        ProjectSerializer, source='current_project', read_only=True)
+        ProjectSerializer, source='current_project', read_only=True
+    )
     future_projects = relations.PolymorphicResourceRelatedField(
-        ProjectSerializer, queryset=Project.objects.all(), many=True)
+        ProjectSerializer, queryset=Project.objects.all(), many=True
+    )
 
     included_serializers = {
         'current_project': ProjectSerializer,
         'future_projects': ProjectSerializer,
         'current_art_project': ProjectSerializer,
-        'current_research_project': ProjectSerializer
+        'current_research_project': ProjectSerializer,
     }
 
     class Meta:
