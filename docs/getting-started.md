@@ -77,7 +77,7 @@ From Source
 	cd django-rest-framework-json-api
 	python3 -m venv env
 	source env/bin/activate
-	pip install -U -e . r requirements.txt
+	pip install -Ur requirements.txt
 	django-admin migrate --settings=example.settings
 	django-admin loaddata drf_example --settings=example.settings
 	django-admin runserver --settings=example.settings
