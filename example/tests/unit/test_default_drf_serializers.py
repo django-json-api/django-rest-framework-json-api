@@ -95,11 +95,10 @@ def test_blog_create(client):
 
     expected = {
         'data': {
-            'attributes': {'name': blog.name},
+            'attributes': {'name': blog.name, 'tags': []},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
             'meta': {'copyright': datetime.now().year},
-            'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
         'meta': {'apiDocs': '/docs/api/blogs'}
@@ -116,11 +115,10 @@ def test_get_object_gives_correct_blog(client, blog, entry):
     resp = client.get(url)
     expected = {
         'data': {
-            'attributes': {'name': blog.name},
+            'attributes': {'name': blog.name, 'tags': []},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
             'meta': {'copyright': datetime.now().year},
-            'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
         'meta': {'apiDocs': '/docs/api/blogs'}
@@ -154,11 +152,10 @@ def test_get_object_patches_correct_blog(client, blog, entry):
 
     expected = {
         'data': {
-            'attributes': {'name': new_name},
+            'attributes': {'name': new_name, 'tags': []},
             'id': '{}'.format(blog.id),
             'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
             'meta': {'copyright': datetime.now().year},
-            'relationships': {'tags': {'data': []}},
             'type': 'blogs'
         },
         'meta': {'apiDocs': '/docs/api/blogs'}
@@ -189,17 +186,14 @@ def test_get_entry_list_with_blogs(client, entry):
             'first': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
             'last': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
             'next': None,
-            'prev': None
+            'prev': None,
         },
         'data': [
             {
                 'type': 'entries',
                 'id': '1',
-                'attributes': {},
-                'relationships': {
-                    'tags': {
-                        'data': []
-                    }
+                'attributes': {
+                    'tags': [],
                 },
                 'links': {
                     'self': 'http://testserver/drf-blogs/1'

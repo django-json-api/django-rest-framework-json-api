@@ -45,7 +45,7 @@ class TestResourceIdentifierObjectSerializer(TestCase):
             )
 
     def test_forward_relationship_not_loaded_when_not_included(self):
-        to_representation_method = 'example.serializers.BlogSerializer.to_representation'
+        to_representation_method = 'example.serializers.TaggedItemSerializer.to_representation'
         with mock.patch(to_representation_method) as mocked_serializer:
             class EntrySerializer(ModelSerializer):
                 blog = BlogSerializer()
@@ -79,7 +79,12 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         expected = dict(
             [
                 ('id', 1),
-                ('blog', dict([('type', 'blogs'), ('id', 1)])),
+                ('blog', dict([
+                    ('name', 'Some Blog'),
+                    ('tags', []),
+                    ('copyright', 2020),
+                    ('url', 'http://testserver/blogs/1')
+                ])),
                 ('headline', 'headline'),
                 ('body_text', 'body_text'),
                 ('pub_date', DateField().to_representation(self.entry.pub_date)),
