@@ -73,6 +73,7 @@ def test_pagination_with_single_entry(single_entry, client):
                         }
                     },
                     "tags": {
+                        'meta': {'count': 1},
                         "data": [
                             {
                                 "id": "1",

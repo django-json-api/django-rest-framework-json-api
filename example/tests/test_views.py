@@ -538,7 +538,7 @@ class TestBlogViewSet(APITestCase):
                 'id': '{}'.format(self.blog.id),
                 'links': {'self': 'http://testserver/blogs/{}'.format(self.blog.id)},
                 'meta': {'copyright': datetime.now().year},
-                'relationships': {'tags': {'data': []}},
+                'relationships': {'tags': {'data': [], 'meta': {'count': 0}}},
                 'type': 'blogs'
             },
             'meta': {'apiDocs': '/docs/api/blogs'}
@@ -632,7 +632,7 @@ class TestEntryViewSet(APITestCase):
                                     '/suggested_hyperlinked'.format(self.second_entry.id)
                         }
                     },
-                    'tags': {'data': []}},
+                    'tags': {'data': [], 'meta': {'count': 0}}},
                 'type': 'posts'
             }
         }

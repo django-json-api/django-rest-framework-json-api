@@ -72,9 +72,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                             "self": "http://testserver/entries/1/relationships/featured_hyperlinked"
                         }
                     },
-                    "tags": {
-                        "data": []
-                    }
+                    'tags': {'data': [], 'meta': {'count': 0}},
                 }
             },
             {
@@ -135,9 +133,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                             "self": "http://testserver/entries/2/relationships/featured_hyperlinked"
                         }
                     },
-                    "tags": {
-                        "data": []
-                    }
+                    'tags': {'data': [], 'meta': {'count': 0}},
                 }
             },
         ]

@@ -40,9 +40,9 @@ class TaggedItemDRFSerializer(drf_serilazers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     copyright = serializers.SerializerMethodField()
-    tags = TaggedItemSerializer(many=True, read_only=True)
+    tags = relations.ResourceRelatedField(many=True, read_only=True)
 
-    include_serializers = {
+    included_serializers = {
         'tags': 'example.serializers.TaggedItemSerializer',
     }
 
@@ -147,7 +147,7 @@ class EntrySerializer(serializers.ModelSerializer):
         model=Entry,
         read_only=True
     )
-    tags = TaggedItemSerializer(many=True, read_only=True)
+    tags = relations.ResourceRelatedField(many=True, read_only=True)
 
     def get_suggested(self, obj):
         return Entry.objects.exclude(pk=obj.pk)

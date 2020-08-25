@@ -18,11 +18,7 @@ def test_top_level_meta_for_list_view(blog, client):
             "links": {
                 "self": 'http://testserver/blogs/1'
             },
-            "relationships": {
-                "tags": {
-                    "data": []
-                }
-            },
+            'relationships': {'tags': {'data': [], 'meta': {'count': 0}}},
             "meta": {
                 "copyright": datetime.now().year
             },
@@ -53,11 +49,7 @@ def test_top_level_meta_for_detail_view(blog, client):
             "attributes": {
                 "name": blog.name
             },
-            "relationships": {
-                "tags": {
-                    "data": []
-                }
-            },
+            'relationships': {'tags': {'data': [], 'meta': {'count': 0}}},
             "links": {
                 "self": "http://testserver/blogs/1"
             },

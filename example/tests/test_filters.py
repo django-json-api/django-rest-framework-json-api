@@ -461,9 +461,7 @@ class DJATestFilters(APITestCase):
                                 'self': 'http://testserver/entries/7/relationships/suggested_hyperlinked',  # noqa: E501
                                 'related': 'http://testserver/entries/7/suggested/'}
                         },
-                        'tags': {
-                            'data': []
-                        },
+                        'tags': {'data': [], 'meta': {'count': 0}},
                         'featuredHyperlinked': {
                             'links': {
                                 'self': 'http://testserver/entries/7/relationships/featured_hyperlinked',  # noqa: E501
