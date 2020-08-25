@@ -69,8 +69,7 @@ def perform_error_test(client, data):
         url = reverse('entries-nested-list')
         response = client.post(url, data=data)
 
-    errors = response.data
-    return errors
+    return response.json()
 
 
 def test_first_level_attribute_error(client, some_blog, snapshot):
@@ -83,7 +82,7 @@ def test_first_level_attribute_error(client, some_blog, snapshot):
             }
         }
     }
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_first_level_custom_attribute_error(client, some_blog, snapshot):
@@ -98,7 +97,7 @@ def test_first_level_custom_attribute_error(client, some_blog, snapshot):
         }
     }
     with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
-        assert snapshot == perform_error_test(client, data)
+        snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_second_level_array_error(client, some_blog, snapshot):
@@ -117,7 +116,7 @@ def test_second_level_array_error(client, some_blog, snapshot):
         }
     }
 
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_second_level_dict_error(client, some_blog, snapshot):
@@ -133,7 +132,7 @@ def test_second_level_dict_error(client, some_blog, snapshot):
         }
     }
 
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_third_level_array_error(client, some_blog, snapshot):
@@ -157,7 +156,7 @@ def test_third_level_array_error(client, some_blog, snapshot):
         }
     }
 
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_third_level_custom_array_error(client, some_blog, snapshot):
@@ -182,7 +181,7 @@ def test_third_level_custom_array_error(client, some_blog, snapshot):
         }
     }
 
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_third_level_dict_error(client, some_blog, snapshot):
@@ -203,7 +202,7 @@ def test_third_level_dict_error(client, some_blog, snapshot):
         }
     }
 
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_many_third_level_dict_errors(client, some_blog, snapshot):
@@ -223,7 +222,7 @@ def test_many_third_level_dict_errors(client, some_blog, snapshot):
         }
     }
 
-    assert snapshot == perform_error_test(client, data)
+    snapshot.assert_match(perform_error_test(client, data))
 
 
 @pytest.mark.filterwarnings('default::DeprecationWarning:rest_framework_json_api.serializers')
@@ -238,4 +237,4 @@ def test_deprecation_warning(recwarn, settings, snapshot):
 
     assert len(recwarn) == 1
     warning = recwarn.pop(DeprecationWarning)
-    assert snapshot == str(warning.message)
+    snapshot.assert_match(str(warning.message))
