@@ -96,17 +96,18 @@ class GenericViewSet(TestBase):
         expected = {
             'errors': [
                 {
-                    'id': 'armageddon101',
-                    'detail': 'Hey! You need a last name!',
-                    'meta': 'something',
-                },
-                {
                     'status': '400',
                     'source': {
                         'pointer': '/data/attributes/email',
                     },
                     'detail': 'Enter a valid email address.',
                     'code': 'invalid',
+                },
+                {
+                    'id': 'armageddon101',
+                    'detail': 'Hey! You need a last name!',
+                    'meta': 'something',
+                    'source': {'pointer': '/data/attributes/lastName'}
                 },
             ]
         }
