@@ -8,17 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [3.2.0] - 2020-08-26
 
 ### Added
 
 * Added support for serializing nested serializers as attribute json value introducing setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE`
+ * Note: As keys of nested serializers are not json api spec field names they are not inflected by format field names option.
 
 ### Fixed
 
 * Avoid `AttributeError` for PUT and PATCH methods when using `APIView`
 * Clear many-to-many relationships instead of deleting related objects during PATCH on `RelationshipView`
-* Allow POST, PATCH, DELETE for actions in `ReadOnlyModelViewSet`. It was problematic since 2.8.0.
+* Allow POST, PATCH, DELETE for actions in `ReadOnlyModelViewSet`. Regression since version `2.8.0`.
 * Properly format nested errors
 
 ### Changed
