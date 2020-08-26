@@ -9,9 +9,9 @@ JSON API and Django Rest Framework
    :alt: Read the docs
    :target: https://django-rest-framework-json-api.readthedocs.org/
 
-.. image:: https://badges.gitter.im/Join%20Chat.svg
-   :alt: Join the chat at https://gitter.im/django-json-api/django-rest-framework-json-api
-   :target: https://gitter.im/django-json-api/django-rest-framework-json-api
+.. image:: https://img.shields.io/pypi/v/djangorestframework-jsonapi.svg
+   :alt: PyPi Version
+   :target: https://pypi.org/project/djangorestframework-jsonapi/
 
 --------
 Overview
