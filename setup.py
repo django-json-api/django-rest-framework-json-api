@@ -84,14 +84,15 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=[
         'inflection>=0.3.0',
-        'djangorestframework>=3.10,<3.12',
-        'django>=1.11,<3.1',
+        'djangorestframework>=3.10,<3.13',
+        'django>=1.11,<3.2',
     ],
     extras_require={
         'django-polymorphic': ['django-polymorphic>=2.0'],
