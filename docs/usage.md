@@ -338,7 +338,7 @@ Example - Without format conversion:
 {
     "data": [{
         "type": "identities",
-        "id": 3,
+        "id": "3",
         "attributes": {
             "username": "john",
             "first_name": "John",
@@ -359,7 +359,7 @@ Example - With format conversion set to `dasherize`:
 {
     "data": [{
         "type": "identities",
-        "id": 3,
+        "id": "3",
         "attributes": {
             "username": "john",
             "first-name": "John",
@@ -389,7 +389,7 @@ Example without format conversion:
 {
 	"data": [{
         "type": "blog_identity",
-        "id": 3,
+        "id": "3",
         "attributes": {
                 ...
         },
@@ -412,7 +412,7 @@ When set to dasherize:
 {
 	"data": [{
         "type": "blog-identity",
-        "id": 3,
+        "id": "3",
         "attributes": {
                 ...
         },
@@ -438,7 +438,7 @@ Example without pluralization:
 {
 	"data": [{
         "type": "identity",
-        "id": 3,
+        "id": "3",
         "attributes": {
                 ...
         },
@@ -446,7 +446,7 @@ Example without pluralization:
             "home_towns": {
                 "data": [{
                     "type": "home_town",
-                    "id": 3
+                    "id": "3"
                 }]
             }
         }
@@ -461,7 +461,7 @@ When set to pluralize:
 {
 	"data": [{
         "type": "identities",
-        "id": 3,
+        "id": "3",
         "attributes": {
                 ...
         },
@@ -469,7 +469,7 @@ When set to pluralize:
             "home_towns": {
                 "data": [{
                     "type": "home_towns",
-                    "id": 3
+                    "id": "3"
                 }]
             }
         }

@@ -33,7 +33,7 @@ class JSONRenderer(renderers.JSONRenderer):
           "data": [
             {
               "type": "companies",
-              "id": 1,
+              "id": "1",
               "attributes": {
                 "name": "Mozilla",
                 "slug": "mozilla",
