@@ -48,7 +48,7 @@ like the following::
         },
         "data": [{
             "type": "identities",
-            "id": 3,
+            "id": "3",
             "attributes": {
                 "username": "john",
                 "full-name": "John Coltrane"
