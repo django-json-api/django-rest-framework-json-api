@@ -13,7 +13,10 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for serializing nested serializers as attribute json value introducing setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE`
- * Note: As keys of nested serializers are not json api spec field names they are not inflected by format field names option.
+ * Note: As keys of nested serializers are not json:api spec field names they are not inflected by format field names option.
+* Added `rest_framework_json_api.serializer.Serializer` class to support initial JSON API views without models.
+  * Note that serializers derived from this class need to define `resource_name` in their `Meta` class.
+  * This fix might be a **BREAKING CHANGE** if you use `rest_framework_json_api.serializers.Serializer` for non json:api spec views (usually `APIView`). You need to change those serializers classes to use `rest_framework.serializers.Serializer` instead.
 
 ### Fixed
 
