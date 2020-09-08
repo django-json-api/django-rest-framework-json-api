@@ -57,6 +57,12 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
 
 
 class SparseFieldsetsMixin(object):
+    """
+    A serializer mixin that adds support for sparse fieldsets through `fields` query parameter.
+
+    Specification: https://jsonapi.org/format/#fetching-sparse-fieldsets
+    """
+
     def __init__(self, *args, **kwargs):
         super(SparseFieldsetsMixin, self).__init__(*args, **kwargs)
         context = kwargs.get('context')
@@ -85,6 +91,13 @@ class SparseFieldsetsMixin(object):
 
 
 class IncludedResourcesValidationMixin(object):
+    """
+    A serializer mixin that adds validation of `include` query parameter to
+    support compound documents.
+
+    Specification: https://jsonapi.org/format/#document-compound-documents)
+    """
+
     def __init__(self, *args, **kwargs):
         context = kwargs.get('context')
         request = context.get('request') if context else None
@@ -147,6 +160,20 @@ class Serializer(
     IncludedResourcesValidationMixin, SparseFieldsetsMixin, Serializer,
     metaclass=SerializerMetaclass
 ):
+    """
+    A `Serializer` is a model-less serializer class with additional
+    support for json:api spec features.
+
+    As in json:api specification a type is always required you need to
+    make sure that you define `resource_name` in your `Meta` class
+    when deriving from this class.
+
+    Included Mixins:
+
+    * A mixin class to enable sparse fieldsets is included
+    * A mixin class to enable validation of included resources is included
+    """
+
     pass
 
 
