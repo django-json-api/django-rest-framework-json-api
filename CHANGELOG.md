@@ -8,7 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased]
+
+### Removed
+
+* Removed support for Django 1.11.
+* Removed support for Django 2.1.
+
 ## [3.2.0] - 2020-08-26
+
+This is the last release supporting Django 1.11 and Django 2.1.
 
 ### Added
 
