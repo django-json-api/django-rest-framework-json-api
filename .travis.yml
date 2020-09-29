@@ -20,40 +20,34 @@ matrix:
       env: TOXENV=docs
 
     - python: 3.5
-      env: TOXENV=py35-django22-drf310
-    - python: 3.5
-      env: TOXENV=py35-django22-drf311
+      env: TOXENV=py35-django22-drf312
     - python: 3.5
       env: TOXENV=py35-django22-drfmaster
 
     - python: 3.6
-      env: TOXENV=py36-django22-drf310
-    - python: 3.6
-      env: TOXENV=py36-django22-drf311
+      env: TOXENV=py36-django22-drf312
     - python: 3.6
       env: TOXENV=py36-django22-drfmaster
     - python: 3.6
-      env: TOXENV=py36-django30-drf311
+      env: TOXENV=py36-django30-drf312
     - python: 3.6
       env: TOXENV=py36-django30-drfmaster
 
     - python: 3.7
-      env: TOXENV=py37-django22-drf310
-    - python: 3.7
-      env: TOXENV=py37-django22-drf311
+      env: TOXENV=py37-django22-drf312
     - python: 3.7
       env: TOXENV=py37-django22-drfmaster
     - python: 3.7
-      env: TOXENV=py37-django30-drf311
+      env: TOXENV=py37-django30-drf312
     - python: 3.7
       env: TOXENV=py37-django30-drfmaster
 
     - python: 3.8
-      env: TOXENV=py38-django22-drf311
+      env: TOXENV=py38-django22-drf312
     - python: 3.8
       env: TOXENV=py38-django22-drfmaster
     - python: 3.8
-      env: TOXENV=py38-django30-drf311
+      env: TOXENV=py38-django30-drf312
     - python: 3.8
       env: TOXENV=py38-django30-drfmaster
 

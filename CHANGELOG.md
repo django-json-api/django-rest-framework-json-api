@@ -14,10 +14,15 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Removed support for Django 1.11.
 * Removed support for Django 2.1.
+* Removed support for Django REST framework 3.10, 3.11
+
+### Added
+* Added support for Django REST framework 3.12
+
 
 ## [3.2.0] - 2020-08-26
 
-This is the last release supporting Django 1.11 and Django 2.1.
+This is the last release supporting Django 1.11, Django 2.1, DRF 3.10 and DRF 3.11.
 
 ### Added
 
