@@ -338,18 +338,18 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
 
             components_schemas.update(components)
 
-            if hasattr(view.schema, 'get_security_schemes'):
+            if hasattr(view.schema, 'get_security_schemes'):  # pragma: no cover
                 security_schemes = view.schema.get_security_schemes(path, method)
             else:
                 security_schemes = {}
-            for k in security_schemes.keys():
+            for k in security_schemes.keys():  # pragma: no cover
                 if k not in security_schemes_schemas:
                     continue
                 if security_schemes_schemas[k] == security_schemes[k]:
                     continue
                 warnings.warn('Securit scheme component "{}" has been overriden with a different '
                               'value.'.format(k))
-            security_schemes_schemas.update(security_schemes)
+            security_schemes_schemas.update(security_schemes)  # pragma: no cover
 
             if hasattr(view, 'action'):
                 view.action = current_action
@@ -367,7 +367,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         schema['paths'] = paths
         schema['components'] = self.jsonapi_components
         schema['components']['schemas'].update(components_schemas)
-        if len(security_schemes_schemas) > 0:
+        if len(security_schemes_schemas) > 0:  # pragma: no cover
             schema['components']['securitySchemes'] = security_schemes_schemas
 
         return schema
@@ -475,7 +475,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         operation = {}
         operation['operationId'] = self.get_operation_id(path, method)
         operation['description'] = self.get_description(path, method)
-        if hasattr(self, 'get_security_requirements'):
+        if hasattr(self, 'get_security_requirements'):  # pragma: no cover
             security = self.get_security_requirements(path, method)
             if security is not None:
                 operation['security'] = security
