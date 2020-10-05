@@ -1,7 +1,6 @@
 import pytest
-from django.conf.urls import url
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import path, reverse
 from rest_framework import views
 
 from rest_framework_json_api import serializers
@@ -51,8 +50,8 @@ class DummyTestView(views.APIView):
 
 
 urlpatterns = [
-    url('entries-nested', DummyTestView.as_view(),
-        name='entries-nested-list')
+    path('entries-nested', DummyTestView.as_view(),
+         name='entries-nested-list')
 ]
 
 
