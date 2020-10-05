@@ -12,6 +12,9 @@ matrix:
     - env: TOXENV=py36-django30-drfmaster
     - env: TOXENV=py37-django30-drfmaster
     - env: TOXENV=py38-django30-drfmaster
+    - env: TOXENV=py36-django31-drfmaster
+    - env: TOXENV=py37-django31-drfmaster
+    - env: TOXENV=py38-django31-drfmaster
 
   include:
     - python: 3.6
@@ -32,6 +35,10 @@ matrix:
       env: TOXENV=py36-django30-drf312
     - python: 3.6
       env: TOXENV=py36-django30-drfmaster
+    - python: 3.6
+      env: TOXENV=py36-django31-drf312
+    - python: 3.6
+      env: TOXENV=py36-django31-drfmaster
 
     - python: 3.7
       env: TOXENV=py37-django22-drf312
@@ -41,6 +48,10 @@ matrix:
       env: TOXENV=py37-django30-drf312
     - python: 3.7
       env: TOXENV=py37-django30-drfmaster
+    - python: 3.7
+      env: TOXENV=py37-django31-drf312
+    - python: 3.7
+      env: TOXENV=py37-django31-drfmaster
 
     - python: 3.8
       env: TOXENV=py38-django22-drf312
@@ -50,6 +61,10 @@ matrix:
       env: TOXENV=py38-django30-drf312
     - python: 3.8
       env: TOXENV=py38-django30-drfmaster
+    - python: 3.8
+      env: TOXENV=py38-django31-drf312
+    - python: 3.8
+      env: TOXENV=py38-django31-drfmaster
 
 install:
   - pip install tox

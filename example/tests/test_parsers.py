@@ -1,9 +1,8 @@
 import json
 from io import BytesIO
 
-from django.conf.urls import url
 from django.test import TestCase, override_settings
-from django.urls import reverse
+from django.urls import path, reverse
 from rest_framework import status, views
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
@@ -104,7 +103,7 @@ class DummyAPIView(views.APIView):
 
 
 urlpatterns = [
-    url(r'repeater$', DummyAPIView.as_view(), name='repeater'),
+    path('repeater', DummyAPIView.as_view(), name='repeater'),
 ]
 
 
