@@ -308,8 +308,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
             elif hasattr(view, 'action') and view.action == 'retrieve_related':
                 expanded_endpoints += self._expand_related(path, method, view, view_endpoints)
             else:
-                expanded_endpoints.append((path, method, view,
-                                           view.action if hasattr(view, 'action') else None))
+                expanded_endpoints.append((path, method, view, getattr(view, 'action', None)))
 
         for path, method, view, action in expanded_endpoints:
             if not self.has_view_permissions(path, method, view):
