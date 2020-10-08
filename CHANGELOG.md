@@ -27,6 +27,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ### Removed
 
+
 * Removed support for Python 3.5.
 * Removed support for Django 1.11.
 * Removed support for Django 2.1.
