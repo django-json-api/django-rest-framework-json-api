@@ -267,11 +267,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                 'style': 'deepObject',
                 'schema': {
                     'type': 'object',
-                    'properties': {
-                        '<typename>': {  # placeholder for actual type names
-                            'type': 'string'
-                        }
-                    }
                 },
                 'explode': True
             },
