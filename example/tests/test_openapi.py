@@ -102,15 +102,6 @@ def test_delete_request(snapshot):
         {'delete': 'delete'}
     )
     inspector = AutoSchema()
-    # DRF >=3.12 changes the capitalization of these method mappings which breaks the snapshot,
-    # so just override them to be consistent with >=3.12
-    inspector.method_mapping = {
-        'get': 'retrieve',
-        'post': 'create',
-        'put': 'update',
-        'patch': 'partialUpdate',
-        'delete': 'destroy',
-    }
     inspector.view = view
 
     operation = inspector.get_operation(path, method)
