@@ -1,7 +1,6 @@
 import warnings
 from urllib.parse import urljoin
 
-from django.db.models.fields import related_descriptors as rd
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework.fields import empty
 from rest_framework.relations import ManyRelatedField
@@ -9,7 +8,6 @@ from rest_framework.schemas import openapi as drf_openapi
 from rest_framework.schemas.utils import is_list_view
 
 from rest_framework_json_api import serializers
-from rest_framework_json_api.views import RelationshipView
 
 
 class SchemaGenerator(drf_openapi.SchemaGenerator):
@@ -302,9 +300,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         #: - 'action' copy of current view.action (list/fetch) as this gets reset for each request.
         expanded_endpoints = []
         for path, method, view in view_endpoints:
-            if isinstance(view, RelationshipView):
-                expanded_endpoints += self._expand_relationships(path, method, view)
-            elif hasattr(view, 'action') and view.action == 'retrieve_related':
+            if hasattr(view, 'action') and view.action == 'retrieve_related':
                 expanded_endpoints += self._expand_related(path, method, view, view_endpoints)
             else:
                 expanded_endpoints.append((path, method, view, getattr(view, 'action', None)))
@@ -349,28 +345,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         schema['components']['schemas'].update(components_schemas)
 
         return schema
-
-    def _expand_relationships(self, path, method, view):
-        """
-        Expand path containing .../{id}/relationships/{related_field} into list of related fields.
-        :return:list[tuple(path, method, view, action)]
-        """
-        queryset = view.get_queryset()
-        if not queryset.model:
-            return [(path, method, view, getattr(view, 'action', '')), ]
-        result = []
-        # TODO: what about serializer-only (non-model) fields?
-        #       Shouldn't this be iterating over serializer fields rather than model fields?
-        #       Look at parent view's serializer to get the list of fields.
-        #       OR maybe like _expand_related?
-        m = queryset.model
-        for field in [f for f in dir(m) if not f.startswith('_')]:
-            attr = getattr(m, field)
-            if isinstance(attr, (rd.ReverseManyToOneDescriptor, rd.ForwardOneToOneDescriptor)):
-                action = 'rels' if isinstance(attr, rd.ReverseManyToOneDescriptor) else 'rel'
-                result.append((path.replace('{related_field}', field), method, view, action))
-
-        return result
 
     def _expand_related(self, path, method, view, view_endpoints):
         """
