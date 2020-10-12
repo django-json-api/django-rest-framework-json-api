@@ -645,7 +645,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         # doesn't work for jsonapi due to the different required fields based on
         # the method, so make those changes and inline another copy of the schema.
         # TODO: A future improvement could make this DRYer with multiple components?
-        item_schema = self.map_serializer(serializer).copy()
+        item_schema = self.map_serializer(serializer)
 
         # 'type' and 'id' are both required for:
         # - all relationship operations
