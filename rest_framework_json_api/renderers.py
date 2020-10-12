@@ -11,13 +11,12 @@ from django.utils import encoding
 from rest_framework import relations, renderers
 from rest_framework.fields import SkipField, get_attribute
 from rest_framework.relations import PKOnlyObject
-from rest_framework.serializers import BaseSerializer, ListSerializer, Serializer
+from rest_framework.serializers import ListSerializer, Serializer
 from rest_framework.settings import api_settings
 
 import rest_framework_json_api
 from rest_framework_json_api import utils
 from rest_framework_json_api.relations import HyperlinkedMixin, ResourceRelatedField, SkipDataMixin
-from rest_framework_json_api.settings import json_api_settings
 
 
 class JSONRenderer(renderers.JSONRenderer):
@@ -53,7 +52,6 @@ class JSONRenderer(renderers.JSONRenderer):
         Builds the `attributes` object of the JSON API resource object.
         """
         data = OrderedDict()
-        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
         for field_name, field in iter(fields.items()):
             # ID is always provided in the root of JSON API so remove it from attributes
             if field_name == 'id':
@@ -65,9 +63,6 @@ class JSONRenderer(renderers.JSONRenderer):
             if isinstance(
                     field, (relations.RelatedField, relations.ManyRelatedField)
             ):
-                continue
-
-            if isinstance(field, BaseSerializer) and not render_nested_as_attribute:
                 continue
 
             # Skip read_only attribute fields when `resource` is an empty
@@ -94,7 +89,6 @@ class JSONRenderer(renderers.JSONRenderer):
         from rest_framework_json_api.relations import ResourceRelatedField
 
         data = OrderedDict()
-        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
 
         # Don't try to extract relationships from a non-existent resource
         if resource_instance is None:
@@ -111,11 +105,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
             # Skip fields without relations
             if not isinstance(
-                field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)
+                field, (relations.RelatedField, relations.ManyRelatedField)
             ):
-                continue
-
-            if isinstance(field, BaseSerializer) and render_nested_as_attribute:
                 continue
 
             source = field.source
@@ -252,56 +243,6 @@ class JSONRenderer(renderers.JSONRenderer):
                 })
                 continue
 
-            if isinstance(field, ListSerializer):
-                resolved, relation_instance = utils.get_relation_instance(
-                    resource_instance, source, field.parent
-                )
-                if not resolved:
-                    continue
-
-                relation_data = list()
-
-                serializer_data = resource.get(field_name)
-                resource_instance_queryset = list(relation_instance)
-                if isinstance(serializer_data, list):
-                    for position in range(len(serializer_data)):
-                        nested_resource_instance = resource_instance_queryset[position]
-                        nested_resource_instance_type = (
-                            relation_type or
-                            utils.get_resource_type_from_instance(nested_resource_instance)
-                        )
-
-                        relation_data.append(OrderedDict([
-                            ('type', nested_resource_instance_type),
-                            ('id', encoding.force_str(nested_resource_instance.pk))
-                        ]))
-
-                    data.update({field_name: {'data': relation_data}})
-                    continue
-
-            if isinstance(field, Serializer):
-                relation_instance_id = getattr(resource_instance, source + "_id", None)
-                if not relation_instance_id:
-                    resolved, relation_instance = utils.get_relation_instance(
-                        resource_instance, source, field.parent
-                    )
-                    if not resolved:
-                        continue
-
-                    if relation_instance is not None:
-                        relation_instance_id = relation_instance.pk
-
-                data.update({
-                    field_name: {
-                        'data': (
-                            OrderedDict([
-                                ('type', relation_type),
-                                ('id', encoding.force_str(relation_instance_id))
-                            ]) if resource.get(field_name) else None)
-                    }
-                })
-                continue
-
         return utils.format_field_names(data)
 
     @classmethod
@@ -336,7 +277,6 @@ class JSONRenderer(renderers.JSONRenderer):
         included_serializers = utils.get_included_serializers(current_serializer)
         included_resources = copy.copy(included_resources)
         included_resources = [inflection.underscore(value) for value in included_resources]
-        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
 
         for field_name, field in iter(fields.items()):
             # Skip URL field
@@ -345,11 +285,8 @@ class JSONRenderer(renderers.JSONRenderer):
 
             # Skip fields without relations
             if not isinstance(
-                field, (relations.RelatedField, relations.ManyRelatedField, BaseSerializer)
+                field, (relations.RelatedField, relations.ManyRelatedField)
             ):
-                continue
-
-            if isinstance(field, BaseSerializer) and render_nested_as_attribute:
                 continue
 
             try:
