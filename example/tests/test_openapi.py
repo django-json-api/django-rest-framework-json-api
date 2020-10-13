@@ -128,7 +128,10 @@ def test_schema_construction():
 def test_schema_related_serializers():
     """
     Confirm that paths are generated for related fields. For example:
-        /authors/{pk}/{related_field>}
+    url path '/authors/{pk}/{related_field>}/' generates:
+        /authors/{id}/relationships/comments/
+        /authors/{id}/relationships/entries/
+        /authors/{id}/relationships/first_entry/ -- Maybe?
         /authors/{id}/comments/
         /authors/{id}/entries/
         /authors/{id}/first_entry/
@@ -138,7 +141,12 @@ def test_schema_related_serializers():
     request = create_request('/')
     schema = generator.get_schema(request=request)
     # make sure the path's relationship and related {related_field}'s got expanded
-    assert '/authors/{id}/relationships/{related_field}' in schema['paths']
+    assert '/authors/{id}/relationships/entries' in schema['paths']
+    assert '/authors/{id}/relationships/comments' in schema['paths']
+    # first_entry is a special case (SerializerMethodRelatedField)
+    # TODO: '/authors/{id}/relationships/first_entry' supposed to be there?
+    # It fails when doing the actual GET, so this schema excluding it is OK.
+    # assert '/authors/{id}/relationships/first_entry/' in schema['paths']
     assert '/authors/{id}/comments/' in schema['paths']
     assert '/authors/{id}/entries/' in schema['paths']
     assert '/authors/{id}/first_entry/' in schema['paths']
