@@ -1,5 +1,3 @@
-import warnings
-
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
@@ -9,7 +7,6 @@ from rest_framework.serializers import *  # noqa: F403
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
-from rest_framework_json_api.settings import json_api_settings
 from rest_framework_json_api.utils import (
     get_included_resources,
     get_included_serializers,
@@ -132,26 +129,7 @@ class IncludedResourcesValidationMixin(object):
 
 
 class SerializerMetaclass(SerializerMetaclass):
-
-    @classmethod
-    def _get_declared_fields(cls, bases, attrs):
-        fields = super()._get_declared_fields(bases, attrs)
-        for field_name, field in fields.items():
-            if isinstance(field, BaseSerializer) and \
-                    not json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE:
-                clazz = '{}.{}'.format(attrs['__module__'], attrs['__qualname__'])
-                if isinstance(field, ListSerializer):
-                    nested_class = type(field.child).__name__
-                else:
-                    nested_class = type(field).__name__
-
-                warnings.warn(DeprecationWarning(
-                    "Rendering nested serializer as relationship is deprecated. "
-                    "Use `ResourceRelatedField` instead if {} in serializer {} should remain "
-                    "a relationship. Otherwise set "
-                    "JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE to True to render nested "
-                    "serializer as nested json attribute".format(nested_class, clazz)))
-        return fields
+    pass
 
 
 # If user imports serializer from here we can catch class definition and check
@@ -234,55 +212,6 @@ class ModelSerializer(IncludedResourcesValidationMixin, SparseFieldsetsMixin, Mo
                 declared[field_name] = field
         fields = super(ModelSerializer, self).get_field_names(declared, info)
         return list(fields) + list(getattr(self.Meta, 'meta_fields', list()))
-
-    def to_representation(self, instance):
-        """
-        Object instance -> Dict of primitive datatypes.
-        """
-        ret = OrderedDict()
-        readable_fields = [
-            field for field in self.fields.values()
-            if not field.write_only
-        ]
-
-        for field in readable_fields:
-            try:
-                field_representation = self._get_field_representation(field, instance)
-                ret[field.field_name] = field_representation
-            except SkipField:
-                continue
-
-        return ret
-
-    def _get_field_representation(self, field, instance):
-        request = self.context.get('request')
-        is_included = field.source in get_included_resources(request)
-        render_nested_as_attribute = json_api_settings.SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE
-        if not is_included and \
-                isinstance(field, ModelSerializer) and \
-                hasattr(instance, field.source + '_id') and \
-                not render_nested_as_attribute:
-            attribute = getattr(instance, field.source + '_id')
-
-            if attribute is None:
-                return None
-
-            resource_type = get_resource_type_from_serializer(field)
-            if resource_type:
-                return OrderedDict([('type', resource_type), ('id', attribute)])
-
-        attribute = field.get_attribute(instance)
-
-        # We skip `to_representation` for `None` values so that fields do
-        # not have to explicitly deal with that case.
-        #
-        # For related fields with `use_pk_only_optimization` we need to
-        # resolve the pk value.
-        check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
-        if check_for_none is None:
-            return None
-        else:
-            return field.to_representation(attribute)
 
 
 class PolymorphicSerializerMetaclass(SerializerMetaclass):

@@ -1,7 +1,6 @@
 import json
 
 import pytest
-from django.test import override_settings
 from django.utils import timezone
 
 from rest_framework_json_api import serializers, views
@@ -173,7 +172,7 @@ def test_extract_relation_instance(comment):
     assert got == comment.entry.blog
 
 
-def test_attribute_rendering_strategy(db):
+def test_render_serializer_as_attribute(db):
     # setting up
     blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
     entry = Entry.objects.create(
@@ -196,10 +195,8 @@ def test_attribute_rendering_strategy(db):
         author=Author.objects.first()
     )
 
-    with override_settings(
-            JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE=True):
-        rendered = render_dummy_test_serialized_view(AuthorWithNestedFieldsViewSet, author)
-        result = json.loads(rendered.decode())
+    rendered = render_dummy_test_serialized_view(AuthorWithNestedFieldsViewSet, author)
+    result = json.loads(rendered.decode())
 
     expected = {
         "data": {

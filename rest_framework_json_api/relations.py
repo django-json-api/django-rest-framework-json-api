@@ -1,5 +1,4 @@
 import json
-import warnings
 from collections import OrderedDict
 
 import inflection
@@ -349,11 +348,6 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
 
 class SerializerMethodFieldBase(Field):
     def __init__(self, method_name=None, **kwargs):
-        if not method_name and kwargs.get('source'):
-            method_name = kwargs.pop('source')
-            warnings.warn(DeprecationWarning(
-                "'source' argument of {cls} is deprecated, use 'method_name' "
-                "as in SerializerMethodField".format(cls=self.__class__.__name__)), stacklevel=3)
         self.method_name = method_name
         kwargs['source'] = '*'
         kwargs['read_only'] = True

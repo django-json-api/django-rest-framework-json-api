@@ -62,7 +62,6 @@ def some_blog(db):
 
 def perform_error_test(client, data):
     with override_settings(
-            JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE=True,
             ROOT_URLCONF=__name__
     ):
         url = reverse('entries-nested-list')
@@ -222,18 +221,3 @@ def test_many_third_level_dict_errors(client, some_blog, snapshot):
     }
 
     snapshot.assert_match(perform_error_test(client, data))
-
-
-@pytest.mark.filterwarnings('default::DeprecationWarning:rest_framework_json_api.serializers')
-def test_deprecation_warning(recwarn, settings, snapshot):
-    settings.JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE = False
-
-    class DummyNestedSerializer(serializers.Serializer):
-        field = serializers.CharField()
-
-    class DummySerializer(serializers.Serializer):
-        nested = DummyNestedSerializer(many=True)
-
-    assert len(recwarn) == 1
-    warning = recwarn.pop(DeprecationWarning)
-    snapshot.assert_match(str(warning.message))

@@ -10,6 +10,9 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+This release is not backwards compatible. For easy migration best upgrade first to version
+3.2.0 and resolve all deprecation warnings before updating to 4.0.0
+
 ### Added
 
 * Added support for Django REST framework 3.12
@@ -20,6 +23,8 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Django 1.11.
 * Removed support for Django 2.1.
 * Removed support for Django REST framework 3.10, 3.11
+* Removed obsolete `source` argument of `SerializerMethodResourceRelatedField`
+* Removed obsolete setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE` to render nested serializers as relationships. Default is as attribute now.
 
 
 ## [3.2.0] - 2020-08-26
