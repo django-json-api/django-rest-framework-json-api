@@ -958,8 +958,6 @@ In order to produce an OAS schema that properly represents the JSON:API structur
 you have to either add a `schema` attribute to each view class or set the `REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS']`
 to DJA's version of AutoSchema.
 
-You can also extend the OAS schema with additional static content (a feature not available in DRF at this time).
-
 #### View-based
 
 ```python
@@ -979,16 +977,16 @@ REST_FRAMEWORK = {
 }
 ```
 
-### Adding static OAS schema content
+### Adding additional OAS schema content
 
-You can optionally include an OAS schema document initialization by subclassing `SchemaGenerator`
-and setting `schema_init`.
+You can extend the OAS schema document by subclassing
+[`SchemaGenerator`](https://www.django-rest-framework.org/api-guide/schemas/#schemagenerator)
+and extending `get_schema`.
 
-Here's an example that fills out OAS `info` and `servers` objects.
+
+Here's an example that adds OAS `info` and `servers` objects.
 
 ```python
-# views.py
-
 from rest_framework_json_api.schemas.openapi import SchemaGenerator as JSONAPISchemaGenerator
 
 
@@ -1047,14 +1045,22 @@ is published.
 ### Generate a Dynamic Schema in a View
 
 See [DRF documentation for a Dynamic Schema](https://www.django-rest-framework.org/api-guide/schemas/#generating-a-dynamic-schema-with-schemaview).
-You will need to pass in your custom SchemaGenerator if you've created one.
 
 ```python
 from rest_framework.schemas import get_schema_view
-from views import MySchemaGenerator
 
 urlpatterns = [
-    path('openapi', get_schema_view(generator_class=MySchemaGenerator), name='openapi-schema'),
+    ...
+    path('openapi', get_schema_view(
+        title="Example API",
+        description="API for all things …",
+        version="1.0.0",
+        generator_class=MySchemaGenerator,
+    ), name='openapi-schema'),
+    path('swagger-ui/', TemplateView.as_view(
+        template_name='swagger-ui.html',
+        extra_context={'schema_url': 'openapi-schema'}
+    ), name='swagger-ui'),
     ...
 ]
 ```
