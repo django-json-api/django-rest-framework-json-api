@@ -468,17 +468,17 @@ class AutoSchema(drf_openapi.AutoSchema):
         # get request and response code schemas
         if method == 'GET':
             if is_list_view(path, method, self.view):
-                self._get_collection_response(operation)
+                self._add_get_collection_response(operation)
             else:
-                self._get_item_response(operation)
+                self._add_get_item_response(operation)
         elif method == 'POST':
-            self._post_item_response(operation, path, action)
+            self._add_post_item_response(operation, path, action)
         elif method == 'PATCH':
-            self._patch_item_response(operation, path, action)
+            self._add_patch_item_response(operation, path, action)
         elif method == 'DELETE':
             # should only allow deleting a resource, not a collection
             # TODO: implement delete of a relationship in future release.
-            self._delete_item_response(operation, path, action)
+            self._add_delete_item_response(operation, path, action)
         return operation
 
     def get_operation_id(self, path, method):
@@ -528,18 +528,18 @@ class AutoSchema(drf_openapi.AutoSchema):
         """
         return [{'$ref': '#/components/parameters/sort'}]
 
-    def _get_collection_response(self, operation):
+    def _add_get_collection_response(self, operation):
         """
-        jsonapi-structured 200 response for GET of a collection
+        Add GET 200 response for a collection to operation
         """
         operation['responses'] = {
             '200': self._get_toplevel_200_response(operation, collection=True)
         }
         self._add_get_4xx_responses(operation)
 
-    def _get_item_response(self, operation):
+    def _add_get_item_response(self, operation):
         """
-        jsonapi-structured 200 response for GET of an item
+        add GET 200 response for an item to operation
         """
         operation['responses'] = {
             '200': self._get_toplevel_200_response(operation, collection=False)
@@ -548,7 +548,7 @@ class AutoSchema(drf_openapi.AutoSchema):
 
     def _get_toplevel_200_response(self, operation, collection=True):
         """
-        top-level JSONAPI GET 200 response
+        return top-level JSONAPI GET 200 response
 
         :param collection: True for collections; False for individual items.
 
@@ -591,9 +591,9 @@ class AutoSchema(drf_openapi.AutoSchema):
             }
         }
 
-    def _post_item_response(self, operation, path, action):
+    def _add_post_item_response(self, operation, path, action):
         """
-        jsonapi-structured response for POST of an item
+        add response for POST of an item to operation
         """
         operation['requestBody'] = self.get_request_body(path, 'POST', action)
         operation['responses'] = {
@@ -610,9 +610,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         }
         self._add_post_4xx_responses(operation)
 
-    def _patch_item_response(self, operation, path, action):
+    def _add_patch_item_response(self, operation, path, action):
         """
-        jsonapi-structured response for PATCH of an item
+        Add PATCH response for an item to operation
         """
         operation['requestBody'] = self.get_request_body(path, 'PATCH', action)
         operation['responses'] = {
@@ -620,9 +620,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         }
         self._add_patch_4xx_responses(operation)
 
-    def _delete_item_response(self, operation, path, action):
+    def _add_delete_item_response(self, operation, path, action):
         """
-        jsonapi-structured response for DELETE of an item or relationship(s)
+        add DELETE response for item or relationship(s) to operation
         """
         # Only DELETE of relationships has a requestBody
         if action in ['rels', 'rel']:
@@ -773,6 +773,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         return result
 
     def _add_async_response(self, operation):
+        """
+        Add async response to operation
+        """
         operation['responses']['202'] = {
             'description': 'Accepted for [asynchronous processing]'
                            '(https://jsonapi.org/recommendations/#asynchronous-processing)',
@@ -784,6 +787,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         }
 
     def _failure_response(self, reason):
+        """
+        Return failure response reason as the description
+        """
         return {
             'description': reason,
             'content': {
@@ -793,19 +799,26 @@ class AutoSchema(drf_openapi.AutoSchema):
             }
         }
 
-    def _generic_failure_responses(self, operation):
+    def _add_generic_failure_responses(self, operation):
+        """
+        Add generic failure response(s) to operation
+        """
         for code, reason in [('401', 'not authorized'), ]:
             operation['responses'][code] = self._failure_response(reason)
 
     def _add_get_4xx_responses(self, operation):
-        """ Add generic responses for get """
-        self._generic_failure_responses(operation)
+        """
+        Add generic 4xx GET responses to operation
+        """
+        self._add_generic_failure_responses(operation)
         for code, reason in [('404', 'not found')]:
             operation['responses'][code] = self._failure_response(reason)
 
     def _add_post_4xx_responses(self, operation):
-        """ Add error responses for post """
-        self._generic_failure_responses(operation)
+        """
+        Add POST 4xx error responses to operation
+        """
+        self._add_generic_failure_responses(operation)
         for code, reason in [
             ('403', '[Forbidden](https://jsonapi.org/format/#crud-creating-responses-403)'),
             ('404', '[Related resource does not exist]'
@@ -815,8 +828,10 @@ class AutoSchema(drf_openapi.AutoSchema):
             operation['responses'][code] = self._failure_response(reason)
 
     def _add_patch_4xx_responses(self, operation):
-        """ Add error responses for patch """
-        self._generic_failure_responses(operation)
+        """
+        Add PATCH 4xx error responses to operation
+        """
+        self._add_generic_failure_responses(operation)
         for code, reason in [
             ('403', '[Forbidden](https://jsonapi.org/format/#crud-updating-responses-403)'),
             ('404', '[Related resource does not exist]'
@@ -827,7 +842,9 @@ class AutoSchema(drf_openapi.AutoSchema):
             operation['responses'][code] = self._failure_response(reason)
 
     def _add_delete_responses(self, operation):
-        """ Add generic responses for delete """
+        """
+        Add generic DELETE responses to operation
+        """
         # the 2xx statuses:
         operation['responses'] = {
             '200': {
@@ -844,7 +861,7 @@ class AutoSchema(drf_openapi.AutoSchema):
             'description': '[no content](https://jsonapi.org/format/#crud-deleting-responses-204)',
         }
         # the 4xx errors:
-        self._generic_failure_responses(operation)
+        self._add_generic_failure_responses(operation)
         for code, reason in [
             ('404', '[Resource does not exist]'
                     '(https://jsonapi.org/format/#crud-deleting-responses-404)'),
