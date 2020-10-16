@@ -57,6 +57,8 @@ like the following:
 
 We **highly** recommend and only officially support the latest patch release of each Python, Django and REST Framework series.
 
+Generally Python and Django series are supported till the official end of life. For Django REST Framework the last two series are supported.
+
 ## Installation
 
 From PyPI
