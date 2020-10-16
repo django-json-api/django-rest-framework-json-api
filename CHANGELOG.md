@@ -20,6 +20,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ### Removed
 
+* Removed support for Python 3.5.
 * Removed support for Django 1.11.
 * Removed support for Django 2.1.
 * Removed support for Django REST framework 3.10, 3.11
@@ -32,7 +33,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ## [3.2.0] - 2020-08-26
 
-This is the last release supporting Django 1.11, Django 2.1, DRF 3.10 and DRF 3.11.
+This is the last release supporting Django 1.11, Django 2.1, DRF 3.10, DRF 3.11 and Python 3.5.
 
 ### Added
 
