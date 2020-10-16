@@ -27,6 +27,9 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Removed obsolete `source` argument of `SerializerMethodResourceRelatedField`
 * Removed obsolete setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE` to render nested serializers as relationships. Default is as attribute now.
 
+### Fixed
+
+* Stopped `SparseFieldsetsMixin` interpretting invalid fields query parameter (e.g. invalidfields[entries]=blog,headline)
 
 ## [3.2.0] - 2020-08-26
 

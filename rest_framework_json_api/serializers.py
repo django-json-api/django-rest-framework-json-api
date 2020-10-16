@@ -71,7 +71,7 @@ class SparseFieldsetsMixin(object):
             )
             try:
                 param_name = next(
-                    key for key in request.query_params if sparse_fieldset_query_param in key
+                    key for key in request.query_params if sparse_fieldset_query_param == key
                 )
             except StopIteration:
                 pass
