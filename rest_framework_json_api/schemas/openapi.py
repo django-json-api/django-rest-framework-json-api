@@ -1,15 +1,13 @@
 import warnings
 from urllib.parse import urljoin
 
-from django.db.models.fields import related_descriptors as rd
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework.fields import empty
 from rest_framework.relations import ManyRelatedField
 from rest_framework.schemas import openapi as drf_openapi
 from rest_framework.schemas.utils import is_list_view
 
-from rest_framework_json_api import serializers
-from rest_framework_json_api.views import RelationshipView
+from rest_framework_json_api import serializers, views
 
 
 class SchemaGenerator(drf_openapi.SchemaGenerator):
@@ -28,19 +26,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                     'meta': {'$ref': '#/components/schemas/meta'}
                 },
                 'additionalProperties': False
-            },
-            'ResourceIdentifierObject': {
-                'type': 'object',
-                'required': ['type', 'id'],
-                'additionalProperties': False,
-                'properties': {
-                    'type': {
-                        '$ref': '#/components/schemas/type'
-                    },
-                    'id': {
-                        '$ref': '#/components/schemas/id'
-                    },
-                },
             },
             'resource': {
                 'type': 'object',
@@ -132,6 +117,18 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                 'type': 'array',
                 'items': {'$ref': '#/components/schemas/linkage'},
                 'uniqueItems': True
+            },
+            # A RelationshipView uses a ResourceIdentifierObjectSerializer (hence the name
+            # ResourceIdentifierObject returned by get_component_name()) which serializes type and
+            # id. These can be lists or individual items depending on whether the relationship is
+            # toMany or toOne so offer both options since we are not iterating over all the
+            # possible {related_field}'s but rather rendering one path schema which may represent
+            # toMany and toOne relationships.
+            'ResourceIdentifierObject': {
+                'oneOf': [
+                    {'$ref': '#/components/schemas/relationshipToOne'},
+                    {'$ref': '#/components/schemas/relationshipToMany'}
+                ]
             },
             'linkage': {
                 'type': 'object',
@@ -302,9 +299,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         #: - 'action' copy of current view.action (list/fetch) as this gets reset for each request.
         expanded_endpoints = []
         for path, method, view in view_endpoints:
-            if isinstance(view, RelationshipView):
-                expanded_endpoints += self._expand_relationships(path, method, view)
-            elif hasattr(view, 'action') and view.action == 'retrieve_related':
+            if hasattr(view, 'action') and view.action == 'retrieve_related':
                 expanded_endpoints += self._expand_related(path, method, view, view_endpoints)
             else:
                 expanded_endpoints.append((path, method, view, getattr(view, 'action', None)))
@@ -312,14 +307,15 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         for path, method, view, action in expanded_endpoints:
             if not self.has_view_permissions(path, method, view):
                 continue
-            # kludge to preserve view.action as it changes "globally" for the same ViewSet
-            # whether it is used for a collection, item or related serializer. _expand_related
-            # sets it based on whether the related field is a toMany collection or toOne item.
+            # kludge to preserve view.action as it is 'list' for the parent ViewSet
+            # but the related viewset that was expanded may be either 'fetch' (to_one) or 'list'
+            # (to_many). This patches the view.action appropriately so that
+            # view.schema.get_operation() "does the right thing" for fetch vs. list.
             current_action = None
             if hasattr(view, 'action'):
                 current_action = view.action
                 view.action = action
-            operation = view.schema.get_operation(path, method, action)
+            operation = view.schema.get_operation(path, method)
             components = view.schema.get_components(path, method)
             for k in components.keys():
                 if k not in components_schemas:
@@ -349,28 +345,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         schema['components']['schemas'].update(components_schemas)
 
         return schema
-
-    def _expand_relationships(self, path, method, view):
-        """
-        Expand path containing .../{id}/relationships/{related_field} into list of related fields.
-        :return:list[tuple(path, method, view, action)]
-        """
-        queryset = view.get_queryset()
-        if not queryset.model:
-            return [(path, method, view, getattr(view, 'action', '')), ]
-        result = []
-        # TODO: what about serializer-only (non-model) fields?
-        #       Shouldn't this be iterating over serializer fields rather than model fields?
-        #       Look at parent view's serializer to get the list of fields.
-        #       OR maybe like _expand_related?
-        m = queryset.model
-        for field in [f for f in dir(m) if not f.startswith('_')]:
-            attr = getattr(m, field)
-            if isinstance(attr, (rd.ReverseManyToOneDescriptor, rd.ForwardOneToOneDescriptor)):
-                action = 'rels' if isinstance(attr, rd.ReverseManyToOneDescriptor) else 'rel'
-                result.append((path.replace('{related_field}', field), method, view, action))
-
-        return result
 
     def _expand_related(self, path, method, view, view_endpoints):
         """
@@ -439,16 +413,12 @@ class AutoSchema(drf_openapi.AutoSchema):
     #: ignore all the media types and only generate a JSONAPI schema.
     content_types = ['application/vnd.api+json']
 
-    def get_operation(self, path, method, action=None):
+    def get_operation(self, path, method):
         """
         JSONAPI adds some standard fields to the API response that are not in upstream DRF:
         - some that only apply to GET/HEAD methods.
         - collections
-        - special handling for POST, PATCH, DELETE:
-
-        :param action: One of the usual actions for a conventional path (list, retrieve, update,
-            partial_update, destroy) or special case 'rel' or 'rels' for a singular or
-            plural relationship.
+        - special handling for POST, PATCH, DELETE
         """
         operation = {}
         operation['operationId'] = self.get_operation_id(path, method)
@@ -472,13 +442,13 @@ class AutoSchema(drf_openapi.AutoSchema):
             else:
                 self._add_get_item_response(operation)
         elif method == 'POST':
-            self._add_post_item_response(operation, path, action)
+            self._add_post_item_response(operation, path)
         elif method == 'PATCH':
-            self._add_patch_item_response(operation, path, action)
+            self._add_patch_item_response(operation, path)
         elif method == 'DELETE':
             # should only allow deleting a resource, not a collection
             # TODO: implement delete of a relationship in future release.
-            self._add_delete_item_response(operation, path, action)
+            self._add_delete_item_response(operation, path)
         return operation
 
     def get_operation_id(self, path, method):
@@ -591,11 +561,11 @@ class AutoSchema(drf_openapi.AutoSchema):
             }
         }
 
-    def _add_post_item_response(self, operation, path, action):
+    def _add_post_item_response(self, operation, path):
         """
         add response for POST of an item to operation
         """
-        operation['requestBody'] = self.get_request_body(path, 'POST', action)
+        operation['requestBody'] = self.get_request_body(path, 'POST')
         operation['responses'] = {
             '201': self._get_toplevel_200_response(operation, collection=False)
         }
@@ -610,55 +580,54 @@ class AutoSchema(drf_openapi.AutoSchema):
         }
         self._add_post_4xx_responses(operation)
 
-    def _add_patch_item_response(self, operation, path, action):
+    def _add_patch_item_response(self, operation, path):
         """
         Add PATCH response for an item to operation
         """
-        operation['requestBody'] = self.get_request_body(path, 'PATCH', action)
+        operation['requestBody'] = self.get_request_body(path, 'PATCH')
         operation['responses'] = {
             '200': self._get_toplevel_200_response(operation, collection=False)
         }
         self._add_patch_4xx_responses(operation)
 
-    def _add_delete_item_response(self, operation, path, action):
+    def _add_delete_item_response(self, operation, path):
         """
         add DELETE response for item or relationship(s) to operation
         """
         # Only DELETE of relationships has a requestBody
-        if action in ['rels', 'rel']:
-            operation['requestBody'] = self.get_request_body(path, 'DELETE', action)
+        if isinstance(self.view, views.RelationshipView):
+            operation['requestBody'] = self.get_request_body(path, 'DELETE')
         self._add_delete_responses(operation)
 
-    def get_request_body(self, path, method, action=None):
+    def get_request_body(self, path, method):
         """
         A request body is required by jsonapi for POST, PATCH, and DELETE methods.
-        This has an added parameter which is not in upstream DRF:
-
-        :param action: None for conventional path; 'rel' or 'rels' for a singular or plural
-            relationship of a related path, respectively.
         """
         serializer = self.get_serializer(path, method)
         if not isinstance(serializer, (serializers.BaseSerializer, )):
             return {}
+        is_relationship = isinstance(self.view, views.RelationshipView)
 
-        # DRF uses a $ref to the component definition, but this
+        # DRF uses a $ref to the component schema definition, but this
         # doesn't work for jsonapi due to the different required fields based on
         # the method, so make those changes and inline another copy of the schema.
-        # TODO: A future improvement could make this DRYer with multiple components?
-        item_schema = self.map_serializer(serializer)
+        # TODO: A future improvement could make this DRYer with multiple component schemas:
+        #   A base schema for each viewset that has no required fields
+        #   One subclassed from the base that requires some fields (`type` but not `id` for POST)
+        #   Another subclassed from base with required type/id but no required attributes (PATCH)
 
-        # 'type' and 'id' are both required for:
-        # - all relationship operations
-        # - regular PATCH or DELETE
-        # Only 'type' is required for POST: system may assign the 'id'.
-        if action in ['rels', 'rel']:
-            item_schema['required'] = ['type', 'id']
-        elif method in ['PATCH', 'DELETE']:
-            item_schema['required'] = ['type', 'id']
-        elif method == 'POST':
-            item_schema['required'] = ['type']
+        if is_relationship:
+            item_schema = {'$ref': '#/components/schemas/ResourceIdentifierObject'}
+        else:
+            item_schema = self.map_serializer(serializer)
+            if method == 'POST':
+                # 'type' and 'id' are both required for:
+                # - all relationship operations
+                # - regular PATCH or DELETE
+                # Only 'type' is required for POST: system may assign the 'id'.
+                item_schema['required'] = ['type']
 
-        if 'attributes' in item_schema['properties']:
+        if 'properties' in item_schema and 'attributes' in item_schema['properties']:
             # No required attributes for PATCH
             if method in ['PATCH', 'PUT'] and 'required' in item_schema['properties']['attributes']:
                 del item_schema['properties']['attributes']['required']
@@ -666,39 +635,19 @@ class AutoSchema(drf_openapi.AutoSchema):
             for name, schema in item_schema['properties']['attributes']['properties'].copy().items():  # noqa E501
                 if 'readOnly' in schema:
                     del item_schema['properties']['attributes']['properties'][name]
-        # relationships special case: plural request body (data is array of items)
-        if action == 'rels':
-            return {
-                'content': {
-                    ct: {
-                        'schema': {
-                            'required': ['data'],
-                            'properties': {
-                                'data': {
-                                    'type': 'array',
-                                    'items': item_schema
-                                }
-                            }
+        return {
+            'content': {
+                ct: {
+                    'schema': {
+                        'required': ['data'],
+                        'properties': {
+                            'data': item_schema
                         }
                     }
-                    for ct in self.content_types
                 }
+                for ct in self.content_types
             }
-        # singular request body for all other cases
-        else:
-            return {
-                'content': {
-                    ct: {
-                        'schema': {
-                            'required': ['data'],
-                            'properties': {
-                                'data': item_schema
-                            }
-                        }
-                    }
-                    for ct in self.content_types
-                }
-            }
+        }
 
     def map_serializer(self, serializer):
         """
