@@ -8,16 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [4.0.0] - 2020-10-31
 
 This release is not backwards compatible. For easy migration best upgrade first to version
 3.2.0 and resolve all deprecation warnings before updating to 4.0.0
 
 ### Added
 
-* Added support for Django REST framework 3.12
-* Added support for Django 3.1
-* Added support for Python 3.9
+* Added support for Django REST framework 3.12.
+* Added support for Django 3.1.
+* Added support for Python 3.9.
 * Added initial optional support for [openapi](https://www.openapis.org/) schema generation. Enable with:
   ```
   pip install djangorestframework-jsonapi['openapi']
@@ -32,17 +32,18 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Removed support for Python 3.5.
 * Removed support for Django 1.11.
 * Removed support for Django 2.1.
-* Removed support for Django REST framework 3.10, 3.11
-* Removed obsolete `source` argument of `SerializerMethodResourceRelatedField`
-* Removed obsolete setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE` to render nested serializers as relationships. Default is as attribute now.
+* Removed support for Django REST framework 3.10 and 3.11.
+* Removed obsolete `source` argument of `SerializerMethodResourceRelatedField`.
+* Removed obsolete setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE` to render nested serializers as relationships.
+  Default is render as attribute now.
 
 ### Fixed
 
-* Stopped `SparseFieldsetsMixin` interpretting invalid fields query parameter (e.g. invalidfields[entries]=blog,headline)
+* Stopped `SparseFieldsetsMixin` interpretting invalid fields query parameter (e.g. invalidfields[entries]=blog,headline).
 
 ## [3.2.0] - 2020-08-26
 
-This is the last release supporting Django 1.11, Django 2.1, DRF 3.10, DRF 3.11 and Python 3.5.
+This is the last release supporting Django 1.11, Django 2.1, Django REST Framework 3.10, Django REST Framework 3.11 and Python 3.5.
 
 ### Added
 
