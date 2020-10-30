@@ -18,8 +18,16 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Added support for Django REST framework 3.12
 * Added support for Django 3.1
 * Added support for Python 3.9
+* Added initial optional support for [openapi](https://www.openapis.org/) schema generation. Enable with:
+  ```
+  pip install djangorestframework-jsonapi['openapi']
+  ```
+  This first release is a start at implementing OAS schema generation. To use the generated schema you may
+  still need to manually add some schema attributes but can expect future improvements here and as
+  upstream DRF's OAS schema generation continues to mature.
 
 ### Removed
+
 
 * Removed support for Python 3.5.
 * Removed support for Django 1.11.

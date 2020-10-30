@@ -230,6 +230,16 @@ class AuthorSerializer(serializers.ModelSerializer):
         queryset=Comment.objects,
         many=True
     )
+    secrets = serializers.HiddenField(
+        default='Shhhh!'
+    )
+    defaults = serializers.CharField(
+        default='default',
+        max_length=20,
+        min_length=3,
+        write_only=True,
+        help_text='help for defaults',
+    )
     included_serializers = {
         'bio': AuthorBioSerializer,
         'type': AuthorTypeSerializer
@@ -244,7 +254,8 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('name', 'email', 'bio', 'entries', 'comments', 'first_entry', 'type')
+        fields = ('name', 'email', 'bio', 'entries', 'comments', 'first_entry', 'type',
+                  'secrets', 'defaults')
 
     def get_first_entry(self, obj):
         return obj.entries.first()

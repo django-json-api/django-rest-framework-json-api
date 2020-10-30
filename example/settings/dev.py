@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sessions',
     'django.contrib.auth',
+    'rest_framework_json_api',
     'rest_framework',
     'polymorphic',
     'example',
@@ -88,6 +89,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
