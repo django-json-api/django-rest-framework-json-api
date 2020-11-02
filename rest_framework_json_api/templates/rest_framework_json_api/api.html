@@ -1,0 +1,19 @@
+{% extends "rest_framework/base.html" %}
+{% load i18n %}
+
+{% block request_forms %}
+  {{ block.super }}
+  {% if includes_form %}
+    <button style="float: right; margin-right: 10px" data-toggle="modal" data-target="#includesModal" class="btn btn-default">
+      <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+      {% trans "JSON:API includes" %}
+    </button>
+  {% endif %}
+{% endblock request_forms %}
+
+{% block script %}
+  {{ block.super }}
+  {% if includes_form %}
+    {{ includes_form }}
+  {% endif %}
+{% endblock script %}
