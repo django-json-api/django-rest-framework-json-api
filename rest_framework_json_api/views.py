@@ -144,10 +144,19 @@ class RelatedMixin(object):
         if isinstance(instance, Iterable):
             serializer_kwargs['many'] = True
 
-        serializer = self.get_serializer(instance, **serializer_kwargs)
+        serializer = self.get_related_serializer(instance, **serializer_kwargs)
         return Response(serializer.data)
 
-    def get_serializer_class(self):
+    def get_related_serializer(self, *args, **kwargs):
+        """
+        Return the serializer instance that should be used for validating and
+        deserializing input, and for serializing output.
+        """
+        serializer_class = self.get_related_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        return serializer_class(*args, **kwargs)
+
+    def get_related_serializer_class(self):
         parent_serializer_class = super(RelatedMixin, self).get_serializer_class()
 
         if 'related_field' in self.kwargs:
