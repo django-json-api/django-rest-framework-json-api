@@ -148,10 +148,6 @@ class RelatedMixin(object):
         return Response(serializer.data)
 
     def get_related_serializer(self, *args, **kwargs):
-        """
-        Return the serializer instance that should be used for validating and
-        deserializing input, and for serializing output.
-        """
         serializer_class = self.get_related_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
         return serializer_class(*args, **kwargs)
