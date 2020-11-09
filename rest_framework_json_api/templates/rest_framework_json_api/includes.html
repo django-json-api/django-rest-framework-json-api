@@ -1,0 +1,40 @@
+{% load i18n %}
+
+<div class="modal fade" id="includesModal" tabindex="-1" role="dialog" aria-labelledby="includes" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{% trans "JSON:API includes" %}</h4>
+      </div>
+      <div class="modal-body">
+        {% for element in elements %}
+        <div>
+          <label for="includes-{{ element }}">{{ element }}</label>
+          <input type="checkbox" name="includes" id="includes-{{ element }}" value="{{ element }}">
+        </div>
+        {% endfor %}
+        <form method="get">
+          <input type="hidden" name="include">
+          <button type="submit">{% trans "Apply includes" %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function() {
+  let param_include = new URLSearchParams(window.location.search).get('include')
+  if (param_include) {
+    let applied_includes = param_include.split(',')
+    $('#includesModal input[name=includes]').each(function () {
+      this.checked = applied_includes.includes(this.value)
+    })
+  }
+  $('#includesModal form').submit(function () {
+    $('#includesModal input[name=include]').get(0).value = $('#includesModal input[name=includes]:checked').map(
+        function() {return this.value}
+    ).get().join(",")
+  })
+});
+</script>

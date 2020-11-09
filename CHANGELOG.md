@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased] - TBD
+
+### Added
+
+* Ability for the user to select `included_serializers` to apply when using `BrowsableAPI`, based on available `included_serializers` defined for the current endpoint.
+
+
 ## [4.0.0] - 2020-10-31
 
 This release is not backwards compatible. For easy migration best upgrade first to version

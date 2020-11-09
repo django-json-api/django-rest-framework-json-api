@@ -7,6 +7,7 @@ from collections.abc import Iterable
 
 import inflection
 from django.db.models import Manager
+from django.template import loader
 from django.utils import encoding
 from rest_framework import relations, renderers
 from rest_framework.fields import SkipField, get_attribute
@@ -606,3 +607,53 @@ class JSONRenderer(renderers.JSONRenderer):
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context
         )
+
+
+class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
+    template = 'rest_framework_json_api/api.html'
+    includes_template = 'rest_framework_json_api/includes.html'
+
+    def get_context(self, data, accepted_media_type, renderer_context):
+        context = super(BrowsableAPIRenderer, self).get_context(
+            data, accepted_media_type, renderer_context
+        )
+        view = renderer_context['view']
+
+        context['includes_form'] = self.get_includes_form(view)
+
+        return context
+
+    @classmethod
+    def _get_included_serializers(cls, serializer, prefix='', already_seen=None):
+        if not already_seen:
+            already_seen = set()
+
+        if serializer in already_seen:
+            return []
+
+        included_serializers = []
+        already_seen.add(serializer)
+
+        for include, included_serializer in utils.get_included_serializers(serializer).items():
+            included_serializers.append(f'{prefix}{include}')
+            included_serializers.extend(
+                cls._get_included_serializers(
+                    included_serializer, f'{prefix}{include}.',
+                    already_seen=already_seen
+                )
+            )
+
+        return included_serializers
+
+    def get_includes_form(self, view):
+        try:
+            serializer_class = view.get_serializer_class()
+        except AttributeError:
+            return
+
+        if not hasattr(serializer_class, 'included_serializers'):
+            return
+
+        template = loader.get_template(self.includes_template)
+        context = {'elements': self._get_included_serializers(serializer_class)}
+        return template.render(context)

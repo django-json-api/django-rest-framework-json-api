@@ -86,7 +86,7 @@ REST_FRAMEWORK = {
         # If performance testing, enable:
         # 'example.utils.BrowsableAPIRendererWithoutForms',
         # Otherwise, to play around with the browseable API, enable:
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_json_api.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
