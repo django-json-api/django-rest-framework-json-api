@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Ability for the user to select `included_serializers` to apply when using `BrowsableAPI`, based on available `included_serializers` defined for the current endpoint.
+* Fixed #859: Allow users to overwrite a view's `get_serializer()` and `get_serializer_class()` methods for views that have related fields.
 
 
 ## [4.0.0] - 2020-10-31
