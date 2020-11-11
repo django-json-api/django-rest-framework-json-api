@@ -15,9 +15,9 @@ from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
 from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
 from example.serializers import (
-    AuthorSerializer,
-    AuthorListSerializer,
     AuthorDetailSerializer,
+    AuthorListSerializer,
+    AuthorSerializer,
     BlogDRFSerializer,
     BlogSerializer,
     CommentSerializer,
@@ -190,7 +190,7 @@ class AuthorViewSet(ModelViewSet):
     serializer_classes = {
         "list": AuthorListSerializer,
         "retrieve": AuthorDetailSerializer}
-    serializer_class = AuthorSerializer # fallback
+    serializer_class = AuthorSerializer  # fallback
 
     def get_serializer_class(self):
         try:

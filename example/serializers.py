@@ -260,8 +260,10 @@ class AuthorSerializer(serializers.ModelSerializer):
     def get_first_entry(self, obj):
         return obj.entries.first()
 
+
 class AuthorListSerializer(AuthorSerializer):
     pass
+
 
 class AuthorDetailSerializer(AuthorSerializer):
     pass
