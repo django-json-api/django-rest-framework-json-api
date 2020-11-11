@@ -52,7 +52,10 @@ def get_resource_name(context, expand_polymorphic_types=False):
         resource_name = getattr(view, 'resource_name')
     except AttributeError:
         try:
-            serializer = view.get_serializer_class()
+            if 'kwargs' in context and 'related_field' in context['kwargs']:
+                serializer = view.get_related_serializer_class()
+            else:
+                serializer = view.get_serializer_class()
             if expand_polymorphic_types and issubclass(serializer, PolymorphicModelSerializer):
                 return serializer.get_polymorphic_types()
             else:

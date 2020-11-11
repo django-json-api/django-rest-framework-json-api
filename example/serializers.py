@@ -261,6 +261,14 @@ class AuthorSerializer(serializers.ModelSerializer):
         return obj.entries.first()
 
 
+class AuthorListSerializer(AuthorSerializer):
+    pass
+
+
+class AuthorDetailSerializer(AuthorSerializer):
+    pass
+
+
 class WriterSerializer(serializers.ModelSerializer):
     included_serializers = {
         'bio': AuthorBioSerializer

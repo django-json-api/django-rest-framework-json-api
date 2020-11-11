@@ -15,6 +15,8 @@ from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
 from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
 from example.serializers import (
+    AuthorDetailSerializer,
+    AuthorListSerializer,
     AuthorSerializer,
     BlogDRFSerializer,
     BlogSerializer,
@@ -185,7 +187,16 @@ class NoFiltersetEntryViewSet(EntryViewSet):
 
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
+    serializer_classes = {
+        "list": AuthorListSerializer,
+        "retrieve": AuthorDetailSerializer}
+    serializer_class = AuthorSerializer  # fallback
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_classes.get(self.action, self.serializer_class)
+        except AttributeError:
+            return self.serializer_class
 
 
 class CommentViewSet(ModelViewSet):

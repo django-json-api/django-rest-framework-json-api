@@ -65,7 +65,7 @@ snapshots['test_path_without_parameters 1'] = '''{
             "properties": {
               "data": {
                 "items": {
-                  "$ref": "#/components/schemas/Author"
+                  "$ref": "#/components/schemas/AuthorList"
                 },
                 "type": "array"
               },
@@ -171,7 +171,7 @@ snapshots['test_path_with_id_parameter 1'] = '''{
           "schema": {
             "properties": {
               "data": {
-                "$ref": "#/components/schemas/Author"
+                "$ref": "#/components/schemas/AuthorDetail"
               },
               "included": {
                 "items": {

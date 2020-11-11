@@ -144,10 +144,15 @@ class RelatedMixin(object):
         if isinstance(instance, Iterable):
             serializer_kwargs['many'] = True
 
-        serializer = self.get_serializer(instance, **serializer_kwargs)
+        serializer = self.get_related_serializer(instance, **serializer_kwargs)
         return Response(serializer.data)
 
-    def get_serializer_class(self):
+    def get_related_serializer(self, instance, **kwargs):
+        serializer_class = self.get_related_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        return serializer_class(instance, **kwargs)
+
+    def get_related_serializer_class(self):
         parent_serializer_class = super(RelatedMixin, self).get_serializer_class()
 
         if 'related_field' in self.kwargs:
@@ -179,7 +184,8 @@ class RelatedMixin(object):
 
     def get_related_instance(self):
         parent_obj = self.get_object()
-        parent_serializer = self.serializer_class(parent_obj)
+        parent_serializer_class = self.get_serializer_class()
+        parent_serializer = parent_serializer_class(parent_obj)
         field_name = self.get_related_field_name()
         field = parent_serializer.fields.get(field_name, None)
 

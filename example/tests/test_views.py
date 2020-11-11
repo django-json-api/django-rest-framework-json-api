@@ -367,16 +367,16 @@ class TestRelatedMixin(APITestCase):
         got = view.get_related_instance()
         self.assertEqual(got, self.author.id)
 
-    def test_get_serializer_class(self):
+    def test_get_related_serializer_class(self):
         kwargs = {'pk': self.author.id, 'related_field': 'bio'}
         view = self._get_view(kwargs)
-        got = view.get_serializer_class()
+        got = view.get_related_serializer_class()
         self.assertEqual(got, AuthorBioSerializer)
 
-    def test_get_serializer_class_many(self):
+    def test_get_related_serializer_class_many(self):
         kwargs = {'pk': self.author.id, 'related_field': 'entries'}
         view = self._get_view(kwargs)
-        got = view.get_serializer_class()
+        got = view.get_related_serializer_class()
         self.assertEqual(got, EntrySerializer)
 
     def test_get_serializer_comes_from_included_serializers(self):
@@ -384,15 +384,15 @@ class TestRelatedMixin(APITestCase):
         view = self._get_view(kwargs)
         related_serializers = view.serializer_class.related_serializers
         delattr(view.serializer_class, 'related_serializers')
-        got = view.get_serializer_class()
+        got = view.get_related_serializer_class()
         self.assertEqual(got, AuthorTypeSerializer)
 
         view.serializer_class.related_serializers = related_serializers
 
-    def test_get_serializer_class_raises_error(self):
+    def test_get_related_serializer_class_raises_error(self):
         kwargs = {'pk': self.author.id, 'related_field': 'unknown'}
         view = self._get_view(kwargs)
-        self.assertRaises(NotFound, view.get_serializer_class)
+        self.assertRaises(NotFound, view.get_related_serializer_class)
 
     def test_retrieve_related_single_reverse_lookup(self):
         url = reverse('author-related', kwargs={'pk': self.author.pk, 'related_field': 'bio'})
