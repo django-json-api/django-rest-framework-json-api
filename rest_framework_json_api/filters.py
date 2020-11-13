@@ -18,9 +18,10 @@ class OrderingFilter(OrderingFilter):
     Also applies DJA format_value() to convert (e.g. camelcase) to underscore.
     (See JSON_API_FORMAT_FIELD_NAMES in docs/usage.md)
     """
+
     #: override :py:attr:`rest_framework.filters.OrderingFilter.ordering_param`
     #: with JSON:API-compliant query parameter name.
-    ordering_param = 'sort'
+    ordering_param = "sort"
 
     def remove_invalid_fields(self, queryset, fields, view, request):
         """
@@ -31,16 +32,21 @@ class OrderingFilter(OrderingFilter):
         :raises ValidationError: if a sort field is invalid.
         """
         valid_fields = [
-            item[0] for item in self.get_valid_fields(queryset, view,
-                                                      {'request': request})
+            item[0]
+            for item in self.get_valid_fields(queryset, view, {"request": request})
         ]
         bad_terms = [
-            term for term in fields
-            if format_value(term.replace(".", "__").lstrip('-'), "underscore") not in valid_fields
+            term
+            for term in fields
+            if format_value(term.replace(".", "__").lstrip("-"), "underscore")
+            not in valid_fields
         ]
         if bad_terms:
-            raise ValidationError('invalid sort parameter{}: {}'.format(
-                ('s' if len(bad_terms) > 1 else ''), ','.join(bad_terms)))
+            raise ValidationError(
+                "invalid sort parameter{}: {}".format(
+                    ("s" if len(bad_terms) > 1 else ""), ",".join(bad_terms)
+                )
+            )
         # this looks like it duplicates code above, but we want the ValidationError to report
         # the actual parameter supplied while we want the fields passed to the super() to
         # be correctly rewritten.
@@ -48,14 +54,16 @@ class OrderingFilter(OrderingFilter):
         underscore_fields = []
         for item in fields:
             item_rewritten = item.replace(".", "__")
-            if item_rewritten.startswith('-'):
+            if item_rewritten.startswith("-"):
                 underscore_fields.append(
-                    '-' + format_value(item_rewritten.lstrip('-'), "underscore"))
+                    "-" + format_value(item_rewritten.lstrip("-"), "underscore")
+                )
             else:
                 underscore_fields.append(format_value(item_rewritten, "underscore"))
 
         return super(OrderingFilter, self).remove_invalid_fields(
-            queryset, underscore_fields, view, request)
+            queryset, underscore_fields, view, request
+        )
 
 
 class QueryParameterValidationFilter(BaseFilterBackend):
@@ -68,9 +76,12 @@ class QueryParameterValidationFilter(BaseFilterBackend):
     override :py:attr:`query_regex` adding the new parameters. Make sure to comply with
     the rules at http://jsonapi.org/format/#query-parameters.
     """
+
     #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters:
     #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
-    query_regex = re.compile(r'^(sort|include)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$')
+    query_regex = re.compile(
+        r"^(sort|include)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$"
+    )
 
     def validate_query_params(self, request):
         """
@@ -84,10 +95,14 @@ class QueryParameterValidationFilter(BaseFilterBackend):
         for qp in request.query_params.keys():
             m = self.query_regex.match(qp)
             if not m:
-                raise ValidationError('invalid query parameter: {}'.format(qp))
-            if not m.group('type') == 'filter' and len(request.query_params.getlist(qp)) > 1:
+                raise ValidationError("invalid query parameter: {}".format(qp))
+            if (
+                not m.group("type") == "filter"
+                and len(request.query_params.getlist(qp)) > 1
+            ):
                 raise ValidationError(
-                    'repeated query parameter not allowed: {}'.format(qp))
+                    "repeated query parameter not allowed: {}".format(qp)
+                )
 
     def filter_queryset(self, request, queryset, view):
         """

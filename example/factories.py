@@ -15,7 +15,7 @@ from example.models import (
     Entry,
     ProjectType,
     ResearchProject,
-    TaggedItem
+    TaggedItem,
 )
 
 faker = FakerFactory.create()
@@ -43,7 +43,7 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda x: faker.name())
     email = factory.LazyAttribute(lambda x: faker.email())
 
-    bio = factory.RelatedFactory('example.factories.AuthorBioFactory', 'author')
+    bio = factory.RelatedFactory("example.factories.AuthorBioFactory", "author")
     type = factory.SubFactory(AuthorTypeFactory)
 
 
@@ -54,7 +54,9 @@ class AuthorBioFactory(factory.django.DjangoModelFactory):
     author = factory.SubFactory(AuthorFactory)
     body = factory.LazyAttribute(lambda x: faker.text())
 
-    metadata = factory.RelatedFactory('example.factories.AuthorBioMetadataFactory', 'bio')
+    metadata = factory.RelatedFactory(
+        "example.factories.AuthorBioMetadataFactory", "bio"
+    )
 
 
 class AuthorBioMetadataFactory(factory.django.DjangoModelFactory):

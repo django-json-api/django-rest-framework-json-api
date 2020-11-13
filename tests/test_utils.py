@@ -12,7 +12,7 @@ from rest_framework_json_api.utils import (
     format_value,
     get_included_serializers,
     get_related_resource_type,
-    get_resource_name
+    get_resource_name,
 )
 from tests.models import (
     BasicModel,
@@ -20,7 +20,7 @@ from tests.models import (
     ForeignKeySource,
     ForeignKeyTarget,
     ManyToManySource,
-    ManyToManyTarget
+    ManyToManyTarget,
 )
 
 
@@ -28,64 +28,79 @@ def test_get_resource_name_no_view():
     assert get_resource_name({}) is None
 
 
-@pytest.mark.parametrize("format_type,pluralize_type,output", [
-    (False, False, 'APIView'),
-    (False, True, 'APIViews'),
-    ('dasherize', False, 'api-view'),
-    ('dasherize', True, 'api-views'),
-])
+@pytest.mark.parametrize(
+    "format_type,pluralize_type,output",
+    [
+        (False, False, "APIView"),
+        (False, True, "APIViews"),
+        ("dasherize", False, "api-view"),
+        ("dasherize", True, "api-views"),
+    ],
+)
 def test_get_resource_name_from_view(settings, format_type, pluralize_type, output):
     settings.JSON_API_FORMAT_TYPES = format_type
     settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
     view = APIView()
-    context = {'view': view}
+    context = {"view": view}
     assert output == get_resource_name(context)
 
 
-@pytest.mark.parametrize("format_type,pluralize_type", [
-    (False, False),
-    (False, True),
-    ('dasherize', False),
-    ('dasherize', True),
-])
-def test_get_resource_name_from_view_custom_resource_name(settings, format_type, pluralize_type):
+@pytest.mark.parametrize(
+    "format_type,pluralize_type",
+    [
+        (False, False),
+        (False, True),
+        ("dasherize", False),
+        ("dasherize", True),
+    ],
+)
+def test_get_resource_name_from_view_custom_resource_name(
+    settings, format_type, pluralize_type
+):
     settings.JSON_API_FORMAT_TYPES = format_type
     settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
     view = APIView()
-    view.resource_name = 'custom'
-    context = {'view': view}
-    assert 'custom' == get_resource_name(context)
+    view.resource_name = "custom"
+    context = {"view": view}
+    assert "custom" == get_resource_name(context)
 
 
-@pytest.mark.parametrize("format_type,pluralize_type,output", [
-    (False, False, 'BasicModel'),
-    (False, True, 'BasicModels'),
-    ('dasherize', False, 'basic-model'),
-    ('dasherize', True, 'basic-models'),
-])
+@pytest.mark.parametrize(
+    "format_type,pluralize_type,output",
+    [
+        (False, False, "BasicModel"),
+        (False, True, "BasicModels"),
+        ("dasherize", False, "basic-model"),
+        ("dasherize", True, "basic-models"),
+    ],
+)
 def test_get_resource_name_from_model(settings, format_type, pluralize_type, output):
     settings.JSON_API_FORMAT_TYPES = format_type
     settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
     view = APIView()
     view.model = BasicModel
-    context = {'view': view}
+    context = {"view": view}
     assert output == get_resource_name(context)
 
 
-@pytest.mark.parametrize("format_type,pluralize_type,output", [
-    (False, False, 'BasicModel'),
-    (False, True, 'BasicModels'),
-    ('dasherize', False, 'basic-model'),
-    ('dasherize', True, 'basic-models'),
-])
-def test_get_resource_name_from_model_serializer_class(settings, format_type,
-                                                       pluralize_type, output):
+@pytest.mark.parametrize(
+    "format_type,pluralize_type,output",
+    [
+        (False, False, "BasicModel"),
+        (False, True, "BasicModels"),
+        ("dasherize", False, "basic-model"),
+        ("dasherize", True, "basic-models"),
+    ],
+)
+def test_get_resource_name_from_model_serializer_class(
+    settings, format_type, pluralize_type, output
+):
     class BasicModelSerializer(serializers.ModelSerializer):
         class Meta:
-            fields = ('text',)
+            fields = ("text",)
             model = BasicModel
 
     settings.JSON_API_FORMAT_TYPES = format_type
@@ -93,22 +108,25 @@ def test_get_resource_name_from_model_serializer_class(settings, format_type,
 
     view = GenericAPIView()
     view.serializer_class = BasicModelSerializer
-    context = {'view': view}
+    context = {"view": view}
     assert output == get_resource_name(context)
 
 
-@pytest.mark.parametrize("format_type,pluralize_type", [
-    (False, False),
-    (False, True),
-    ('dasherize', False),
-    ('dasherize', True),
-])
-def test_get_resource_name_from_model_serializer_class_custom_resource_name(settings,
-                                                                            format_type,
-                                                                            pluralize_type):
+@pytest.mark.parametrize(
+    "format_type,pluralize_type",
+    [
+        (False, False),
+        (False, True),
+        ("dasherize", False),
+        ("dasherize", True),
+    ],
+)
+def test_get_resource_name_from_model_serializer_class_custom_resource_name(
+    settings, format_type, pluralize_type
+):
     class BasicModelSerializer(serializers.ModelSerializer):
         class Meta:
-            fields = ('text',)
+            fields = ("text",)
             model = BasicModel
 
     settings.JSON_API_FORMAT_TYPES = format_type
@@ -116,22 +134,27 @@ def test_get_resource_name_from_model_serializer_class_custom_resource_name(sett
 
     view = GenericAPIView()
     view.serializer_class = BasicModelSerializer
-    view.serializer_class.Meta.resource_name = 'custom'
+    view.serializer_class.Meta.resource_name = "custom"
 
-    context = {'view': view}
-    assert 'custom' == get_resource_name(context)
+    context = {"view": view}
+    assert "custom" == get_resource_name(context)
 
 
-@pytest.mark.parametrize("format_type,pluralize_type", [
-    (False, False),
-    (False, True),
-    ('dasherize', False),
-    ('dasherize', True),
-])
-def test_get_resource_name_from_plain_serializer_class(settings, format_type, pluralize_type):
+@pytest.mark.parametrize(
+    "format_type,pluralize_type",
+    [
+        (False, False),
+        (False, True),
+        ("dasherize", False),
+        ("dasherize", True),
+    ],
+)
+def test_get_resource_name_from_plain_serializer_class(
+    settings, format_type, pluralize_type
+):
     class PlainSerializer(serializers.Serializer):
         class Meta:
-            resource_name = 'custom'
+            resource_name = "custom"
 
     settings.JSON_API_FORMAT_TYPES = format_type
     settings.JSON_API_PLURALIZE_TYPES = pluralize_type
@@ -139,61 +162,76 @@ def test_get_resource_name_from_plain_serializer_class(settings, format_type, pl
     view = GenericAPIView()
     view.serializer_class = PlainSerializer
 
-    context = {'view': view}
-    assert 'custom' == get_resource_name(context)
+    context = {"view": view}
+    assert "custom" == get_resource_name(context)
 
 
-@pytest.mark.parametrize("status_code", [
-    status.HTTP_400_BAD_REQUEST,
-    status.HTTP_403_FORBIDDEN,
-    status.HTTP_500_INTERNAL_SERVER_ERROR
-])
+@pytest.mark.parametrize(
+    "status_code",
+    [
+        status.HTTP_400_BAD_REQUEST,
+        status.HTTP_403_FORBIDDEN,
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+    ],
+)
 def test_get_resource_name_with_errors(status_code):
     view = APIView()
-    context = {'view': view}
+    context = {"view": view}
     view.response = Response(status=status_code)
-    assert 'errors' == get_resource_name(context)
+    assert "errors" == get_resource_name(context)
 
 
-@pytest.mark.parametrize("format_type,output", [
-    ('camelize', {'fullName': {'last-name': 'a', 'first-name': 'b'}}),
-    ('capitalize', {'FullName': {'last-name': 'a', 'first-name': 'b'}}),
-    ('dasherize', {'full-name': {'last-name': 'a', 'first-name': 'b'}}),
-    ('underscore', {'full_name': {'last-name': 'a', 'first-name': 'b'}}),
-])
+@pytest.mark.parametrize(
+    "format_type,output",
+    [
+        ("camelize", {"fullName": {"last-name": "a", "first-name": "b"}}),
+        ("capitalize", {"FullName": {"last-name": "a", "first-name": "b"}}),
+        ("dasherize", {"full-name": {"last-name": "a", "first-name": "b"}}),
+        ("underscore", {"full_name": {"last-name": "a", "first-name": "b"}}),
+    ],
+)
 def test_format_field_names(settings, format_type, output):
     settings.JSON_API_FORMAT_FIELD_NAMES = format_type
 
-    value = {'full_name': {'last-name': 'a', 'first-name': 'b'}}
+    value = {"full_name": {"last-name": "a", "first-name": "b"}}
     assert format_field_names(value, format_type) == output
 
 
-@pytest.mark.parametrize("format_type,output", [
-    (None, 'first_name'),
-    ('camelize', 'firstName'),
-    ('capitalize', 'FirstName'),
-    ('dasherize', 'first-name'),
-    ('underscore', 'first_name')
-])
+@pytest.mark.parametrize(
+    "format_type,output",
+    [
+        (None, "first_name"),
+        ("camelize", "firstName"),
+        ("capitalize", "FirstName"),
+        ("dasherize", "first-name"),
+        ("underscore", "first_name"),
+    ],
+)
 def test_format_value(settings, format_type, output):
-    assert format_value('first_name', format_type) == output
+    assert format_value("first_name", format_type) == output
 
 
-@pytest.mark.parametrize("resource_type,pluralize,output", [
-    (None, None, 'ResourceType'),
-    ('camelize', False, 'resourceType'),
-    ('camelize', True, 'resourceTypes'),
-])
+@pytest.mark.parametrize(
+    "resource_type,pluralize,output",
+    [
+        (None, None, "ResourceType"),
+        ("camelize", False, "resourceType"),
+        ("camelize", True, "resourceTypes"),
+    ],
+)
 def test_format_resource_type(settings, resource_type, pluralize, output):
-    assert format_resource_type('ResourceType', resource_type, pluralize) == output
+    assert format_resource_type("ResourceType", resource_type, pluralize) == output
 
 
-@pytest.mark.parametrize('model_class,field,output', [
-    (ManyToManySource, 'targets', 'ManyToManyTarget'),
-    (ManyToManyTarget, 'sources', 'ManyToManySource'),
-    (ForeignKeySource, 'target', 'ForeignKeyTarget'),
-    (ForeignKeyTarget, 'sources', 'ForeignKeySource'),
-])
+@pytest.mark.parametrize(
+    "model_class,field,output",
+    [
+        (ManyToManySource, "targets", "ManyToManyTarget"),
+        (ManyToManyTarget, "sources", "ManyToManySource"),
+        (ForeignKeySource, "target", "ForeignKeyTarget"),
+        (ForeignKeyTarget, "sources", "ForeignKeySource"),
+    ],
+)
 def test_get_related_resource_type(model_class, field, output):
     class RelatedResourceTypeSerializer(serializers.ModelSerializer):
         class Meta:
@@ -212,29 +250,29 @@ class ManyToManyTargetSerializer(serializers.ModelSerializer):
 
 def test_get_included_serializers():
     class IncludedSerializersModel(DJAModel):
-        self = models.ForeignKey('self', on_delete=models.CASCADE)
+        self = models.ForeignKey("self", on_delete=models.CASCADE)
         target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
         other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
 
         class Meta:
-            app_label = 'tests'
+            app_label = "tests"
 
     class IncludedSerializersSerializer(serializers.ModelSerializer):
         included_serializers = {
-            'self': 'self',
-            'target': ManyToManyTargetSerializer,
-            'other_target': 'tests.test_utils.ManyToManyTargetSerializer'
+            "self": "self",
+            "target": ManyToManyTargetSerializer,
+            "other_target": "tests.test_utils.ManyToManyTargetSerializer",
         }
 
         class Meta:
             model = IncludedSerializersModel
-            fields = ('self', 'other_target', 'target')
+            fields = ("self", "other_target", "target")
 
     included_serializers = get_included_serializers(IncludedSerializersSerializer)
     expected_included_serializers = {
-        'self': IncludedSerializersSerializer,
-        'target': ManyToManyTargetSerializer,
-        'other_target': ManyToManyTargetSerializer
+        "self": IncludedSerializersSerializer,
+        "target": ManyToManyTargetSerializer,
+        "other_target": ManyToManyTargetSerializer,
     }
 
     assert included_serializers == expected_included_serializers

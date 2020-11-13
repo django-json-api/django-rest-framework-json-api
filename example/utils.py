@@ -6,7 +6,7 @@ class BrowsableAPIRendererWithoutForms(BrowsableAPIRenderer):
 
     def get_context(self, *args, **kwargs):
         ctx = super().get_context(*args, **kwargs)
-        ctx['display_edit_forms'] = False
+        ctx["display_edit_forms"] = False
         return ctx
 
     def show_form_for_method(self, view, method, request, obj):

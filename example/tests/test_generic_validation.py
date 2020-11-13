@@ -10,7 +10,7 @@ class GenericValidationTest(TestBase):
 
     def setUp(self):
         super(GenericValidationTest, self).setUp()
-        self.url = reverse('user-validation', kwargs={'pk': self.miles.pk})
+        self.url = reverse("user-validation", kwargs={"pk": self.miles.pk})
 
     def test_generic_validation_error(self):
         """
@@ -20,14 +20,14 @@ class GenericValidationTest(TestBase):
         self.assertEqual(response.status_code, 400)
 
         expected = {
-            'errors': [{
-                'status': '400',
-                'source': {
-                    'pointer': '/data'
-                },
-                'detail': 'Oh nohs!',
-                'code': 'invalid',
-            }]
+            "errors": [
+                {
+                    "status": "400",
+                    "source": {"pointer": "/data"},
+                    "detail": "Oh nohs!",
+                    "code": "invalid",
+                }
+            ]
         }
 
         assert expected == response.json()

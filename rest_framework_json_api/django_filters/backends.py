@@ -54,6 +54,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
     keyword. The default is "search" unless overriden but it's used here just to make sure
     we don't complain about it being an invalid filter.
     """
+
     search_param = api_settings.SEARCH_PARAM
 
     # Make this regex check for 'filter' as well as 'filter[...]'
@@ -63,7 +64,9 @@ class DjangoFilterBackend(DjangoFilterBackend):
     # regex `\w` matches [a-zA-Z0-9_].
     # TODO: U+0080 and above allowed but not recommended. Leave them out for now.e
     #       Also, ' ' (space) is allowed within a member name but not recommended.
-    filter_regex = re.compile(r'^filter(?P<ldelim>\[?)(?P<assoc>[\w\.\-]*)(?P<rdelim>\]?$)')
+    filter_regex = re.compile(
+        r"^filter(?P<ldelim>\[?)(?P<assoc>[\w\.\-]*)(?P<rdelim>\]?$)"
+    )
 
     def _validate_filter(self, keys, filterset_class):
         """
@@ -74,7 +77,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
         :raises ValidationError: if key not in FilterSet keys or no FilterSet.
         """
         for k in keys:
-            if ((not filterset_class) or (k not in filterset_class.base_filters)):
+            if (not filterset_class) or (k not in filterset_class.base_filters):
                 raise ValidationError("invalid filter[{}]".format(k))
 
     def get_filterset(self, request, queryset, view):
@@ -86,7 +89,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
         # TODO: .base_filters vs. .filters attr (not always present)
         filterset_class = self.get_filterset_class(view, queryset)
         kwargs = self.get_filterset_kwargs(request, queryset, view)
-        self._validate_filter(kwargs.pop('filter_keys'), filterset_class)
+        self._validate_filter(kwargs.pop("filter_keys"), filterset_class)
         if filterset_class is None:
             return None
         return filterset_class(**kwargs)
@@ -103,24 +106,29 @@ class DjangoFilterBackend(DjangoFilterBackend):
         data = request.query_params.copy()
         for qp, val in request.query_params.lists():
             m = self.filter_regex.match(qp)
-            if m and (not m.groupdict()['assoc'] or
-                      m.groupdict()['ldelim'] != '[' or m.groupdict()['rdelim'] != ']'):
+            if m and (
+                not m.groupdict()["assoc"]
+                or m.groupdict()["ldelim"] != "["
+                or m.groupdict()["rdelim"] != "]"
+            ):
                 raise ValidationError("invalid query parameter: {}".format(qp))
             if m and qp != self.search_param:
                 if not all(val):
-                    raise ValidationError("missing value for query parameter {}".format(qp))
+                    raise ValidationError(
+                        "missing value for query parameter {}".format(qp)
+                    )
                 # convert jsonapi relationship path to Django ORM's __ notation
-                key = m.groupdict()['assoc'].replace('.', '__')
+                key = m.groupdict()["assoc"].replace(".", "__")
                 # undo JSON_API_FORMAT_FIELD_NAMES conversion:
-                key = format_value(key, 'underscore')
+                key = format_value(key, "underscore")
                 data.setlist(key, val)
                 filter_keys.append(key)
                 del data[qp]
         return {
-            'data': data,
-            'queryset': queryset,
-            'request': request,
-            'filter_keys': filter_keys,
+            "data": data,
+            "queryset": queryset,
+            "request": request,
+            "filter_keys": filter_keys,
         }
 
     def get_schema_operation_parameters(self, view):
@@ -133,6 +141,6 @@ class DjangoFilterBackend(DjangoFilterBackend):
         """
         result = super(DjangoFilterBackend, self).get_schema_operation_parameters(view)
         for res in result:
-            if 'name' in res:
-                res['name'] = 'filter[{}]'.format(res['name']).replace('__', '.')
+            if "name" in res:
+                res["name"] = "filter[{}]".format(res["name"]).replace("__", ".")
         return result

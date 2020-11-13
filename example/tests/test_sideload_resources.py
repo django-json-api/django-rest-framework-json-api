@@ -13,7 +13,8 @@ class SideloadResourceTest(TestBase):
     """
     Test that sideloading resources returns expected output.
     """
-    url = reverse('user-posts')
+
+    url = reverse("user-posts")
 
     def test_get_sideloaded_data(self):
         """
@@ -21,9 +22,9 @@ class SideloadResourceTest(TestBase):
         do not return a single root key.
         """
         response = self.client.get(self.url)
-        content = json.loads(response.content.decode('utf8'))
+        content = json.loads(response.content.decode("utf8"))
 
         self.assertEqual(
             sorted(content.keys()),
-            [encoding.force_str('identities'),
-             encoding.force_str('posts')])
+            [encoding.force_str("identities"), encoding.force_str("posts")],
+        )

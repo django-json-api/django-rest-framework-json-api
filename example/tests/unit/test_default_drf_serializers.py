@@ -15,7 +15,7 @@ from example.models import Blog, Comment, Entry
 class RelatedModelSerializer(ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('id',)
+        fields = ("id",)
 
 
 class DummyTestSerializer(ModelSerializer):
@@ -23,16 +23,19 @@ class DummyTestSerializer(ModelSerializer):
     This serializer is a simple compound document serializer which includes only
     a single embedded relation
     """
-    related_models = RelatedModelSerializer(source='comments', many=True, read_only=True)
+
+    related_models = RelatedModelSerializer(
+        source="comments", many=True, read_only=True
+    )
 
     json_field = SerializerMethodField()
 
     def get_json_field(self, entry):
-        return {'JsonKey': 'JsonValue'}
+        return {"JsonKey": "JsonValue"}
 
     class Meta:
         model = Entry
-        fields = ('related_models', 'json_field')
+        fields = ("related_models", "json_field")
 
 
 # views
@@ -44,9 +47,7 @@ class DummyTestViewSet(viewsets.ModelViewSet):
 def render_dummy_test_serialized_view(view_class):
     serializer = DummyTestSerializer(instance=Entry())
     renderer = JSONRenderer()
-    return renderer.render(
-        serializer.data,
-        renderer_context={'view': view_class()})
+    return renderer.render(serializer.data, renderer_context={"view": view_class()})
 
 
 # tests
@@ -54,32 +55,28 @@ def test_simple_reverse_relation_included_renderer():
     """
     Test renderer when a single reverse fk relation is passed.
     """
-    rendered = render_dummy_test_serialized_view(
-        DummyTestViewSet)
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
 
     assert rendered
 
 
 def test_render_format_field_names(settings):
     """Test that json field is kept untouched."""
-    settings.JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
+    settings.JSON_API_FORMAT_FIELD_NAMES = "dasherize"
     rendered = render_dummy_test_serialized_view(DummyTestViewSet)
 
     result = json.loads(rendered.decode())
-    assert result['data']['attributes']['json-field'] == {'JsonKey': 'JsonValue'}
+    assert result["data"]["attributes"]["json-field"] == {"JsonKey": "JsonValue"}
 
 
 @pytest.mark.django_db
 def test_blog_create(client):
 
-    url = reverse('drf-entry-blog-list')
+    url = reverse("drf-entry-blog-list")
     name = "Dummy Name"
 
     request_data = {
-        'data': {
-            'attributes': {'name': name},
-            'type': 'blogs'
-        },
+        "data": {"attributes": {"name": name}, "type": "blogs"},
     }
 
     resp = client.post(url, request_data)
@@ -94,14 +91,14 @@ def test_blog_create(client):
     blog = blog.first()
 
     expected = {
-        'data': {
-            'attributes': {'name': blog.name, 'tags': []},
-            'id': '{}'.format(blog.id),
-            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': datetime.now().year},
-            'type': 'blogs'
+        "data": {
+            "attributes": {"name": blog.name, "tags": []},
+            "id": "{}".format(blog.id),
+            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "meta": {"copyright": datetime.now().year},
+            "type": "blogs",
         },
-        'meta': {'apiDocs': '/docs/api/blogs'}
+        "meta": {"apiDocs": "/docs/api/blogs"},
     }
 
     assert resp.status_code == 201
@@ -111,17 +108,17 @@ def test_blog_create(client):
 @pytest.mark.django_db
 def test_get_object_gives_correct_blog(client, blog, entry):
 
-    url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
+    url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
     resp = client.get(url)
     expected = {
-        'data': {
-            'attributes': {'name': blog.name, 'tags': []},
-            'id': '{}'.format(blog.id),
-            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': datetime.now().year},
-            'type': 'blogs'
+        "data": {
+            "attributes": {"name": blog.name, "tags": []},
+            "id": "{}".format(blog.id),
+            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "meta": {"copyright": datetime.now().year},
+            "type": "blogs",
         },
-        'meta': {'apiDocs': '/docs/api/blogs'}
+        "meta": {"apiDocs": "/docs/api/blogs"},
     }
     got = resp.json()
     assert got == expected
@@ -130,20 +127,20 @@ def test_get_object_gives_correct_blog(client, blog, entry):
 @pytest.mark.django_db
 def test_get_object_patches_correct_blog(client, blog, entry):
 
-    url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
+    url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
     new_name = blog.name + " update"
     assert not new_name == blog.name
 
     request_data = {
-        'data': {
-            'attributes': {'name': new_name},
-            'id': '{}'.format(blog.id),
-            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': datetime.now().year},
-            'relationships': {'tags': {'data': []}},
-            'type': 'blogs'
+        "data": {
+            "attributes": {"name": new_name},
+            "id": "{}".format(blog.id),
+            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "meta": {"copyright": datetime.now().year},
+            "relationships": {"tags": {"data": []}},
+            "type": "blogs",
         },
-        'meta': {'apiDocs': '/docs/api/blogs'}
+        "meta": {"apiDocs": "/docs/api/blogs"},
     }
 
     resp = client.patch(url, data=request_data)
@@ -151,14 +148,14 @@ def test_get_object_patches_correct_blog(client, blog, entry):
     assert resp.status_code == 200
 
     expected = {
-        'data': {
-            'attributes': {'name': new_name, 'tags': []},
-            'id': '{}'.format(blog.id),
-            'links': {'self': 'http://testserver/blogs/{}'.format(blog.id)},
-            'meta': {'copyright': datetime.now().year},
-            'type': 'blogs'
+        "data": {
+            "attributes": {"name": new_name, "tags": []},
+            "id": "{}".format(blog.id),
+            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "meta": {"copyright": datetime.now().year},
+            "type": "blogs",
         },
-        'meta': {'apiDocs': '/docs/api/blogs'}
+        "meta": {"apiDocs": "/docs/api/blogs"},
     }
     got = resp.json()
     assert got == expected
@@ -167,7 +164,7 @@ def test_get_object_patches_correct_blog(client, blog, entry):
 @pytest.mark.django_db
 def test_get_object_deletes_correct_blog(client, entry):
 
-    url = reverse('drf-entry-blog-detail', kwargs={'entry_pk': entry.id})
+    url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
 
     resp = client.delete(url)
 
@@ -176,37 +173,29 @@ def test_get_object_deletes_correct_blog(client, entry):
 
 @pytest.mark.django_db
 def test_get_entry_list_with_blogs(client, entry):
-    url = reverse('drf-entry-suggested', kwargs={'entry_pk': entry.id})
+    url = reverse("drf-entry-suggested", kwargs={"entry_pk": entry.id})
     resp = client.get(url)
 
     got = resp.json()
 
     expected = {
-        'links': {
-            'first': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
-            'last': 'http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1',
-            'next': None,
-            'prev': None,
+        "links": {
+            "first": "http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1",
+            "last": "http://testserver/drf-entries/1/suggested/?page%5Bnumber%5D=1",
+            "next": None,
+            "prev": None,
         },
-        'data': [
+        "data": [
             {
-                'type': 'entries',
-                'id': '1',
-                'attributes': {
-                    'tags': [],
+                "type": "entries",
+                "id": "1",
+                "attributes": {
+                    "tags": [],
                 },
-                'links': {
-                    'self': 'http://testserver/drf-blogs/1'
-                }
+                "links": {"self": "http://testserver/drf-blogs/1"},
             }
         ],
-        'meta': {
-            'pagination': {
-                'page': 1,
-                'pages': 1,
-                'count': 1
-            }
-        }
+        "meta": {"pagination": {"page": 1, "pages": 1, "count": 1}},
     }
 
     assert resp.status_code == 200

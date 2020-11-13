@@ -13,7 +13,7 @@ from example.factories import (
     CompanyFactory,
     EntryFactory,
     ResearchProjectFactory,
-    TaggedItemFactory
+    TaggedItemFactory,
 )
 
 register(BlogFactory)
@@ -59,7 +59,9 @@ def single_comment(blog, author, entry_factory, comment_factory):
 
 @pytest.fixture
 def single_company(art_project_factory, research_project_factory, company_factory):
-    company = company_factory(future_projects=(research_project_factory(), art_project_factory()))
+    company = company_factory(
+        future_projects=(research_project_factory(), art_project_factory())
+    )
     return company
 
 

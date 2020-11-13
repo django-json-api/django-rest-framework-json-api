@@ -12,14 +12,15 @@ class JsonApiPageNumberPagination(PageNumberPagination):
     """
     A json-api compatible pagination format.
     """
-    page_query_param = 'page[number]'
-    page_size_query_param = 'page[size]'
+
+    page_query_param = "page[number]"
+    page_size_query_param = "page[size]"
     max_page_size = 100
 
     def build_link(self, index):
         if not index:
             return None
-        url = self.request and self.request.build_absolute_uri() or ''
+        url = self.request and self.request.build_absolute_uri() or ""
         return replace_query_param(url, self.page_query_param, index)
 
     def get_paginated_response(self, data):
@@ -31,22 +32,28 @@ class JsonApiPageNumberPagination(PageNumberPagination):
         if self.page.has_previous():
             previous = self.page.previous_page_number()
 
-        return Response({
-            'results': data,
-            'meta': {
-                'pagination': OrderedDict([
-                    ('page', self.page.number),
-                    ('pages', self.page.paginator.num_pages),
-                    ('count', self.page.paginator.count),
-                ])
-            },
-            'links': OrderedDict([
-                ('first', self.build_link(1)),
-                ('last', self.build_link(self.page.paginator.num_pages)),
-                ('next', self.build_link(next)),
-                ('prev', self.build_link(previous))
-            ])
-        })
+        return Response(
+            {
+                "results": data,
+                "meta": {
+                    "pagination": OrderedDict(
+                        [
+                            ("page", self.page.number),
+                            ("pages", self.page.paginator.num_pages),
+                            ("count", self.page.paginator.count),
+                        ]
+                    )
+                },
+                "links": OrderedDict(
+                    [
+                        ("first", self.build_link(1)),
+                        ("last", self.build_link(self.page.paginator.num_pages)),
+                        ("next", self.build_link(next)),
+                        ("prev", self.build_link(previous)),
+                    ]
+                ),
+            }
+        )
 
 
 class JsonApiLimitOffsetPagination(LimitOffsetPagination):
@@ -59,8 +66,9 @@ class JsonApiLimitOffsetPagination(LimitOffsetPagination):
         http://api.example.org/accounts/?page[offset]=400&page[limit]=100
 
     """
-    limit_query_param = 'page[limit]'
-    offset_query_param = 'page[offset]'
+
+    limit_query_param = "page[limit]"
+    offset_query_param = "page[offset]"
     max_limit = 100
 
     def get_last_link(self):
@@ -85,19 +93,25 @@ class JsonApiLimitOffsetPagination(LimitOffsetPagination):
         return remove_query_param(url, self.offset_query_param)
 
     def get_paginated_response(self, data):
-        return Response({
-            'results': data,
-            'meta': {
-                'pagination': OrderedDict([
-                    ('count', self.count),
-                    ('limit', self.limit),
-                    ('offset', self.offset),
-                ])
-            },
-            'links': OrderedDict([
-                ('first', self.get_first_link()),
-                ('last', self.get_last_link()),
-                ('next', self.get_next_link()),
-                ('prev', self.get_previous_link())
-            ])
-        })
+        return Response(
+            {
+                "results": data,
+                "meta": {
+                    "pagination": OrderedDict(
+                        [
+                            ("count", self.count),
+                            ("limit", self.limit),
+                            ("offset", self.offset),
+                        ]
+                    )
+                },
+                "links": OrderedDict(
+                    [
+                        ("first", self.get_first_link()),
+                        ("last", self.get_last_link()),
+                        ("next", self.get_next_link()),
+                        ("prev", self.get_previous_link()),
+                    ]
+                ),
+            }
+        )

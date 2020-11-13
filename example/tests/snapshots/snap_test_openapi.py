@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
-snapshots['test_path_without_parameters 1'] = '''{
+snapshots[
+    "test_path_without_parameters 1"
+] = """{
   "description": "",
   "operationId": "List/authors/",
   "parameters": [
@@ -121,9 +122,11 @@ snapshots['test_path_without_parameters 1'] = '''{
       "description": "not found"
     }
   }
-}'''
+}"""
 
-snapshots['test_path_with_id_parameter 1'] = '''{
+snapshots[
+    "test_path_with_id_parameter 1"
+] = """{
   "description": "",
   "operationId": "retrieve/authors/{id}/",
   "parameters": [
@@ -225,9 +228,11 @@ snapshots['test_path_with_id_parameter 1'] = '''{
       "description": "not found"
     }
   }
-}'''
+}"""
 
-snapshots['test_post_request 1'] = '''{
+snapshots[
+    "test_post_request 1"
+] = """{
   "description": "",
   "operationId": "create/authors/",
   "parameters": [],
@@ -407,9 +412,11 @@ snapshots['test_post_request 1'] = '''{
       "description": "[Conflict](https://jsonapi.org/format/#crud-creating-responses-409)"
     }
   }
-}'''
+}"""
 
-snapshots['test_patch_request 1'] = '''{
+snapshots[
+    "test_patch_request 1"
+] = """{
   "description": "",
   "operationId": "update/authors/{id}",
   "parameters": [
@@ -583,9 +590,11 @@ snapshots['test_patch_request 1'] = '''{
       "description": "[Conflict]([Conflict](https://jsonapi.org/format/#crud-updating-responses-409)"
     }
   }
-}'''
+}"""
 
-snapshots['test_delete_request 1'] = '''{
+snapshots[
+    "test_delete_request 1"
+] = """{
   "description": "",
   "operationId": "destroy/authors/{id}",
   "parameters": [
@@ -644,4 +653,4 @@ snapshots['test_delete_request 1'] = '''{
       "description": "[Resource does not exist](https://jsonapi.org/format/#crud-deleting-responses-404)"
     }
   }
-}'''
+}"""
