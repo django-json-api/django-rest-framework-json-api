@@ -7,7 +7,7 @@ class DJAModel(models.Model):
     """
 
     class Meta:
-        app_label = 'tests'
+        app_label = "tests"
         abstract = True
 
 
@@ -23,7 +23,7 @@ class ManyToManyTarget(DJAModel):
 
 class ManyToManySource(DJAModel):
     name = models.CharField(max_length=100)
-    targets = models.ManyToManyField(ManyToManyTarget, related_name='sources')
+    targets = models.ManyToManyField(ManyToManyTarget, related_name="sources")
 
 
 # ForeignKey
@@ -33,5 +33,6 @@ class ForeignKeyTarget(DJAModel):
 
 class ForeignKeySource(DJAModel):
     name = models.CharField(max_length=100)
-    target = models.ForeignKey(ForeignKeyTarget, related_name='sources',
-                               on_delete=models.CASCADE)
+    target = models.ForeignKey(
+        ForeignKeyTarget, related_name="sources", on_delete=models.CASCADE
+    )

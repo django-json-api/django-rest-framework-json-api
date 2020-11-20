@@ -14,47 +14,41 @@ from rest_framework_json_api.renderers import JSONRenderer
 
 
 class TestJSONParser(TestCase):
-
     def setUp(self):
         class MockRequest(object):
-
             def __init__(self):
-                self.method = 'GET'
+                self.method = "GET"
 
         request = MockRequest()
 
-        self.parser_context = {'request': request, 'kwargs': {}, 'view': 'BlogViewSet'}
+        self.parser_context = {"request": request, "kwargs": {}, "view": "BlogViewSet"}
 
         data = {
-            'data': {
-                'id': 123,
-                'type': 'Blog',
-                'attributes': {
-                    'json-value': {'JsonKey': 'JsonValue'}
-                },
+            "data": {
+                "id": 123,
+                "type": "Blog",
+                "attributes": {"json-value": {"JsonKey": "JsonValue"}},
             },
-            'meta': {
-                'random_key': 'random_value'
-            }
+            "meta": {"random_key": "random_value"},
         }
 
         self.string = json.dumps(data)
 
-    @override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize')
+    @override_settings(JSON_API_FORMAT_FIELD_NAMES="dasherize")
     def test_parse_include_metadata_format_field_names(self):
         parser = JSONParser()
 
-        stream = BytesIO(self.string.encode('utf-8'))
+        stream = BytesIO(self.string.encode("utf-8"))
         data = parser.parse(stream, None, self.parser_context)
 
-        self.assertEqual(data['_meta'], {'random_key': 'random_value'})
-        self.assertEqual(data['json_value'], {'JsonKey': 'JsonValue'})
+        self.assertEqual(data["_meta"], {"random_key": "random_value"})
+        self.assertEqual(data["json_value"], {"JsonKey": "JsonValue"})
 
     def test_parse_invalid_data(self):
         parser = JSONParser()
 
         string = json.dumps([])
-        stream = BytesIO(string.encode('utf-8'))
+        stream = BytesIO(string.encode("utf-8"))
 
         with self.assertRaises(ParseError):
             parser.parse(stream, None, self.parser_context)
@@ -62,16 +56,18 @@ class TestJSONParser(TestCase):
     def test_parse_invalid_data_key(self):
         parser = JSONParser()
 
-        string = json.dumps({
-            'data': [{
-                'id': 123,
-                'type': 'Blog',
-                'attributes': {
-                    'json-value': {'JsonKey': 'JsonValue'}
-                },
-            }]
-        })
-        stream = BytesIO(string.encode('utf-8'))
+        string = json.dumps(
+            {
+                "data": [
+                    {
+                        "id": 123,
+                        "type": "Blog",
+                        "attributes": {"json-value": {"JsonKey": "JsonValue"}},
+                    }
+                ]
+            }
+        )
+        stream = BytesIO(string.encode("utf-8"))
 
         with self.assertRaises(ParseError):
             parser.parse(stream, None, self.parser_context)
@@ -84,7 +80,7 @@ class DummyDTO:
 
     @property
     def pk(self):
-        return self.id if hasattr(self, 'id') else None
+        return self.id if hasattr(self, "id") else None
 
 
 class DummySerializer(serializers.Serializer):
@@ -95,7 +91,7 @@ class DummySerializer(serializers.Serializer):
 class DummyAPIView(views.APIView):
     parser_classes = [JSONParser]
     renderer_classes = [JSONRenderer]
-    resource_name = 'dummy'
+    resource_name = "dummy"
 
     def patch(self, request, *args, **kwargs):
         serializer = DummySerializer(DummyDTO(request.data))
@@ -103,28 +99,25 @@ class DummyAPIView(views.APIView):
 
 
 urlpatterns = [
-    path('repeater', DummyAPIView.as_view(), name='repeater'),
+    path("repeater", DummyAPIView.as_view(), name="repeater"),
 ]
 
 
 class TestParserOnAPIView(APITestCase):
-
     def setUp(self):
         class MockRequest(object):
             def __init__(self):
-                self.method = 'PATCH'
+                self.method = "PATCH"
 
         request = MockRequest()
         # To be honest view string isn't resolved into actual view
-        self.parser_context = {'request': request, 'kwargs': {}, 'view': 'DummyAPIView'}
+        self.parser_context = {"request": request, "kwargs": {}, "view": "DummyAPIView"}
 
         self.data = {
-            'data': {
-                'id': 123,
-                'type': 'strs',
-                'attributes': {
-                    'body': 'hello'
-                },
+            "data": {
+                "id": 123,
+                "type": "strs",
+                "attributes": {"body": "hello"},
             }
         }
 
@@ -133,20 +126,20 @@ class TestParserOnAPIView(APITestCase):
     def test_patch_doesnt_raise_attribute_error(self):
         parser = JSONParser()
 
-        stream = BytesIO(self.string.encode('utf-8'))
+        stream = BytesIO(self.string.encode("utf-8"))
 
         data = parser.parse(stream, None, self.parser_context)
 
-        assert data['id'] == 123
-        assert data['body'] == 'hello'
+        assert data["id"] == 123
+        assert data["body"] == "hello"
 
     @override_settings(ROOT_URLCONF=__name__)
     def test_patch_request(self):
-        url = reverse('repeater')
+        url = reverse("repeater")
         data = self.data
-        data['data']['type'] = 'dummy'
+        data["data"]["type"] = "dummy"
         response = self.client.patch(url, data=data)
         data = response.json()
 
-        assert data['data']['id'] == str(123)
-        assert data['data']['attributes']['body'] == 'hello'
+        assert data["data"]["id"] == str(123)
+        assert data["data"]["attributes"]["body"] == "hello"

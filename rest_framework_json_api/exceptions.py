@@ -8,7 +8,8 @@ from .settings import json_api_settings
 
 def rendered_with_json_api(view):
     from rest_framework_json_api.renderers import JSONRenderer
-    for renderer_class in getattr(view, 'renderer_classes', []):
+
+    for renderer_class in getattr(view, "renderer_classes", []):
         if issubclass(renderer_class, JSONRenderer):
             return True
     return False
@@ -29,7 +30,7 @@ def exception_handler(exc, context):
         return response
 
     # Use regular DRF format if not rendered by DRF JSON API and not uniform
-    is_json_api_view = rendered_with_json_api(context['view'])
+    is_json_api_view = rendered_with_json_api(context["view"])
     is_uniform = json_api_settings.UNIFORM_EXCEPTIONS
     if not is_json_api_view and not is_uniform:
         return response
@@ -46,4 +47,4 @@ def exception_handler(exc, context):
 
 class Conflict(exceptions.APIException):
     status_code = status.HTTP_409_CONFLICT
-    default_detail = _('Conflict.')
+    default_detail = _("Conflict.")

@@ -23,14 +23,11 @@ def create_view_with_kw(view_cls, method, request, initkwargs):
 
 
 def test_path_without_parameters(snapshot):
-    path = '/authors/'
-    method = 'GET'
+    path = "/authors/"
+    method = "GET"
 
     view = create_view_with_kw(
-        views.AuthorViewSet,
-        method,
-        create_request(path),
-        {'get': 'list'}
+        views.AuthorViewSet, method, create_request(path), {"get": "list"}
     )
     inspector = AutoSchema()
     inspector.view = view
@@ -40,14 +37,11 @@ def test_path_without_parameters(snapshot):
 
 
 def test_path_with_id_parameter(snapshot):
-    path = '/authors/{id}/'
-    method = 'GET'
+    path = "/authors/{id}/"
+    method = "GET"
 
     view = create_view_with_kw(
-        views.AuthorViewSet,
-        method,
-        create_request(path),
-        {'get': 'retrieve'}
+        views.AuthorViewSet, method, create_request(path), {"get": "retrieve"}
     )
     inspector = AutoSchema()
     inspector.view = view
@@ -57,14 +51,11 @@ def test_path_with_id_parameter(snapshot):
 
 
 def test_post_request(snapshot):
-    method = 'POST'
-    path = '/authors/'
+    method = "POST"
+    path = "/authors/"
 
     view = create_view_with_kw(
-        views.AuthorViewSet,
-        method,
-        create_request(path),
-        {'post': 'create'}
+        views.AuthorViewSet, method, create_request(path), {"post": "create"}
     )
     inspector = AutoSchema()
     inspector.view = view
@@ -74,14 +65,11 @@ def test_post_request(snapshot):
 
 
 def test_patch_request(snapshot):
-    method = 'PATCH'
-    path = '/authors/{id}'
+    method = "PATCH"
+    path = "/authors/{id}"
 
     view = create_view_with_kw(
-        views.AuthorViewSet,
-        method,
-        create_request(path),
-        {'patch': 'update'}
+        views.AuthorViewSet, method, create_request(path), {"patch": "update"}
     )
     inspector = AutoSchema()
     inspector.view = view
@@ -91,14 +79,11 @@ def test_patch_request(snapshot):
 
 
 def test_delete_request(snapshot):
-    method = 'DELETE'
-    path = '/authors/{id}'
+    method = "DELETE"
+    path = "/authors/{id}"
 
     view = create_view_with_kw(
-        views.AuthorViewSet,
-        method,
-        create_request(path),
-        {'delete': 'delete'}
+        views.AuthorViewSet, method, create_request(path), {"delete": "delete"}
     )
     inspector = AutoSchema()
     inspector.view = view
@@ -107,22 +92,25 @@ def test_delete_request(snapshot):
     snapshot.assert_match(json.dumps(operation, indent=2, sort_keys=True))
 
 
-@override_settings(REST_FRAMEWORK={
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema'})
+@override_settings(
+    REST_FRAMEWORK={
+        "DEFAULT_SCHEMA_CLASS": "rest_framework_json_api.schemas.openapi.AutoSchema"
+    }
+)
 def test_schema_construction():
     """Construction of the top level dictionary."""
     patterns = [
-        re_path('^authors/?$', views.AuthorViewSet.as_view({'get': 'list'})),
+        re_path("^authors/?$", views.AuthorViewSet.as_view({"get": "list"})),
     ]
     generator = SchemaGenerator(patterns=patterns)
 
-    request = create_request('/')
+    request = create_request("/")
     schema = generator.get_schema(request=request)
 
-    assert 'openapi' in schema
-    assert 'info' in schema
-    assert 'paths' in schema
-    assert 'components' in schema
+    assert "openapi" in schema
+    assert "info" in schema
+    assert "paths" in schema
+    assert "components" in schema
 
 
 def test_schema_related_serializers():
@@ -135,15 +123,15 @@ def test_schema_related_serializers():
     and confirm that the schema for the related field is properly rendered
     """
     generator = SchemaGenerator()
-    request = create_request('/')
+    request = create_request("/")
     schema = generator.get_schema(request=request)
     # make sure the path's relationship and related {related_field}'s got expanded
-    assert '/authors/{id}/relationships/{related_field}' in schema['paths']
-    assert '/authors/{id}/comments/' in schema['paths']
-    assert '/authors/{id}/entries/' in schema['paths']
-    assert '/authors/{id}/first_entry/' in schema['paths']
-    first_get = schema['paths']['/authors/{id}/first_entry/']['get']['responses']['200']
-    first_schema = first_get['content']['application/vnd.api+json']['schema']
-    first_props = first_schema['properties']['data']
-    assert '$ref' in first_props
-    assert first_props['$ref'] == '#/components/schemas/Entry'
+    assert "/authors/{id}/relationships/{related_field}" in schema["paths"]
+    assert "/authors/{id}/comments/" in schema["paths"]
+    assert "/authors/{id}/entries/" in schema["paths"]
+    assert "/authors/{id}/first_entry/" in schema["paths"]
+    first_get = schema["paths"]["/authors/{id}/first_entry/"]["get"]["responses"]["200"]
+    first_schema = first_get["content"]["application/vnd.api+json"]["schema"]
+    first_props = first_schema["properties"]["data"]
+    assert "$ref" in first_props
+    assert first_props["$ref"] == "#/components/schemas/Entry"

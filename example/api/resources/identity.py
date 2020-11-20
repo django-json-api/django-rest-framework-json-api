@@ -11,7 +11,7 @@ from example.api.serializers.post import PostSerializer
 
 
 class Identity(viewsets.ModelViewSet):
-    queryset = auth_models.User.objects.all().order_by('pk')
+    queryset = auth_models.User.objects.all().order_by("pk")
     serializer_class = IdentitySerializer
 
     # demonstrate sideloading data for use at app boot time
@@ -20,22 +20,24 @@ class Identity(viewsets.ModelViewSet):
         self.resource_name = False
 
         identities = self.queryset
-        posts = [{'id': 1, 'title': 'Test Blog Post'}]
+        posts = [{"id": 1, "title": "Test Blog Post"}]
 
         data = {
-            encoding.force_str('identities'): IdentitySerializer(identities, many=True).data,
-            encoding.force_str('posts'): PostSerializer(posts, many=True).data,
+            encoding.force_str("identities"): IdentitySerializer(
+                identities, many=True
+            ).data,
+            encoding.force_str("posts"): PostSerializer(posts, many=True).data,
         }
-        return Response(utils.format_field_names(data, format_type='camelize'))
+        return Response(utils.format_field_names(data, format_type="camelize"))
 
     @action(detail=True)
     def manual_resource_name(self, request, *args, **kwargs):
-        self.resource_name = 'data'
+        self.resource_name = "data"
         return super(Identity, self).retrieve(request, args, kwargs)
 
     @action(detail=True)
     def validation(self, request, *args, **kwargs):
-        raise serializers.ValidationError('Oh nohs!')
+        raise serializers.ValidationError("Oh nohs!")
 
 
 class GenericIdentity(generics.GenericAPIView):
@@ -44,10 +46,11 @@ class GenericIdentity(generics.GenericAPIView):
 
     GET /identities/generic
     """
+
     serializer_class = IdentitySerializer
-    allowed_methods = ['GET']
-    renderer_classes = (renderers.JSONRenderer, )
-    parser_classes = (parsers.JSONParser, )
+    allowed_methods = ["GET"]
+    renderer_classes = (renderers.JSONRenderer,)
+    parser_classes = (parsers.JSONParser,)
 
     def get_queryset(self):
         return auth_models.User.objects.all()

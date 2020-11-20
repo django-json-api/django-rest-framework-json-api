@@ -11,7 +11,7 @@ from rest_framework_json_api.serializers import (
     DateField,
     ModelSerializer,
     ResourceIdentifierObjectSerializer,
-    empty
+    empty,
 )
 from rest_framework_json_api.utils import format_resource_type
 
@@ -25,37 +25,40 @@ pytestmark = pytest.mark.django_db
 
 class TestResourceIdentifierObjectSerializer(TestCase):
     def setUp(self):
-        self.blog = Blog.objects.create(name='Some Blog', tagline="It's a blog")
+        self.blog = Blog.objects.create(name="Some Blog", tagline="It's a blog")
         now = timezone.now()
 
         self.entry = Entry.objects.create(
             blog=self.blog,
-            headline='headline',
-            body_text='body_text',
+            headline="headline",
+            body_text="body_text",
             pub_date=now.date(),
             mod_date=now.date(),
             n_comments=0,
             n_pingbacks=0,
-            rating=3
+            rating=3,
         )
         for i in range(1, 6):
-            name = 'some_author{}'.format(i)
+            name = "some_author{}".format(i)
             self.entry.authors.add(
-                Author.objects.create(name=name, email='{}@example.org'.format(name))
+                Author.objects.create(name=name, email="{}@example.org".format(name))
             )
 
     def test_forward_relationship_not_loaded_when_not_included(self):
-        to_representation_method = 'example.serializers.TaggedItemSerializer.to_representation'
+        to_representation_method = (
+            "example.serializers.TaggedItemSerializer.to_representation"
+        )
         with mock.patch(to_representation_method) as mocked_serializer:
+
             class EntrySerializer(ModelSerializer):
                 blog = BlogSerializer()
 
                 class Meta:
                     model = Entry
-                    fields = '__all__'
+                    fields = "__all__"
 
-            request_without_includes = Request(request_factory.get('/'))
-            serializer = EntrySerializer(context={'request': request_without_includes})
+            request_without_includes = Request(request_factory.get("/"))
+            serializer = EntrySerializer(context={"request": request_without_includes})
             serializer.to_representation(self.entry)
 
             mocked_serializer.assert_not_called()
@@ -66,62 +69,74 @@ class TestResourceIdentifierObjectSerializer(TestCase):
 
             class Meta:
                 model = Entry
-                fields = '__all__'
+                fields = "__all__"
 
-        request_without_includes = Request(request_factory.get('/'))
-        serializer = EntrySerializer(context={'request': request_without_includes})
+        request_without_includes = Request(request_factory.get("/"))
+        serializer = EntrySerializer(context={"request": request_without_includes})
         result = serializer.to_representation(self.entry)
 
         # Remove non deterministic fields
-        result.pop('created_at')
-        result.pop('modified_at')
+        result.pop("created_at")
+        result.pop("modified_at")
 
         expected = dict(
             [
-                ('id', 1),
-                ('blog', dict([
-                    ('name', 'Some Blog'),
-                    ('tags', []),
-                    ('copyright', 2020),
-                    ('url', 'http://testserver/blogs/1')
-                ])),
-                ('headline', 'headline'),
-                ('body_text', 'body_text'),
-                ('pub_date', DateField().to_representation(self.entry.pub_date)),
-                ('mod_date', DateField().to_representation(self.entry.mod_date)),
-                ('n_comments', 0),
-                ('n_pingbacks', 0),
-                ('rating', 3),
-                ('authors',
+                ("id", 1),
+                (
+                    "blog",
+                    dict(
+                        [
+                            ("name", "Some Blog"),
+                            ("tags", []),
+                            ("copyright", 2020),
+                            ("url", "http://testserver/blogs/1"),
+                        ]
+                    ),
+                ),
+                ("headline", "headline"),
+                ("body_text", "body_text"),
+                ("pub_date", DateField().to_representation(self.entry.pub_date)),
+                ("mod_date", DateField().to_representation(self.entry.mod_date)),
+                ("n_comments", 0),
+                ("n_pingbacks", 0),
+                ("rating", 3),
+                (
+                    "authors",
                     [
-                        dict([('type', 'authors'), ('id', '1')]),
-                        dict([('type', 'authors'), ('id', '2')]),
-                        dict([('type', 'authors'), ('id', '3')]),
-                        dict([('type', 'authors'), ('id', '4')]),
-                        dict([('type', 'authors'), ('id', '5')])])])
+                        dict([("type", "authors"), ("id", "1")]),
+                        dict([("type", "authors"), ("id", "2")]),
+                        dict([("type", "authors"), ("id", "3")]),
+                        dict([("type", "authors"), ("id", "4")]),
+                        dict([("type", "authors"), ("id", "5")]),
+                    ],
+                ),
+            ]
+        )
 
         self.assertDictEqual(expected, result)
 
     def test_data_in_correct_format_when_instantiated_with_blog_object(self):
         serializer = ResourceIdentifierObjectSerializer(instance=self.blog)
 
-        expected_data = {'type': format_resource_type('Blog'), 'id': str(self.blog.id)}
+        expected_data = {"type": format_resource_type("Blog"), "id": str(self.blog.id)}
 
         assert serializer.data == expected_data
 
     def test_data_in_correct_format_when_instantiated_with_entry_object(self):
         serializer = ResourceIdentifierObjectSerializer(instance=self.entry)
 
-        expected_data = {'type': format_resource_type('Entry'), 'id': str(self.entry.id)}
+        expected_data = {
+            "type": format_resource_type("Entry"),
+            "id": str(self.entry.id),
+        }
 
         assert serializer.data == expected_data
 
     def test_deserialize_primitive_data_blog(self):
-        initial_data = {
-            'type': format_resource_type('Blog'),
-            'id': str(self.blog.id)
-        }
-        serializer = ResourceIdentifierObjectSerializer(data=initial_data, model_class=Blog)
+        initial_data = {"type": format_resource_type("Blog"), "id": str(self.blog.id)}
+        serializer = ResourceIdentifierObjectSerializer(
+            data=initial_data, model_class=Blog
+        )
 
         self.assertTrue(serializer.is_valid(), msg=serializer.errors)
         assert serializer.validated_data == self.blog
@@ -131,29 +146,28 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         self.blog.delete()
         assert not Blog.objects.filter(id=unexisting_pk).exists()
 
-        initial_data = {
-            'type': format_resource_type('Blog'),
-            'id': str(unexisting_pk)
-        }
-        serializer = ResourceIdentifierObjectSerializer(data=initial_data, model_class=Blog)
+        initial_data = {"type": format_resource_type("Blog"), "id": str(unexisting_pk)}
+        serializer = ResourceIdentifierObjectSerializer(
+            data=initial_data, model_class=Blog
+        )
 
         self.assertFalse(serializer.is_valid())
-        self.assertEqual(serializer.errors[0].code, 'does_not_exist')
+        self.assertEqual(serializer.errors[0].code, "does_not_exist")
 
     def test_data_in_correct_format_when_instantiated_with_queryset(self):
         qs = Author.objects.all()
         serializer = ResourceIdentifierObjectSerializer(instance=qs, many=True)
 
-        type_string = format_resource_type('Author')
-        author_pks = Author.objects.values_list('pk', flat=True)
-        expected_data = [{'type': type_string, 'id': str(pk)} for pk in author_pks]
+        type_string = format_resource_type("Author")
+        author_pks = Author.objects.values_list("pk", flat=True)
+        expected_data = [{"type": type_string, "id": str(pk)} for pk in author_pks]
 
         assert serializer.data == expected_data
 
     def test_deserialize_many(self):
-        type_string = format_resource_type('Author')
-        author_pks = Author.objects.values_list('pk', flat=True)
-        initial_data = [{'type': type_string, 'id': str(pk)} for pk in author_pks]
+        type_string = format_resource_type("Author")
+        author_pks = Author.objects.values_list("pk", flat=True)
+        initial_data = [{"type": type_string, "id": str(pk)} for pk in author_pks]
 
         serializer = ResourceIdentifierObjectSerializer(
             data=initial_data, model_class=Author, many=True
@@ -170,33 +184,20 @@ class TestModelSerializer(object):
             "data": {
                 "type": "comments",
                 "id": str(comment.pk),
-                "attributes": {
-                    "body": comment.body
-                },
+                "attributes": {"body": comment.body},
                 "relationships": {
-                    "entry": {
-                        "data": {
-                            "type": "entries",
-                            "id": str(comment.entry.pk)
-                        }
-                    },
+                    "entry": {"data": {"type": "entries", "id": str(comment.entry.pk)}},
                     "author": {
-                        "data": {
-                            "type": "authors",
-                            "id": str(comment.author.pk)
-                        }
+                        "data": {"type": "authors", "id": str(comment.author.pk)}
                     },
                     "writer": {
-                        "data": {
-                            "type": "writers",
-                            "id": str(comment.author.pk)
-                        }
+                        "data": {"type": "writers", "id": str(comment.author.pk)}
                     },
-                }
+                },
             }
         }
 
-        response = client.get(reverse("comment-detail", kwargs={'pk': comment.pk}))
+        response = client.get(reverse("comment-detail", kwargs={"pk": comment.pk}))
 
         assert response.status_code == 200
         assert expected == response.json()

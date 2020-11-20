@@ -7,13 +7,13 @@ the defaults.
 from django.conf import settings
 from django.core.signals import setting_changed
 
-JSON_API_SETTINGS_PREFIX = 'JSON_API_'
+JSON_API_SETTINGS_PREFIX = "JSON_API_"
 
 DEFAULTS = {
-    'FORMAT_FIELD_NAMES': False,
-    'FORMAT_TYPES': False,
-    'PLURALIZE_TYPES': False,
-    'UNIFORM_EXCEPTIONS': False,
+    "FORMAT_FIELD_NAMES": False,
+    "FORMAT_TYPES": False,
+    "PLURALIZE_TYPES": False,
+    "UNIFORM_EXCEPTIONS": False,
 }
 
 
@@ -31,7 +31,9 @@ class JSONAPISettings(object):
         if attr not in self.defaults:
             raise AttributeError("Invalid JSON API setting: '%s'" % attr)
 
-        value = getattr(self.user_settings, JSON_API_SETTINGS_PREFIX + attr, self.defaults[attr])
+        value = getattr(
+            self.user_settings, JSON_API_SETTINGS_PREFIX + attr, self.defaults[attr]
+        )
 
         # Cache the result
         setattr(self, attr, value)
@@ -42,9 +44,9 @@ json_api_settings = JSONAPISettings()
 
 
 def reload_json_api_settings(*args, **kwargs):
-    django_setting = kwargs['setting']
-    setting = django_setting.replace(JSON_API_SETTINGS_PREFIX, '')
-    value = kwargs['value']
+    django_setting = kwargs["setting"]
+    setting = django_setting.replace(JSON_API_SETTINGS_PREFIX, "")
+    value = kwargs["value"]
     if setting in DEFAULTS.keys():
         if value is not None:
             setattr(json_api_settings, setting, value)

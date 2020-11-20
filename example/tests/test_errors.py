@@ -14,7 +14,7 @@ class CommentAttachmentSerializer(serializers.Serializer):
 
     def validate_data(self, value):
         if value and len(value) < 10:
-            raise serializers.ValidationError('Too short data')
+            raise serializers.ValidationError("Too short data")
 
 
 class CommentSerializer(serializers.Serializer):
@@ -32,17 +32,17 @@ class EntrySerializer(serializers.Serializer):
     body_text = serializers.CharField()
 
     def validate(self, attrs):
-        body_text = attrs['body_text']
+        body_text = attrs["body_text"]
         if len(body_text) < 5:
-            raise serializers.ValidationError({'body_text': {
-                'title': 'Too Short title', 'detail': 'Too short'}
-            })
+            raise serializers.ValidationError(
+                {"body_text": {"title": "Too Short title", "detail": "Too short"}}
+            )
 
 
 # view
 class DummyTestView(views.APIView):
     serializer_class = EntrySerializer
-    resource_name = 'entries'
+    resource_name = "entries"
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -50,21 +50,18 @@ class DummyTestView(views.APIView):
 
 
 urlpatterns = [
-    path('entries-nested', DummyTestView.as_view(),
-         name='entries-nested-list')
+    path("entries-nested", DummyTestView.as_view(), name="entries-nested-list")
 ]
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def some_blog(db):
-    return Blog.objects.create(name='Some Blog', tagline="It's a blog")
+    return Blog.objects.create(name="Some Blog", tagline="It's a blog")
 
 
 def perform_error_test(client, data):
-    with override_settings(
-            ROOT_URLCONF=__name__
-    ):
-        url = reverse('entries-nested-list')
+    with override_settings(ROOT_URLCONF=__name__):
+        url = reverse("entries-nested-list")
         response = client.post(url, data=data)
 
     return response.json()
@@ -72,12 +69,12 @@ def perform_error_test(client, data):
 
 def test_first_level_attribute_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+            },
         }
     }
     snapshot.assert_match(perform_error_test(client, data))
@@ -85,32 +82,29 @@ def test_first_level_attribute_error(client, some_blog, snapshot):
 
 def test_first_level_custom_attribute_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'body-text': 'body',
-                'headline': 'headline'
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "body-text": "body",
+                "headline": "headline",
+            },
         }
     }
-    with override_settings(JSON_API_FORMAT_FIELD_NAMES='dasherize'):
+    with override_settings(JSON_API_FORMAT_FIELD_NAMES="dasherize"):
         snapshot.assert_match(perform_error_test(client, data))
 
 
 def test_second_level_array_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-                'headline': 'headline',
-                'comments': [
-                    {
-                    }
-                ]
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+                "comments": [{}],
+            },
         }
     }
 
@@ -119,14 +113,14 @@ def test_second_level_array_error(client, some_blog, snapshot):
 
 def test_second_level_dict_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-                'headline': 'headline',
-                'comment': {}
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+                "comment": {},
+            },
         }
     }
 
@@ -135,22 +129,14 @@ def test_second_level_dict_error(client, some_blog, snapshot):
 
 def test_third_level_array_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-                'headline': 'headline',
-                'comments': [
-                    {
-                        'body': 'test comment',
-                        'attachments': [
-                            {
-                            }
-                        ]
-                    }
-                ]
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+                "comments": [{"body": "test comment", "attachments": [{}]}],
+            },
         }
     }
 
@@ -159,23 +145,16 @@ def test_third_level_array_error(client, some_blog, snapshot):
 
 def test_third_level_custom_array_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-                'headline': 'headline',
-                'comments': [
-                    {
-                        'body': 'test comment',
-                        'attachments': [
-                            {
-                                'data': 'text'
-                            }
-                        ]
-                    }
-                ]
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+                "comments": [
+                    {"body": "test comment", "attachments": [{"data": "text"}]}
+                ],
+            },
         }
     }
 
@@ -184,19 +163,14 @@ def test_third_level_custom_array_error(client, some_blog, snapshot):
 
 def test_third_level_dict_error(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-                'headline': 'headline',
-                'comments': [
-                    {
-                        'body': 'test comment',
-                        'attachment': {}
-                    }
-                ]
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+                "comments": [{"body": "test comment", "attachment": {}}],
+            },
         }
     }
 
@@ -205,18 +179,14 @@ def test_third_level_dict_error(client, some_blog, snapshot):
 
 def test_many_third_level_dict_errors(client, some_blog, snapshot):
     data = {
-        'data': {
-            'type': 'entries',
-            'attributes': {
-                'blog': some_blog.pk,
-                'bodyText': 'body_text',
-                'headline': 'headline',
-                'comments': [
-                    {
-                        'attachment': {}
-                    }
-                ]
-            }
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+                "comments": [{"attachment": {}}],
+            },
         }
     }
 

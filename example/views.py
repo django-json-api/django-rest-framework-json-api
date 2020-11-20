@@ -8,7 +8,10 @@ import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from rest_framework_json_api.django_filters import DjangoFilterBackend
-from rest_framework_json_api.filters import OrderingFilter, QueryParameterValidationFilter
+from rest_framework_json_api.filters import (
+    OrderingFilter,
+    QueryParameterValidationFilter,
+)
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
@@ -25,7 +28,7 @@ from example.serializers import (
     EntryDRFSerializers,
     EntrySerializer,
     ProjectSerializer,
-    ProjectTypeSerializer
+    ProjectTypeSerializer,
 )
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
@@ -36,7 +39,7 @@ class BlogViewSet(ModelViewSet):
     serializer_class = BlogSerializer
 
     def get_object(self):
-        entry_pk = self.kwargs.get('entry_pk', None)
+        entry_pk = self.kwargs.get("entry_pk", None)
         if entry_pk is not None:
             return Entry.objects.get(id=entry_pk).blog
 
@@ -46,7 +49,7 @@ class BlogViewSet(ModelViewSet):
 class DRFBlogViewSet(ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogDRFSerializer
-    lookup_url_kwarg = 'entry_pk'
+    lookup_url_kwarg = "entry_pk"
 
     def get_object(self):
         entry_pk = self.kwargs.get(self.lookup_url_kwarg, None)
@@ -62,6 +65,7 @@ class JsonApiViewSet(ModelViewSet):
     within a class. It allows using DRF-jsonapi alongside
     vanilla DRF API views.
     """
+
     parser_classes = [
         rest_framework_json_api.parsers.JSONParser,
         rest_framework.parsers.FormParser,
@@ -92,14 +96,14 @@ class BlogCustomViewSet(JsonApiViewSet):
 
 class EntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
-    resource_name = 'posts'
+    resource_name = "posts"
 
     def get_serializer_class(self):
         return EntrySerializer
 
     def get_object(self):
         # Handle featured
-        entry_pk = self.kwargs.get('entry_pk', None)
+        entry_pk = self.kwargs.get("entry_pk", None)
         if entry_pk is not None:
             return Entry.objects.exclude(pk=entry_pk).first()
 
@@ -109,7 +113,7 @@ class EntryViewSet(ModelViewSet):
 class DRFEntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
     serializer_class = EntryDRFSerializers
-    lookup_url_kwarg = 'entry_pk'
+    lookup_url_kwarg = "entry_pk"
 
     def get_object(self):
         # Handle featured
@@ -128,30 +132,42 @@ class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
     # override the default filter backends in order to test QueryParameterValidationFilter without
     # breaking older usage of non-standard query params like `page_size`.
-    filter_backends = (QueryParameterValidationFilter, OrderingFilter,
-                       DjangoFilterBackend, SearchFilter)
-    ordering_fields = ('headline', 'body_text', 'blog__name', 'blog__id')
-    rels = ('exact', 'iexact',
-            'contains', 'icontains',
-            'gt', 'gte', 'lt', 'lte',
-            'in', 'regex', 'isnull',)
+    filter_backends = (
+        QueryParameterValidationFilter,
+        OrderingFilter,
+        DjangoFilterBackend,
+        SearchFilter,
+    )
+    ordering_fields = ("headline", "body_text", "blog__name", "blog__id")
+    rels = (
+        "exact",
+        "iexact",
+        "contains",
+        "icontains",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "in",
+        "regex",
+        "isnull",
+    )
     filterset_fields = {
-        'id': ('exact', 'in'),
-        'headline': rels,
-        'body_text': rels,
-        'blog__name': rels,
-        'blog__tagline': rels,
+        "id": ("exact", "in"),
+        "headline": rels,
+        "body_text": rels,
+        "blog__name": rels,
+        "blog__tagline": rels,
     }
-    search_fields = ('headline', 'body_text', 'blog__name', 'blog__tagline')
+    search_fields = ("headline", "body_text", "blog__name", "blog__tagline")
 
 
 class EntryFilter(filters.FilterSet):
-    bname = filters.CharFilter(field_name="blog__name",
-                               lookup_expr="exact")
+    bname = filters.CharFilter(field_name="blog__name", lookup_expr="exact")
 
     authors__id = filters.ModelMultipleChoiceFilter(
-        field_name='authors',
-        to_field_name='id',
+        field_name="authors",
+        to_field_name="id",
         conjoined=True,  # to "and" the ids
         queryset=Author.objects.all(),
     )
@@ -159,10 +175,10 @@ class EntryFilter(filters.FilterSet):
     class Meta:
         model = Entry
         fields = {
-            'id': ('exact',),
-            'headline': ('exact',),
-            'body_text': ('exact',),
-            'authors__id': ('in',),
+            "id": ("exact",),
+            "headline": ("exact",),
+            "body_text": ("exact",),
+            "authors__id": ("in",),
         }
 
 
@@ -170,16 +186,21 @@ class FiltersetEntryViewSet(EntryViewSet):
     """
     like above but use filterset_class instead of filterset_fields
     """
+
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = EntryFilter
-    filter_backends = (QueryParameterValidationFilter, DjangoFilterBackend,)
+    filter_backends = (
+        QueryParameterValidationFilter,
+        DjangoFilterBackend,
+    )
 
 
 class NoFiltersetEntryViewSet(EntryViewSet):
     """
     like above but no filtersets
     """
+
     pagination_class = NoPagination
     filterset_fields = None
     filterset_class = None
@@ -189,7 +210,8 @@ class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
     serializer_classes = {
         "list": AuthorListSerializer,
-        "retrieve": AuthorDetailSerializer}
+        "retrieve": AuthorDetailSerializer,
+    }
     serializer_class = AuthorSerializer  # fallback
 
     def get_serializer_class(self):
@@ -202,16 +224,14 @@ class AuthorViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    select_for_includes = {
-        'writer': ['author__bio']
-    }
+    select_for_includes = {"writer": ["author__bio"]}
     prefetch_for_includes = {
-        '__all__': [],
-        'author': ['author__bio', 'author__entries'],
+        "__all__": [],
+        "author": ["author__bio", "author__entries"],
     }
 
     def get_queryset(self, *args, **kwargs):
-        entry_pk = self.kwargs.get('entry_pk', None)
+        entry_pk = self.kwargs.get("entry_pk", None)
         if entry_pk is not None:
             return self.queryset.filter(entry_id=entry_pk)
 
@@ -224,7 +244,7 @@ class CompanyViewset(ModelViewSet):
 
 
 class ProjectViewset(ModelViewSet):
-    queryset = Project.objects.all().order_by('pk')
+    queryset = Project.objects.all().order_by("pk")
     serializer_class = ProjectSerializer
 
 
@@ -247,4 +267,4 @@ class CommentRelationshipView(RelationshipView):
 
 class AuthorRelationshipView(RelationshipView):
     queryset = Author.objects.all()
-    self_link_view_name = 'author-relationships'
+    self_link_view_name = "author-relationships"
