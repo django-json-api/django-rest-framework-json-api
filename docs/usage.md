@@ -135,7 +135,7 @@ simply don't use this filter backend.
 #### OrderingFilter
 
 `OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
-DRF's [ordering filter](http://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#orderingfilter).
+DRF's [ordering filter](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter).
 
 Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
 it **MUST** return `400 Bad Request`." For example, for `?sort=abc,foo,def` where `foo` is a valid
@@ -205,7 +205,7 @@ As this feature depends on `django-filter` you need to run
 #### SearchFilter
 
 To comply with JSON:API query parameter naming standards, DRF's
-[SearchFilter](https://django-rest-framework.readthedocs.io/en/latest/api-guide/filtering/#searchfilter) should
+[SearchFilter](https://www.django-rest-framework.org/api-guide/filtering/#searchfilter) should
 be configured to use a `filter[_something_]` query parameter. This can be done by default by adding the
 SearchFilter to `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` and setting `REST_FRAMEWORK['SEARCH_PARAM']` or
 adding the `.search_param` attribute to a custom class derived from `SearchFilter`.  If you do this and also
