@@ -33,6 +33,13 @@ To run tests clone the repository, and then:
      # Run tests
      pytest
 
+### Running against multiple environments
+
+You can also use the excellent [tox](https://tox.readthedocs.io/en/latest/) testing tool to run the tests against all supported versions of Python and Django.  Install `tox` globally, and then simply run:
+
+    tox
+
+
 ### Setup pre-commit
 
 pre-commit hooks is an additional option to check linting and formatting of code independent of
