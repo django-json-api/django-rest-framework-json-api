@@ -16,6 +16,7 @@ from django.utils.module_loading import import_string as import_class_from_dotte
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
+from rest_framework.serializers import ManyRelatedField
 
 from .settings import json_api_settings
 
@@ -215,6 +216,11 @@ def get_related_resource_type(relation):
                 return get_related_resource_type(parent_model_relation)
 
     if relation_model is None:
+        # For ManyRelatedFields on plain Serializers the resource_type
+        # cannot be determined from a model, so we must get it from the
+        # child_relation
+        if hasattr(relation, "child_relation"):
+            return get_related_resource_type(relation.child_relation)
         raise APIException(
             _("Could not resolve resource type for relation %s" % relation)
         )

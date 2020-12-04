@@ -243,6 +243,27 @@ def test_get_related_resource_type(model_class, field, output):
     assert get_related_resource_type(field) == output
 
 
+@pytest.mark.parametrize(
+    "related_field_kwargs,output",
+    [
+        ({"queryset": BasicModel.objects}, "BasicModel"),
+        ({"queryset": BasicModel.objects, "model": BasicModel}, "BasicModel"),
+        ({"model": BasicModel, "read_only": True}, "BasicModel"),
+    ],
+)
+def test_get_related_resource_type_from_plain_serializer_class(
+    related_field_kwargs, output
+):
+    class PlainRelatedResourceTypeSerializer(serializers.Serializer):
+        basic_models = serializers.ResourceRelatedField(
+            many=True, **related_field_kwargs
+        )
+
+    serializer = PlainRelatedResourceTypeSerializer()
+    field = serializer.fields["basic_models"]
+    assert get_related_resource_type(field) == output
+
+
 class ManyToManyTargetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManyToManyTarget
