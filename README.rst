@@ -142,18 +142,6 @@ Browse to
 * http://localhost:8000/openapi for the schema view's OpenAPI specification document.
 
 
-Running Tests and linting
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-It is recommended to create a virtualenv for testing. Assuming it is already
-installed and activated:
-
-::
-
-    $ pip install -Ur requirements.txt
-    $ flake8
-    $ pytest
-
 -----
 Usage
 -----

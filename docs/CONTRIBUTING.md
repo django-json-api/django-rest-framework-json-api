@@ -1,30 +1,60 @@
-Contributing
-============
+# Contributing
 
-DJA should be easy to contribute to.
+Django REST Framework JSON API (aka DJA)  should be easy to contribute to.
 If anything is unclear about how to contribute,
 please submit an issue on GitHub so that we can fix it!
 
-How
----
+Before writing any code, have a conversation on a GitHub issue to see
+if the proposed change makes sense for the project.
 
-Before writing any code,
-have a conversation on a GitHub issue
-to see if the proposed change makes sense
-for the project.
+## Setup development environment
 
-Fork DJA on [GitHub](https://github.com/django-json-api/django-rest-framework-json-api) and
-[submit a Pull Request](https://help.github.com/articles/creating-a-pull-request/)
-when you're ready.
+### Clone
 
-For maintainers
----------------
+To start developing on Django REST Framework JSON API you need to first clone the repository:
 
-To upload a release (using version 1.2.3 as the example):
+    git clone https://github.com/django-json-api/django-rest-framework-json-api.git
 
-```bash
-(venv)$ python setup.py sdist bdist_wheel
-(venv)$ twine upload dist/*
-(venv)$ git tag -a v1.2.3 -m 'Release 1.2.3'
-(venv)$ git push --tags
-```
+### Testing
+
+To run tests clone the repository, and then:
+
+     # Setup the virtual environment
+     python3 -m venv env
+     source env/bin/activate
+     pip install -r requirements.txt
+
+     # Format code
+     black .
+
+     # Run linting
+     flake8
+
+     # Run tests
+     pytest
+
+### Running against multiple environments
+
+You can also use the excellent [tox](https://tox.readthedocs.io/en/latest/) testing tool to run the tests against all supported versions of Python and Django.  Install `tox` globally, and then simply run:
+
+    tox
+
+
+### Setup pre-commit
+
+pre-commit hooks is an additional option to check linting and formatting of code independent of
+an editor before you commit your changes with git.
+
+To setup pre-commit hooks first create a testing environment as explained above before running below commands:
+
+    pip install pre-commit
+    pre-commit install
+
+## For maintainers
+
+To upload a release (using version 1.2.3 as the example) first setup testing environment as above before running below commands:
+
+    python setup.py sdist bdist_wheel
+    twine upload dist/*
+    git tag -a v1.2.3 -m 'Release 1.2.3'
+    git push --tags
