@@ -215,6 +215,11 @@ def get_related_resource_type(relation):
                 return get_related_resource_type(parent_model_relation)
 
     if relation_model is None:
+        # For ManyRelatedFields on plain Serializers the resource_type
+        # cannot be determined from a model, so we must get it from the
+        # child_relation
+        if hasattr(relation, "child_relation"):
+            return get_related_resource_type(relation.child_relation)
         raise APIException(
             _("Could not resolve resource type for relation %s" % relation)
         )

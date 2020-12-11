@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased] - TBD
+## [Unreleased]
 
 ### Added
 
@@ -17,6 +17,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Allow users to overwrite a view's `get_serializer_class()` method when using [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#related-urls)
+* Correctly resolve the resource type of `ResourceRelatedField(many=True)` fields on plain serializers
 
 
 ## [4.0.0] - 2020-10-31
