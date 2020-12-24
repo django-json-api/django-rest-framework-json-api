@@ -25,6 +25,7 @@ from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializ
 from rest_framework_json_api.utils import (
     Hyperlink,
     OrderedDict,
+    format_value,
     get_included_resources,
     get_resource_type_from_instance,
 )
@@ -185,7 +186,8 @@ class RelatedMixin(object):
         return parent_serializer_class
 
     def get_related_field_name(self):
-        return self.kwargs["related_field"]
+        field_name = self.kwargs["related_field"]
+        return format_value(field_name, "underscore")
 
     def get_related_instance(self):
         parent_obj = self.get_object()
@@ -227,7 +229,6 @@ class RelationshipView(generics.GenericAPIView):
     serializer_class = ResourceIdentifierObjectSerializer
     self_link_view_name = None
     related_link_view_name = None
-    field_name_mapping = {}
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_serializer_class(self):
@@ -400,9 +401,7 @@ class RelationshipView(generics.GenericAPIView):
 
     def get_related_field_name(self):
         field_name = self.kwargs["related_field"]
-        if field_name in self.field_name_mapping:
-            return self.field_name_mapping[field_name]
-        return field_name
+        return format_value(field_name, "underscore")
 
     def _instantiate_serializer(self, instance):
         if isinstance(instance, Model) or instance is None:
