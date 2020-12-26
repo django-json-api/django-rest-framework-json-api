@@ -229,6 +229,7 @@ class RelationshipView(generics.GenericAPIView):
     serializer_class = ResourceIdentifierObjectSerializer
     self_link_view_name = None
     related_link_view_name = None
+    field_name_mapping = {}
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_serializer_class(self):
@@ -401,7 +402,9 @@ class RelationshipView(generics.GenericAPIView):
 
     def get_related_field_name(self):
         field_name = self.kwargs["related_field"]
-        return format_value(field_name, "underscore")
+        if field_name in self.field_name_mapping:
+            return self.field_name_mapping[field_name]
+        return field_name
 
     def _instantiate_serializer(self, instance):
         if isinstance(instance, Model) or instance is None:
