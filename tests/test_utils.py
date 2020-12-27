@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework_json_api import serializers
 from rest_framework_json_api.utils import (
     format_field_names,
+    format_link_segment,
     format_resource_type,
     format_value,
     get_included_serializers,
@@ -195,6 +196,21 @@ def test_format_field_names(settings, format_type, output):
 
     value = {"full_name": {"last-name": "a", "first-name": "b"}}
     assert format_field_names(value, format_type) == output
+
+
+@pytest.mark.parametrize(
+    "format_type,output",
+    [
+        (None, "first_Name"),
+        ("camelize", "firstName"),
+        ("capitalize", "FirstName"),
+        ("dasherize", "first-name"),
+        ("underscore", "first_name"),
+    ],
+)
+def test_format_field_segment(settings, format_type, output):
+    settings.JSON_API_FORMAT_LINKS = format_type
+    assert format_link_segment("first_Name") == output
 
 
 @pytest.mark.parametrize(
