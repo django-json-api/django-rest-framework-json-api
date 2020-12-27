@@ -1,5 +1,4 @@
 import pytest
-from django.test import RequestFactory
 
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.relations import ResourceRelatedField
@@ -21,10 +20,10 @@ related_model_field_name = "related_field_model"
         "underscore",
     ],
 )
-def test_get_related_field_name_handles_formatted_link_segments(format_links):
+def test_get_related_field_name_handles_formatted_link_segments(format_links, rf):
     url_segment = format_value(related_model_field_name, format_links)
 
-    request = RequestFactory().get("/basic_models/1/{}".format(url_segment))
+    request = rf.get(f"/basic_models/1/{url_segment}")
 
     view = BasicModelFakeViewSet()
     view.setup(request, related_field=url_segment)

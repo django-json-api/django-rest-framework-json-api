@@ -31,14 +31,8 @@ def test_relationship_urls_respect_format_links(
     field.field_name = "relatedField_name"
 
     expected = {
-        "self": "/basic_models/{}/relationships/{}/".format(
-            model.pk,
-            expected_url_segment,
-        ),
-        "related": "/basic_models/{}/{}/".format(
-            model.pk,
-            expected_url_segment,
-        ),
+        "self": f"/basic_models/{model.pk}/relationships/{expected_url_segment}/",
+        "related": f"/basic_models/{model.pk}/{expected_url_segment}/",
     }
 
     actual = field.get_links(model)
