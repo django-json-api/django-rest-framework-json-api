@@ -9,7 +9,6 @@ from .models import BasicModel
 related_model_field_name = "related_field_model"
 
 
-@pytest.mark.urls("tests.urls")
 @pytest.mark.parametrize(
     "format_links",
     [
