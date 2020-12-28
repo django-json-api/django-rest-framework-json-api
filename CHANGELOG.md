@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Ability for the user to select `included_serializers` to apply when using `BrowsableAPI`, based on available `included_serializers` defined for the current endpoint.
+* Ability for the user to format serializer properties in URL segments using the `JSON_API_FORMAT_LINKS` setting.
 
 ### Fixed
 
