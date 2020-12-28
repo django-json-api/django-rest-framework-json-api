@@ -741,6 +741,14 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
     }
 ```
 
+<div class="warning">
+    <strong>Note:</strong>
+    Even though with related urls relations are served on different urls there are still served
+    by the same view. This means that the object permission check is performed on the parent object.
+    In other words when the parent object is accessible by the user the related object will be as well.
+</div>
+
+
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
 relationship views (see the
