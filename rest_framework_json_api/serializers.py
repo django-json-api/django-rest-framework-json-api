@@ -1,9 +1,22 @@
+from collections import OrderedDict
+
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ParseError
-from rest_framework.serializers import *  # noqa: F403
+
+# star import defined so `rest_framework_json_api.serializers` can be
+# a simple drop in for `rest_framework.serializers`
+from rest_framework.serializers import *  # noqa: F401, F403
+from rest_framework.serializers import (
+    BaseSerializer,
+    HyperlinkedModelSerializer,
+    ModelSerializer,
+    Serializer,
+    SerializerMetaclass,
+)
+from rest_framework.settings import api_settings
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
