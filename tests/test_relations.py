@@ -10,7 +10,7 @@ from .models import BasicModel
 
 @pytest.mark.urls(__name__)
 @pytest.mark.parametrize(
-    "format_links,expected_url_segment",
+    "format_related_links,expected_url_segment",
     [
         (None, "relatedField_name"),
         ("dasherize", "related-field-name"),
@@ -19,10 +19,10 @@ from .models import BasicModel
         ("underscore", "related_field_name"),
     ],
 )
-def test_relationship_urls_respect_format_links(
-    settings, format_links, expected_url_segment
+def test_relationship_urls_respect_format_related_links_setting(
+    settings, format_related_links, expected_url_segment
 ):
-    settings.JSON_API_FORMAT_LINKS = format_links
+    settings.JSON_API_FORMAT_RELATED_LINKS = format_related_links
 
     model = BasicModel(text="Some text")
 

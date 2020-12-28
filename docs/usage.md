@@ -479,10 +479,10 @@ When set to pluralize:
 
 #### Related URL segments
 
-Serializer properties in relationship and related resource URLs may be infected using the `JSON_API_FORMAT_LINKS` setting.
+Serializer properties in relationship and related resource URLs may be infected using the `JSON_API_FORMAT_RELATED_LINKS` setting.
 
 ``` python
-JSON_API_FORMAT_LINKS = 'dasherize'
+JSON_API_FORMAT_RELATED_LINKS = 'dasherize'
 ```
 
 For example, with a serializer property `created_by` and with `'dasherize'` formatting:
@@ -513,7 +513,7 @@ For example, with a serializer property `created_by` and with `'dasherize'` form
 }
 ```
 
-The relationship name is formatted by the `JSON_API_FORMAT_FIELD_NAMES` setting, but the URL segments are formatted by the `JSON_API_FORMAT_LINKS` setting.
+The relationship name is formatted by the `JSON_API_FORMAT_FIELD_NAMES` setting, but the URL segments are formatted by the `JSON_API_FORMAT_RELATED_LINKS` setting.
 
 ### Related fields
 
