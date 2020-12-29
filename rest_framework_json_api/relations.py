@@ -15,6 +15,7 @@ from rest_framework.serializers import Serializer
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.utils import (
     Hyperlink,
+    format_link_segment,
     get_included_serializers,
     get_resource_type_from_instance,
     get_resource_type_from_queryset,
@@ -112,14 +113,10 @@ class HyperlinkedMixin(object):
             else view.kwargs[lookup_field]
         }
 
+        field_name = self.field_name if self.field_name else self.parent.field_name
+
         self_kwargs = kwargs.copy()
-        self_kwargs.update(
-            {
-                "related_field": self.field_name
-                if self.field_name
-                else self.parent.field_name
-            }
-        )
+        self_kwargs.update({"related_field": format_link_segment(field_name)})
         self_link = self.get_url("self", self.self_link_view_name, self_kwargs, request)
 
         # Assuming RelatedField will be declared in two ways:

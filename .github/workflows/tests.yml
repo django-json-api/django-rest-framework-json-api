@@ -1,0 +1,55 @@
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Run test
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.django-rest-framework == 'master' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
+        django: ["2.2", "3.0", "3.1"]
+        django-rest-framework: ["3.12", "master"]
+    env:
+      PYTHON: ${{ matrix.python-version }}
+      DJANGO: ${{ matrix.django }}
+      DJANGO_REST_FRAMEWORK: ${{ matrix.django-rest-framework }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+      - name: Test with tox
+        run: tox
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v1
+        with:
+          env_vars: PYTHON,DJANGO,DJANGO_REST_FRAMEWORK
+  check:
+    name: Run check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tox-env: ["black", "lint", "docs"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+      - name: Run lint
+        run: tox
+        env:
+          TOXENV: ${{ matrix.tox-env }}

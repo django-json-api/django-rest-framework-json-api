@@ -477,6 +477,44 @@ When set to pluralize:
 }
 ```
 
+#### Related URL segments
+
+Serializer properties in relationship and related resource URLs may be infected using the `JSON_API_FORMAT_RELATED_LINKS` setting.
+
+``` python
+JSON_API_FORMAT_RELATED_LINKS = 'dasherize'
+```
+
+For example, with a serializer property `created_by` and with `'dasherize'` formatting:
+
+```json
+{
+  "data": {
+      "type": "comments",
+      "id": "1",
+      "attributes": {
+          "text": "Comments are fun!"
+      },
+      "links": {
+          "self": "/comments/1"
+      },
+      "relationships": {
+        "created_by": {
+          "links": {
+            "self": "/comments/1/relationships/created-by",
+            "related": "/comments/1/created-by"
+          }
+        }
+      }
+  },
+  "links": {
+      "self": "/comments/1"
+  }
+}
+```
+
+The relationship name is formatted by the `JSON_API_FORMAT_FIELD_NAMES` setting, but the URL segments are formatted by the `JSON_API_FORMAT_RELATED_LINKS` setting.
+
 ### Related fields
 
 #### ResourceRelatedField
@@ -702,6 +740,14 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
         'line_items': 'example.serializers.LineItemSerializer'
     }
 ```
+
+<div class="warning">
+    <strong>Note:</strong>
+    Even though with related urls relations are served on different urls there are still served
+    by the same view. This means that the object permission check is performed on the parent object.
+    In other words when the parent object is accessible by the user the related object will be as well.
+</div>
+
 
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
