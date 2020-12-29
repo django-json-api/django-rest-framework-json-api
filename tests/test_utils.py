@@ -209,7 +209,7 @@ def test_format_field_names(settings, format_type, output):
     ],
 )
 def test_format_field_segment(settings, format_type, output):
-    settings.JSON_API_FORMAT_LINKS = format_type
+    settings.JSON_API_FORMAT_RELATED_LINKS = format_type
     assert format_link_segment("first_Name") == output
 
 

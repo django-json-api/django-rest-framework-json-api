@@ -151,12 +151,12 @@ def format_resource_type(value, format_type=None, pluralize=None):
 def format_link_segment(value, format_type=None):
     """
     Takes a string value and returns it with formatted keys as set in `format_type`
-    or `JSON_API_FORMAT_LINKS`.
+    or `JSON_API_FORMAT_RELATED_LINKS`.
 
     :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
     """
     if format_type is None:
-        format_type = json_api_settings.FORMAT_LINKS
+        format_type = json_api_settings.FORMAT_RELATED_LINKS
 
     return format_value(value, format_type)
 
