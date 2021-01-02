@@ -2,7 +2,7 @@
 JSON API and Django Rest Framework
 ==================================
 
-.. image:: hhttps://github.com/django-json-api/django-rest-framework-json-api/workflows/Tests/badge.svg
+.. image:: https://github.com/django-json-api/django-rest-framework-json-api/workflows/Tests/badge.svg
    :alt: Tests
    :target: https://github.com/django-json-api/django-rest-framework-json-api/actions
 
