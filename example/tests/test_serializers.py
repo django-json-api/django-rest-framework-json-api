@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import mock
 
 import pytest
@@ -88,7 +89,7 @@ class TestResourceIdentifierObjectSerializer(TestCase):
                         [
                             ("name", "Some Blog"),
                             ("tags", []),
-                            ("copyright", 2020),
+                            ("copyright", datetime.now().year),
                             ("url", "http://testserver/blogs/1"),
                         ]
                     ),
