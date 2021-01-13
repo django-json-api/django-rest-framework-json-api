@@ -281,7 +281,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         return obj.entries.first()
 
     def get_initials(self, obj):
-        return ' '.join([word[0] for word in [obj.name]])
+        return " ".join([word[0] for word in [obj.name]])
 
 
 class AuthorListSerializer(AuthorSerializer):

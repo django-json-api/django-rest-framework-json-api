@@ -195,7 +195,9 @@ class TestModelSerializer(object):
                         "data": {"type": "writers", "id": str(comment.author.pk)}
                     },
                 },
-                "meta": {"modifiedDaysAgo": (datetime.now() - comment.modified_at).days}
+                "meta": {
+                    "modifiedDaysAgo": (datetime.now() - comment.modified_at).days
+                },
             }
         }
 

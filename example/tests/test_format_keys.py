@@ -63,6 +63,6 @@ def test_options_format_field_names(db, client):
         "comments",
         "secrets",
         "defaults",
-        "initials"
+        "initials",
     }
     assert expected_keys == data["actions"]["POST"].keys()

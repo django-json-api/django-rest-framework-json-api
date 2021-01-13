@@ -380,8 +380,9 @@ class JSONRenderer(renderers.JSONRenderer):
                         ] = utils.format_field_names(new_item)
                         meta = cls.extract_meta(field, serializer_resource)
                         if meta:
-                            included_cache[new_item['type']][new_item['id']]['meta'] = \
-                                utils.format_field_names(meta)
+                            included_cache[new_item["type"]][new_item["id"]][
+                                "meta"
+                            ] = utils.format_field_names(meta)
                         cls.extract_included(
                             serializer_fields,
                             serializer_resource,
@@ -408,8 +409,9 @@ class JSONRenderer(renderers.JSONRenderer):
                     ] = utils.format_field_names(new_item)
                     meta = cls.extract_meta(field, serializer_data)
                     if meta:
-                        included_cache[new_item['type']][new_item['id']]['meta'] = \
-                            utils.format_field_names(meta)
+                        included_cache[new_item["type"]][new_item["id"]][
+                            "meta"
+                        ] = utils.format_field_names(meta)
                     cls.extract_included(
                         serializer_fields,
                         serializer_data,
