@@ -378,11 +378,9 @@ class JSONRenderer(renderers.JSONRenderer):
                         included_cache[new_item["type"]][
                             new_item["id"]
                         ] = utils.format_field_names(new_item)
-                        meta = cls.extract_meta(field, serializer_resource)
-                        if meta:
-                            included_cache[new_item["type"]][new_item["id"]][
-                                "meta"
-                            ] = utils.format_field_names(meta)
+                        cls.add_meta_to_included(
+                            included_cache, field, serializer_resource, new_item
+                        )
                         cls.extract_included(
                             serializer_fields,
                             serializer_resource,
@@ -407,11 +405,9 @@ class JSONRenderer(renderers.JSONRenderer):
                     included_cache[new_item["type"]][
                         new_item["id"]
                     ] = utils.format_field_names(new_item)
-                    meta = cls.extract_meta(field, serializer_data)
-                    if meta:
-                        included_cache[new_item["type"]][new_item["id"]][
-                            "meta"
-                        ] = utils.format_field_names(meta)
+                    cls.add_meta_to_included(
+                        included_cache, field, serializer_data, new_item
+                    )
                     cls.extract_included(
                         serializer_fields,
                         serializer_data,
@@ -419,6 +415,14 @@ class JSONRenderer(renderers.JSONRenderer):
                         new_included_resources,
                         included_cache,
                     )
+
+    @classmethod
+    def add_meta_to_included(cls, included_cache, field, resource, new_item):
+        meta = cls.extract_meta(field, resource)
+        if meta:
+            included_cache[new_item["type"]][new_item["id"]][
+                "meta"
+            ] = utils.format_field_names(meta)
 
     @classmethod
     def extract_meta(cls, serializer, resource):
