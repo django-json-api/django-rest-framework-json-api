@@ -373,14 +373,11 @@ class JSONRenderer(renderers.JSONRenderer):
                             serializer_resource,
                             nested_resource_instance,
                             resource_type,
+                            serializer,
                             getattr(serializer, "_poly_force_type_resolution", False),
                         )
-                        included_cache[new_item["type"]][
-                            new_item["id"]
-                        ] = utils.format_field_names(new_item)
-                        cls.add_meta_to_included(
-                            included_cache, field, serializer_resource, new_item
-                        )
+                        included_cache[new_item["type"]][new_item["id"]] = new_item
+
                         cls.extract_included(
                             serializer_fields,
                             serializer_resource,
@@ -400,14 +397,11 @@ class JSONRenderer(renderers.JSONRenderer):
                         serializer_data,
                         relation_instance,
                         relation_type,
+                        field,
                         getattr(field, "_poly_force_type_resolution", False),
                     )
-                    included_cache[new_item["type"]][
-                        new_item["id"]
-                    ] = utils.format_field_names(new_item)
-                    cls.add_meta_to_included(
-                        included_cache, field, serializer_data, new_item
-                    )
+                    included_cache[new_item["type"]][new_item["id"]] = new_item
+
                     cls.extract_included(
                         serializer_fields,
                         serializer_data,
@@ -415,14 +409,6 @@ class JSONRenderer(renderers.JSONRenderer):
                         new_included_resources,
                         included_cache,
                     )
-
-    @classmethod
-    def add_meta_to_included(cls, included_cache, field, resource, new_item):
-        meta = cls.extract_meta(field, resource)
-        if meta:
-            included_cache[new_item["type"]][new_item["id"]][
-                "meta"
-            ] = utils.format_field_names(meta)
 
     @classmethod
     def extract_meta(cls, serializer, resource):
@@ -464,6 +450,7 @@ class JSONRenderer(renderers.JSONRenderer):
         resource,
         resource_instance,
         resource_name,
+        serializer,
         force_type_resolution=False,
     ):
         """
@@ -490,6 +477,11 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_data.append(
                 ("links", {"self": resource[api_settings.URL_FIELD_NAME]})
             )
+
+        meta = cls.extract_meta(serializer, resource)
+        if meta:
+            resource_data.append(("meta", utils.format_field_names(meta)))
+
         return OrderedDict(resource_data)
 
     def render_relationship_view(
@@ -596,13 +588,9 @@ class JSONRenderer(renderers.JSONRenderer):
                         resource,
                         resource_instance,
                         resource_name,
+                        serializer,
                         force_type_resolution,
                     )
-                    meta = self.extract_meta(serializer, resource)
-                    if meta:
-                        json_resource_obj.update(
-                            {"meta": utils.format_field_names(meta)}
-                        )
                     json_api_data.append(json_resource_obj)
 
                     self.extract_included(
@@ -624,12 +612,9 @@ class JSONRenderer(renderers.JSONRenderer):
                     serializer_data,
                     resource_instance,
                     resource_name,
+                    serializer,
                     force_type_resolution,
                 )
-
-                meta = self.extract_meta(serializer, serializer_data)
-                if meta:
-                    json_api_data.update({"meta": utils.format_field_names(meta)})
 
                 self.extract_included(
                     fields,

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework_json_api import serializers
 from rest_framework_json_api.renderers import JSONRenderer
+from rest_framework_json_api.utils import get_serializer_fields
 
 pytestmark = pytest.mark.django_db
 
@@ -20,10 +21,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 
 def test_build_json_resource_obj():
-    resource = {
-        "pk": 1,
-        "username": "Alice",
-    }
+    resource = {"username": "Alice", "version": "1.0.0"}
 
     serializer = ResourceSerializer(data={"username": "Alice"})
     serializer.is_valid()
@@ -33,11 +31,16 @@ def test_build_json_resource_obj():
         "type": "user",
         "id": "1",
         "attributes": {"username": "Alice"},
+        "meta": {"version": "1.0.0"},
     }
 
     assert (
         JSONRenderer.build_json_resource_obj(
-            serializer.fields, resource, resource_instance, "user"
+            get_serializer_fields(serializer),
+            resource,
+            resource_instance,
+            "user",
+            serializer,
         )
         == output
     )
@@ -47,11 +50,8 @@ def test_can_override_methods():
     """
     Make sure extract_attributes and extract_relationships can be overriden.
     """
-    resource = {
-        "pk": 1,
-        "username": "Alice",
-    }
 
+    resource = {"username": "Alice", "version": "1.0.0"}
     serializer = ResourceSerializer(data={"username": "Alice"})
     serializer.is_valid()
     resource_instance = serializer.save()
@@ -60,6 +60,7 @@ def test_can_override_methods():
         "type": "user",
         "id": "1",
         "attributes": {"username": "Alice"},
+        "meta": {"version": "1.0.0"},
     }
 
     class CustomRenderer(JSONRenderer):
@@ -80,7 +81,11 @@ def test_can_override_methods():
 
     assert (
         CustomRenderer.build_json_resource_obj(
-            serializer.fields, resource, resource_instance, "user"
+            get_serializer_fields(serializer),
+            resource,
+            resource_instance,
+            "user",
+            serializer,
         )
         == output
     )

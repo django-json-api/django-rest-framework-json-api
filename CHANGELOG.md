@@ -14,12 +14,12 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Ability for the user to select `included_serializers` to apply when using `BrowsableAPI`, based on available `included_serializers` defined for the current endpoint.
 * Ability for the user to format serializer properties in URL segments using the `JSON_API_FORMAT_RELATED_LINKS` setting.
-* Ability to render meta_fields of included resources
 
 ### Fixed
 
 * Allow users to overwrite a view's `get_serializer_class()` method when using [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#related-urls)
 * Correctly resolve the resource type of `ResourceRelatedField(many=True)` fields on plain serializers
+* Render `meta_fields` in included resources
 
 
 ## [4.0.0] - 2020-10-31
