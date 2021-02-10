@@ -261,3 +261,17 @@ def test_data_resource_not_included_again(single_comment, client):
     # The comment in the data attribute must not be included again.
     expected_comment_count -= 1
     assert comment_count == expected_comment_count, "Comment count incorrect"
+
+
+def test_meta_object_added_to_included_resources(single_entry, client):
+    response = client.get(
+        reverse("entry-detail", kwargs={"pk": single_entry.pk}) + "?include=comments"
+    )
+    assert response.json()["included"][0].get("meta")
+
+    response = client.get(
+        reverse("entry-detail", kwargs={"pk": single_entry.pk})
+        + "?include=comments.author"
+    )
+    assert response.json()["included"][0].get("meta")
+    assert response.json()["included"][1].get("meta")

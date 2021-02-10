@@ -251,6 +251,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         write_only=True,
         help_text="help for defaults",
     )
+    initials = serializers.SerializerMethodField()
     included_serializers = {"bio": AuthorBioSerializer, "type": AuthorTypeSerializer}
     related_serializers = {
         "bio": "example.serializers.AuthorBioSerializer",
@@ -272,10 +273,15 @@ class AuthorSerializer(serializers.ModelSerializer):
             "type",
             "secrets",
             "defaults",
+            "initials",
         )
+        meta_fields = ("initials",)
 
     def get_first_entry(self, obj):
         return obj.entries.first()
+
+    def get_initials(self, obj):
+        return "".join([word[0] for word in obj.name.split(" ")])
 
 
 class AuthorListSerializer(AuthorSerializer):
@@ -298,6 +304,7 @@ class WriterSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     # testing remapping of related name
     writer = relations.ResourceRelatedField(source="author", read_only=True)
+    modified_days_ago = serializers.SerializerMethodField()
 
     included_serializers = {
         "entry": EntrySerializer,
@@ -312,6 +319,10 @@ class CommentSerializer(serializers.ModelSerializer):
             "modified_at",
         )
         # fields = ('entry', 'body', 'author',)
+        meta_fields = ("modified_days_ago",)
+
+    def get_modified_days_ago(self, obj):
+        return (datetime.now() - obj.modified_at).days
 
 
 class ProjectTypeSerializer(serializers.ModelSerializer):

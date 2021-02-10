@@ -19,6 +19,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Allow users to overwrite a view's `get_serializer_class()` method when using [related urls](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#related-urls)
 * Correctly resolve the resource type of `ResourceRelatedField(many=True)` fields on plain serializers
+* Render `meta_fields` in included resources
 
 
 ## [4.0.0] - 2020-10-31
