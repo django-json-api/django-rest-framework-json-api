@@ -23,6 +23,7 @@ from tests.models import (
     ManyToManySource,
     ManyToManyTarget,
 )
+from tests.serializers import BasicModelSerializer, ManyToManyTargetSerializer
 
 
 def test_get_resource_name_no_view():
@@ -99,11 +100,6 @@ def test_get_resource_name_from_model(settings, format_type, pluralize_type, out
 def test_get_resource_name_from_model_serializer_class(
     settings, format_type, pluralize_type, output
 ):
-    class BasicModelSerializer(serializers.ModelSerializer):
-        class Meta:
-            fields = ("text",)
-            model = BasicModel
-
     settings.JSON_API_FORMAT_TYPES = format_type
     settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
@@ -125,11 +121,6 @@ def test_get_resource_name_from_model_serializer_class(
 def test_get_resource_name_from_model_serializer_class_custom_resource_name(
     settings, format_type, pluralize_type
 ):
-    class BasicModelSerializer(serializers.ModelSerializer):
-        class Meta:
-            fields = ("text",)
-            model = BasicModel
-
     settings.JSON_API_FORMAT_TYPES = format_type
     settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
@@ -280,11 +271,6 @@ def test_get_related_resource_type_from_plain_serializer_class(
     assert get_related_resource_type(field) == output
 
 
-class ManyToManyTargetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ManyToManyTarget
-
-
 def test_get_included_serializers():
     class IncludedSerializersModel(DJAModel):
         self = models.ForeignKey("self", on_delete=models.CASCADE)
@@ -298,7 +284,7 @@ def test_get_included_serializers():
         included_serializers = {
             "self": "self",
             "target": ManyToManyTargetSerializer,
-            "other_target": "tests.test_utils.ManyToManyTargetSerializer",
+            "other_target": "tests.serializers.ManyToManyTargetSerializer",
         }
 
         class Meta:
