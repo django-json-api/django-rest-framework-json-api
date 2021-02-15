@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "example",
     "debug_toolbar",
     "django_filters",
+    "tests",
 ]
 
 TEMPLATES = [

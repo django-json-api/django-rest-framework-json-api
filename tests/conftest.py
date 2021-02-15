@@ -1,5 +1,7 @@
 import pytest
 
+from tests.models import ForeignKeyTarget, ManyToManySource, ManyToManyTarget
+
 
 @pytest.fixture(autouse=True)
 def use_rest_framework_json_api_defaults(settings):
@@ -19,3 +21,23 @@ def use_rest_framework_json_api_defaults(settings):
     settings.JSON_API_FORMAT_FIELD_NAMES = False
     settings.JSON_API_FORMAT_TYPES = False
     settings.JSON_API_PLURALIZE_TYPES = False
+
+
+@pytest.fixture
+def foreign_key_target(db):
+    return ForeignKeyTarget.objects.create(name="Target")
+
+
+@pytest.fixture
+def many_to_many_source(db, many_to_many_targets):
+    source = ManyToManySource.objects.create(name="Source")
+    source.targets.add(*many_to_many_targets)
+    return source
+
+
+@pytest.fixture
+def many_to_many_targets(db):
+    return [
+        ManyToManyTarget.objects.create(name="Target1"),
+        ManyToManyTarget.objects.create(name="Target2"),
+    ]
