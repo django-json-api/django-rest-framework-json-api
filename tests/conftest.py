@@ -1,6 +1,11 @@
 import pytest
 
-from tests.models import ForeignKeyTarget, ManyToManySource, ManyToManyTarget
+from tests.models import (
+    BasicModel,
+    ForeignKeyTarget,
+    ManyToManySource,
+    ManyToManyTarget,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -21,6 +26,11 @@ def use_rest_framework_json_api_defaults(settings):
     settings.JSON_API_FORMAT_FIELD_NAMES = False
     settings.JSON_API_FORMAT_TYPES = False
     settings.JSON_API_PLURALIZE_TYPES = False
+
+
+@pytest.fixture
+def model(db):
+    return BasicModel.objects.create(text="Model")
 
 
 @pytest.fixture
