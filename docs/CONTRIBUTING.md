@@ -52,9 +52,21 @@ To setup pre-commit hooks first create a testing environment as explained above 
 
 ## For maintainers
 
+### Create release
+
 To upload a release (using version 1.2.3 as the example) first setup testing environment as above before running below commands:
 
     python setup.py sdist bdist_wheel
     twine upload dist/*
     git tag -a v1.2.3 -m 'Release 1.2.3'
     git push --tags
+
+
+### Add maintainer
+
+In case a new maintainer joins our team we need to consider to what of following services we want to add them our:
+
+* [Github organization](https://github.com/django-json-api)
+* [Read the Docs project](https://django-rest-framework-json-api.readthedocs.io/)
+* [PyPi project](https://pypi.org/project/djangorestframework-jsonapi/)
+* [Google Groups security mailing list](https://groups.google.com/g/rest-framework-jsonapi-security)
