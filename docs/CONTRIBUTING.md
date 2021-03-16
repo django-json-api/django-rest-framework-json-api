@@ -64,7 +64,7 @@ To upload a release (using version 1.2.3 as the example) first setup testing env
 
 ### Add maintainer
 
-In case a new maintainer joins our team we need to consider to what of following services we want to add them our:
+In case a new maintainer joins our team we need to consider to what of following services we want to add them too:
 
 * [Github organization](https://github.com/django-json-api)
 * [Read the Docs project](https://django-rest-framework-json-api.readthedocs.io/)
