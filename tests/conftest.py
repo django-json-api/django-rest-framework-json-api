@@ -1,4 +1,5 @@
 import pytest
+from rest_framework.test import APIClient
 
 from tests.models import (
     BasicModel,
@@ -51,3 +52,8 @@ def many_to_many_targets(db):
         ManyToManyTarget.objects.create(name="Target1"),
         ManyToManyTarget.objects.create(name="Target2"),
     ]
+
+
+@pytest.fixture
+def client():
+    return APIClient()

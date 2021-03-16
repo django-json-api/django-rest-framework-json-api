@@ -11,13 +11,14 @@ from rest_framework_json_api.relations import (
     SerializerMethodHyperlinkedRelatedField,
 )
 from rest_framework_json_api.utils import format_link_segment
-from rest_framework_json_api.views import ModelViewSet, RelationshipView
+from rest_framework_json_api.views import RelationshipView
 from tests.models import BasicModel
 from tests.serializers import (
     ForeignKeySourceSerializer,
     ManyToManySourceReadOnlySerializer,
     ManyToManySourceSerializer,
 )
+from tests.views import BasicModelViewSet
 
 
 @pytest.mark.django_db
@@ -264,11 +265,6 @@ class TestHyperlinkedRelatedField:
 
 
 # Routing setup
-
-
-class BasicModelViewSet(ModelViewSet):
-    class Meta:
-        model = BasicModel
 
 
 class BasicModelRelationshipView(RelationshipView):
