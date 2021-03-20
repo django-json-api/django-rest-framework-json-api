@@ -1,49 +1,104 @@
 import pytest
+from django.urls import path, reverse
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from rest_framework_json_api import serializers, views
+from rest_framework_json_api import serializers
+from rest_framework_json_api.parsers import JSONParser
 from rest_framework_json_api.relations import ResourceRelatedField
+from rest_framework_json_api.renderers import JSONRenderer
 from rest_framework_json_api.utils import format_value
-
-from .models import BasicModel
-
-related_model_field_name = "related_field_model"
+from rest_framework_json_api.views import ModelViewSet
+from tests.models import BasicModel
 
 
-@pytest.mark.parametrize(
-    "format_links",
-    [
-        None,
-        "dasherize",
-        "camelize",
-        "capitalize",
-        "underscore",
-    ],
-)
-def test_get_related_field_name_handles_formatted_link_segments(format_links, rf):
-    url_segment = format_value(related_model_field_name, format_links)
+class TestModelViewSet:
+    @pytest.mark.parametrize(
+        "format_links",
+        [
+            None,
+            "dasherize",
+            "camelize",
+            "capitalize",
+            "underscore",
+        ],
+    )
+    def test_get_related_field_name_handles_formatted_link_segments(
+        self, format_links, rf
+    ):
+        # use field name which actually gets formatted
+        related_model_field_name = "related_field_model"
 
-    request = rf.get(f"/basic_models/1/{url_segment}")
+        class RelatedFieldNameSerializer(serializers.ModelSerializer):
+            related_model_field = ResourceRelatedField(queryset=BasicModel.objects)
 
-    view = BasicModelFakeViewSet()
-    view.setup(request, related_field=url_segment)
+            def __init__(self, *args, **kwargs):
+                self.related_model_field.field_name = related_model_field_name
+                super().__init(*args, **kwargs)
 
-    assert view.get_related_field_name() == related_model_field_name
+            class Meta:
+                model = BasicModel
+
+        class RelatedFieldNameView(ModelViewSet):
+            serializer_class = RelatedFieldNameSerializer
+
+        url_segment = format_value(related_model_field_name, format_links)
+
+        request = rf.get(f"/basic_models/1/{url_segment}")
+
+        view = RelatedFieldNameView()
+        view.setup(request, related_field=url_segment)
+
+        assert view.get_related_field_name() == related_model_field_name
 
 
-class BasicModelSerializer(serializers.ModelSerializer):
-    related_model_field = ResourceRelatedField(queryset=BasicModel.objects)
+class TestAPIView:
+    @pytest.mark.urls(__name__)
+    def test_patch(self, client):
+        data = {
+            "data": {
+                "id": 123,
+                "type": "custom",
+                "attributes": {"body": "hello"},
+            }
+        }
 
-    def __init__(self, *args, **kwargs):
-        # Intentionally setting field_name property to something that matches no format
-        self.related_model_field.field_name = related_model_field_name
-        super(BasicModelSerializer, self).__init(*args, **kwargs)
+        url = reverse("custom")
 
-    class Meta:
-        model = BasicModel
+        response = client.patch(url, data=data)
+        result = response.json()
+
+        assert result["data"]["id"] == str(123)
+        assert result["data"]["type"] == "custom"
+        assert result["data"]["attributes"]["body"] == "hello"
 
 
-class BasicModelFakeViewSet(views.ModelViewSet):
-    serializer_class = BasicModelSerializer
+class CustomModel:
+    def __init__(self, response_dict):
+        for k, v in response_dict.items():
+            setattr(self, k, v)
 
-    def retrieve(self, request, *args, **kwargs):
-        pass
+    @property
+    def pk(self):
+        return self.id if hasattr(self, "id") else None
+
+
+class CustomModelSerializer(serializers.Serializer):
+    body = serializers.CharField()
+    id = serializers.IntegerField()
+
+
+class CustomAPIView(APIView):
+    parser_classes = [JSONParser]
+    renderer_classes = [JSONRenderer]
+    resource_name = "custom"
+
+    def patch(self, request, *args, **kwargs):
+        serializer = CustomModelSerializer(CustomModel(request.data))
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+
+urlpatterns = [
+    path("custom", CustomAPIView.as_view(), name="custom"),
+]
