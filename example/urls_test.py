@@ -78,17 +78,17 @@ urlpatterns = [
         name="entry-featured",
     ),
     re_path(
-        r"^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$",
+        r"^authors/(?P<pk>[^/.]+)/(?P<related_field>[-\w]+)/$",
         AuthorViewSet.as_view({"get": "retrieve_related"}),
         name="author-related",
     ),
     re_path(
-        r"^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
+        r"^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>[\-\w]+)$",
         EntryRelationshipView.as_view(),
         name="entry-relationships",
     ),
     re_path(
-        r"^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
+        r"^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>[^/.]+)$",
         BlogRelationshipView.as_view(),
         name="blog-relationships",
     ),

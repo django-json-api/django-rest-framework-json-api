@@ -19,6 +19,13 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Allow `get_serializer_class` to be overwritten when using related urls without defining `serializer_class` fallback
 * Preserve field names when no formatting is configured.
+* Properly support `JSON_API_FORMAT_RELATED_LINKS` setting in related urls. In case you want to use `dasherize` for formatting links make sure that your url pattern matches dashes as well like following example:
+  ```
+  url(r'^orders/(?P<pk>[^/.]+)/(?P<related_field>[-\w]+)/$',
+      OrderViewSet.as_view({'get': 'retrieve_related'}),
+      name='order-related'),
+  ```
+
 
 ### Deprecated
 

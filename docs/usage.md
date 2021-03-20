@@ -515,6 +515,11 @@ For example, with a serializer property `created_by` and with `'dasherize'` form
 
 The relationship name is formatted by the `JSON_API_FORMAT_FIELD_NAMES` setting, but the URL segments are formatted by the `JSON_API_FORMAT_RELATED_LINKS` setting.
 
+<div class="warning">
+    <strong>Note:</strong>
+    When using this setting make sure that your url pattern matches the formatted url segement.
+</div>
+
 ### Related fields
 
 #### ResourceRelatedField
@@ -702,7 +707,7 @@ All you need is just add to `urls.py`:
 url(r'^orders/(?P<pk>[^/.]+)/$',
         OrderViewSet.as_view({'get': 'retrieve'}),
         name='order-detail'),
-url(r'^orders/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
+url(r'^orders/(?P<pk>[^/.]+)/(?P<related_field>[-\w]+)/$',
         OrderViewSet.as_view({'get': 'retrieve_related'}),
         name='order-related'),
 ```
@@ -775,7 +780,7 @@ The urlconf would need to contain a route like the following:
 
 ```python
 url(
-    regex=r'^orders/(?P<pk>[^/.]+)/relationships/(?P<related_field>[^/.]+)$',
+    regex=r'^orders/(?P<pk>[^/.]+)/relationships/(?P<related_field>[-/w]+)$',
     view=OrderRelationshipView.as_view(),
     name='order-relationships'
 )
