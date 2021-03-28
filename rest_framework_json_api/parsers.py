@@ -4,8 +4,8 @@ Parsers
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
-from . import exceptions, renderers, serializers, utils
-from .settings import json_api_settings
+from rest_framework_json_api import exceptions, renderers, serializers
+from rest_framework_json_api.utils import get_resource_name, undo_format_field_names
 
 
 class JSONParser(parsers.JSONParser):
@@ -37,27 +37,13 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_attributes(data):
-        attributes = data.get("attributes")
-        uses_format_translation = json_api_settings.FORMAT_FIELD_NAMES
-
-        if not attributes:
-            return dict()
-        elif uses_format_translation:
-            # convert back to python/rest_framework's preferred underscore format
-            return utils.format_field_names(attributes, "underscore")
-        else:
-            return attributes
+        attributes = data.get("attributes") or dict()
+        return undo_format_field_names(attributes)
 
     @staticmethod
     def parse_relationships(data):
-        uses_format_translation = json_api_settings.FORMAT_FIELD_NAMES
-        relationships = data.get("relationships")
-
-        if not relationships:
-            relationships = dict()
-        elif uses_format_translation:
-            # convert back to python/rest_framework's preferred underscore format
-            relationships = utils.format_field_names(relationships, "underscore")
+        relationships = data.get("relationships") or dict()
+        relationships = undo_format_field_names(relationships)
 
         # Parse the relationships
         parsed_relationships = dict()
@@ -130,7 +116,7 @@ class JSONParser(parsers.JSONParser):
 
         # Check for inconsistencies
         if request.method in ("PUT", "POST", "PATCH"):
-            resource_name = utils.get_resource_name(
+            resource_name = get_resource_name(
                 parser_context, expand_polymorphic_types=True
             )
             if isinstance(resource_name, str):

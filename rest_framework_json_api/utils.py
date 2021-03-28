@@ -1,6 +1,7 @@
 import copy
 import inspect
 import operator
+import warnings
 from collections import OrderedDict
 
 import inflection
@@ -118,8 +119,76 @@ def format_field_names(obj, format_type=None):
     return obj
 
 
+def undo_format_field_names(obj):
+    """
+    Takes a dict and undo format field names to underscore which is the Python convention
+    but only in case `JSON_API_FORMAT_FIELD_NAMES` is actually configured.
+    """
+    if json_api_settings.FORMAT_FIELD_NAMES:
+        return format_field_names(obj, "underscore")
+
+    return obj
+
+
+def format_field_name(field_name):
+    """
+    Takes a field name and returns it with formatted keys as set in
+    `JSON_API_FORMAT_FIELD_NAMES`
+    """
+    return format_value(field_name, json_api_settings.FORMAT_FIELD_NAMES)
+
+
+def undo_format_field_name(field_name):
+    """
+    Takes a string and undos format field name to underscore which is the Python convention
+    but only in case `JSON_API_FORMAT_FIELD_NAMES` is actually configured.
+    """
+    if json_api_settings.FORMAT_FIELD_NAMES:
+        return format_value(field_name, "underscore")
+
+    return field_name
+
+
+def format_link_segment(value, format_type=None):
+    """
+    Takes a string value and returns it with formatted keys as set in `format_type`
+    or `JSON_API_FORMAT_RELATED_LINKS`.
+
+    :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
+    """
+    if format_type is None:
+        format_type = json_api_settings.FORMAT_RELATED_LINKS
+    else:
+        warnings.warn(
+            DeprecationWarning(
+                "Using `format_type` argument is deprecated."
+                "Use `format_value` instead."
+            )
+        )
+
+    return format_value(value, format_type)
+
+
+def undo_format_link_segment(value):
+    """
+    Takes a link segment and undos format link segment to underscore which is the Python convention
+    but only in case `JSON_API_FORMAT_RELATED_LINKS` is actually configured.
+    """
+
+    if json_api_settings.FORMAT_RELATED_LINKS:
+        return format_value(value, "underscore")
+
+    return value
+
+
 def format_value(value, format_type=None):
     if format_type is None:
+        warnings.warn(
+            DeprecationWarning(
+                "Using `format_value` without passing on `format_type` argument is deprecated."
+                "Use `format_field_name` instead."
+            )
+        )
         format_type = json_api_settings.FORMAT_FIELD_NAMES
     if format_type == "dasherize":
         # inflection can't dasherize camelCase
@@ -142,23 +211,9 @@ def format_resource_type(value, format_type=None, pluralize=None):
         pluralize = json_api_settings.PLURALIZE_TYPES
 
     if format_type:
-        # format_type will never be None here so we can use format_value
         value = format_value(value, format_type)
 
     return inflection.pluralize(value) if pluralize else value
-
-
-def format_link_segment(value, format_type=None):
-    """
-    Takes a string value and returns it with formatted keys as set in `format_type`
-    or `JSON_API_FORMAT_RELATED_LINKS`.
-
-    :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
-    """
-    if format_type is None:
-        format_type = json_api_settings.FORMAT_RELATED_LINKS
-
-    return format_value(value, format_type)
 
 
 def get_related_resource_type(relation):
@@ -348,7 +403,7 @@ def format_drf_errors(response, context, exc):
     # handle all errors thrown from serializers
     else:
         for field, error in response.data.items():
-            field = format_value(field)
+            field = format_field_name(field)
             pointer = "/data/attributes/{}".format(field)
             if isinstance(exc, Http404) and isinstance(error, str):
                 # 404 errors don't have a pointer
