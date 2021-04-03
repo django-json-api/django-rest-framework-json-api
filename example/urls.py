@@ -46,11 +46,6 @@ urlpatterns = [
         name="entry-blog",
     ),
     url(
-        r"entries/(?P<entry_pk>[^/.]+)/comments$",
-        CommentViewSet.as_view({"get": "list"}),
-        name="entry-comments",
-    ),
-    url(
         r"entries/(?P<entry_pk>[^/.]+)/authors$",
         AuthorViewSet.as_view({"get": "list"}),
         name="entry-authors",
@@ -59,6 +54,11 @@ urlpatterns = [
         r"entries/(?P<entry_pk>[^/.]+)/featured$",
         EntryViewSet.as_view({"get": "retrieve"}),
         name="entry-featured",
+    ),
+    url(
+        r"^entries/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$",
+        EntryViewSet.as_view({"get": "retrieve_related"}),
+        name="entry-related",
     ),
     url(
         r"^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$",

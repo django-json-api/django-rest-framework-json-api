@@ -27,6 +27,7 @@ LINKS_PARAMS = [
     "related_link_view_name",
     "related_link_lookup_field",
     "related_link_url_kwarg",
+    "related_link_related_name",
 ]
 
 
@@ -66,6 +67,10 @@ class HyperlinkedMixin(object):
         )
         self.related_link_url_kwarg = kwargs.pop(
             "related_link_url_kwarg", self.related_link_lookup_field
+        )
+
+        self.related_link_related_name = kwargs.pop(
+            "related_link_related_name", None
         )
 
         # We include this simply for dependency injection in tests.
@@ -118,6 +123,9 @@ class HyperlinkedMixin(object):
         self_kwargs = kwargs.copy()
         self_kwargs.update({"related_field": format_link_segment(field_name)})
         self_link = self.get_url("self", self.self_link_view_name, self_kwargs, request)
+
+        if self.related_link_related_name:
+            self_kwargs.update({"related_field": format_link_segment(self.related_link_related_name)})
 
         # Assuming RelatedField will be declared in two ways:
         # 1. url(r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',

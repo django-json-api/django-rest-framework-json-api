@@ -154,7 +154,7 @@ class RelatedMixin(object):
         return serializer_class(instance, **kwargs)
 
     def get_related_serializer_class(self):
-        parent_serializer_class = super(RelatedMixin, self).get_serializer_class()
+        parent_serializer_class = self.get_serializer_class()
 
         if "related_field" in self.kwargs:
             field_name = self.kwargs["related_field"]

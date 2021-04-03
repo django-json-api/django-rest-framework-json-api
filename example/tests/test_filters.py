@@ -491,7 +491,7 @@ class DJATestFilters(APITestCase):
                         "commentsHyperlinked": {
                             "links": {
                                 "self": "http://testserver/entries/7/relationships/comments_hyperlinked",  # noqa: E501
-                                "related": "http://testserver/entries/7/comments",
+                                "related": "http://testserver/entries/7/comments/",
                             }
                         },
                         "suggested": {
