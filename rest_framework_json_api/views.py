@@ -63,7 +63,9 @@ class PreloadIncludesMixin(object):
     def get_queryset(self, *args, **kwargs):
         qs = super(PreloadIncludesMixin, self).get_queryset(*args, **kwargs)
 
-        included_resources = get_included_resources(self.request, self.get_serializer_class())
+        included_resources = get_included_resources(
+            self.request, self.get_serializer_class()
+        )
         for included in included_resources + ["__all__"]:
 
             select_related = self.get_select_related(included)
@@ -82,7 +84,9 @@ class AutoPrefetchMixin(object):
         """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
         qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
 
-        included_resources = get_included_resources(self.request, self.get_serializer_class())
+        included_resources = get_included_resources(
+            self.request, self.get_serializer_class()
+        )
 
         for included in included_resources + ["__all__"]:
             # If include was not defined, trying to resolve it automatically

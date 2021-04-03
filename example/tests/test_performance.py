@@ -80,5 +80,7 @@ class PerformanceTestCase(APITestCase):
         3. Comments prefetched
         """
         with self.assertNumQueries(3):
-            response = self.client.get("/entries?fields[entry]=comments&page[size]=25")
+            response = self.client.get(
+                "/entries?fields[entries]=comments&page[size]=25"
+            )
             self.assertEqual(len(response.data["results"]), 25)
