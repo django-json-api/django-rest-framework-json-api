@@ -112,7 +112,7 @@ class EntrySerializer(serializers.ModelSerializer):
     # many related hyperlinked from model
     comments_hyperlinked = relations.HyperlinkedRelatedField(
         related_link_view_name="entry-related",
-        related_link_related_name='comments',
+        related_link_related_name="comments",
         self_link_view_name="entry-relationships",
         many=True,
         read_only=True,

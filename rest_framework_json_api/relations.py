@@ -69,9 +69,7 @@ class HyperlinkedMixin(object):
             "related_link_url_kwarg", self.related_link_lookup_field
         )
 
-        self.related_link_related_name = kwargs.pop(
-            "related_link_related_name", None
-        )
+        self.related_link_related_name = kwargs.pop("related_link_related_name", None)
 
         # We include this simply for dependency injection in tests.
         # We can't add it as a class attributes or it would expect an
@@ -125,7 +123,9 @@ class HyperlinkedMixin(object):
         self_link = self.get_url("self", self.self_link_view_name, self_kwargs, request)
 
         if self.related_link_related_name:
-            self_kwargs.update({"related_field": format_link_segment(self.related_link_related_name)})
+            self_kwargs.update(
+                {"related_field": format_link_segment(self.related_link_related_name)}
+            )
 
         # Assuming RelatedField will be declared in two ways:
         # 1. url(r'^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$',
