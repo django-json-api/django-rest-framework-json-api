@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
-from example.factories import CommentFactory
+from example.factories import CommentFactory, EntryFactory
 from example.models import Author, Blog, Comment, Entry
 
 
@@ -36,6 +36,7 @@ class PerformanceTestCase(APITestCase):
         )
         self.comment = Comment.objects.create(entry=self.first_entry)
         CommentFactory.create_batch(50)
+        EntryFactory.create_batch(50)
 
     def test_query_count_no_includes(self):
         """We expect a simple list view to issue only two queries.
@@ -49,7 +50,7 @@ class PerformanceTestCase(APITestCase):
             self.assertEqual(len(response.data["results"]), 25)
 
     def test_query_count_include_author(self):
-        """We expect a list view with an include have three queries:
+        """We expect a list view with an include have five queries:
 
         1. Primary resource COUNT query
         2. Primary resource SELECT
@@ -69,4 +70,15 @@ class PerformanceTestCase(APITestCase):
         """
         with self.assertNumQueries(2):
             response = self.client.get("/comments?include=writer&page[size]=25")
+            self.assertEqual(len(response.data["results"]), 25)
+
+    def test_query_prefetch_related_resources(self):
+        """We expect a list view with related_resources have three queries:
+
+        1. Primary resource COUNT query
+        2. Primary resource SELECT
+        3. Comments prefetched
+        """
+        with self.assertNumQueries(3):
+            response = self.client.get("/entries?fields[entry]=comments&page[size]=25")
             self.assertEqual(len(response.data["results"]), 25)
