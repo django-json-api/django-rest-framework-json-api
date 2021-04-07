@@ -98,7 +98,7 @@ setup(
     install_requires=[
         "inflection>=0.3.0",
         "djangorestframework>=3.12,<3.13",
-        "django>=2.2,<3.2",
+        "django>=2.2,<3.3",
     ],
     extras_require={
         "django-polymorphic": ["django-polymorphic>=2.0"],
