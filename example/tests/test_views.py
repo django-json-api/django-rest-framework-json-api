@@ -651,7 +651,7 @@ class TestEntryViewSet(APITestCase):
                     "commentsHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/{}"
-                            "/comments/".format(self.second_entry.id),
+                            "/comments".format(self.second_entry.id),
                             "self": "http://testserver/entries/{}/relationships"
                             "/comments_hyperlinked".format(self.second_entry.id),
                         }

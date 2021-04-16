@@ -53,6 +53,11 @@ urlpatterns = [
         name="entry-blog",
     ),
     re_path(
+        r"^entries/(?P<entry_pk>[^/.]+)/comments$",
+        CommentViewSet.as_view({"get": "list"}),
+        name="entry-comments",
+    ),
+    re_path(
         r"^entries/(?P<entry_pk>[^/.]+)/suggested/$",
         EntryViewSet.as_view({"get": "list"}),
         name="entry-suggested",
@@ -71,11 +76,6 @@ urlpatterns = [
         r"entries/(?P<entry_pk>[^/.]+)/featured$",
         EntryViewSet.as_view({"get": "retrieve"}),
         name="entry-featured",
-    ),
-    re_path(
-        r"^entries/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$",
-        EntryViewSet.as_view({"get": "retrieve_related"}),
-        name="entry-related",
     ),
     re_path(
         r"^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$",

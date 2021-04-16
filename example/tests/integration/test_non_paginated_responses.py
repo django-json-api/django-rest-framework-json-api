@@ -42,7 +42,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     },
                     "commentsHyperlinked": {
                         "links": {
-                            "related": "http://testserver/entries/1/comments/",
+                            "related": "http://testserver/entries/1/comments",
                             "self": "http://testserver/entries/1/relationships/comments_hyperlinked",
                         }
                     },
@@ -97,7 +97,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     },
                     "commentsHyperlinked": {
                         "links": {
-                            "related": "http://testserver/entries/2/comments/",
+                            "related": "http://testserver/entries/2/comments",
                             "self": "http://testserver/entries/2/relationships/comments_hyperlinked",
                         }
                     },

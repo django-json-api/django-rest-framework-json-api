@@ -42,7 +42,7 @@ def test_pagination_with_single_entry(single_entry, client):
                     },
                     "commentsHyperlinked": {
                         "links": {
-                            "related": "http://testserver/entries/1/comments/",
+                            "related": "http://testserver/entries/1/comments",
                             "self": "http://testserver/entries/1/relationships/comments_hyperlinked",
                         }
                     },

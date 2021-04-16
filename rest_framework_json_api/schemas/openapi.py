@@ -357,15 +357,14 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
             )
             if related_view:
                 action = self._field_is_one_or_many(field, view)
-                if action:
-                    result.append(
-                        (
-                            path.replace("{related_field}", field),
-                            method,
-                            related_view,
-                            action,
-                        )
+                result.append(
+                    (
+                        path.replace("{related_field}", field),
+                        method,
+                        related_view,
+                        action,
                     )
+                )
 
         return result
 
@@ -393,9 +392,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
 
     def _field_is_one_or_many(self, field, view):
         serializer = view.get_serializer()
-        if field not in serializer.fields:
-            return None
-
         if isinstance(serializer.fields[field], ManyRelatedField):
             return "list"
         else:
