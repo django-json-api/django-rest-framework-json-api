@@ -14,6 +14,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added support for Django 3.2.
 
+### Fixed
+
+* Avoided error when using `include` query parameter on related urls (a regression since 4.1.0)
+
 ## [4.1.0] - 2021-03-08
 
 ### Added

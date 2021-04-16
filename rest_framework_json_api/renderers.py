@@ -708,7 +708,10 @@ class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
 
     def get_includes_form(self, view):
         try:
-            serializer_class = view.get_serializer_class()
+            if "related_field" in view.kwargs:
+                serializer_class = view.get_related_serializer_class()
+            else:
+                serializer_class = view.get_serializer_class()
         except AttributeError:
             return
 
