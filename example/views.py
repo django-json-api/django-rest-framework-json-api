@@ -208,17 +208,15 @@ class NoFiltersetEntryViewSet(EntryViewSet):
 
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
-    serializer_classes = {
-        "list": AuthorListSerializer,
-        "retrieve": AuthorDetailSerializer,
-    }
-    serializer_class = AuthorSerializer  # fallback
 
     def get_serializer_class(self):
-        try:
-            return self.serializer_classes.get(self.action, self.serializer_class)
-        except AttributeError:
-            return self.serializer_class
+        serializer_classes = {
+            "list": AuthorListSerializer,
+            "retrieve": AuthorDetailSerializer,
+        }
+
+        action = getattr(self, "action", "")
+        return serializer_classes.get(action, AuthorSerializer)
 
 
 class CommentViewSet(ModelViewSet):
