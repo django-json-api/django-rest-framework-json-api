@@ -14,6 +14,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added support for Django 3.2.
 
+### Fixed
+
+* Allow `get_serializer_class` to be overwritten when using related urls without defining `serializer_class` fallback
+
 ## [4.1.0] - 2021-03-08
 
 ### Added
