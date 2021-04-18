@@ -1,4 +1,3 @@
-import copy
 import inspect
 import operator
 import warnings
@@ -13,7 +12,6 @@ from django.db.models.fields.related_descriptors import (
 )
 from django.http import Http404
 from django.utils import encoding
-from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
