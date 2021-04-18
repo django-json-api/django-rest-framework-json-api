@@ -1,8 +1,10 @@
 from collections import OrderedDict
+from collections.abc import MutableMapping
 
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ParseError
 
@@ -152,8 +154,54 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
+class LazySerializersDict(MutableMapping):
+    def __init__(self, klass, serializers):
+        self.klass = klass
+        self.serializers = serializers
+
+    def __getitem__(self, key):
+        value = self.serializers[key]
+        if not isinstance(value, type):
+            if value == 'self':
+                value = self.klass
+
+            print(value)
+            value = import_class_from_dotted_path(value)
+            self.serializers[key] = value
+
+        return value
+
+    def __setitem__(self, key, field):
+        self.serializers[key] = field
+
+    def __delitem__(self, key):
+        del self.serializers[key]
+
+    def __iter__(self):
+        return iter(self.serializers)
+
+    def __len__(self):
+        return len(self.serializers)
+
+    def __repr__(self):
+        return dict.__repr__(self.serializers)
+
+
 class SerializerMetaclass(SerializerMetaclass):
-    pass
+    def __new__(cls, name, bases, attrs):
+        #print(name)
+        #print(cls.__module__)
+        #print(attrs)
+
+        included_serializers = attrs.get('included_serializers', None)
+        if included_serializers:
+            attrs['included_serializers'] = LazySerializersDict(attrs['__module__']+'.'+name, included_serializers)
+
+        related_serializers = attrs.get('related_serializers', None)
+        if related_serializers:
+            attrs['related_serializers'] = LazySerializersDict(attrs['__module__']+'.'+name, related_serializers)
+
+        return super().__new__(cls, name, bases, attrs)
 
 
 # If user imports serializer from here we can catch class definition and check

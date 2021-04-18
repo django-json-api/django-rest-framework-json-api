@@ -342,20 +342,7 @@ def get_default_included_resources_from_serializer(serializer):
 
 
 def get_included_serializers(serializer):
-    included_serializers = copy.copy(
-        getattr(serializer, "included_serializers", dict())
-    )
-
-    for name, value in iter(included_serializers.items()):
-        if not isinstance(value, type):
-            if value == "self":
-                included_serializers[name] = (
-                    serializer if isinstance(serializer, type) else serializer.__class__
-                )
-            else:
-                included_serializers[name] = import_class_from_dotted_path(value)
-
-    return included_serializers
+    return getattr(serializer, "included_serializers", dict())
 
 
 def get_relation_instance(resource_instance, source, serializer):

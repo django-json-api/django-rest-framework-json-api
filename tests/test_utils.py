@@ -345,26 +345,26 @@ def test_get_related_resource_type_from_plain_serializer_class(
     assert get_related_resource_type(field) == output
 
 
+class IncludedSerializersModel(DJAModel):
+    self = models.ForeignKey("self", on_delete=models.CASCADE)
+    target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
+    other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "tests"
+
+class IncludedSerializersSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        "self": "self",
+        "target": ManyToManyTargetSerializer,
+        "other_target": "tests.serializers.ManyToManyTargetSerializer",
+    }
+
+    class Meta:
+        model = IncludedSerializersModel
+        fields = ("self", "other_target", "target")
+
 def test_get_included_serializers():
-    class IncludedSerializersModel(DJAModel):
-        self = models.ForeignKey("self", on_delete=models.CASCADE)
-        target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
-        other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
-
-        class Meta:
-            app_label = "tests"
-
-    class IncludedSerializersSerializer(serializers.ModelSerializer):
-        included_serializers = {
-            "self": "self",
-            "target": ManyToManyTargetSerializer,
-            "other_target": "tests.serializers.ManyToManyTargetSerializer",
-        }
-
-        class Meta:
-            model = IncludedSerializersModel
-            fields = ("self", "other_target", "target")
-
     included_serializers = get_included_serializers(IncludedSerializersSerializer)
     expected_included_serializers = {
         "self": IncludedSerializersSerializer,
