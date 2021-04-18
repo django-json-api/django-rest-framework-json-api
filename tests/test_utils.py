@@ -353,6 +353,7 @@ class IncludedSerializersModel(DJAModel):
     class Meta:
         app_label = "tests"
 
+
 class IncludedSerializersSerializer(serializers.ModelSerializer):
     included_serializers = {
         "self": "self",
@@ -363,6 +364,7 @@ class IncludedSerializersSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncludedSerializersModel
         fields = ("self", "other_target", "target")
+
 
 def test_get_included_serializers():
     included_serializers = get_included_serializers(IncludedSerializersSerializer)

@@ -162,7 +162,7 @@ class LazySerializersDict(MutableMapping):
     def __getitem__(self, key):
         value = self.serializers[key]
         if not isinstance(value, type):
-            if value == 'self':
+            if value == "self":
                 value = self.klass
 
             value = import_class_from_dotted_path(value)
@@ -188,15 +188,19 @@ class LazySerializersDict(MutableMapping):
 
 class SerializerMetaclass(SerializerMetaclass):
     def __new__(cls, name, bases, attrs):
-        serializer_class_path = attrs['__module__']+'.'+name
+        serializer_class_path = attrs["__module__"] + "." + name
 
-        included_serializers = attrs.get('included_serializers', None)
+        included_serializers = attrs.get("included_serializers", None)
         if included_serializers:
-            attrs['included_serializers'] = LazySerializersDict(serializer_class_path, included_serializers)
+            attrs["included_serializers"] = LazySerializersDict(
+                serializer_class_path, included_serializers
+            )
 
-        related_serializers = attrs.get('related_serializers', None)
+        related_serializers = attrs.get("related_serializers", None)
         if related_serializers:
-            attrs['related_serializers'] = LazySerializersDict(serializer_class_path, related_serializers)
+            attrs["related_serializers"] = LazySerializersDict(
+                serializer_class_path, related_serializers
+            )
 
         return super().__new__(cls, name, bases, attrs)
 
