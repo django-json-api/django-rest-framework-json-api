@@ -16,6 +16,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
+* Allow `get_serializer_class` to be overwritten when using related urls without defining `serializer_class` fallback
 * Preserve field names when no formatting is configured.
 
 ### Deprecated

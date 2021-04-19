@@ -1,4 +1,4 @@
-django-debug-toolbar==3.2
+django-debug-toolbar==3.2.1
 factory-boy==3.2.0
 Faker==6.6.0
 pytest==6.2.2
