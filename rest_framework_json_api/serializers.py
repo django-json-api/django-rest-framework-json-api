@@ -24,7 +24,6 @@ from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
     get_included_resources,
-    get_included_serializers,
     get_resource_type_from_instance,
     get_resource_type_from_model,
     get_resource_type_from_serializer,
@@ -122,7 +121,7 @@ class IncludedResourcesValidationMixin(object):
         view = context.get("view") if context else None
 
         def validate_path(serializer_class, field_path, path):
-            serializers = get_included_serializers(serializer_class)
+            serializers = getattr(serializer_class, "included_serializers", None)
             if serializers is None:
                 raise ParseError("This endpoint does not support the include parameter")
             this_field_name = inflection.underscore(field_path[0])

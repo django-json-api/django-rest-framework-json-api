@@ -339,10 +339,6 @@ def get_default_included_resources_from_serializer(serializer):
     return list(getattr(meta, "included_resources", []))
 
 
-def get_included_serializers(serializer):
-    return getattr(serializer, "included_serializers", dict())
-
-
 def get_relation_instance(resource_instance, source, serializer):
     try:
         relation_instance = operator.attrgetter(source)(resource_instance)

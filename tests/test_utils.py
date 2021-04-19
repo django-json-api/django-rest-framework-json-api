@@ -12,7 +12,6 @@ from rest_framework_json_api.utils import (
     format_link_segment,
     format_resource_type,
     format_value,
-    get_included_serializers,
     get_related_resource_type,
     get_resource_name,
     undo_format_field_name,
@@ -367,7 +366,9 @@ class IncludedSerializersSerializer(serializers.ModelSerializer):
 
 
 def test_get_included_serializers():
-    included_serializers = get_included_serializers(IncludedSerializersSerializer)
+    included_serializers = getattr(
+        IncludedSerializersSerializer, "included_serializers", {}
+    )
     expected_included_serializers = {
         "self": IncludedSerializersSerializer,
         "target": ManyToManyTargetSerializer,
