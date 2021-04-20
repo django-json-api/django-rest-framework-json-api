@@ -427,6 +427,7 @@ class AutoSchema(drf_openapi.AutoSchema):
             parameters += self.get_pagination_parameters(path, method)
             parameters += self.get_filter_parameters(path, method)
         operation["parameters"] = parameters
+        operation["tags"] = self.get_tags(path, method)
 
         # get request and response code schemas
         if method == "GET":

@@ -121,7 +121,10 @@ snapshots[
       },
       "description": "not found"
     }
-  }
+  },
+  "tags": [
+    "authors"
+  ]
 }"""
 
 snapshots[
@@ -227,7 +230,10 @@ snapshots[
       },
       "description": "not found"
     }
-  }
+  },
+  "tags": [
+    "authors"
+  ]
 }"""
 
 snapshots[
@@ -411,7 +417,10 @@ snapshots[
       },
       "description": "[Conflict](https://jsonapi.org/format/#crud-creating-responses-409)"
     }
-  }
+  },
+  "tags": [
+    "authors"
+  ]
 }"""
 
 snapshots[
@@ -589,7 +598,10 @@ snapshots[
       },
       "description": "[Conflict]([Conflict](https://jsonapi.org/format/#crud-updating-responses-409)"
     }
-  }
+  },
+  "tags": [
+    "authors"
+  ]
 }"""
 
 snapshots[
@@ -652,5 +664,8 @@ snapshots[
       },
       "description": "[Resource does not exist](https://jsonapi.org/format/#crud-deleting-responses-404)"
     }
-  }
+  },
+  "tags": [
+    "authors"
+  ]
 }"""
