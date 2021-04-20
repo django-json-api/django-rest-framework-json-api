@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Django 3.2.
+* Added support for tags in OAS schema
 
 ### Fixed
 
