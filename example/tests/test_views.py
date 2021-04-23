@@ -432,7 +432,7 @@ class TestRelatedMixin(APITestCase):
         url = reverse(
             "author-related", kwargs={"pk": self.author.pk, "related_field": "bio"}
         )
-        resp = self.client.get(url)
+        resp = self.client.get(url, data={"include": "metadata"})
         expected = {
             "data": {
                 "type": "authorBios",
@@ -447,7 +447,14 @@ class TestRelatedMixin(APITestCase):
                     },
                 },
                 "attributes": {"body": str(self.author.bio.body)},
-            }
+            },
+            "included": [
+                {
+                    "attributes": {"body": str(self.author.bio.metadata.body)},
+                    "id": str(self.author.bio.metadata.id),
+                    "type": "authorBioMetadata",
+                }
+            ],
         }
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), expected)

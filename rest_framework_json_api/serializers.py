@@ -140,7 +140,10 @@ class IncludedResourcesValidationMixin(object):
             included_resources = get_included_resources(request)
             for included_field_name in included_resources:
                 included_field_path = included_field_name.split(".")
-                this_serializer_class = view.get_serializer_class()
+                if "related_field" in view.kwargs:
+                    this_serializer_class = view.get_related_serializer_class()
+                else:
+                    this_serializer_class = view.get_serializer_class()
                 # lets validate the current path
                 validate_path(
                     this_serializer_class, included_field_path, included_field_name
