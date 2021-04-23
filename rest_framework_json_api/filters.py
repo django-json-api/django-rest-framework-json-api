@@ -3,7 +3,7 @@ import re
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import BaseFilterBackend, OrderingFilter
 
-from rest_framework_json_api.utils import format_value
+from rest_framework_json_api.utils import undo_format_field_name
 
 
 class OrderingFilter(OrderingFilter):
@@ -15,7 +15,7 @@ class OrderingFilter(OrderingFilter):
     :py:class:`rest_framework.filters.OrderingFilter` with
     :py:attr:`~rest_framework.filters.OrderingFilter.ordering_param` = "sort"
 
-    Also applies DJA format_value() to convert (e.g. camelcase) to underscore.
+    Also supports undo of field name formatting
     (See JSON_API_FORMAT_FIELD_NAMES in docs/usage.md)
     """
 
@@ -38,7 +38,7 @@ class OrderingFilter(OrderingFilter):
         bad_terms = [
             term
             for term in fields
-            if format_value(term.replace(".", "__").lstrip("-"), "underscore")
+            if undo_format_field_name(term.replace(".", "__").lstrip("-"))
             not in valid_fields
         ]
         if bad_terms:
@@ -56,10 +56,10 @@ class OrderingFilter(OrderingFilter):
             item_rewritten = item.replace(".", "__")
             if item_rewritten.startswith("-"):
                 underscore_fields.append(
-                    "-" + format_value(item_rewritten.lstrip("-"), "underscore")
+                    "-" + undo_format_field_name(item_rewritten.lstrip("-"))
                 )
             else:
-                underscore_fields.append(format_value(item_rewritten, "underscore"))
+                underscore_fields.append(undo_format_field_name(item_rewritten))
 
         return super(OrderingFilter, self).remove_invalid_fields(
             queryset, underscore_fields, view, request
