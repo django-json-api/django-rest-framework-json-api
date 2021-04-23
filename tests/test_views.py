@@ -8,7 +8,7 @@ from rest_framework_json_api import serializers
 from rest_framework_json_api.parsers import JSONParser
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.renderers import JSONRenderer
-from rest_framework_json_api.utils import format_value
+from rest_framework_json_api.utils import format_link_segment
 from rest_framework_json_api.views import ModelViewSet
 from tests.models import BasicModel
 
@@ -17,7 +17,7 @@ class TestModelViewSet:
     @pytest.mark.parametrize(
         "format_links",
         [
-            None,
+            False,
             "dasherize",
             "camelize",
             "capitalize",
@@ -25,8 +25,10 @@ class TestModelViewSet:
         ],
     )
     def test_get_related_field_name_handles_formatted_link_segments(
-        self, format_links, rf
+        self, settings, format_links, rf
     ):
+        settings.JSON_API_FORMAT_RELATED_LINKS = format_links
+
         # use field name which actually gets formatted
         related_model_field_name = "related_field_model"
 
@@ -43,7 +45,7 @@ class TestModelViewSet:
         class RelatedFieldNameView(ModelViewSet):
             serializer_class = RelatedFieldNameSerializer
 
-        url_segment = format_value(related_model_field_name, format_links)
+        url_segment = format_link_segment(related_model_field_name)
 
         request = rf.get(f"/basic_models/1/{url_segment}")
 

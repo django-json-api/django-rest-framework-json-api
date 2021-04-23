@@ -25,9 +25,9 @@ from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializ
 from rest_framework_json_api.utils import (
     Hyperlink,
     OrderedDict,
-    format_value,
     get_included_resources,
     get_resource_type_from_instance,
+    undo_format_link_segment,
 )
 
 
@@ -154,7 +154,7 @@ class RelatedMixin(object):
         return serializer_class(instance, **kwargs)
 
     def get_related_serializer_class(self):
-        parent_serializer_class = super(RelatedMixin, self).get_serializer_class()
+        parent_serializer_class = self.get_serializer_class()
 
         if "related_field" in self.kwargs:
             field_name = self.kwargs["related_field"]
@@ -187,7 +187,7 @@ class RelatedMixin(object):
 
     def get_related_field_name(self):
         field_name = self.kwargs["related_field"]
-        return format_value(field_name, "underscore")
+        return undo_format_link_segment(field_name)
 
     def get_related_instance(self):
         parent_obj = self.get_object()

@@ -233,7 +233,7 @@ class TestHyperlinkedRelatedField:
     @pytest.mark.parametrize(
         "format_related_links",
         [
-            None,
+            False,
             "dasherize",
             "camelize",
             "capitalize",

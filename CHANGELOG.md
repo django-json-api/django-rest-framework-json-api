@@ -13,6 +13,17 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Django 3.2.
+* Added support for tags in OAS schema
+
+### Fixed
+
+* Allow `get_serializer_class` to be overwritten when using related urls without defining `serializer_class` fallback
+* Preserve field names when no formatting is configured.
+
+### Deprecated
+
+* Deprecated default `format_type` argument of `rest_framework_json_api.utils.format_value`. Use `rest_framework_json_api.utils.format_field_name` or specify specifc `format_type` instead.
+* Deprecated `format_type` argument of `rest_framework_json_api.utils.format_link_segment`. Use `format_value` instead.
 
 ### Fixed
 

@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from rest_framework_json_api.utils import format_value
+from rest_framework_json_api.utils import undo_format_field_name
 
 
 class DjangoFilterBackend(DjangoFilterBackend):
@@ -119,8 +119,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
                     )
                 # convert jsonapi relationship path to Django ORM's __ notation
                 key = m.groupdict()["assoc"].replace(".", "__")
-                # undo JSON_API_FORMAT_FIELD_NAMES conversion:
-                key = format_value(key, "underscore")
+                key = undo_format_field_name(key)
                 data.setlist(key, val)
                 filter_keys.append(key)
                 del data[qp]

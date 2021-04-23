@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from rest_framework_json_api import serializers
 from rest_framework_json_api.utils import (
+    format_field_name,
     format_field_names,
     format_link_segment,
     format_resource_type,
@@ -14,6 +15,9 @@ from rest_framework_json_api.utils import (
     get_included_serializers,
     get_related_resource_type,
     get_resource_name,
+    undo_format_field_name,
+    undo_format_field_names,
+    undo_format_link_segment,
 )
 from tests.models import (
     BasicModel,
@@ -176,6 +180,7 @@ def test_get_resource_name_with_errors(status_code):
 @pytest.mark.parametrize(
     "format_type,output",
     [
+        (False, {"full_name": {"last-name": "a", "first-name": "b"}}),
         ("camelize", {"fullName": {"last-name": "a", "first-name": "b"}}),
         ("capitalize", {"FullName": {"last-name": "a", "first-name": "b"}}),
         ("dasherize", {"full-name": {"last-name": "a", "first-name": "b"}}),
@@ -192,22 +197,86 @@ def test_format_field_names(settings, format_type, output):
 @pytest.mark.parametrize(
     "format_type,output",
     [
-        (None, "first_Name"),
+        (False, {"fullName": "Test Name"}),
+        ("camelize", {"full_name": "Test Name"}),
+    ],
+)
+def test_undo_format_field_names(settings, format_type, output):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    value = {"fullName": "Test Name"}
+    assert undo_format_field_names(value) == output
+
+
+@pytest.mark.parametrize(
+    "format_type,output",
+    [
+        (False, "full_name"),
+        ("camelize", "fullName"),
+        ("capitalize", "FullName"),
+        ("dasherize", "full-name"),
+        ("underscore", "full_name"),
+    ],
+)
+def test_format_field_name(settings, format_type, output):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    field_name = "full_name"
+    assert format_field_name(field_name) == output
+
+
+@pytest.mark.parametrize(
+    "format_type,output",
+    [
+        (False, "fullName"),
+        ("camelize", "full_name"),
+    ],
+)
+def test_undo_format_field_name(settings, format_type, output):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    field_name = "fullName"
+    assert undo_format_field_name(field_name) == output
+
+
+@pytest.mark.parametrize(
+    "format_type,output",
+    [
+        (False, "first_Name"),
         ("camelize", "firstName"),
         ("capitalize", "FirstName"),
         ("dasherize", "first-name"),
         ("underscore", "first_name"),
     ],
 )
-def test_format_field_segment(settings, format_type, output):
+def test_format_link_segment(settings, format_type, output):
     settings.JSON_API_FORMAT_RELATED_LINKS = format_type
     assert format_link_segment("first_Name") == output
+
+
+def test_format_link_segment_deprecates_format_type_argument():
+    with pytest.deprecated_call():
+        assert "first-name" == format_link_segment("first_name", "dasherize")
+
+
+@pytest.mark.parametrize(
+    "format_links,output",
+    [
+        (False, "fullName"),
+        ("camelize", "full_name"),
+    ],
+)
+def test_undo_format_link_segment(settings, format_links, output):
+    settings.JSON_API_FORMAT_RELATED_LINKS = format_links
+
+    link_segment = "fullName"
+    assert undo_format_link_segment(link_segment) == output
 
 
 @pytest.mark.parametrize(
     "format_type,output",
     [
-        (None, "first_name"),
+        (False, "first_name"),
         ("camelize", "firstName"),
         ("capitalize", "FirstName"),
         ("dasherize", "first-name"),
@@ -216,6 +285,11 @@ def test_format_field_segment(settings, format_type, output):
 )
 def test_format_value(settings, format_type, output):
     assert format_value("first_name", format_type) == output
+
+
+def test_format_value_deprecates_default_format_type_argument():
+    with pytest.deprecated_call():
+        assert "first_name" == format_value("first_name")
 
 
 @pytest.mark.parametrize(

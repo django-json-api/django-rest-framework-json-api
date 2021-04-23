@@ -29,7 +29,7 @@ class TestJSONParser:
     @pytest.mark.parametrize(
         "format_field_names",
         [
-            None,
+            False,
             "dasherize",
             "camelize",
             "capitalize",
