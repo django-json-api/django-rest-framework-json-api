@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
@@ -84,6 +84,18 @@ class TestRelationshipView(APITestCase):
     def test_get_blog_relationship_entry_set(self):
         response = self.client.get(
             "/blogs/{}/relationships/entry_set".format(self.blog.id)
+        )
+        expected_data = [
+            {"type": format_resource_type("Entry"), "id": str(self.first_entry.id)},
+            {"type": format_resource_type("Entry"), "id": str(self.second_entry.id)},
+        ]
+
+        assert response.data == expected_data
+
+    @override_settings(JSON_API_FORMAT_RELATED_LINKS="dasherize")
+    def test_get_blog_relationship_entry_set_with_formatted_link(self):
+        response = self.client.get(
+            "/blogs/{}/relationships/entry-set".format(self.blog.id)
         )
         expected_data = [
             {"type": format_resource_type("Entry"), "id": str(self.first_entry.id)},
@@ -506,6 +518,17 @@ class TestRelatedMixin(APITestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), {"data": None})
+
+    @override_settings(JSON_API_FORMAT_RELATED_LINKS="dasherize")
+    def test_retrieve_related_with_formatted_link(self):
+        first_entry = EntryFactory(authors=(self.author,))
+
+        kwargs = {"pk": self.author.pk, "related_field": "first-entry"}
+        url = reverse("author-related", kwargs=kwargs)
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["data"]["id"], str(first_entry.id))
 
 
 class TestValidationErrorResponses(TestBase):

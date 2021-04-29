@@ -157,7 +157,7 @@ class RelatedMixin(object):
         parent_serializer_class = self.get_serializer_class()
 
         if "related_field" in self.kwargs:
-            field_name = self.kwargs["related_field"]
+            field_name = self.get_related_field_name()
 
             # Try get the class from related_serializers
             if hasattr(parent_serializer_class, "related_serializers"):
@@ -402,6 +402,8 @@ class RelationshipView(generics.GenericAPIView):
 
     def get_related_field_name(self):
         field_name = self.kwargs["related_field"]
+        field_name = undo_format_link_segment(field_name)
+
         if field_name in self.field_name_mapping:
             return self.field_name_mapping[field_name]
         return field_name
