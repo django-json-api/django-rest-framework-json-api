@@ -72,8 +72,8 @@ class PerformanceTestCase(APITestCase):
             response = self.client.get("/comments?include=writer&page[size]=25")
             self.assertEqual(len(response.data["results"]), 25)
 
-    def test_query_prefetch_related_resources(self):
-        """We expect a list view with related_resources have three queries:
+    def test_query_prefetch_uses_included_resources(self):
+        """We expect a list view with `included_resources` to have three queries:
 
         1. Primary resource COUNT query
         2. Primary resource SELECT
