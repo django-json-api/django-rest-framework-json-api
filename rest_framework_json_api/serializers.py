@@ -137,7 +137,7 @@ class IncludedResourcesValidationMixin(object):
                 validate_path(this_included_serializer, new_included_field_path, path)
 
         if request and view:
-            included_resources = get_included_resources(request)
+            included_resources = get_included_resources(request, self)
             for included_field_name in included_resources:
                 included_field_path = included_field_name.split(".")
                 if "related_field" in view.kwargs:

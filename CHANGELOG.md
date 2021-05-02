@@ -25,6 +25,7 @@ any parts of the framework not mentioned in the documentation should generally b
       OrderViewSet.as_view({'get': 'retrieve_related'}),
       name='order-related'),
   ```
+* Ensure default `included_resources` are considered when calculating prefetches.
 
 
 ### Deprecated
