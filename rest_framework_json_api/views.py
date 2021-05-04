@@ -81,7 +81,7 @@ class PreloadIncludesMixin(object):
 
 class AutoPrefetchMixin(object):
     def get_queryset(self, *args, **kwargs):
-        """ This mixin adds automatic prefetching for OneToOne and ManyToMany fields. """
+        """This mixin adds automatic prefetching for OneToOne and ManyToMany fields."""
         qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
 
         included_resources = get_included_resources(

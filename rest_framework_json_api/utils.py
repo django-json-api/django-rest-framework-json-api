@@ -326,7 +326,7 @@ def get_resource_type_from_serializer(serializer):
 
 
 def get_included_resources(request, serializer=None):
-    """ Build a list of included resources. """
+    """Build a list of included resources."""
     include_resources_param = request.query_params.get("include") if request else None
     if include_resources_param:
         return include_resources_param.split(",")
