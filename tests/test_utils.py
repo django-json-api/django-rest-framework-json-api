@@ -1,4 +1,5 @@
 import pytest
+from django.db import models
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -11,6 +12,7 @@ from rest_framework_json_api.utils import (
     format_link_segment,
     format_resource_type,
     format_value,
+    get_included_serializers,
     get_related_resource_type,
     get_resource_name,
     undo_format_field_name,
@@ -19,12 +21,13 @@ from rest_framework_json_api.utils import (
 )
 from tests.models import (
     BasicModel,
+    DJAModel,
     ForeignKeySource,
     ForeignKeyTarget,
     ManyToManySource,
     ManyToManyTarget,
 )
-from tests.serializers import BasicModelSerializer
+from tests.serializers import BasicModelSerializer, ManyToManyTargetSerializer
 
 
 def test_get_resource_name_no_view():
@@ -340,3 +343,35 @@ def test_get_related_resource_type_from_plain_serializer_class(
     serializer = PlainRelatedResourceTypeSerializer()
     field = serializer.fields["basic_models"]
     assert get_related_resource_type(field) == output
+
+
+def test_get_included_serializers():
+    class DeprecatedIncludedSerializersModel(DJAModel):
+        self = models.ForeignKey("self", on_delete=models.CASCADE)
+        target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
+        other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
+
+        class Meta:
+            app_label = "tests"
+
+    class DeprecatedIncludedSerializersSerializer(serializers.ModelSerializer):
+        included_serializers = {
+            "target": ManyToManyTargetSerializer,
+            "other_target": "tests.serializers.ManyToManyTargetSerializer",
+        }
+
+        class Meta:
+            model = DeprecatedIncludedSerializersModel
+            fields = ("self", "other_target", "target")
+
+    with pytest.deprecated_call():
+        included_serializers = get_included_serializers(
+            DeprecatedIncludedSerializersSerializer
+        )
+
+    expected_included_serializers = {
+        "target": ManyToManyTargetSerializer,
+        "other_target": ManyToManyTargetSerializer,
+    }
+
+    assert included_serializers == expected_included_serializers
