@@ -101,7 +101,8 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
     # First author does not have a bio
     author = author_factory(bio=None)
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")
-    assert "included" not in response.json()
+    data = response.json()
+    assert "included" not in data
     # Second author does
     author = author_factory()
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")

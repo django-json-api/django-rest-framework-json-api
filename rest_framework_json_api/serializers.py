@@ -154,15 +154,15 @@ class IncludedResourcesValidationMixin(object):
 
 
 class LazySerializersDict(MutableMapping):
-    def __init__(self, klass, serializers):
-        self.klass = klass
+    def __init__(self, serializers):  # klass, serializers):
+        # self.klass = klass
         self.serializers = serializers
 
     def __getitem__(self, key):
         value = self.serializers[key]
         if not isinstance(value, type):
-            if value == "self":
-                value = self.klass
+            # if value == "self":
+            # value = self.klass
 
             value = import_class_from_dotted_path(value)
             self.serializers[key] = value
@@ -187,18 +187,34 @@ class LazySerializersDict(MutableMapping):
 
 class SerializerMetaclass(SerializerMetaclass):
     def __new__(cls, name, bases, attrs):
-        serializer_class_path = attrs["__module__"] + "." + name
+        # serializer_class_path = attrs["__module__"] + "." + name
 
-        included_serializers = attrs.get("included_serializers", None)
-        if included_serializers:
+        included_serializers = attrs.pop("included_serializers", None)
+        if included_serializers is None:
+            for base in bases:
+                included = getattr(base, "included_serializers", None)
+                if included is not None:
+                    included_serializers = included
+
+        attrs["included_serializers"] = None
+        if included_serializers is not None:
             attrs["included_serializers"] = LazySerializersDict(
-                serializer_class_path, included_serializers
+                # serializer_class_path,
+                included_serializers
             )
 
-        related_serializers = attrs.get("related_serializers", None)
-        if related_serializers:
+        related_serializers = attrs.pop("related_serializers", None)
+        if related_serializers is None:
+            for base in bases:
+                related = getattr(base, "related_serializers", None)
+                if related is not None:
+                    related_serializers = related
+
+        attrs["related_serializers"] = None
+        if related_serializers is not None:
             attrs["related_serializers"] = LazySerializersDict(
-                serializer_class_path, related_serializers
+                # serializer_class_path,
+                related_serializers
             )
 
         return super().__new__(cls, name, bases, attrs)

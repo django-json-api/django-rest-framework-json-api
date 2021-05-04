@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased]
+
+* Deprecated `get_included_serializers(serializer)` function under `rest_framework_json_api.utils`. Use `serializer.included_serializers` and `serializer.related_serializers` instead.
+
 ## [4.2.1] - 2021-07-06
 
 ### Fixed
@@ -39,7 +43,6 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Deprecated default `format_type` argument of `rest_framework_json_api.utils.format_value`. Use `rest_framework_json_api.utils.format_field_name` or specify specifc `format_type` instead.
 * Deprecated `format_type` argument of `rest_framework_json_api.utils.format_link_segment`. Use `rest_framework_json_api.utils.format_value` instead.
-
 
 ## [4.1.0] - 2021-03-08
 

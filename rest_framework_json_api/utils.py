@@ -339,6 +339,17 @@ def get_default_included_resources_from_serializer(serializer):
     return list(getattr(meta, "included_resources", []))
 
 
+def get_included_serializers(serializer):
+    warnings.warn(
+        DeprecationWarning(
+            "Using `get_included_serializers(serializer)` function is deprecated."
+            "Use `serializer.included_serializers` instead."
+        )
+    )
+
+    return serializer.included_serializers
+
+
 def get_relation_instance(resource_instance, source, serializer):
     try:
         relation_instance = operator.attrgetter(source)(resource_instance)
