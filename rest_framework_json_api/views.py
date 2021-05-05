@@ -164,14 +164,14 @@ class RelatedMixin(object):
             field_name = self.get_related_field_name()
 
             # Try get the class from related_serializers
-            if parent_serializer_class.related_serializers is not None:
+            if hasattr(parent_serializer_class, "related_serializers"):
                 _class = parent_serializer_class.related_serializers.get(
                     field_name, None
                 )
                 if _class is None:
                     raise NotFound
 
-            elif parent_serializer_class.included_serializers is not None:
+            elif hasattr(parent_serializer_class, "included_serializers"):
                 _class = parent_serializer_class.included_serializers.get(
                     field_name, None
                 )

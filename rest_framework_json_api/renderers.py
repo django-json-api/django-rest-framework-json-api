@@ -284,10 +284,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
         current_serializer = fields.serializer
         context = current_serializer.context
-        included_serializers = getattr(current_serializer, "included_serializers", None)
-        if included_serializers is None:
-            return
-
+        included_serializers = getattr(
+            current_serializer, "included_serializers", dict()
+        )
         included_resources = copy.copy(included_resources)
         included_resources = [
             inflection.underscore(value) for value in included_resources
@@ -695,11 +694,9 @@ class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
         included_serializers = []
         already_seen.add(serializer)
 
-        included = serializer.included_serializers
-        if included is None:
-            return []
-
-        for include, included_serializer in included.items():
+        for include, included_serializer in getattr(
+            serializer, "included_serializers", dict()
+        ).items():
             included_serializers.append(f"{prefix}{include}")
             included_serializers.extend(
                 cls._get_included_serializers(
@@ -720,7 +717,7 @@ class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
         except AttributeError:
             return
 
-        if not serializer_class.included_serializers:
+        if not hasattr(serializer_class, "included_serializers"):
             return
 
         template = loader.get_template(self.includes_template)

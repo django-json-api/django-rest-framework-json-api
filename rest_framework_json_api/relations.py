@@ -273,10 +273,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
                 inflection.singularize(field_name),
                 inflection.pluralize(field_name),
             ]
-            includes = getattr(parent, "included_serializers", None)
-            if includes is None:
-                return None
-
+            includes = getattr(parent, "included_serializers", dict())
             for field in field_names:
                 if field in includes.keys():
                     return get_resource_type_from_serializer(includes[field])

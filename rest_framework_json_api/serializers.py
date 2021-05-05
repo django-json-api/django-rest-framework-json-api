@@ -189,32 +189,16 @@ class SerializerMetaclass(SerializerMetaclass):
     def __new__(cls, name, bases, attrs):
         # serializer_class_path = attrs["__module__"] + "." + name
 
-        included_serializers = attrs.pop("included_serializers", None)
-        if included_serializers is None:
-            for base in bases:
-                included = getattr(base, "included_serializers", None)
-                if included is not None:
-                    included_serializers = included
-
-        attrs["included_serializers"] = None
-        if included_serializers is not None:
+        if attrs.get("included_serializers", None):
             attrs["included_serializers"] = LazySerializersDict(
                 # serializer_class_path,
-                included_serializers
+                attrs["included_serializers"]
             )
 
-        related_serializers = attrs.pop("related_serializers", None)
-        if related_serializers is None:
-            for base in bases:
-                related = getattr(base, "related_serializers", None)
-                if related is not None:
-                    related_serializers = related
-
-        attrs["related_serializers"] = None
-        if related_serializers is not None:
+        if attrs.get("related_serializers", None):
             attrs["related_serializers"] = LazySerializersDict(
                 # serializer_class_path,
-                related_serializers
+                attrs["related_serializers"]
             )
 
         return super().__new__(cls, name, bases, attrs)
