@@ -7,7 +7,7 @@ from tests.serializers import ManyToManyTargetSerializer
 
 def test_get_included_serializers():
     class IncludedSerializersModel(DJAModel):
-        self = models.ForeignKey("self", on_delete=models.CASCADE)
+        # self = models.ForeignKey("self", on_delete=models.CASCADE)
         target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
         other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
 

@@ -347,7 +347,7 @@ def get_included_serializers(serializer):
         )
     )
 
-    return serializer.included_serializers
+    return getattr(serializer, "included_serializers", dict())
 
 
 def get_relation_instance(resource_instance, source, serializer):
