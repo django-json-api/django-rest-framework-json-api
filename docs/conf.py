@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Django REST Framework JSON API documentation build configuration file, created by
+# Django REST Framework JSON:API documentation build configuration file, created by
 # sphinx-quickstart on Fri Jul 24 23:31:15 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -59,10 +59,10 @@ source_suffix = [".rst", ".md"]
 master_doc = "index"
 
 # General information about the project.
-project = "Django REST Framework JSON API"
+project = "Django REST Framework JSON:API"
 year = datetime.date.today().year
-copyright = "{}, Django REST Framework JSON API contributors".format(year)
-author = "Django REST Framework JSON API contributors"
+copyright = "{}, Django REST Framework JSON:API contributors".format(year)
+author = "Django REST Framework JSON:API contributors"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -244,8 +244,8 @@ latex_documents = [
     (
         master_doc,
         "DjangoRESTFrameworkJSONAPI.tex",
-        "Django REST Framework JSON API Documentation",
-        "Django REST Framework JSON API contributors",
+        "Django REST Framework JSON:API Documentation",
+        "Django REST Framework JSON:API contributors",
         "manual",
     ),
 ]
@@ -279,7 +279,7 @@ man_pages = [
     (
         master_doc,
         "djangorestframeworkjsonapi",
-        "Django REST Framework JSON API Documentation",
+        "Django REST Framework JSON:API Documentation",
         [author],
         1,
     )
@@ -298,7 +298,7 @@ texinfo_documents = [
     (
         master_doc,
         "DjangoRESTFrameworkJSONAPI",
-        "Django REST Framework JSON API Documentation",
+        "Django REST Framework JSON:API Documentation",
         author,
         "DjangoRESTFrameworkJSONAPI",
         "One line description of project.",
