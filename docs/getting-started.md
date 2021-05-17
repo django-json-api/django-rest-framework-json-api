@@ -20,7 +20,7 @@ By default, Django REST Framework produces a response like:
 ```
 
 
-However, for the same `identity` model in JSON:APIJSON API format the response should look
+However, for the same `identity` model in JSON:API format the response should look
 like the following:
 ``` js
 {

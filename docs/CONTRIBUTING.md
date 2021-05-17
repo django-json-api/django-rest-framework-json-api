@@ -11,7 +11,7 @@ if the proposed change makes sense for the project.
 
 ### Clone
 
-To start developing on Django REST Framework JSON:APIJSON API you need to first clone the repository:
+To start developing on Django REST Framework JSON:API you need to first clone the repository:
 
     git clone https://github.com/django-json-api/django-rest-framework-json-api.git
 
