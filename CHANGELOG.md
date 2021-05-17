@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [4.2.0] - 2021-05-12
 
 ### Added
 
@@ -26,16 +26,13 @@ any parts of the framework not mentioned in the documentation should generally b
       name='order-related'),
   ```
 * Ensure default `included_resources` are considered when calculating prefetches.
-
+* Avoided error when using `include` query parameter on related urls (a regression since 4.1.0)
 
 ### Deprecated
 
 * Deprecated default `format_type` argument of `rest_framework_json_api.utils.format_value`. Use `rest_framework_json_api.utils.format_field_name` or specify specifc `format_type` instead.
-* Deprecated `format_type` argument of `rest_framework_json_api.utils.format_link_segment`. Use `format_value` instead.
+* Deprecated `format_type` argument of `rest_framework_json_api.utils.format_link_segment`. Use `rest_framework_json_api.utils.format_value` instead.
 
-### Fixed
-
-* Avoided error when using `include` query parameter on related urls (a regression since 4.1.0)
 
 ## [4.1.0] - 2021-03-08
 
