@@ -1,6 +1,6 @@
 """
 This module provides the `json_api_settings` object that is used to access
-JSON API REST framework settings, checking for user settings first, then falling back to
+JSON:API REST framework settings, checking for user settings first, then falling back to
 the defaults.
 """
 
