@@ -1,5 +1,5 @@
 ==================================
-JSON API and Django Rest Framework
+JSON:API and Django Rest Framework
 ==================================
 
 .. image:: https://github.com/django-json-api/django-rest-framework-json-api/workflows/Tests/badge.svg
@@ -18,7 +18,7 @@ JSON API and Django Rest Framework
 Overview
 --------
 
-**JSON API support for Django REST Framework**
+**JSON:API support for Django REST Framework**
 
 * Documentation: https://django-rest-framework-json-api.readthedocs.org/
 * Format specification: http://jsonapi.org/format/
@@ -38,7 +38,7 @@ By default, Django REST Framework will produce a response like::
     }
 
 
-However, for an ``identity`` model in JSON API format the response should look
+However, for an ``identity`` model in JSON:API format the response should look
 like the following::
 
     {
@@ -69,7 +69,7 @@ Goals
 
 As a Django REST Framework JSON API (short DJA) we are trying to address following goals:
 
-1. Support the `JSON API`_ spec to compliance
+1. Support the `JSON:API`_ spec to compliance
 
 2. Be as compatible with `Django REST Framework`_ as possible
 
@@ -81,7 +81,7 @@ As a Django REST Framework JSON API (short DJA) we are trying to address followi
 
 5. Be performant
 
-.. _JSON API: http://jsonapi.org
+.. _JSON:API: http://jsonapi.org
 .. _Django REST Framework: https://www.django-rest-framework.org/
 
 ------------
