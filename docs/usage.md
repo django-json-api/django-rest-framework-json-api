@@ -312,8 +312,7 @@ multiple endpoints. Setting the `resource_name` on views may result in a differe
 
 ### Inflecting object and relation keys
 
-This package includes the ability (off by default) to automatically convert [json
-api field names](http://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
+This package includes the ability (off by default) to automatically convert [json:api field names](http://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
 a format of your choice. To hook this up include the following setting in your
 project settings:
 
@@ -524,8 +523,7 @@ The relationship name is formatted by the `JSON_API_FORMAT_FIELD_NAMES` setting,
 
 #### ResourceRelatedField
 
-Because of the additional structure needed to represent relationships in JSON
-API, this package provides the `ResourceRelatedField` for serializers, which
+Because of the additional structure needed to represent relationships in JSON:API, this package provides the `ResourceRelatedField` for serializers, which
 works similarly to `PrimaryKeyRelatedField`. By default,
 `rest_framework_json_api.serializers.ModelSerializer` will use this for
 related fields automatically. It can be instantiated explicitly as in the
