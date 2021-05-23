@@ -10,7 +10,7 @@ from rest_framework.views import Response
 
 class JsonApiPageNumberPagination(PageNumberPagination):
     """
-    A json-api compatible pagination format.
+    A json:api compatible pagination format.
     """
 
     page_query_param = "page[number]"
