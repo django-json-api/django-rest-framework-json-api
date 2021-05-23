@@ -29,7 +29,7 @@ class JSONRenderer(renderers.JSONRenderer):
     The `JSONRenderer` exposes a number of methods that you may override if you need highly
     custom rendering control.
 
-    Render a JSON response per the JSON API spec:
+    Render a JSON response per the JSON:API spec:
 
     .. code-block:: json
 
@@ -54,7 +54,7 @@ class JSONRenderer(renderers.JSONRenderer):
     @classmethod
     def extract_attributes(cls, fields, resource):
         """
-        Builds the `attributes` object of the JSON API resource object.
+        Builds the `attributes` object of the JSON:API resource object.
         """
         data = OrderedDict()
         for field_name, field in iter(fields.items()):
