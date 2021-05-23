@@ -13,7 +13,7 @@ class JSONParser(parsers.JSONParser):
     Similar to `JSONRenderer`, the `JSONParser` you may override the following methods if you
     need highly custom parsing control.
 
-    A JSON API client will send a payload that looks like this:
+    A JSON:API client will send a payload that looks like this:
 
     .. code:: json
 
