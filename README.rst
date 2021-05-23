@@ -67,7 +67,7 @@ like the following::
 Goals
 -----
 
-As a Django REST Framework JSON API (short DJA) we are trying to address following goals:
+As a Django REST Framework JSON:API (short DJA) we are trying to address following goals:
 
 1. Support the `JSON:API`_ spec to compliance
 
