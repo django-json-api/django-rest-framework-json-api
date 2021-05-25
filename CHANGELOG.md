@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## Unreleased
+
+### Fixed
+
+* Include `PreloadIncludesMixin` in `ReadOnlyModelViewSet` to enable the usage of [performance utilities](https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#performance-improvements) on read only views (regression since 2.8.0)
+
 ## [4.2.0] - 2021-05-12
 
 ### Added

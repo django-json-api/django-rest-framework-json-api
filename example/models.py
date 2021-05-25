@@ -161,6 +161,13 @@ class LabResults(models.Model):
     )
     date = models.DateField()
     measurements = models.TextField()
+    author = models.ForeignKey(
+        Author,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="lab_results",
+    )
 
 
 class Company(models.Model):

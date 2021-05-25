@@ -356,9 +356,11 @@ class ResearchProjectSerializer(BaseProjectSerializer):
 
 
 class LabResultsSerializer(serializers.ModelSerializer):
+    included_serializers = {"author": AuthorSerializer}
+
     class Meta:
         model = LabResults
-        fields = ("date", "measurements")
+        fields = ("date", "measurements", "author")
 
 
 class ProjectSerializer(serializers.PolymorphicModelSerializer):

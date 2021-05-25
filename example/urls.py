@@ -17,6 +17,7 @@ from example.views import (
     CompanyViewset,
     EntryRelationshipView,
     EntryViewSet,
+    LabResultViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
     ProjectViewset,
@@ -32,6 +33,7 @@ router.register(r"comments", CommentViewSet)
 router.register(r"companies", CompanyViewset)
 router.register(r"projects", ProjectViewset)
 router.register(r"project-types", ProjectTypeViewset)
+router.register(r"lab-results", LabResultViewSet)
 
 urlpatterns = [
     url(r"^", include(router.urls)),

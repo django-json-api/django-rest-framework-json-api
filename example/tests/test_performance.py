@@ -1,8 +1,11 @@
+from datetime import date, timedelta
+from random import randint
+
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from example.factories import CommentFactory, EntryFactory
-from example.models import Author, Blog, Comment, Entry
+from example.models import Author, Blog, Comment, Entry, LabResults, ResearchProject
 
 
 class PerformanceTestCase(APITestCase):
@@ -84,3 +87,32 @@ class PerformanceTestCase(APITestCase):
                 "/entries?fields[entries]=comments&page[size]=25"
             )
             self.assertEqual(len(response.data["results"]), 25)
+
+    def test_query_prefetch_read_only(self):
+        """We expect a read only list view with an include have five queries:
+
+        1. Primary resource COUNT query
+        2. Primary resource SELECT
+        3. Authors prefetched
+        4. Author types prefetched
+        5. Entries prefetched
+        """
+        project = ResearchProject.objects.create(
+            topic="Mars Mission", supervisor="Elon Musk"
+        )
+
+        LabResults.objects.bulk_create(
+            [
+                LabResults(
+                    research_project=project,
+                    date=date.today() + timedelta(days=i),
+                    measurements=randint(0, 10000),
+                    author=self.author,
+                )
+                for i in range(20)
+            ]
+        )
+
+        with self.assertNumQueries(5):
+            response = self.client.get("/lab-results?include=author&page[size]=25")
+            self.assertEqual(len(response.data["results"]), 20)
