@@ -356,6 +356,7 @@ def test_get_included_serializers():
 
     class DeprecatedIncludedSerializersSerializer(serializers.ModelSerializer):
         included_serializers = {
+            "self": "self",
             "target": ManyToManyTargetSerializer,
             "other_target": "tests.serializers.ManyToManyTargetSerializer",
         }
@@ -370,6 +371,7 @@ def test_get_included_serializers():
         )
 
     expected_included_serializers = {
+        "self": DeprecatedIncludedSerializersSerializer,
         "target": ManyToManyTargetSerializer,
         "other_target": ManyToManyTargetSerializer,
     }

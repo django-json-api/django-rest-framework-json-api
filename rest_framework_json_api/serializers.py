@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from collections.abc import MutableMapping
+from collections.abc import Mapping
 
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
@@ -153,27 +153,21 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
-class LazySerializersDict(MutableMapping):
-    def __init__(self, serializers):  # klass, serializers):
-        # self.klass = klass
+class LazySerializersDict(Mapping):
+    def __init__(self, klass, serializers):
+        self.klass = klass
         self.serializers = serializers
 
     def __getitem__(self, key):
         value = self.serializers[key]
         if not isinstance(value, type):
-            # if value == "self":
-            # value = self.klass
-
-            value = import_class_from_dotted_path(value)
+            if value == "self":
+                value = self.klass
+            else:
+                value = import_class_from_dotted_path(value)
             self.serializers[key] = value
 
         return value
-
-    def __setitem__(self, key, field):
-        self.serializers[key] = field
-
-    def __delitem__(self, key):
-        del self.serializers[key]
 
     def __iter__(self):
         return iter(self.serializers)
@@ -187,21 +181,23 @@ class LazySerializersDict(MutableMapping):
 
 class SerializerMetaclass(SerializerMetaclass):
     def __new__(cls, name, bases, attrs):
-        # serializer_class_path = attrs["__module__"] + "." + name
+        klass = super().__new__(cls, name, bases, attrs)
 
         if attrs.get("included_serializers", None):
-            attrs["included_serializers"] = LazySerializersDict(
-                # serializer_class_path,
-                attrs["included_serializers"]
+            setattr(
+                klass,
+                "included_serializers",
+                LazySerializersDict(klass, attrs["included_serializers"]),
             )
 
         if attrs.get("related_serializers", None):
-            attrs["related_serializers"] = LazySerializersDict(
-                # serializer_class_path,
-                attrs["related_serializers"]
+            setattr(
+                klass,
+                "related_serializers",
+                LazySerializersDict(klass, attrs["related_serializers"]),
             )
 
-        return super().__new__(cls, name, bases, attrs)
+        return klass
 
 
 # If user imports serializer from here we can catch class definition and check
