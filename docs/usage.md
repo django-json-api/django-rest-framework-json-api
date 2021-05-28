@@ -942,7 +942,7 @@ class QuestSerializer(serializers.ModelSerializer):
 
 Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m\*(n+1) queries.
 
-A viewset helper was therefore designed to automatically preload data when possible. Such is automatically available when subclassing `ModelViewSet`.
+A viewset helper was therefore designed to automatically preload data when possible. Such is automatically available when subclassing `ModelViewSet` or `ReadOnlyModelViewSet`.
 
 It also allows to define custom `select_related` and `prefetch_related` for each requested `include` when needed in special cases:
 

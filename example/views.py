@@ -14,9 +14,22 @@ from rest_framework_json_api.filters import (
 )
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.utils import format_drf_errors
-from rest_framework_json_api.views import ModelViewSet, RelationshipView
+from rest_framework_json_api.views import (
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+    RelationshipView,
+)
 
-from example.models import Author, Blog, Comment, Company, Entry, Project, ProjectType
+from example.models import (
+    Author,
+    Blog,
+    Comment,
+    Company,
+    Entry,
+    LabResults,
+    Project,
+    ProjectType,
+)
 from example.serializers import (
     AuthorDetailSerializer,
     AuthorListSerializer,
@@ -27,6 +40,7 @@ from example.serializers import (
     CompanySerializer,
     EntryDRFSerializers,
     EntrySerializer,
+    LabResultsSerializer,
     ProjectSerializer,
     ProjectTypeSerializer,
 )
@@ -266,3 +280,12 @@ class CommentRelationshipView(RelationshipView):
 class AuthorRelationshipView(RelationshipView):
     queryset = Author.objects.all()
     self_link_view_name = "author-relationships"
+
+
+class LabResultViewSet(ReadOnlyModelViewSet):
+    queryset = LabResults.objects.all()
+    serializer_class = LabResultsSerializer
+    prefetch_for_includes = {
+        "__all__": [],
+        "author": ["author__bio", "author__entries"],
+    }

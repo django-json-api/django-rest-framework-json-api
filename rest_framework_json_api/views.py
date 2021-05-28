@@ -224,7 +224,7 @@ class ModelViewSet(
 
 
 class ReadOnlyModelViewSet(
-    AutoPrefetchMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
+    AutoPrefetchMixin, PreloadIncludesMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
 ):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
