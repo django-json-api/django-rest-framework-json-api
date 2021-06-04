@@ -55,7 +55,7 @@ class GenericViewSet(TestBase):
 
     def test_default_validation_exceptions(self):
         """
-        Default validation exceptions should conform to json api spec
+        Default validation exceptions should conform to json:api spec
         """
         expected = {
             "errors": [

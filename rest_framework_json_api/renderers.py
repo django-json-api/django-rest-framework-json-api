@@ -58,7 +58,7 @@ class JSONRenderer(renderers.JSONRenderer):
         """
         data = OrderedDict()
         for field_name, field in iter(fields.items()):
-            # ID is always provided in the root of JSON API so remove it from attributes
+            # ID is always provided in the root of JSON:API so remove it from attributes
             if field_name == "id":
                 continue
             # don't output a key for write only fields

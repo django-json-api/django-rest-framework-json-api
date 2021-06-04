@@ -20,7 +20,7 @@ DEFAULTS = {
 
 class JSONAPISettings(object):
     """
-    A settings object that allows json api settings to be access as
+    A settings object that allows json:api settings to be access as
     properties.
     """
 
@@ -30,7 +30,7 @@ class JSONAPISettings(object):
 
     def __getattr__(self, attr):
         if attr not in self.defaults:
-            raise AttributeError("Invalid JSON API setting: '%s'" % attr)
+            raise AttributeError("Invalid JSON:API setting: '%s'" % attr)
 
         value = getattr(
             self.user_settings, JSON_API_SETTINGS_PREFIX + attr, self.defaults[attr]
