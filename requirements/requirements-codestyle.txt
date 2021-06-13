@@ -1,4 +1,4 @@
-black==21.4b2
-flake8==3.9.1
+black==21.5b2
+flake8==3.9.2
 flake8-isort==4.0.0
 isort==5.8.0
