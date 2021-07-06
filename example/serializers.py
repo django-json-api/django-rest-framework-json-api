@@ -321,6 +321,9 @@ class CommentSerializer(serializers.ModelSerializer):
         # fields = ('entry', 'body', 'author',)
         meta_fields = ("modified_days_ago",)
 
+    class JSONAPIMeta:
+        included_resources = ("writer",)
+
     def get_modified_days_ago(self, obj):
         return (datetime.now() - obj.modified_at).days
 

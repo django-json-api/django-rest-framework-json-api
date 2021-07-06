@@ -198,7 +198,25 @@ class TestModelSerializer(object):
                 "meta": {
                     "modifiedDaysAgo": (datetime.now() - comment.modified_at).days
                 },
-            }
+            },
+            "included": [
+                {
+                    "attributes": {
+                        "email": comment.author.email,
+                        "name": comment.author.name,
+                    },
+                    "id": str(comment.author.pk),
+                    "relationships": {
+                        "bio": {
+                            "data": {
+                                "id": str(comment.author.bio.pk),
+                                "type": "authorBios",
+                            }
+                        }
+                    },
+                    "type": "writers",
+                }
+            ],
         }
 
         response = client.get(reverse("comment-detail", kwargs={"pk": comment.pk}))
