@@ -154,6 +154,10 @@ class IncludedResourcesValidationMixin(object):
 
 
 class LazySerializersDict(Mapping):
+    """
+    A dictionary of serializers which lazily import dotted class path and self.
+    """
+
     def __init__(self, parent, serializers):
         self.parent = parent
         self.serializers = serializers

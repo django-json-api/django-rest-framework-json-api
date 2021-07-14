@@ -342,7 +342,7 @@ def get_default_included_resources_from_serializer(serializer):
 def get_included_serializers(serializer):
     warnings.warn(
         DeprecationWarning(
-            "Using `get_included_serializers(serializer)` function is deprecated."
+            "Using of `get_included_serializers(serializer)` function is deprecated."
             "Use `serializer.included_serializers` instead."
         )
     )
