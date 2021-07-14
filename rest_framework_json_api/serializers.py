@@ -154,15 +154,15 @@ class IncludedResourcesValidationMixin(object):
 
 
 class LazySerializersDict(Mapping):
-    def __init__(self, klass, serializers):
-        self.klass = klass
+    def __init__(self, parent, serializers):
+        self.parent = parent
         self.serializers = serializers
 
     def __getitem__(self, key):
         value = self.serializers[key]
         if not isinstance(value, type):
             if value == "self":
-                value = self.klass
+                value = self.parent
             else:
                 value = import_class_from_dotted_path(value)
             self.serializers[key] = value
@@ -181,23 +181,23 @@ class LazySerializersDict(Mapping):
 
 class SerializerMetaclass(SerializerMetaclass):
     def __new__(cls, name, bases, attrs):
-        klass = super().__new__(cls, name, bases, attrs)
+        serializer = super().__new__(cls, name, bases, attrs)
 
         if attrs.get("included_serializers", None):
             setattr(
-                klass,
+                serializer,
                 "included_serializers",
-                LazySerializersDict(klass, attrs["included_serializers"]),
+                LazySerializersDict(serializer, attrs["included_serializers"]),
             )
 
         if attrs.get("related_serializers", None):
             setattr(
-                klass,
+                serializer,
                 "related_serializers",
-                LazySerializersDict(klass, attrs["related_serializers"]),
+                LazySerializersDict(serializer, attrs["related_serializers"]),
             )
 
-        return klass
+        return serializer
 
 
 # If user imports serializer from here we can catch class definition and check
