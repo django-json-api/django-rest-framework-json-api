@@ -169,6 +169,9 @@ class LabResults(models.Model):
         related_name="lab_results",
     )
 
+    class Meta:
+        ordering = ("id",)
+
 
 class Company(models.Model):
     name = models.CharField(max_length=100)
