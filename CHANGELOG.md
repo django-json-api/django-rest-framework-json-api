@@ -10,7 +10,13 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
-* Deprecated `get_included_serializers(serializer)` function under `rest_framework_json_api.utils`. Use `serializer.included_serializers` and `serializer.related_serializers` instead.
+### Changed
+
+* Moved resolving of `included_serialzers` and `related_serializers` classes to serializer's meta class.
+
+### Deprecated
+
+* Deprecated `get_included_serializers(serializer)` function under `rest_framework_json_api.utils`. Use `serializer.included_serializers` instead.
 
 ## [4.2.1] - 2021-07-06
 
