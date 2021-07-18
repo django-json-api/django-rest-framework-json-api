@@ -1,8 +1,10 @@
 from collections import OrderedDict
+from collections.abc import Mapping
 
 import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ParseError
 
@@ -22,7 +24,6 @@ from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
     get_included_resources,
-    get_included_serializers,
     get_resource_type_from_instance,
     get_resource_type_from_model,
     get_resource_type_from_serializer,
@@ -120,7 +121,7 @@ class IncludedResourcesValidationMixin(object):
         view = context.get("view") if context else None
 
         def validate_path(serializer_class, field_path, path):
-            serializers = get_included_serializers(serializer_class)
+            serializers = getattr(serializer_class, "included_serializers", None)
             if serializers is None:
                 raise ParseError("This endpoint does not support the include parameter")
             this_field_name = inflection.underscore(field_path[0])
@@ -152,8 +153,55 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
+class LazySerializersDict(Mapping):
+    """
+    A dictionary of serializers which lazily import dotted class path and self.
+    """
+
+    def __init__(self, parent, serializers):
+        self.parent = parent
+        self.serializers = serializers
+
+    def __getitem__(self, key):
+        value = self.serializers[key]
+        if not isinstance(value, type):
+            if value == "self":
+                value = self.parent
+            else:
+                value = import_class_from_dotted_path(value)
+            self.serializers[key] = value
+
+        return value
+
+    def __iter__(self):
+        return iter(self.serializers)
+
+    def __len__(self):
+        return len(self.serializers)
+
+    def __repr__(self):
+        return dict.__repr__(self.serializers)
+
+
 class SerializerMetaclass(SerializerMetaclass):
-    pass
+    def __new__(cls, name, bases, attrs):
+        serializer = super().__new__(cls, name, bases, attrs)
+
+        if attrs.get("included_serializers", None):
+            setattr(
+                serializer,
+                "included_serializers",
+                LazySerializersDict(serializer, attrs["included_serializers"]),
+            )
+
+        if attrs.get("related_serializers", None):
+            setattr(
+                serializer,
+                "related_serializers",
+                LazySerializersDict(serializer, attrs["related_serializers"]),
+            )
+
+        return serializer
 
 
 # If user imports serializer from here we can catch class definition and check
