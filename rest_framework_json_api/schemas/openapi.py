@@ -1,7 +1,6 @@
 import warnings
 from urllib.parse import urljoin
 
-from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework.fields import empty
 from rest_framework.relations import ManyRelatedField
 from rest_framework.schemas import openapi as drf_openapi
@@ -379,13 +378,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         """
         for path, method, view in view_endpoints:
             view_serializer = view.get_serializer()
-            if not isinstance(related_serializer, type):
-                related_serializer_class = import_class_from_dotted_path(
-                    related_serializer
-                )
-            else:
-                related_serializer_class = related_serializer
-            if isinstance(view_serializer, related_serializer_class):
+            if isinstance(view_serializer, related_serializer):
                 return view
 
         return None

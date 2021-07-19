@@ -1,4 +1,3 @@
-import copy
 import inspect
 import operator
 import warnings
@@ -13,7 +12,6 @@ from django.db.models.fields.related_descriptors import (
 )
 from django.http import Http404
 from django.utils import encoding
-from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import APIException
@@ -342,20 +340,14 @@ def get_default_included_resources_from_serializer(serializer):
 
 
 def get_included_serializers(serializer):
-    included_serializers = copy.copy(
-        getattr(serializer, "included_serializers", dict())
+    warnings.warn(
+        DeprecationWarning(
+            "Using of `get_included_serializers(serializer)` function is deprecated."
+            "Use `serializer.included_serializers` instead."
+        )
     )
 
-    for name, value in iter(included_serializers.items()):
-        if not isinstance(value, type):
-            if value == "self":
-                included_serializers[name] = (
-                    serializer if isinstance(serializer, type) else serializer.__class__
-                )
-            else:
-                included_serializers[name] = import_class_from_dotted_path(value)
-
-    return included_serializers
+    return getattr(serializer, "included_serializers", dict())
 
 
 def get_relation_instance(resource_instance, source, serializer):

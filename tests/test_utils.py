@@ -346,7 +346,7 @@ def test_get_related_resource_type_from_plain_serializer_class(
 
 
 def test_get_included_serializers():
-    class IncludedSerializersModel(DJAModel):
+    class DeprecatedIncludedSerializersModel(DJAModel):
         self = models.ForeignKey("self", on_delete=models.CASCADE)
         target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
         other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
@@ -354,7 +354,7 @@ def test_get_included_serializers():
         class Meta:
             app_label = "tests"
 
-    class IncludedSerializersSerializer(serializers.ModelSerializer):
+    class DeprecatedIncludedSerializersSerializer(serializers.ModelSerializer):
         included_serializers = {
             "self": "self",
             "target": ManyToManyTargetSerializer,
@@ -362,12 +362,16 @@ def test_get_included_serializers():
         }
 
         class Meta:
-            model = IncludedSerializersModel
+            model = DeprecatedIncludedSerializersModel
             fields = ("self", "other_target", "target")
 
-    included_serializers = get_included_serializers(IncludedSerializersSerializer)
+    with pytest.deprecated_call():
+        included_serializers = get_included_serializers(
+            DeprecatedIncludedSerializersSerializer
+        )
+
     expected_included_serializers = {
-        "self": IncludedSerializersSerializer,
+        "self": DeprecatedIncludedSerializersSerializer,
         "target": ManyToManyTargetSerializer,
         "other_target": ManyToManyTargetSerializer,
     }

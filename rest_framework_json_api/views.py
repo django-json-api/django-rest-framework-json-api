@@ -11,7 +11,6 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch
-from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.fields import get_attribute
@@ -183,8 +182,6 @@ class RelatedMixin(object):
                     False
                 ), 'Either "included_serializers" or "related_serializers" should be configured'
 
-            if not isinstance(_class, type):
-                return import_class_from_dotted_path(_class)
             return _class
 
         return parent_serializer_class

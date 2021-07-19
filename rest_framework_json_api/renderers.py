@@ -284,7 +284,9 @@ class JSONRenderer(renderers.JSONRenderer):
 
         current_serializer = fields.serializer
         context = current_serializer.context
-        included_serializers = utils.get_included_serializers(current_serializer)
+        included_serializers = getattr(
+            current_serializer, "included_serializers", dict()
+        )
         included_resources = copy.copy(included_resources)
         included_resources = [
             inflection.underscore(value) for value in included_resources
@@ -692,8 +694,8 @@ class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
         included_serializers = []
         already_seen.add(serializer)
 
-        for include, included_serializer in utils.get_included_serializers(
-            serializer
+        for include, included_serializer in getattr(
+            serializer, "included_serializers", dict()
         ).items():
             included_serializers.append(f"{prefix}{include}")
             included_serializers.extend(
