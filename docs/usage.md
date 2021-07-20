@@ -998,7 +998,7 @@ The `prefetch_related` case will issue 4 queries, but they will be small and fas
 
 ## Generating an OpenAPI Specification (OAS) 3.0 schema document
 
-DRF >= 3.12 has a [new OAS schema functionality](https://www.django-rest-framework.org/api-guide/schemas/) to generate an
+DRF has a [OAS schema functionality](https://www.django-rest-framework.org/api-guide/schemas/) to generate an
 [OAS 3.0 schema](https://www.openapis.org/) as a YAML or JSON file.
 
 DJA extends DRF's schema support to generate an OAS schema in the JSON:API format.
