@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Moved resolving of `included_serialzers` and `related_serializers` classes to serializer's meta class.
+* Removed `PreloadIncludesMixin`, as the logic did not work when nesting includes, and the laborious effort needed in its manual config was unnecessary.
 
 ### Deprecated
 
