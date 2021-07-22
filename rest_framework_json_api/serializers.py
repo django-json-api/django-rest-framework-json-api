@@ -23,7 +23,6 @@ from rest_framework.settings import api_settings
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
-    get_expensive_relational_fields,
     get_included_resources,
     get_resource_type_from_instance,
     get_resource_type_from_model,
@@ -31,6 +30,7 @@ from rest_framework_json_api.utils import (
 )
 
 from .settings import json_api_settings
+from .utils.serializers import get_expensive_relational_fields
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):

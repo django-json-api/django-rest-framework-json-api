@@ -236,11 +236,6 @@ class AuthorViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    select_for_includes = {"writer": ["author__bio"]}
-    prefetch_for_includes = {
-        "__all__": [],
-        "author": ["author__bio", "author__entries"],
-    }
 
     def get_queryset(self, *args, **kwargs):
         entry_pk = self.kwargs.get("entry_pk", None)
@@ -285,7 +280,3 @@ class AuthorRelationshipView(RelationshipView):
 class LabResultViewSet(ReadOnlyModelViewSet):
     queryset = LabResults.objects.all()
     serializer_class = LabResultsSerializer
-    prefetch_for_includes = {
-        "__all__": [],
-        "author": ["author__bio", "author__entries"],
-    }

@@ -20,11 +20,12 @@ from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializ
 from rest_framework_json_api.utils import (
     Hyperlink,
     OrderedDict,
-    add_nested_prefetches_to_qs,
     get_resource_type_from_instance,
     includes_to_dict,
     undo_format_link_segment,
 )
+
+from .utils.serializers import get_expensive_relational_fields
 
 
 class AutoPrefetchMixin(object):
@@ -41,6 +42,12 @@ class AutoPrefetchMixin(object):
         if hasattr(cls, 'prefetch_for_includes'):
             raise AttributeError(
                 f"{cls.__name__!r} defines `prefetch_for_includes`. This manual legacy form of"
+                " prefetching is no longer supported! It's all automatically handled now."
+            )
+        # Throw error if a `select_for_includes` is defined.
+        if hasattr(cls, 'select_for_includes'):
+            raise AttributeError(
+                f"{cls.__name__!r} defines `select_for_includes`. This manual legacy form of"
                 " prefetching is no longer supported! It's all automatically handled now."
             )
 

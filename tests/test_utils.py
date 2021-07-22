@@ -15,6 +15,7 @@ from rest_framework_json_api.utils import (
     get_included_serializers,
     get_related_resource_type,
     get_resource_name,
+    includes_to_dict,
     undo_format_field_name,
     undo_format_field_names,
     undo_format_link_segment,
@@ -377,3 +378,24 @@ def test_get_included_serializers():
     }
 
     assert included_serializers == expected_included_serializers
+
+
+def test_includes_to_dict():
+    result = includes_to_dict([
+        'property.client',
+        'property.client.clientgroup',
+        'property.client.task_set.branch',
+        'property.branch',
+    ])
+    expected = {
+        'property': {
+            'client': {
+                'clientgroup': {},
+                'task_set': {
+                    'branch': {},
+                },
+            },
+            'branch': {},
+        },
+    }
+    assert result == expected

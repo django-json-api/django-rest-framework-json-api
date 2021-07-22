@@ -227,7 +227,7 @@ class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
     filter_backends = (filters.QueryParameterValidationFilter, filters.OrderingFilter,
-	                   django_filters.DjangoFilterBackend, SearchFilter)
+                     django_filters.DjangoFilterBackend, SearchFilter)
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
         'descriptuon': ('icontains', 'iexact', 'contains'),
@@ -387,7 +387,7 @@ Example without format conversion:
 
 ``` js
 {
-	"data": [{
+  "data": [{
         "type": "blog_identity",
         "id": "3",
         "attributes": {
@@ -410,7 +410,7 @@ When set to dasherize:
 
 ``` js
 {
-	"data": [{
+  "data": [{
         "type": "blog-identity",
         "id": "3",
         "attributes": {
@@ -436,7 +436,7 @@ Example without pluralization:
 
 ``` js
 {
-	"data": [{
+  "data": [{
         "type": "identity",
         "id": "3",
         "attributes": {
@@ -459,7 +459,7 @@ When set to pluralize:
 
 ``` js
 {
-	"data": [{
+  "data": [{
         "type": "identities",
         "id": "3",
         "attributes": {
@@ -643,7 +643,7 @@ and increase performance.
 
 #### SerializerMethodResourceRelatedField
 
-`relations.SerializerMethodResourceRelatedField` combines behaviour of DRF `SerializerMethodField` and 
+`relations.SerializerMethodResourceRelatedField` combines behaviour of DRF `SerializerMethodField` and
 `ResourceRelatedField`, so it accepts `method_name` together with `model` and links-related arguments.
 `data` is rendered in `ResourceRelatedField` manner.
 
@@ -940,28 +940,10 @@ class QuestSerializer(serializers.ModelSerializer):
 
 #### Performance improvements
 
-Be aware that using included resources without any form of prefetching **WILL HURT PERFORMANCE** as it will introduce m\*(n+1) queries.
+Be aware that reverse relationships can be expensive to prepare.
 
-A viewset helper was therefore designed to automatically preload data when possible. Such is automatically available when subclassing `ModelViewSet` or `ReadOnlyModelViewSet`.
+As a result, these are excluded by default unless explicitly demanded with sparsefieldsets.
 
-It also allows to define custom `select_related` and `prefetch_related` for each requested `include` when needed in special cases:
-
-`rest_framework_json_api.views.ModelViewSet`:
-```python
-from rest_framework_json_api import views
-
-# When MyViewSet is called with ?include=author it will dynamically prefetch author and author.bio
-class MyViewSet(views.ModelViewSet):
-    queryset = Book.objects.all()
-    select_for_includes = {
-        'author': ['author__bio'],
-    }
-    prefetch_for_includes = {
-        '__all__': [],
-        'all_authors': [Prefetch('all_authors', queryset=Author.objects.select_related('bio'))],
-        'category.section': ['category']
-    }
-```
 
 An additional convenience DJA class exists for read-only views, just as it does in DRF.
 ```python
@@ -970,31 +952,6 @@ from rest_framework_json_api import views
 class MyReadOnlyViewSet(views.ReadOnlyModelViewSet):
     # ...
 ```
-
-The special keyword `__all__` can be used to specify a prefetch which should be done regardless of the include, similar to making the prefetch yourself on the QuerySet.
-
-Using the helper to prefetch, rather than attempting to minimise queries via `select_related` might give you better performance depending on the characteristics of your data and database.
-
-For example:
-
-If you have a single model, e.g. Book, which has four relations e.g. Author, Publisher, CopyrightHolder, Category.
-
-To display 25 books and related models, you would need to either do:
-
-a) 1 query via selected_related, e.g. SELECT * FROM books LEFT JOIN author LEFT JOIN publisher LEFT JOIN CopyrightHolder LEFT JOIN Category
-
-b) 4 small queries via prefetch_related.
-
-If you have 1M books, 50k authors, 10k categories, 10k copyrightholders
-in the `select_related` scenario, you've just created a in-memory table
-with 1e18 rows which will likely exhaust any available memory and
-slow your database to crawl.
-
-The `prefetch_related` case will issue 4 queries, but they will be small and fast queries.
-<!--
-### Relationships
-### Errors
--->
 
 ## Generating an OpenAPI Specification (OAS) 3.0 schema document
 
@@ -1115,4 +1072,3 @@ urlpatterns = [
     ...
 ]
 ```
-
