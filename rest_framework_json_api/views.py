@@ -6,7 +6,6 @@ from django.db.models import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch
-from django.utils.module_loading import import_string as import_class_from_dotted_path
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.fields import get_attribute
@@ -17,15 +16,15 @@ from rest_framework.serializers import Serializer, SkipField
 
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
-from rest_framework_json_api.utils import (
+
+from .utils import (
     Hyperlink,
     OrderedDict,
     get_resource_type_from_instance,
     includes_to_dict,
     undo_format_link_segment,
 )
-
-from .utils.serializers import get_expensive_relational_fields
+from .utils.serializers import add_nested_prefetches_to_qs
 
 
 class AutoPrefetchMixin(object):
@@ -145,8 +144,6 @@ class RelatedMixin(object):
                     False
                 ), 'Either "included_serializers" or "related_serializers" should be configured'
 
-            if not isinstance(_class, type):
-                return import_class_from_dotted_path(_class)
             return _class
 
         return parent_serializer_class

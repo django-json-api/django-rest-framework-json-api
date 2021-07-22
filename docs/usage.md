@@ -226,8 +226,10 @@ from models import MyModel
 class MyViewset(ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer
-    filter_backends = (filters.QueryParameterValidationFilter, filters.OrderingFilter,
-                     django_filters.DjangoFilterBackend, SearchFilter)
+    filter_backends = (
+      filters.QueryParameterValidationFilter, filters.OrderingFilter,
+      django_filters.DjangoFilterBackend, SearchFilter
+    )
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
         'descriptuon': ('icontains', 'iexact', 'contains'),
@@ -387,7 +389,7 @@ Example without format conversion:
 
 ``` js
 {
-  "data": [{
+    "data": [{
         "type": "blog_identity",
         "id": "3",
         "attributes": {
@@ -410,7 +412,7 @@ When set to dasherize:
 
 ``` js
 {
-  "data": [{
+    "data": [{
         "type": "blog-identity",
         "id": "3",
         "attributes": {
@@ -436,7 +438,7 @@ Example without pluralization:
 
 ``` js
 {
-  "data": [{
+    "data": [{
         "type": "identity",
         "id": "3",
         "attributes": {
@@ -459,7 +461,7 @@ When set to pluralize:
 
 ``` js
 {
-  "data": [{
+    "data": [{
         "type": "identities",
         "id": "3",
         "attributes": {
@@ -940,9 +942,11 @@ class QuestSerializer(serializers.ModelSerializer):
 
 #### Performance improvements
 
-Be aware that reverse relationships can be expensive to prepare.
+Be aware that reverse relationships and M2Ms can be expensive to prepare.
 
 As a result, these are excluded by default unless explicitly demanded with sparsefieldsets.
+
+You can opt out of this auto-exclusion with the `JSON_API_INCLUDE_EXPENSVE_FIELDS` setting.
 
 
 An additional convenience DJA class exists for read-only views, just as it does in DRF.
