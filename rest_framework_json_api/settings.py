@@ -15,6 +15,7 @@ DEFAULTS = {
     "FORMAT_RELATED_LINKS": False,
     "PLURALIZE_TYPES": False,
     "UNIFORM_EXCEPTIONS": False,
+    "INCLUDE_EXPENSVE_FIELDS": False,
 }
 
 

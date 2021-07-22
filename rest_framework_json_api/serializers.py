@@ -23,11 +23,14 @@ from rest_framework.settings import api_settings
 from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
+    get_expensive_relational_fields,
     get_included_resources,
     get_resource_type_from_instance,
     get_resource_type_from_model,
     get_resource_type_from_serializer,
 )
+
+from .settings import json_api_settings
 
 
 class ResourceIdentifierObjectSerializer(BaseSerializer):
@@ -153,6 +156,43 @@ class IncludedResourcesValidationMixin(object):
         super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
 
 
+class OnDemandFieldsMixin:
+    """
+    Automatically certain fields from the serializer that have been deemed expensive.
+    In order to see these fields, the client must explcitly request them.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Pop any fields off the serializer that shouldn't come through.
+        for field in self.get_excluded_ondemand_fields():
+            self.fields.pop(field, None)
+
+    def get_excluded_ondemand_fields(self) -> list[str]:
+        """
+        Determine which fields should be popped off if not explicitly asked for.
+        Will not nominate any fields that have been designated as `demanded_fields` in context.
+        Ondemand fields are determined in like so:
+        - Fields that we automatically determine to be expensive, and thus automatically remove
+           from the default offering. Currently such fields are M2Ms and reverse FKs.
+        """
+        if json_api_settings.INCLUDE_EXPENSVE_FIELDS:
+            return set()
+
+        # If we've instantiated the serializer ourselves, we'll have fed `demanded_fields` into its context.
+        # If it's happened as part of drf render internals, then we have a fallback where the view
+        # has provided the entire sparsefields context for us to pick through.
+        if 'demanded_fields' in self.context:
+            demanded_fields = set(self.context.get('demanded_fields'))
+        else:
+            resource_name = get_resource_type_from_serializer(type(self))
+            demanded_fields = set(self.context.get('all_sparsefields', {}).get(resource_name, []))
+
+        # We only want to exclude those ondemand fields that haven't been explicitly requested.
+        return set(get_expensive_relational_fields(type(self))) - set(demanded_fields)
+
+
 class LazySerializersDict(Mapping):
     """
     A dictionary of serializers which lazily import dotted class path and self.
@@ -207,6 +247,7 @@ class SerializerMetaclass(SerializerMetaclass):
 # If user imports serializer from here we can catch class definition and check
 # nested serializers for depricated use.
 class Serializer(
+    OnDemandFieldsMixin,
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
     Serializer,
@@ -230,6 +271,7 @@ class Serializer(
 
 
 class HyperlinkedModelSerializer(
+    OnDemandFieldsMixin,
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
     HyperlinkedModelSerializer,
@@ -250,6 +292,7 @@ class HyperlinkedModelSerializer(
 
 
 class ModelSerializer(
+    OnDemandFieldsMixin,
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
     ModelSerializer,

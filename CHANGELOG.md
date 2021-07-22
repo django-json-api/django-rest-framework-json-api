@@ -13,6 +13,8 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Moved resolving of `included_serialzers` and `related_serializers` classes to serializer's meta class.
+* `AutoPrefetchMixin` updated to be more clever about how relationships are prefetched, with recursion all the way down.
+* Expensive reverse relations are now automatically excluded from queries that don't explicitly name them in sparsefieldsets. Set `INCLUDE_EXPENSVE_FIELDS` to revert to old behaviour.
 * Removed `PreloadIncludesMixin`, as the logic did not work when nesting includes, and the laborious effort needed in its manual config was unnecessary.
 
 ### Deprecated

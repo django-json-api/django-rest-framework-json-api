@@ -1,13 +1,8 @@
+import re
 from collections.abc import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
-from django.db.models.fields.related_descriptors import (
-    ForwardManyToOneDescriptor,
-    ManyToManyDescriptor,
-    ReverseManyToOneDescriptor,
-    ReverseOneToOneDescriptor,
-)
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch
@@ -25,59 +20,67 @@ from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializ
 from rest_framework_json_api.utils import (
     Hyperlink,
     OrderedDict,
-    get_included_resources,
+    add_nested_prefetches_to_qs,
     get_resource_type_from_instance,
+    includes_to_dict,
     undo_format_link_segment,
 )
 
 
 class AutoPrefetchMixin(object):
-    def get_queryset(self, *args, **kwargs):
-        """This mixin adds automatic prefetching for OneToOne and ManyToMany fields."""
-        qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
+    """ Hides "expensive" fields by default, and calculates automatic prefetching when said fields
+        are explicitly requested.
 
-        included_resources = get_included_resources(
-            self.request, self.get_serializer_class()
+        "Expensive" fields are ones that require additional SQL queries to prepare, such as
+        reverse or M2M relations.
+    """
+    def __init_subclass__(cls, **kwargs):
+        """Run a smidge of validation at class declaration, to avoid silly mistakes."""
+
+        # Throw error if a `prefetch_for_includes` is defined.
+        if hasattr(cls, 'prefetch_for_includes'):
+            raise AttributeError(
+                f"{cls.__name__!r} defines `prefetch_for_includes`. This manual legacy form of"
+                " prefetching is no longer supported! It's all automatically handled now."
+            )
+
+        return super().__init_subclass__(**kwargs)
+
+    def get_sparsefields_as_dict(self):
+        if not hasattr(self, '_sparsefields'):
+            self._sparsefields = {
+                match.groupdict()['resource_name']: queryvalues.split(',')
+                for queryparam, queryvalues in self.request.query_params.items()
+                if (match := re.match(r'fields\[(?P<resource_name>\w+)\]', queryparam))
+            }
+        return self._sparsefields
+
+    def get_queryset(self, *args, **kwargs) -> QuerySet:
+        qs = super().get_queryset(*args, **kwargs)
+        # Since we're going to be recursing through serializers (to cover nested cases), we hand
+        # the prefetching work off to the top-level serializer here. We give it:
+        # - the base qs.
+        # - the request, in case the serializer wants to perform any user-permission-based logic.
+        # - sparsefields & includes.
+        # The serializer will return a qs with all required prefetches, select_related calls and
+        # annotations tacked on. If the serializer encounters any includes, it'll
+        # itself pass the work down to additional serializers to get their contribution.
+        return add_nested_prefetches_to_qs(
+            self.get_serializer_class(),
+            qs,
+            request=self.request,
+            sparsefields=self.get_sparsefields_as_dict(),
+            includes=includes_to_dict(self.request.query_params.get('include', '').replace(',', ' ').split()),  # See https://bugs.python.org/issue28937#msg282923
         )
 
-        for included in included_resources + ["__all__"]:
-            # If include was not defined, trying to resolve it automatically
-            included_model = None
-            levels = included.split(".")
-            level_model = qs.model
-            for level in levels:
-                if not hasattr(level_model, level):
-                    break
-                field = getattr(level_model, level)
-                field_class = field.__class__
-
-                is_forward_relation = issubclass(
-                    field_class, (ForwardManyToOneDescriptor, ManyToManyDescriptor)
-                )
-                is_reverse_relation = issubclass(
-                    field_class, (ReverseManyToOneDescriptor, ReverseOneToOneDescriptor)
-                )
-                if not (is_forward_relation or is_reverse_relation):
-                    break
-
-                if level == levels[-1]:
-                    included_model = field
-                else:
-
-                    if issubclass(field_class, ReverseOneToOneDescriptor):
-                        model_field = field.related.field
-                    else:
-                        model_field = field.field
-
-                    if is_forward_relation:
-                        level_model = model_field.related_model
-                    else:
-                        level_model = model_field.model
-
-            if included_model is not None:
-                qs = qs.prefetch_related(included.replace(".", "__"))
-
-        return qs
+    def get_serializer_context(self):
+        """ Pass args into the serializer's context, for field-level access. """
+        context = super().get_serializer_context()
+        # We don't have direct control over some serializers, so we can't always feed them their
+        # specific `demanded_fields` into context how we'd like. Next best thing is to make the
+        # entire sparsefields dict available for them to pick through.
+        context['all_sparsefields'] = self.get_sparsefields_as_dict()
+        return context
 
 
 class RelatedMixin(object):
@@ -169,15 +172,11 @@ class RelatedMixin(object):
                 raise NotFound
 
 
-class ModelViewSet(
-    AutoPrefetchMixin, RelatedMixin, viewsets.ModelViewSet
-):
+class ModelViewSet(AutoPrefetchMixin, RelatedMixin, viewsets.ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
 
-class ReadOnlyModelViewSet(
-    AutoPrefetchMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
-):
+class ReadOnlyModelViewSet(AutoPrefetchMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
 
