@@ -100,8 +100,7 @@ Generally Python and Django series are supported till the official end of life. 
 Installation
 ------------
 
-From PyPI
-^^^^^^^^^
+Install using ``pip``...
 
 ::
 
@@ -112,14 +111,25 @@ From PyPI
     $ pip install djangorestframework-jsonapi['openapi']
 
 
-From Source
-^^^^^^^^^^^
+or from source...
 
 ::
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     $ cd django-rest-framework-json-api
     $ pip install -e .
+
+
+and add ``rest_framework_json_api`` to your ``INSTALLED_APPS`` setting below ``rest_framework``.
+
+::
+
+    INSTALLED_APPS = [
+        ...
+        'rest_framework',
+        'rest_framework_json_api',
+        ...
+    ]
 
 
 Running the example app
