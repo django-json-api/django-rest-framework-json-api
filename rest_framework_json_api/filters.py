@@ -90,7 +90,7 @@ class QueryParameterValidationFilter(BaseFilterBackend):
 
         :raises ValidationError: if not.
         """
-        # TODO: For jsonapi error object conformance, must set jsonapi errors "parameter" for
+        # TODO: For JSON:API error object conformance, must set JSON:API errors "parameter" for
         # the ValidationError. This requires extending DRF/DJA Exceptions.
         for qp in request.query_params.keys():
             m = self.query_regex.match(qp)

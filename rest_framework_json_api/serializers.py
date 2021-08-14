@@ -214,9 +214,9 @@ class Serializer(
 ):
     """
     A `Serializer` is a model-less serializer class with additional
-    support for json:api spec features.
+    support for JSON:API spec features.
 
-    As in json:api specification a type is always required you need to
+    As in JSON:API specification a type is always required you need to
     make sure that you define `resource_name` in your `Meta` class
     when deriving from this class.
 

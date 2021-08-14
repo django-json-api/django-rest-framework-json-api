@@ -1,4 +1,4 @@
-# The base set of requirements for Django REST framework JSON API is actually
+# The base set of requirements for Django REST framework JSON:API is actually
 # fairly small, but for the purposes of development and testing
 # there are a number of packages that are useful to install.
 

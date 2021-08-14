@@ -29,16 +29,16 @@ def exception_handler(exc, context):
     if not response:
         return response
 
-    # Use regular DRF format if not rendered by DRF JSON API and not uniform
+    # Use regular DRF format if not rendered by DRF JSON:API and not uniform
     is_json_api_view = rendered_with_json_api(context["view"])
     is_uniform = json_api_settings.UNIFORM_EXCEPTIONS
     if not is_json_api_view and not is_uniform:
         return response
 
-    # Convert to DRF JSON API error format
+    # Convert to DRF JSON:API error format
     response = utils.format_drf_errors(response, context, exc)
 
-    # Add top-level 'errors' object when not rendered by DRF JSON API
+    # Add top-level 'errors' object when not rendered by DRF JSON:API
     if not is_json_api_view:
         response.data = utils.format_errors(response.data)
 

@@ -1,6 +1,6 @@
 # Contributing
 
-Django REST Framework JSON API (aka DJA)  should be easy to contribute to.
+Django REST Framework JSON:API (aka DJA)  should be easy to contribute to.
 If anything is unclear about how to contribute,
 please submit an issue on GitHub so that we can fix it!
 
@@ -11,7 +11,7 @@ if the proposed change makes sense for the project.
 
 ### Clone
 
-To start developing on Django REST Framework JSON API you need to first clone the repository:
+To start developing on Django REST Framework JSON:API you need to first clone the repository:
 
     git clone https://github.com/django-json-api/django-rest-framework-json-api.git
 

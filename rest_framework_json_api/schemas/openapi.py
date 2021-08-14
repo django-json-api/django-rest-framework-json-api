@@ -11,10 +11,10 @@ from rest_framework_json_api import serializers, views
 
 class SchemaGenerator(drf_openapi.SchemaGenerator):
     """
-    Extend DRF's SchemaGenerator to implement jsonapi-flavored generateschema command.
+    Extend DRF's SchemaGenerator to implement JSON:API flavored generateschema command.
     """
 
-    #: These JSONAPI component definitions are referenced by the generated OAS schema.
+    #: These JSON:API component definitions are referenced by the generated OAS schema.
     #: If you need to add more or change these static component definitions, extend this dict.
     jsonapi_components = {
         "schemas": {
@@ -258,7 +258,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
 
     def get_schema(self, request=None, public=False):
         """
-        Generate a JSONAPI OpenAPI schema.
+        Generate a JSON:API OpenAPI schema.
         Overrides upstream DRF's get_schema.
         """
         # TODO: avoid copying so much of upstream get_schema()
@@ -393,15 +393,15 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
 
 class AutoSchema(drf_openapi.AutoSchema):
     """
-    Extend DRF's openapi.AutoSchema for JSONAPI serialization.
+    Extend DRF's openapi.AutoSchema for JSON:API serialization.
     """
 
-    #: ignore all the media types and only generate a JSONAPI schema.
+    #: ignore all the media types and only generate a JSON:API schema.
     content_types = ["application/vnd.api+json"]
 
     def get_operation(self, path, method):
         """
-        JSONAPI adds some standard fields to the API response that are not in upstream DRF:
+        JSON:API adds some standard fields to the API response that are not in upstream DRF:
         - some that only apply to GET/HEAD methods.
         - collections
         - special handling for POST, PATCH, DELETE
@@ -505,7 +505,7 @@ class AutoSchema(drf_openapi.AutoSchema):
 
     def _get_toplevel_200_response(self, operation, collection=True):
         """
-        return top-level JSONAPI GET 200 response
+        return top-level JSON:API GET 200 response
 
         :param collection: True for collections; False for individual items.
 
@@ -587,7 +587,7 @@ class AutoSchema(drf_openapi.AutoSchema):
 
     def get_request_body(self, path, method):
         """
-        A request body is required by jsonapi for POST, PATCH, and DELETE methods.
+        A request body is required by JSON:API for POST, PATCH, and DELETE methods.
         """
         serializer = self.get_serializer(path, method)
         if not isinstance(serializer, (serializers.BaseSerializer,)):
@@ -595,7 +595,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         is_relationship = isinstance(self.view, views.RelationshipView)
 
         # DRF uses a $ref to the component schema definition, but this
-        # doesn't work for jsonapi due to the different required fields based on
+        # doesn't work for JSON:API due to the different required fields based on
         # the method, so make those changes and inline another copy of the schema.
         # TODO: A future improvement could make this DRYer with multiple component schemas:
         #   A base schema for each viewset that has no required fields
@@ -640,7 +640,7 @@ class AutoSchema(drf_openapi.AutoSchema):
 
     def map_serializer(self, serializer):
         """
-        Custom map_serializer that serializes the schema using the jsonapi spec.
+        Custom map_serializer that serializes the schema using the JSON:API spec.
         Non-attributes like related and identity fields, are move to 'relationships' and 'links'.
         """
         # TODO: remove attributes, etc. for relationshipView??

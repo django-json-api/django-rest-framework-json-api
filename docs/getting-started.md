@@ -1,7 +1,7 @@
 
 # Getting Started
 
-*Note: this package is named Django REST Framework JSON API to follow the naming
+*Note: this package is named Django REST Framework JSON:API to follow the naming
 convention of other Django REST Framework packages. Since that's quite a bit
 to say or type this package will be referred to as DJA elsewhere in these docs.*
 
@@ -20,7 +20,7 @@ By default, Django REST Framework produces a response like:
 ```
 
 
-However, for the same `identity` model in JSON API format the response should look
+However, for the same `identity` model in JSON:API format the response should look
 like the following:
 ``` js
 {
@@ -97,7 +97,7 @@ and add `rest_framework_json_api` to your `INSTALLED_APPS` setting below `rest_f
 
 
 Browse to
-* [http://localhost:8000](http://localhost:8000) for the list of available collections (in a non-JSONAPI format!),
+* [http://localhost:8000](http://localhost:8000) for the list of available collections (in a non-JSON:API format!),
 * [http://localhost:8000/swagger-ui/](http://localhost:8000/swagger-ui/) for a Swagger user interface to the dynamic schema view, or
 * [http://localhost:8000/openapi](http://localhost:8000/openapi) for the schema view's OpenAPI specification document.
 
