@@ -104,7 +104,7 @@ class DJATestFilters(APITestCase):
 
     def test_sort_related(self):
         """
-        test sort via related field using jsonapi path `.` and django orm `__` notation.
+        test sort via related field using JSON:API path `.` and django orm `__` notation.
         ORM relations must be predefined in the View's .ordering_fields attr
         """
         for datum in ("blog__id", "blog.id"):

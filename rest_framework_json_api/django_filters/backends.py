@@ -11,7 +11,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
     """
     A Django-style ORM filter implementation, using `django-filter`.
 
-    This is not part of the jsonapi standard per-se, other than the requirement
+    This is not part of the JSON:API standard per-se, other than the requirement
     to use the `filter` keyword: This is an optional implementation of style of
     filtering in which each filter is an ORM expression as implemented by
     DjangoFilterBackend and seems to be in alignment with an interpretation of
@@ -50,7 +50,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
     the name of the query parameter for searching to make sure it doesn't conflict
     with a field name defined in the filterset.
     The recommended value is: `search_param="filter[search]"` but just make sure it's
-    `filter[<something>]` to comply with the jsonapi spec requirement to use the filter
+    `filter[<something>]` to comply with the JSON:API spec requirement to use the filter
     keyword. The default is "search" unless overriden but it's used here just to make sure
     we don't complain about it being an invalid filter.
     """
@@ -117,7 +117,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
                     raise ValidationError(
                         "missing value for query parameter {}".format(qp)
                     )
-                # convert jsonapi relationship path to Django ORM's __ notation
+                # convert JSON:API relationship path to Django ORM's __ notation
                 key = m.groupdict()["assoc"].replace(".", "__")
                 key = undo_format_field_name(key)
                 data.setlist(key, val)

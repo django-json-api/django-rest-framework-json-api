@@ -20,7 +20,7 @@ DEFAULTS = {
 
 class JSONAPISettings(object):
     """
-    A settings object that allows json:api settings to be access as
+    A settings object that allows JSON:API settings to be access as
     properties.
     """
 

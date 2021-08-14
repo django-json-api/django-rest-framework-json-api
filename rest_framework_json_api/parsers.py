@@ -87,7 +87,7 @@ class JSONParser(parsers.JSONParser):
         from rest_framework_json_api.views import RelationshipView
 
         if isinstance(view, RelationshipView):
-            # We skip parsing the object as JSONAPI Resource Identifier Object and not a regular
+            # We skip parsing the object as JSON:API Resource Identifier Object and not a regular
             # Resource Object
             if isinstance(data, list):
                 for resource_identifier_object in data:
@@ -96,12 +96,12 @@ class JSONParser(parsers.JSONParser):
                         and resource_identifier_object.get("type")
                     ):
                         raise ParseError(
-                            "Received data contains one or more malformed JSONAPI "
+                            "Received data contains one or more malformed JSON:API "
                             "Resource Identifier Object(s)"
                         )
             elif not (data.get("id") and data.get("type")):
                 raise ParseError(
-                    "Received data is not a valid JSONAPI Resource Identifier Object"
+                    "Received data is not a valid JSON:API Resource Identifier Object"
                 )
 
             return data
@@ -111,7 +111,7 @@ class JSONParser(parsers.JSONParser):
         # Sanity check
         if not isinstance(data, dict):
             raise ParseError(
-                "Received data is not a valid JSONAPI Resource Identifier Object"
+                "Received data is not a valid JSON:API Resource Identifier Object"
             )
 
         # Check for inconsistencies

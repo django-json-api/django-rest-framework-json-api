@@ -104,10 +104,10 @@ This is the last release supporting Django 1.11, Django 2.1, Django REST Framewo
 ### Added
 
 * Added support for serializing nested serializers as attribute json value introducing setting `JSON_API_SERIALIZE_NESTED_SERIALIZERS_AS_ATTRIBUTE`
- * Note: As keys of nested serializers are not json:api spec field names they are not inflected by format field names option.
+ * Note: As keys of nested serializers are not JSON:API spec field names they are not inflected by format field names option.
 * Added `rest_framework_json_api.serializer.Serializer` class to support initial JSON:API views without models.
   * Note that serializers derived from this class need to define `resource_name` in their `Meta` class.
-  * This fix might be a **BREAKING CHANGE** if you use `rest_framework_json_api.serializers.Serializer` for non json:api spec views (usually `APIView`). You need to change those serializers classes to use `rest_framework.serializers.Serializer` instead.
+  * This fix might be a **BREAKING CHANGE** if you use `rest_framework_json_api.serializers.Serializer` for non JSON:API spec views (usually `APIView`). You need to change those serializers classes to use `rest_framework.serializers.Serializer` instead.
 
 ### Fixed
 
@@ -202,7 +202,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Don't swallow `filter[]` params when there are several
 * Fix DeprecationWarning regarding collections.abc import in Python 3.7
 * Allow OPTIONS request to be used on RelationshipView
-* Remove non-JSONAPI methods (PUT and TRACE) from ModelViewSet and RelationshipView.
+* Remove non-JSON:API methods (PUT and TRACE) from ModelViewSet and RelationshipView.
   This fix might be a **BREAKING CHANGE** if your clients are incorrectly using PUT instead of PATCH.
 * Avoid validation error for missing fields on a PATCH request using polymorphic serializers
 
