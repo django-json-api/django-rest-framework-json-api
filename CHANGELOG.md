@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Fixed
+
+* Adjusted error messages to correctly use capitial "JSON:API" abbreviation as used in the specification.
+
 ### Changed
 
 * Moved resolving of `included_serialzers` and `related_serializers` classes to serializer's meta class.
