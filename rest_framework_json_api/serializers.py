@@ -45,7 +45,7 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
         self.model_class = kwargs.pop("model_class", self.model_class)
         # this has no fields but assumptions are made elsewhere that self.fields exists.
         self.fields = {}
-        super(ResourceIdentifierObjectSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_representation(self, instance):
         return {
@@ -69,7 +69,7 @@ class ResourceIdentifierObjectSerializer(BaseSerializer):
             self.fail("incorrect_type", data_type=type(data["pk"]).__name__)
 
 
-class SparseFieldsetsMixin(object):
+class SparseFieldsetsMixin:
     """
     A serializer mixin that adds support for sparse fieldsets through `fields` query parameter.
 
@@ -77,7 +77,7 @@ class SparseFieldsetsMixin(object):
     """
 
     def __init__(self, *args, **kwargs):
-        super(SparseFieldsetsMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         context = kwargs.get("context")
         request = context.get("request") if context else None
 
@@ -107,7 +107,7 @@ class SparseFieldsetsMixin(object):
                         self.fields.pop(field_name)
 
 
-class IncludedResourcesValidationMixin(object):
+class IncludedResourcesValidationMixin:
     """
     A serializer mixin that adds validation of `include` query parameter to
     support compound documents.
@@ -150,7 +150,7 @@ class IncludedResourcesValidationMixin(object):
                     this_serializer_class, included_field_path, included_field_name
                 )
 
-        super(IncludedResourcesValidationMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class LazySerializersDict(Mapping):
@@ -302,9 +302,7 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
     """
 
     def __new__(cls, name, bases, attrs):
-        new_class = super(PolymorphicSerializerMetaclass, cls).__new__(
-            cls, name, bases, attrs
-        )
+        new_class = super().__new__(cls, name, bases, attrs)
 
         # Ensure initialization is only performed for subclasses of PolymorphicModelSerializer
         # (excluding PolymorphicModelSerializer class itself).
@@ -363,7 +361,7 @@ class PolymorphicModelSerializer(
                 raise Exception(
                     "Cannot get fields from a polymorphic serializer given a queryset"
                 )
-        return super(PolymorphicModelSerializer, self).get_fields()
+        return super().get_fields()
 
     @classmethod
     def get_polymorphic_serializer_for_instance(cls, instance):
