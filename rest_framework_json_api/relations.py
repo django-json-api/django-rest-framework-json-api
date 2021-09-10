@@ -29,14 +29,14 @@ LINKS_PARAMS = [
 ]
 
 
-class SkipDataMixin(object):
+class SkipDataMixin:
     """
     This workaround skips "data" rendering for relationships
     in order to save some sql queries and improve performance
     """
 
     def __init__(self, *args, **kwargs):
-        super(SkipDataMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_attribute(self, instance):
         raise SkipField
@@ -49,7 +49,7 @@ class ManyRelatedFieldWithNoData(SkipDataMixin, DRFManyRelatedField):
     pass
 
 
-class HyperlinkedMixin(object):
+class HyperlinkedMixin:
     self_link_view_name = None
     related_link_view_name = None
     related_link_lookup_field = "pk"
@@ -72,7 +72,7 @@ class HyperlinkedMixin(object):
         # implicit `self` argument to be passed.
         self.reverse = reverse
 
-        super(HyperlinkedMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def get_url(self, name, view_name, kwargs, request):
         """
@@ -197,7 +197,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
         if model:
             self.model = model
 
-        super(ResourceRelatedField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def use_pk_only_optimization(self):
         # We need the real object to determine its type...
@@ -245,7 +245,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
                 received_type=data["type"],
             )
 
-        return super(ResourceRelatedField, self).to_internal_value(data["id"])
+        return super().to_internal_value(data["id"])
 
     def to_representation(self, value):
         if getattr(self, "pk_field", None) is not None:
@@ -329,7 +329,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
 
     def __init__(self, polymorphic_serializer, *args, **kwargs):
         self.polymorphic_serializer = polymorphic_serializer
-        super(PolymorphicResourceRelatedField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def use_pk_only_optimization(self):
         return False
