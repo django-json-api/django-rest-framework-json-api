@@ -30,7 +30,7 @@ from rest_framework_json_api.utils import (
 )
 
 
-class PreloadIncludesMixin(object):
+class PreloadIncludesMixin:
     """
     This mixin provides a helper attributes to select or prefetch related models
     based on the include specified in the URL.
@@ -60,7 +60,7 @@ class PreloadIncludesMixin(object):
         return getattr(self, "prefetch_for_includes", {}).get(include, None)
 
     def get_queryset(self, *args, **kwargs):
-        qs = super(PreloadIncludesMixin, self).get_queryset(*args, **kwargs)
+        qs = super().get_queryset(*args, **kwargs)
 
         included_resources = get_included_resources(
             self.request, self.get_serializer_class()
@@ -78,10 +78,10 @@ class PreloadIncludesMixin(object):
         return qs
 
 
-class AutoPrefetchMixin(object):
+class AutoPrefetchMixin:
     def get_queryset(self, *args, **kwargs):
         """This mixin adds automatic prefetching for OneToOne and ManyToMany fields."""
-        qs = super(AutoPrefetchMixin, self).get_queryset(*args, **kwargs)
+        qs = super().get_queryset(*args, **kwargs)
 
         included_resources = get_included_resources(
             self.request, self.get_serializer_class()
@@ -127,7 +127,7 @@ class AutoPrefetchMixin(object):
         return qs
 
 
-class RelatedMixin(object):
+class RelatedMixin:
     """
     This mixin handles all related entities, whose Serializers are declared in "related_serializers"
     """
@@ -239,7 +239,7 @@ class RelationshipView(generics.GenericAPIView):
         return self.serializer_class
 
     def __init__(self, **kwargs):
-        super(RelationshipView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         # We include this simply for dependency injection in tests.
         # We can't add it as a class attributes or it would expect an
         # implicit `self` argument to be passed.
