@@ -495,12 +495,12 @@ class JSONRenderer(renderers.JSONRenderer):
         links = view.get_links()
         if links:
             render_data.update({"links": links}),
-        return super(JSONRenderer, self).render(
+        return super().render(
             render_data, accepted_media_type, renderer_context
         )
 
     def render_errors(self, data, accepted_media_type=None, renderer_context=None):
-        return super(JSONRenderer, self).render(
+        return super().render(
             utils.format_errors(data), accepted_media_type, renderer_context
         )
 
@@ -522,7 +522,7 @@ class JSONRenderer(renderers.JSONRenderer):
         # be None
         response = renderer_context.get("response", None)
         if response is not None and response.status_code == 204:
-            return super(JSONRenderer, self).render(
+            return super().render(
                 None, accepted_media_type, renderer_context
             )
 
@@ -536,7 +536,7 @@ class JSONRenderer(renderers.JSONRenderer):
         # If `resource_name` is set to None then render default as the dev
         # wants to build the output format manually.
         if resource_name is None or resource_name is False:
-            return super(JSONRenderer, self).render(
+            return super().render(
                 data, accepted_media_type, renderer_context
             )
 
@@ -664,7 +664,7 @@ class JSONRenderer(renderers.JSONRenderer):
         if json_api_meta:
             render_data["meta"] = utils.format_field_names(json_api_meta)
 
-        return super(JSONRenderer, self).render(
+        return super().render(
             render_data, accepted_media_type, renderer_context
         )
 
