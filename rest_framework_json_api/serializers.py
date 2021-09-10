@@ -302,9 +302,7 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
     """
 
     def __new__(cls, name, bases, attrs):
-        new_class = super().__new__(
-            cls, name, bases, attrs
-        )
+        new_class = super().__new__(cls, name, bases, attrs)
 
         # Ensure initialization is only performed for subclasses of PolymorphicModelSerializer
         # (excluding PolymorphicModelSerializer class itself).
