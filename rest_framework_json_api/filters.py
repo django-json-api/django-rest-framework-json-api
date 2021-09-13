@@ -61,9 +61,7 @@ class OrderingFilter(OrderingFilter):
             else:
                 underscore_fields.append(undo_format_field_name(item_rewritten))
 
-        return super(OrderingFilter, self).remove_invalid_fields(
-            queryset, underscore_fields, view, request
-        )
+        return super().remove_invalid_fields(queryset, underscore_fields, view, request)
 
 
 class QueryParameterValidationFilter(BaseFilterBackend):

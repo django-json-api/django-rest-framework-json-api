@@ -74,7 +74,7 @@ class JSONParser(parsers.JSONParser):
         """
         Parses the incoming bytestream as JSON and returns the resulting data
         """
-        result = super(JSONParser, self).parse(
+        result = super().parse(
             stream, media_type=media_type, parser_context=parser_context
         )
 
