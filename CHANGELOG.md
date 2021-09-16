@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
+Note that in line with [Django REST framework policy](http://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
 ## [Unreleased]
@@ -103,7 +103,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ## [3.2.0] - 2020-08-26
 
-This is the last release supporting Django 1.11, Django 2.1, Django REST Framework 3.10, Django REST Framework 3.11 and Python 3.5.
+This is the last release supporting Django 1.11, Django 2.1, Django REST framework 3.10, Django REST framework 3.11 and Python 3.5.
 
 ### Added
 
@@ -171,7 +171,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Removed support for Python 2.7 and 3.4.
 * Removed support for Django Filter 1.1.
 * Removed obsolete dependency six.
-* Removed support for Django REST Framework <=3.9.
+* Removed support for Django REST framework <=3.9.
 * Removed support for Django 2.0.
 * Removed obsolete mixins `MultipleIDMixin` and `PrefetchForIncludesHelperMixin`
 * Removed obsolete settings `JSON_API_FORMAT_KEYS`, `JSON_API_FORMAT_RELATION_KEYS` and
@@ -188,7 +188,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ## [2.8.0] - 2019-06-13
 
-This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST Framework <=3.9 and Django 2.0.
+This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST framework <=3.9 and Django 2.0.
 
 ### Added
 
@@ -265,7 +265,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add new pagination classes based on JSON:API query parameter *recommendations*:
   * `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`. See [usage docs](docs/usage.md#pagination).
 * Add `ReadOnlyModelViewSet` extension with prefetch mixins
-* Add support for Django REST Framework 3.8.x
+* Add support for Django REST framework 3.8.x
 * Introduce `JSON_API_FORMAT_FIELD_NAMES` option replacing `JSON_API_FORMAT_KEYS` but in comparison preserving
   values from being formatted as attributes can contain any [json value](http://jsonapi.org/format/#document-resource-object-attributes).
 * Allow overwriting of `get_queryset()` in custom `ResourceRelatedField`
@@ -293,13 +293,13 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 
 ### Added
 
-* Add support for Django REST Framework 3.7.x.
+* Add support for Django REST framework 3.7.x.
 * Add support for Django 2.0.
 
 ### Removed
 
 * Drop support for Django 1.8 - 1.10 (EOL)
-* Drop support for Django REST Framework < 3.6.3
+* Drop support for Django REST framework < 3.6.3
   (3.6.3 is the first to support Django 1.11)
 * Drop support for Python 3.3 (EOL)
 
@@ -326,7 +326,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 
 ### Added
 
-* Add support for Django REST Framework 3.5 and 3.6
+* Add support for Django REST framework 3.5 and 3.6
 * Add support for Django 1.11
 * Add support for Python 3.6
 

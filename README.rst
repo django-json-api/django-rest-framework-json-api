@@ -1,5 +1,5 @@
 ==================================
-JSON:API and Django Rest Framework
+JSON:API and Django REST framework
 ==================================
 
 .. image:: https://github.com/django-json-api/django-rest-framework-json-api/workflows/Tests/badge.svg
@@ -18,13 +18,13 @@ JSON:API and Django Rest Framework
 Overview
 --------
 
-**JSON:API support for Django REST Framework**
+**JSON:API support for Django REST framework**
 
 * Documentation: https://django-rest-framework-json-api.readthedocs.org/
 * Format specification: http://jsonapi.org/format/
 
 
-By default, Django REST Framework will produce a response like::
+By default, Django REST framework will produce a response like::
 
     {
         "count": 20,
@@ -67,13 +67,13 @@ like the following::
 Goals
 -----
 
-As a Django REST Framework JSON:API (short DJA) we are trying to address following goals:
+As a Django REST framework JSON:API (short DJA) we are trying to address following goals:
 
 1. Support the `JSON:API`_ spec to compliance
 
-2. Be as compatible with `Django REST Framework`_ as possible
+2. Be as compatible with `Django REST framework`_ as possible
 
-   e.g. issues in Django REST Framework should be fixed upstream and not worked around in DJA
+   e.g. issues in Django REST framework should be fixed upstream and not worked around in DJA
 
 3. Have sane defaults to be as easy to pick up as possible
 
@@ -82,7 +82,7 @@ As a Django REST Framework JSON:API (short DJA) we are trying to address followi
 5. Be performant
 
 .. _JSON:API: http://jsonapi.org
-.. _Django REST Framework: https://www.django-rest-framework.org/
+.. _Django REST framework: https://www.django-rest-framework.org/
 
 ------------
 Requirements
@@ -90,11 +90,11 @@ Requirements
 
 1. Python (3.6, 3.7, 3.8, 3.9)
 2. Django (2.2, 3.0, 3.1, 3.2)
-3. Django REST Framework (3.12)
+3. Django REST framework (3.12)
 
-We **highly** recommend and only officially support the latest patch release of each Python, Django and REST Framework series.
+We **highly** recommend and only officially support the latest patch release of each Python, Django and REST framework series.
 
-Generally Python and Django series are supported till the official end of life. For Django REST Framework the last two series are supported.
+Generally Python and Django series are supported till the official end of life. For Django REST framework the last two series are supported.
 
 ------------
 Installation
@@ -160,7 +160,7 @@ Usage
 
 
 ``rest_framework_json_api`` assumes you are using class-based views in Django
-Rest Framework.
+REST framework.
 
 
 Settings
