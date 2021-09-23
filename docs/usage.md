@@ -620,14 +620,14 @@ class LineItemViewSet(viewsets.ModelViewSet):
     serializer_class = LineItemSerializer
 
     def get_queryset(self):
-        queryset = super(LineItemViewSet, self).get_queryset()
+        queryset = super().get_queryset()
 
         # if this viewset is accessed via the 'order-lineitems-list' route,
         # it wll have been passed the `order_pk` kwarg and the queryset
         # needs to be filtered accordingly; if it was accessed via the
         # unnested '/lineitems' route, the queryset should include all LineItems
-        if 'order_pk' in self.kwargs:
-            order_pk = self.kwargs['order_pk']
+        order_pk = self.kwargs.get('order_pk')
+        if order_pk is not None:
             queryset = queryset.filter(order__pk=order_pk)
 
         return queryset

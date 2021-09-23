@@ -243,11 +243,13 @@ class CommentViewSet(ModelViewSet):
     }
 
     def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()
+
         entry_pk = self.kwargs.get("entry_pk", None)
         if entry_pk is not None:
-            return self.queryset.filter(entry_id=entry_pk)
+            queryset = queryset.filter(entry_id=entry_pk)
 
-        return super(CommentViewSet, self).get_queryset()
+        return queryset
 
 
 class CompanyViewset(ModelViewSet):
