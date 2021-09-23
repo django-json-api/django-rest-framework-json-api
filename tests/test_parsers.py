@@ -15,8 +15,8 @@ class TestJSONParser:
         return JSONParser()
 
     @pytest.fixture
-    def parse(self, parser, parser_context):
-        def parse_wrapper(data):
+    def parse(self, parser):
+        def parse_wrapper(data, parser_context):
             stream = BytesIO(json.dumps(data).encode("utf-8"))
             return parser.parse(stream, None, parser_context)
 
@@ -41,6 +41,7 @@ class TestJSONParser:
         settings,
         format_field_names,
         parse,
+        parser_context,
     ):
         settings.JSON_API_FORMAT_FIELD_NAMES = format_field_names
 
@@ -59,14 +60,14 @@ class TestJSONParser:
             }
         }
 
-        result = parse(data)
+        result = parse(data, parser_context)
         assert result == {
             "id": "123",
             "test_attribute": "test-value",
             "test_relationship": {"id": "123", "type": "TestRelationship"},
         }
 
-    def test_parse_extracts_meta(self, parse):
+    def test_parse_extracts_meta(self, parse, parser_context):
         data = {
             "data": {
                 "type": "BasicModel",
@@ -74,10 +75,21 @@ class TestJSONParser:
             "meta": {"random_key": "random_value"},
         }
 
-        result = parse(data)
+        result = parse(data, parser_context)
         assert result["_meta"] == data["meta"]
 
-    def test_parse_preserves_json_value_field_names(self, settings, parse):
+    def test_parse_with_default_arguments(self, parse):
+        data = {
+            "data": {
+                "type": "BasicModel",
+            },
+        }
+        result = parse(data, None)
+        assert result == {}
+
+    def test_parse_preserves_json_value_field_names(
+        self, settings, parse, parser_context
+    ):
         settings.JSON_API_FORMAT_FIELD_NAMES = "dasherize"
 
         data = {
@@ -87,17 +99,17 @@ class TestJSONParser:
             },
         }
 
-        result = parse(data)
+        result = parse(data, parser_context)
         assert result["json_value"] == {"JsonKey": "JsonValue"}
 
-    def test_parse_raises_error_on_empty_data(self, parse):
+    def test_parse_raises_error_on_empty_data(self, parse, parser_context):
         data = []
 
         with pytest.raises(ParseError) as excinfo:
-            parse(data)
+            parse(data, parser_context)
         assert "Received document does not contain primary data" == str(excinfo.value)
 
-    def test_parse_fails_on_list_of_objects(self, parse):
+    def test_parse_fails_on_list_of_objects(self, parse, parser_context):
         data = {
             "data": [
                 {
@@ -108,7 +120,7 @@ class TestJSONParser:
         }
 
         with pytest.raises(ParseError) as excinfo:
-            parse(data)
+            parse(data, parser_context)
 
         assert (
             "Received data is not a valid JSON:API Resource Identifier Object"
@@ -124,7 +136,7 @@ class TestJSONParser:
         }
 
         with pytest.raises(ParseError) as excinfo:
-            parse(data)
+            parse(data, parser_context)
 
         assert "The resource identifier object must contain an 'id' member" == str(
             excinfo.value
