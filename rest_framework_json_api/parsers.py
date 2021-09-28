@@ -82,7 +82,8 @@ class JSONParser(parsers.JSONParser):
             raise ParseError("Received document does not contain primary data")
 
         data = result.get("data")
-        view = parser_context["view"]
+        parser_context = parser_context or {}
+        view = parser_context.get("view")
 
         from rest_framework_json_api.views import RelationshipView
 
@@ -107,6 +108,7 @@ class JSONParser(parsers.JSONParser):
             return data
 
         request = parser_context.get("request")
+        method = request and request.method
 
         # Sanity check
         if not isinstance(data, dict):
@@ -115,7 +117,7 @@ class JSONParser(parsers.JSONParser):
             )
 
         # Check for inconsistencies
-        if request.method in ("PUT", "POST", "PATCH"):
+        if method in ("PUT", "POST", "PATCH"):
             resource_name = get_resource_name(
                 parser_context, expand_polymorphic_types=True
             )
@@ -138,12 +140,12 @@ class JSONParser(parsers.JSONParser):
                             resource_types=", ".join(resource_name),
                         )
                     )
-        if not data.get("id") and request.method in ("PATCH", "PUT"):
+        if not data.get("id") and method in ("PATCH", "PUT"):
             raise ParseError(
                 "The resource identifier object must contain an 'id' member"
             )
 
-        if request.method in ("PATCH", "PUT"):
+        if method in ("PATCH", "PUT"):
             lookup_url_kwarg = getattr(view, "lookup_url_kwarg", None) or getattr(
                 view, "lookup_field", None
             )

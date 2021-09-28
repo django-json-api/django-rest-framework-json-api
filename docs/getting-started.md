@@ -1,11 +1,11 @@
 
 # Getting Started
 
-*Note: this package is named Django REST Framework JSON:API to follow the naming
-convention of other Django REST Framework packages. Since that's quite a bit
+*Note: this package is named Django REST framework JSON:API to follow the naming
+convention of other Django REST framework packages. Since that's quite a bit
 to say or type this package will be referred to as DJA elsewhere in these docs.*
 
-By default, Django REST Framework produces a response like:
+By default, Django REST framework produces a response like:
 ``` js
 {
     "count": 20,
@@ -53,11 +53,11 @@ like the following:
 
 1. Python (3.6, 3.7, 3.8, 3.9)
 2. Django (2.2, 3.0, 3.1, 3.2)
-3. Django REST Framework (3.12)
+3. Django REST framework (3.12)
 
-We **highly** recommend and only officially support the latest patch release of each Python, Django and REST Framework series.
+We **highly** recommend and only officially support the latest patch release of each Python, Django and REST framework series.
 
-Generally Python and Django series are supported till the official end of life. For Django REST Framework the last two series are supported.
+Generally Python and Django series are supported till the official end of life. For Django REST framework the last two series are supported.
 
 ## Installation
 
