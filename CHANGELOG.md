@@ -12,8 +12,9 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Adjusted error messages to correctly use capitial "JSON:API" abbreviation as used in the specification.
+* Adjusted error messages to correctly use capital "JSON:API" abbreviation as used in the specification.
 * Avoid error when `parser_context` is `None` while parsing.
+* Raise comprehensible error when reserved field names `meta` and `results` are used.
 
 ### Changed
 

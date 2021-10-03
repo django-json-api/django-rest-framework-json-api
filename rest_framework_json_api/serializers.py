@@ -184,6 +184,25 @@ class LazySerializersDict(Mapping):
 
 
 class SerializerMetaclass(SerializerMetaclass):
+
+    _reserved_field_names = {"meta", "results"}
+
+    @classmethod
+    def _get_declared_fields(cls, bases, attrs):
+        fields = super()._get_declared_fields(bases, attrs)
+
+        found_reserved_field_names = cls._reserved_field_names.intersection(
+            fields.keys()
+        )
+        if found_reserved_field_names:
+            raise AttributeError(
+                f"Serializer class {attrs['__module__']}.{attrs['__qualname__']} uses "
+                f"following reserved field name(s) which is not allowed: "
+                f"{', '.join(sorted(found_reserved_field_names))}"
+            )
+
+        return fields
+
     def __new__(cls, name, bases, attrs):
         serializer = super().__new__(cls, name, bases, attrs)
 
