@@ -21,15 +21,15 @@ Overview
 **JSON:API support for Django REST framework**
 
 * Documentation: https://django-rest-framework-json-api.readthedocs.org/
-* Format specification: http://jsonapi.org/format/
+* Format specification: https://jsonapi.org/format/
 
 
 By default, Django REST framework will produce a response like::
 
     {
         "count": 20,
-        "next": "http://example.com/api/1.0/identities/?page=3",
-        "previous": "http://example.com/api/1.0/identities/?page=1",
+        "next": "https://example.com/api/1.0/identities/?page=3",
+        "previous": "https://example.com/api/1.0/identities/?page=1",
         "results": [{
             "id": 3,
             "username": "john",
@@ -43,9 +43,9 @@ like the following::
 
     {
         "links": {
-            "prev": "http://example.com/api/1.0/identities",
-            "self": "http://example.com/api/1.0/identities?page=2",
-            "next": "http://example.com/api/1.0/identities?page=3",
+            "prev": "https://example.com/api/1.0/identities",
+            "self": "https://example.com/api/1.0/identities?page=2",
+            "next": "https://example.com/api/1.0/identities?page=3",
         },
         "data": [{
             "type": "identities",
@@ -81,7 +81,7 @@ As a Django REST framework JSON:API (short DJA) we are trying to address followi
 
 5. Be performant
 
-.. _JSON:API: http://jsonapi.org
+.. _JSON:API: https://jsonapi.org
 .. _Django REST framework: https://www.django-rest-framework.org/
 
 ------------
@@ -149,9 +149,9 @@ installed and activated:
 
 Browse to
 
-* http://localhost:8000 for the list of available collections (in a non-JSON:API format!),
-* http://localhost:8000/swagger-ui/ for a Swagger user interface to the dynamic schema view, or
-* http://localhost:8000/openapi for the schema view's OpenAPI specification document.
+* https://localhost:8000 for the list of available collections (in a non-JSON:API format!),
+* https://localhost:8000/swagger-ui/ for a Swagger user interface to the dynamic schema view, or
+* https://localhost:8000/openapi for the schema view's OpenAPI specification document.
 
 
 -----
@@ -202,4 +202,4 @@ override ``settings.REST_FRAMEWORK``
 
 This package provides much more including automatic inflection of JSON keys, extra top level data (using nested
 serializers), relationships, links, paginators, filters, and handy shortcuts.
-Read more at http://django-rest-framework-json-api.readthedocs.org/
+Read more at https://django-rest-framework-json-api.readthedocs.org/

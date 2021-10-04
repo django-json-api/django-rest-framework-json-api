@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Note that in line with [Django REST framework policy](http://www.django-rest-framework.org/topics/release-notes/),
+Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
 ## [Unreleased]
@@ -240,7 +240,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
-* Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
+* Add optional [jsonapi-style](https://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
 
 ### Deprecated
 
@@ -268,7 +268,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add `ReadOnlyModelViewSet` extension with prefetch mixins
 * Add support for Django REST framework 3.8.x
 * Introduce `JSON_API_FORMAT_FIELD_NAMES` option replacing `JSON_API_FORMAT_KEYS` but in comparison preserving
-  values from being formatted as attributes can contain any [json value](http://jsonapi.org/format/#document-resource-object-attributes).
+  values from being formatted as attributes can contain any [json value](https://jsonapi.org/format/#document-resource-object-attributes).
 * Allow overwriting of `get_queryset()` in custom `ResourceRelatedField`
 
 ### Deprecated
