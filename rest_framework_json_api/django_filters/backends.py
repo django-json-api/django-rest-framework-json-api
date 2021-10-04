@@ -15,7 +15,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
     to use the `filter` keyword: This is an optional implementation of style of
     filtering in which each filter is an ORM expression as implemented by
     DjangoFilterBackend and seems to be in alignment with an interpretation of
-    http://jsonapi.org/recommendations/#filtering, including relationship
+    https://jsonapi.org/recommendations/#filtering, including relationship
     chaining. It also returns a 400 error for invalid filters.
 
     Filters can be:
@@ -58,8 +58,8 @@ class DjangoFilterBackend(DjangoFilterBackend):
     search_param = api_settings.SEARCH_PARAM
 
     # Make this regex check for 'filter' as well as 'filter[...]'
-    # See http://jsonapi.org/format/#document-member-names for allowed characters
-    # and http://jsonapi.org/format/#document-member-names-reserved-characters for reserved
+    # See https://jsonapi.org/format/#document-member-names for allowed characters
+    # and https://jsonapi.org/format/#document-member-names-reserved-characters for reserved
     # characters (for use in paths, lists or as delimiters).
     # regex `\w` matches [a-zA-Z0-9_].
     # TODO: U+0080 and above allowed but not recommended. Leave them out for now.e
