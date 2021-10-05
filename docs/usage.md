@@ -183,7 +183,7 @@ Filters can be:
     `?filter[inventory.item.partNum]=123456` (where `inventory.item` is the relationship path)
 
 The filter returns a `400 Bad Request` error for invalid filter query parameters as in this example
-for `GET https://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
+for `GET http://127.0.0.1:8000/nopage-entries?filter[bad]=1`:
 ```json
 {
     "errors": [
