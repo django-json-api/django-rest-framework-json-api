@@ -9,8 +9,8 @@ By default, Django REST framework produces a response like:
 ``` js
 {
     "count": 20,
-    "next": "http://example.com/api/1.0/identities/?page=3",
-    "previous": "http://example.com/api/1.0/identities/?page=1",
+    "next": "https://example.com/api/1.0/identities/?page=3",
+    "previous": "https://example.com/api/1.0/identities/?page=1",
     "results": [{
         "id": 3,
         "username": "john",
@@ -25,10 +25,10 @@ like the following:
 ``` js
 {
     "links": {
-        "first": "http://example.com/api/1.0/identities",
-        "last": "http://example.com/api/1.0/identities?page=5",
-        "next": "http://example.com/api/1.0/identities?page=3",
-        "prev": "http://example.com/api/1.0/identities",
+        "first": "https://example.com/api/1.0/identities",
+        "last": "https://example.com/api/1.0/identities?page=5",
+        "next": "https://example.com/api/1.0/identities?page=3",
+        "prev": "https://example.com/api/1.0/identities",
     },
     "data": [{
         "type": "identities",
