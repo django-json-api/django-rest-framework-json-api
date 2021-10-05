@@ -14,6 +14,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Adjusted error messages to correctly use capitial "JSON:API" abbreviation as used in the specification.
 * Avoid error when `parser_context` is `None` while parsing.
+* Perform inflection for `included_resources` in `AutoPrefetchMixin` ([#871](https://github.com/django-json-api/django-rest-framework-json-api/issues/871))
 
 ### Changed
 
