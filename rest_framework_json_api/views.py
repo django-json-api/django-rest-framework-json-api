@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 
+import inflection
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Model
 from django.db.models.fields.related_descriptors import (
@@ -86,6 +87,9 @@ class AutoPrefetchMixin:
         included_resources = get_included_resources(
             self.request, self.get_serializer_class()
         )
+        included_resources = [
+            inflection.underscore(value) for value in included_resources
+        ]
 
         for included in included_resources + ["__all__"]:
             # If include was not defined, trying to resolve it automatically
