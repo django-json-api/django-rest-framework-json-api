@@ -1058,11 +1058,11 @@ class MySchemaGenerator(JSONAPISchemaGenerator):
             }
         }
         schema['servers'] = [
-            {'url': 'https://localhost/v1', 'description': 'local docker'},
-            {'url': 'https://localhost:8000/v1', 'description': 'local dev'},
+            {'url': 'http://localhost/v1', 'description': 'local docker'},
+            {'url': 'http://localhost:8000/v1', 'description': 'local dev'},
             {'url': 'https://api.example.com/v1', 'description': 'demo server'},
             {'url': '{serverURL}', 'description': 'provide your server URL',
-             'variables': {'serverURL': {'default': 'https://localhost:8000/v1'}}}
+             'variables': {'serverURL': {'default': 'http://localhost:8000/v1'}}}
         ]
         return schema
 ```

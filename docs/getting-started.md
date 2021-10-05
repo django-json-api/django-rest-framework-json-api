@@ -97,9 +97,9 @@ and add `rest_framework_json_api` to your `INSTALLED_APPS` setting below `rest_f
 
 
 Browse to
-* [https://localhost:8000](https://localhost:8000) for the list of available collections (in a non-JSON:API format!),
-* [https://localhost:8000/swagger-ui/](https://localhost:8000/swagger-ui/) for a Swagger user interface to the dynamic schema view, or
-* [https://localhost:8000/openapi](https://localhost:8000/openapi) for the schema view's OpenAPI specification document.
+* [http://localhost:8000](http://localhost:8000) for the list of available collections (in a non-JSON:API format!),
+* [http://localhost:8000/swagger-ui/](http://localhost:8000/swagger-ui/) for a Swagger user interface to the dynamic schema view, or
+* [http://localhost:8000/openapi](http://localhost:8000/openapi) for the schema view's OpenAPI specification document.
 
 ## Running Tests
 
