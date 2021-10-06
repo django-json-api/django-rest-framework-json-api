@@ -3,7 +3,7 @@
 The DJA package implements a custom renderer, parser, exception handler, query filter backends, and
 pagination. To get started enable the pieces in `settings.py` that you want to use.
 
-Many features of the [JSON:API](http://jsonapi.org/format) format standard have been implemented using
+Many features of the [JSON:API](https://jsonapi.org/format) format standard have been implemented using
 Mixin classes in `serializers.py`.
 The easiest way to make use of those features is to import ModelSerializer variants
 from `rest_framework_json_api` instead of the usual `rest_framework`
@@ -116,7 +116,7 @@ is used. This can help the client identify misspelled query parameters, for exam
 
 If you want to change the list of valid query parameters, override the `.query_regex` attribute:
 ```python
-# compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters
+# compiled regex that matches the allowed https://jsonapi.org/format/#query-parameters
 # `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
 query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
 ```
@@ -134,7 +134,7 @@ simply don't use this filter backend.
 
 #### OrderingFilter
 
-`OrderingFilter` implements the [JSON:API `sort`](http://jsonapi.org/format/#fetching-sorting) and uses
+`OrderingFilter` implements the [JSON:API `sort`](https://jsonapi.org/format/#fetching-sorting) and uses
 DRF's [ordering filter](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter).
 
 Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
@@ -159,14 +159,14 @@ If you want to silently ignore bad sort fields, just use `rest_framework.filters
 
 #### DjangoFilterBackend
 
-`DjangoFilterBackend` implements a Django ORM-style [JSON:API `filter`](http://jsonapi.org/format/#fetching-filtering)
+`DjangoFilterBackend` implements a Django ORM-style [JSON:API `filter`](https://jsonapi.org/format/#fetching-filtering)
 using the [django-filter](https://django-filter.readthedocs.io/) package.
 
 This filter is not part of the JSON:API standard per-se, other than the requirement
 to use the `filter` keyword: It is an optional implementation of a style of
 filtering in which each filter is an ORM expression as implemented by
 `DjangoFilterBackend` and seems to be in alignment with an interpretation of the
-[JSON:API _recommendations_](http://jsonapi.org/recommendations/#filtering), including relationship
+[JSON:API _recommendations_](https://jsonapi.org/recommendations/#filtering), including relationship
 chaining.
 
 Filters can be:
@@ -240,7 +240,7 @@ class MyViewset(ModelViewSet):
 ### Exception handling
 
 For the `exception_handler` class, if the optional `JSON_API_UNIFORM_EXCEPTIONS` is set to True,
-all exceptions will respond with the JSON:API [error format](http://jsonapi.org/format/#error-objects).
+all exceptions will respond with the JSON:API [error format](https://jsonapi.org/format/#error-objects).
 
 When `JSON_API_UNIFORM_EXCEPTIONS` is False (the default), non-JSON:API views will respond
 with the normal DRF error format.
@@ -312,7 +312,7 @@ multiple endpoints. Setting the `resource_name` on views may result in a differe
 
 ### Inflecting object and relation keys
 
-This package includes the ability (off by default) to automatically convert [JSON:API field names](http://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
+This package includes the ability (off by default) to automatically convert [JSON:API field names](https://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
 a format of your choice. To hook this up include the following setting in your
 project settings:
 
@@ -551,7 +551,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 ```
 
-In the [JSON:API spec](http://jsonapi.org/format/#document-resource-objects),
+In the [JSON:API spec](https://jsonapi.org/format/#document-resource-objects),
 relationship objects contain links to related objects. To make this work
 on a serializer we need to tell the `ResourceRelatedField` about the
 corresponding view. Use the `HyperlinkedModelSerializer` and instantiate
@@ -755,12 +755,12 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
 ### RelationshipView
 `rest_framework_json_api.views.RelationshipView` is used to build
 relationship views (see the
-[JSON:API spec](http://jsonapi.org/format/#fetching-relationships)).
+[JSON:API spec](https://jsonapi.org/format/#fetching-relationships)).
 The `self` link on a relationship object should point to the corresponding
 relationship view.
 
 The relationship view is fairly simple because it only serializes
-[Resource Identifier Objects](http://jsonapi.org/format/#document-resource-identifier-objects)
+[Resource Identifier Objects](https://jsonapi.org/format/#document-resource-identifier-objects)
 rather than full resource objects. In most cases the following is sufficient:
 
 ```python
@@ -896,7 +896,7 @@ Related links will be created automatically when using the Relationship View.
 
 JSON:API can include additional resources in a single network request.
 The specification refers to this feature as
-[Compound Documents](http://jsonapi.org/format/#document-compound-documents).
+[Compound Documents](https://jsonapi.org/format/#document-compound-documents).
 Compound Documents can reduce the number of network requests
 which can lead to a better performing web application.
 To accomplish this,
@@ -1058,7 +1058,7 @@ class MySchemaGenerator(JSONAPISchemaGenerator):
             }
         }
         schema['servers'] = [
-            {'url': 'https://localhost/v1', 'description': 'local docker'},
+            {'url': 'http://localhost/v1', 'description': 'local docker'},
             {'url': 'http://localhost:8000/v1', 'description': 'local dev'},
             {'url': 'https://api.example.com/v1', 'description': 'demo server'},
             {'url': '{serverURL}', 'description': 'provide your server URL',
