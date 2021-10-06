@@ -43,6 +43,8 @@ def test_reserved_field_names():
             meta = serializers.CharField()
             results = serializers.CharField()
 
+        ReservedFieldNamesSerializer().fields
+
     assert str(e.value) == (
         "Serializer class tests.test_serializers.test_reserved_field_names.<locals>."
         "ReservedFieldNamesSerializer uses following reserved field name(s) which is "

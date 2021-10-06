@@ -153,6 +153,27 @@ class IncludedResourcesValidationMixin:
         super().__init__(*args, **kwargs)
 
 
+class ReservedFieldNamesMixin:
+    """Ensures that reserved field names are not used and an error raised instead."""
+
+    _reserved_field_names = {"meta", "results"}
+
+    def get_fields(self):
+        fields = super().get_fields()
+
+        found_reserved_field_names = self._reserved_field_names.intersection(
+            fields.keys()
+        )
+        if found_reserved_field_names:
+            raise AttributeError(
+                f"Serializer class {self.__class__.__module__}.{self.__class__.__qualname__} "
+                f"uses following reserved field name(s) which is not allowed: "
+                f"{', '.join(sorted(found_reserved_field_names))}"
+            )
+
+        return fields
+
+
 class LazySerializersDict(Mapping):
     """
     A dictionary of serializers which lazily import dotted class path and self.
@@ -184,25 +205,6 @@ class LazySerializersDict(Mapping):
 
 
 class SerializerMetaclass(SerializerMetaclass):
-
-    _reserved_field_names = {"meta", "results"}
-
-    @classmethod
-    def _get_declared_fields(cls, bases, attrs):
-        fields = super()._get_declared_fields(bases, attrs)
-
-        found_reserved_field_names = cls._reserved_field_names.intersection(
-            fields.keys()
-        )
-        if found_reserved_field_names:
-            raise AttributeError(
-                f"Serializer class {attrs['__module__']}.{attrs['__qualname__']} uses "
-                f"following reserved field name(s) which is not allowed: "
-                f"{', '.join(sorted(found_reserved_field_names))}"
-            )
-
-        return fields
-
     def __new__(cls, name, bases, attrs):
         serializer = super().__new__(cls, name, bases, attrs)
 
@@ -228,6 +230,7 @@ class SerializerMetaclass(SerializerMetaclass):
 class Serializer(
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
+    ReservedFieldNamesMixin,
     Serializer,
     metaclass=SerializerMetaclass,
 ):
@@ -251,6 +254,7 @@ class Serializer(
 class HyperlinkedModelSerializer(
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
+    ReservedFieldNamesMixin,
     HyperlinkedModelSerializer,
     metaclass=SerializerMetaclass,
 ):
@@ -271,6 +275,7 @@ class HyperlinkedModelSerializer(
 class ModelSerializer(
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
+    ReservedFieldNamesMixin,
     ModelSerializer,
     metaclass=SerializerMetaclass,
 ):
