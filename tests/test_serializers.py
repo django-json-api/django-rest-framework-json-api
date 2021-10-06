@@ -1,3 +1,4 @@
+import pytest
 from django.db import models
 
 from rest_framework_json_api import serializers
@@ -33,3 +34,17 @@ def test_get_included_serializers():
     }
 
     assert included_serializers == expected_included_serializers
+
+
+def test_reserved_field_names():
+    with pytest.raises(AttributeError) as e:
+
+        class ReservedFieldNamesSerializer(serializers.Serializer):
+            meta = serializers.CharField()
+            results = serializers.CharField()
+
+    assert str(e.value) == (
+        "Serializer class tests.test_serializers.test_reserved_field_names.<locals>."
+        "ReservedFieldNamesSerializer uses following reserved field name(s) which is "
+        "not allowed: meta, results"
+    )
