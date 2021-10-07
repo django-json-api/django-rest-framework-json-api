@@ -13,7 +13,7 @@ from django.db.models.fields.related_descriptors import (
 from django.http import Http404
 from django.utils import encoding
 from django.utils.translation import gettext_lazy as _
-from rest_framework import exceptions
+from rest_framework import exceptions, relations
 from rest_framework.exceptions import APIException
 
 from .settings import json_api_settings
@@ -368,6 +368,10 @@ def get_relation_instance(resource_instance, source, serializer):
     return True, relation_instance
 
 
+def is_relationship_field(field):
+    return isinstance(field, (relations.RelatedField, relations.ManyRelatedField))
+
+
 class Hyperlink(str):
     """
     A string like object that additionally has an associated name.
@@ -394,9 +398,24 @@ def format_drf_errors(response, context, exc):
             errors.extend(format_error_object(message, "/data", response))
     # handle all errors thrown from serializers
     else:
+        # Avoid circular deps
+        from rest_framework import generics
+
+        has_serializer = isinstance(context["view"], generics.GenericAPIView)
+        if has_serializer:
+            serializer = context["view"].get_serializer()
+            fields = get_serializer_fields(serializer) or dict()
+            relationship_fields = [
+                name for name, field in fields.items() if is_relationship_field(field)
+            ]
+
         for field, error in response.data.items():
             field = format_field_name(field)
-            pointer = "/data/attributes/{}".format(field)
+            pointer = None
+            # pointer can be determined only if there's a serializer.
+            if has_serializer:
+                rel = "relationships" if field in relationship_fields else "attributes"
+                pointer = "/data/{}/{}".format(rel, field)
             if isinstance(exc, Http404) and isinstance(error, str):
                 # 404 errors don't have a pointer
                 errors.extend(format_error_object(error, None, response))
