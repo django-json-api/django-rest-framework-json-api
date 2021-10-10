@@ -223,17 +223,21 @@ def test_patch_allow_field_type(author, author_type_factory, client):
     """
     Verify that type field may be updated.
     """
-    author_type = author_type_factory()
-    url = reverse("author-detail", args=[author.id])
+    # TODO remove in next major version 5.0.0 see serializers.ReservedFieldNamesMixin
+    with pytest.deprecated_call():
+        author_type = author_type_factory()
+        url = reverse("author-detail", args=[author.id])
 
-    data = {
-        "data": {
-            "id": author.id,
-            "type": "authors",
-            "relationships": {"data": {"id": author_type.id, "type": "author-type"}},
+        data = {
+            "data": {
+                "id": author.id,
+                "type": "authors",
+                "relationships": {
+                    "data": {"id": author_type.id, "type": "author-type"}
+                },
+            }
         }
-    }
 
-    response = client.patch(url, data=data)
+        response = client.patch(url, data=data)
 
-    assert response.status_code == 200
+        assert response.status_code == 200
