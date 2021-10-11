@@ -24,6 +24,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Deprecated
 
 * Deprecated `get_included_serializers(serializer)` function under `rest_framework_json_api.utils`. Use `serializer.included_serializers` instead.
+* Deprecated support for field name `type` as it may not be used according to the [JSON:API spec](https://jsonapi.org/format/#document-resource-object-fields).
 
 ## [4.2.1] - 2021-07-06
 
