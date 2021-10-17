@@ -162,7 +162,7 @@ class JSONParser(parsers.JSONParser):
         # Construct the return data
         serializer_class = getattr(view, "serializer_class", None)
         parsed_data = {"id": data.get("id")} if "id" in data else {}
-        # `type` field needs to be allowed in none polymorphic serializers
+        # TODO remove in next major version 5.0.0 see serializers.ReservedFieldNamesMixin
         if serializer_class is not None:
             if issubclass(serializer_class, serializers.PolymorphicModelSerializer):
                 parsed_data["type"] = data.get("type")

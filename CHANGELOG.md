@@ -5,15 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Note that in line with [Django REST framework policy](http://www.django-rest-framework.org/topics/release-notes/),
+Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
 ## [Unreleased]
 
 ### Fixed
 
-* Adjusted error messages to correctly use capitial "JSON:API" abbreviation as used in the specification.
+* Adjusted error messages to correctly use capital "JSON:API" abbreviation as used in the specification.
 * Avoid error when `parser_context` is `None` while parsing.
+* Raise comprehensible error when reserved field names `meta` and `results` are used.
+* Use `relationships` in the error object `pointer` when the field is actually a relationship.
 
 ### Changed
 
@@ -22,6 +24,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Deprecated
 
 * Deprecated `get_included_serializers(serializer)` function under `rest_framework_json_api.utils`. Use `serializer.included_serializers` instead.
+* Deprecated support for field name `type` as it may not be used according to the [JSON:API spec](https://jsonapi.org/format/#document-resource-object-fields).
 
 ## [4.2.1] - 2021-07-06
 
@@ -240,7 +243,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
-* Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
+* Add optional [jsonapi-style](https://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
 
 ### Deprecated
 
@@ -268,7 +271,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add `ReadOnlyModelViewSet` extension with prefetch mixins
 * Add support for Django REST framework 3.8.x
 * Introduce `JSON_API_FORMAT_FIELD_NAMES` option replacing `JSON_API_FORMAT_KEYS` but in comparison preserving
-  values from being formatted as attributes can contain any [json value](http://jsonapi.org/format/#document-resource-object-attributes).
+  values from being formatted as attributes can contain any [json value](https://jsonapi.org/format/#document-resource-object-attributes).
 * Allow overwriting of `get_queryset()` in custom `ResourceRelatedField`
 
 ### Deprecated

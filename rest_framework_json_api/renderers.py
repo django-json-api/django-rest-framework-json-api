@@ -65,7 +65,7 @@ class JSONRenderer(renderers.JSONRenderer):
             if fields[field_name].write_only:
                 continue
             # Skip fields with relations
-            if isinstance(field, (relations.RelatedField, relations.ManyRelatedField)):
+            if utils.is_relationship_field(field):
                 continue
 
             # Skip read_only attribute fields when `resource` is an empty
@@ -105,9 +105,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             # Skip fields without relations
-            if not isinstance(
-                field, (relations.RelatedField, relations.ManyRelatedField)
-            ):
+            if not utils.is_relationship_field(field):
                 continue
 
             source = field.source
@@ -298,9 +296,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             # Skip fields without relations
-            if not isinstance(
-                field, (relations.RelatedField, relations.ManyRelatedField)
-            ):
+            if not utils.is_relationship_field(field):
                 continue
 
             try:

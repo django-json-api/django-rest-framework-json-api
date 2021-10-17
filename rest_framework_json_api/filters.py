@@ -8,7 +8,7 @@ from rest_framework_json_api.utils import undo_format_field_name
 
 class OrderingFilter(OrderingFilter):
     """
-    A backend filter that implements http://jsonapi.org/format/#fetching-sorting and
+    A backend filter that implements https://jsonapi.org/format/#fetching-sorting and
     raises a 400 error if any sort field is invalid.
 
     If you prefer *not* to report 400 errors for invalid sort fields, just use
@@ -72,10 +72,10 @@ class QueryParameterValidationFilter(BaseFilterBackend):
 
     If you want to add some additional non-standard query parameters,
     override :py:attr:`query_regex` adding the new parameters. Make sure to comply with
-    the rules at http://jsonapi.org/format/#query-parameters.
+    the rules at https://jsonapi.org/format/#query-parameters.
     """
 
-    #: compiled regex that matches the allowed http://jsonapi.org/format/#query-parameters:
+    #: compiled regex that matches the allowed https://jsonapi.org/format/#query-parameters:
     #: `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
     query_regex = re.compile(
         r"^(sort|include)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$"
