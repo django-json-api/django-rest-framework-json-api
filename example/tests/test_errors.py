@@ -1,11 +1,11 @@
 import pytest
 from django.test import override_settings
 from django.urls import path, reverse
-from rest_framework import views
+from rest_framework import generics
 
 from rest_framework_json_api import serializers
 
-from example.models import Blog
+from example.models import Author, Blog
 
 
 # serializers
@@ -30,6 +30,9 @@ class EntrySerializer(serializers.Serializer):
     comment = CommentSerializer(required=False)
     headline = serializers.CharField(allow_null=True, required=True)
     body_text = serializers.CharField()
+    author = serializers.ResourceRelatedField(
+        queryset=Author.objects.all(), required=False
+    )
 
     def validate(self, attrs):
         body_text = attrs["body_text"]
@@ -40,13 +43,12 @@ class EntrySerializer(serializers.Serializer):
 
 
 # view
-class DummyTestView(views.APIView):
+class DummyTestView(generics.CreateAPIView):
     serializer_class = EntrySerializer
     resource_name = "entries"
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def get_serializer_context(self):
+        return {}
 
 
 urlpatterns = [
@@ -186,6 +188,24 @@ def test_many_third_level_dict_errors(client, some_blog, snapshot):
                 "bodyText": "body_text",
                 "headline": "headline",
                 "comments": [{"attachment": {}}],
+            },
+        }
+    }
+
+    snapshot.assert_match(perform_error_test(client, data))
+
+
+def test_relationship_errors_has_correct_pointers(client, some_blog, snapshot):
+    data = {
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+            },
+            "relationships": {
+                "author": {"data": {"id": "INVALID_ID", "type": "authors"}}
             },
         }
     }

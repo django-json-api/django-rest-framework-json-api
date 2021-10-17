@@ -5,14 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Note that in line with [Django REST Framework policy](http://www.django-rest-framework.org/topics/release-notes/),
+Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
 ## [Unreleased]
 
 ### Fixed
 
-* Adjusted error messages to correctly use capitial "JSON:API" abbreviation as used in the specification.
+* Adjusted error messages to correctly use capital "JSON:API" abbreviation as used in the specification.
+* Avoid error when `parser_context` is `None` while parsing.
+* Raise comprehensible error when reserved field names `meta` and `results` are used.
+* Use `relationships` in the error object `pointer` when the field is actually a relationship.
 
 ### Changed
 
@@ -21,6 +24,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Deprecated
 
 * Deprecated `get_included_serializers(serializer)` function under `rest_framework_json_api.utils`. Use `serializer.included_serializers` instead.
+* Deprecated support for field name `type` as it may not be used according to the [JSON:API spec](https://jsonapi.org/format/#document-resource-object-fields).
 
 ## [4.2.1] - 2021-07-06
 
@@ -103,7 +107,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ## [3.2.0] - 2020-08-26
 
-This is the last release supporting Django 1.11, Django 2.1, Django REST Framework 3.10, Django REST Framework 3.11 and Python 3.5.
+This is the last release supporting Django 1.11, Django 2.1, Django REST framework 3.10, Django REST framework 3.11 and Python 3.5.
 
 ### Added
 
@@ -171,7 +175,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 * Removed support for Python 2.7 and 3.4.
 * Removed support for Django Filter 1.1.
 * Removed obsolete dependency six.
-* Removed support for Django REST Framework <=3.9.
+* Removed support for Django REST framework <=3.9.
 * Removed support for Django 2.0.
 * Removed obsolete mixins `MultipleIDMixin` and `PrefetchForIncludesHelperMixin`
 * Removed obsolete settings `JSON_API_FORMAT_KEYS`, `JSON_API_FORMAT_RELATION_KEYS` and
@@ -188,7 +192,7 @@ This release is not backwards compatible. For easy migration best upgrade first 
 
 ## [2.8.0] - 2019-06-13
 
-This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST Framework <=3.9 and Django 2.0.
+This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, Django REST framework <=3.9 and Django 2.0.
 
 ### Added
 
@@ -239,7 +243,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add testing configuration to `REST_FRAMEWORK` configuration as described in [DRF](https://www.django-rest-framework.org/api-guide/testing/#configuration)
 * Add `HyperlinkedRelatedField` and `SerializerMethodHyperlinkedRelatedField`. See [usage docs](docs/usage.md#related-fields)
 * Add related urls support. See [usage docs](docs/usage.md#related-urls)
-* Add optional [jsonapi-style](http://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
+* Add optional [jsonapi-style](https://jsonapi.org/format/) filter backends. See [usage docs](docs/usage.md#filter-backends)
 
 ### Deprecated
 
@@ -265,9 +269,9 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 * Add new pagination classes based on JSON:API query parameter *recommendations*:
   * `JsonApiPageNumberPagination` and `JsonApiLimitOffsetPagination`. See [usage docs](docs/usage.md#pagination).
 * Add `ReadOnlyModelViewSet` extension with prefetch mixins
-* Add support for Django REST Framework 3.8.x
+* Add support for Django REST framework 3.8.x
 * Introduce `JSON_API_FORMAT_FIELD_NAMES` option replacing `JSON_API_FORMAT_KEYS` but in comparison preserving
-  values from being formatted as attributes can contain any [json value](http://jsonapi.org/format/#document-resource-object-attributes).
+  values from being formatted as attributes can contain any [json value](https://jsonapi.org/format/#document-resource-object-attributes).
 * Allow overwriting of `get_queryset()` in custom `ResourceRelatedField`
 
 ### Deprecated
@@ -293,13 +297,13 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 
 ### Added
 
-* Add support for Django REST Framework 3.7.x.
+* Add support for Django REST framework 3.7.x.
 * Add support for Django 2.0.
 
 ### Removed
 
 * Drop support for Django 1.8 - 1.10 (EOL)
-* Drop support for Django REST Framework < 3.6.3
+* Drop support for Django REST framework < 3.6.3
   (3.6.3 is the first to support Django 1.11)
 * Drop support for Python 3.3 (EOL)
 
@@ -326,7 +330,7 @@ This is the last release supporting Python 2.7, Python 3.4, Django Filter 1.1, D
 
 ### Added
 
-* Add support for Django REST Framework 3.5 and 3.6
+* Add support for Django REST framework 3.5 and 3.6
 * Add support for Django 1.11
 * Add support for Python 3.6
 

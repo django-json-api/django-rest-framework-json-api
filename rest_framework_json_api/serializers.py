@@ -1,3 +1,4 @@
+import warnings
 from collections import OrderedDict
 from collections.abc import Mapping
 
@@ -153,6 +154,39 @@ class IncludedResourcesValidationMixin:
         super().__init__(*args, **kwargs)
 
 
+class ReservedFieldNamesMixin:
+    """Ensures that reserved field names are not used and an error raised instead."""
+
+    _reserved_field_names = {"meta", "results"}
+
+    def get_fields(self):
+        fields = super().get_fields()
+
+        found_reserved_field_names = self._reserved_field_names.intersection(
+            fields.keys()
+        )
+        if found_reserved_field_names:
+            raise AttributeError(
+                f"Serializer class {self.__class__.__module__}.{self.__class__.__qualname__} "
+                f"uses following reserved field name(s) which is not allowed: "
+                f"{', '.join(sorted(found_reserved_field_names))}"
+            )
+
+        if "type" in fields:
+            # see https://jsonapi.org/format/#document-resource-object-fields
+            warnings.warn(
+                DeprecationWarning(
+                    f"Field name 'type'  found in serializer class "
+                    f"{self.__class__.__module__}.{self.__class__.__qualname__} "
+                    f"which is not allowed according to the JSON:API spec and "
+                    f"won't be supported anymore in the next major DJA release. "
+                    f"Rename 'type' field to something else. "
+                )
+            )
+
+        return fields
+
+
 class LazySerializersDict(Mapping):
     """
     A dictionary of serializers which lazily import dotted class path and self.
@@ -209,6 +243,7 @@ class SerializerMetaclass(SerializerMetaclass):
 class Serializer(
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
+    ReservedFieldNamesMixin,
     Serializer,
     metaclass=SerializerMetaclass,
 ):
@@ -232,6 +267,7 @@ class Serializer(
 class HyperlinkedModelSerializer(
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
+    ReservedFieldNamesMixin,
     HyperlinkedModelSerializer,
     metaclass=SerializerMetaclass,
 ):
@@ -252,6 +288,7 @@ class HyperlinkedModelSerializer(
 class ModelSerializer(
     IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
+    ReservedFieldNamesMixin,
     ModelSerializer,
     metaclass=SerializerMetaclass,
 ):
