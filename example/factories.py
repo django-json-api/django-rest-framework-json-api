@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 import factory
 from faker import Factory as FakerFactory
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 
 #
 # Django REST framework JSON:API documentation build configuration file, created by
 # sphinx-quickstart on Fri Jul 24 23:31:15 2015.
