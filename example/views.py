@@ -57,7 +57,7 @@ class BlogViewSet(ModelViewSet):
         if entry_pk is not None:
             return Entry.objects.get(id=entry_pk).blog
 
-        return super(BlogViewSet, self).get_object()
+        return super().get_object()
 
 
 class DRFBlogViewSet(ModelViewSet):
@@ -70,7 +70,7 @@ class DRFBlogViewSet(ModelViewSet):
         if entry_pk is not None:
             return Entry.objects.get(id=entry_pk).blog
 
-        return super(DRFBlogViewSet, self).get_object()
+        return super().get_object()
 
 
 class JsonApiViewSet(ModelViewSet):
@@ -98,7 +98,7 @@ class JsonApiViewSet(ModelViewSet):
             exc.status_code = HTTP_422_UNPROCESSABLE_ENTITY
         # exception handler can't be set on class so you have to
         # override the error response in this method
-        response = super(JsonApiViewSet, self).handle_exception(exc)
+        response = super().handle_exception(exc)
         context = self.get_exception_handler_context()
         return format_drf_errors(response, context, exc)
 
@@ -121,7 +121,7 @@ class EntryViewSet(ModelViewSet):
         if entry_pk is not None:
             return Entry.objects.exclude(pk=entry_pk).first()
 
-        return super(EntryViewSet, self).get_object()
+        return super().get_object()
 
 
 class DRFEntryViewSet(ModelViewSet):
@@ -135,7 +135,7 @@ class DRFEntryViewSet(ModelViewSet):
         if entry_pk is not None:
             return Entry.objects.exclude(pk=entry_pk).first()
 
-        return super(DRFEntryViewSet, self).get_object()
+        return super().get_object()
 
 
 class NoPagination(JsonApiPageNumberPagination):
@@ -247,7 +247,7 @@ class CommentViewSet(ModelViewSet):
         if entry_pk is not None:
             return self.queryset.filter(entry_id=entry_pk)
 
-        return super(CommentViewSet, self).get_queryset()
+        return super().get_queryset()
 
 
 class CompanyViewset(ModelViewSet):

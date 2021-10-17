@@ -83,7 +83,7 @@ class BlogDRFSerializer(drf_serilazers.ModelSerializer):
 
 class EntrySerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
-        super(EntrySerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # to make testing more concise we'll only output the
         # `featured` field when it's requested via `include`
         request = kwargs.get("context", {}).get("request")
@@ -379,7 +379,7 @@ class ProjectSerializer(serializers.PolymorphicModelSerializer):
 
 class CurrentProjectRelatedField(relations.PolymorphicResourceRelatedField):
     def get_attribute(self, instance):
-        obj = super(CurrentProjectRelatedField, self).get_attribute(instance)
+        obj = super().get_attribute(instance)
 
         is_art = self.field_name == "current_art_project" and isinstance(
             obj, ArtProject

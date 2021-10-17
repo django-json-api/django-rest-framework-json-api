@@ -19,7 +19,7 @@ class ModelViewSetTests(TestBase):
     list_url = reverse("user-list")
 
     def setUp(self):
-        super(ModelViewSetTests, self).setUp()
+        super().setUp()
         self.detail_url = reverse("user-detail", kwargs={"pk": self.miles.pk})
 
     def test_key_in_list_result(self):

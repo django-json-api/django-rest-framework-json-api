@@ -620,7 +620,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
     serializer_class = LineItemSerializer
 
     def get_queryset(self):
-        queryset = super(LineItemViewSet, self).get_queryset()
+        queryset = super().get_queryset()
 
         # if this viewset is accessed via the 'order-lineitems-list' route,
         # it wll have been passed the `order_pk` kwarg and the queryset

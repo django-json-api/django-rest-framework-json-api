@@ -9,7 +9,7 @@ class GenericValidationTest(TestBase):
     """
 
     def setUp(self):
-        super(GenericValidationTest, self).setUp()
+        super().setUp()
         self.url = reverse("user-validation", kwargs={"pk": self.miles.pk})
 
     def test_generic_validation_error(self):
