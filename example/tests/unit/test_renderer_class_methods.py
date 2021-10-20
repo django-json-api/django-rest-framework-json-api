@@ -70,14 +70,12 @@ def test_can_override_methods():
         @classmethod
         def extract_attributes(cls, fields, resource):
             cls.extract_attributes_was_overriden = True
-            return super(CustomRenderer, cls).extract_attributes(fields, resource)
+            return super().extract_attributes(fields, resource)
 
         @classmethod
         def extract_relationships(cls, fields, resource, resource_instance):
             cls.extract_relationships_was_overriden = True
-            return super(CustomRenderer, cls).extract_relationships(
-                fields, resource, resource_instance
-            )
+            return super().extract_relationships(fields, resource, resource_instance)
 
     assert (
         CustomRenderer.build_json_resource_obj(

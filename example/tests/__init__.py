@@ -11,7 +11,7 @@ class TestBase(APITestCase):
         """
         Create those users
         """
-        super(TestBase, self).setUp()
+        super().setUp()
         self.create_users()
 
     def create_user(self, username, email, password="pw", first_name="", last_name=""):

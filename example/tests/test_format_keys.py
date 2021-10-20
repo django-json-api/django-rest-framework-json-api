@@ -14,7 +14,7 @@ class FormatKeysSetTests(TestBase):
     list_url = reverse("user-list")
 
     def setUp(self):
-        super(FormatKeysSetTests, self).setUp()
+        super().setUp()
         self.detail_url = reverse("user-detail", kwargs={"pk": self.miles.pk})
 
     def test_camelization(self):

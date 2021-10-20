@@ -179,7 +179,7 @@ class TestResourceIdentifierObjectSerializer(TestCase):
         print(serializer.data)
 
 
-class TestModelSerializer(object):
+class TestModelSerializer:
     def test_model_serializer_with_implicit_fields(self, comment, client):
         expected = {
             "data": {

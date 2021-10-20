@@ -138,7 +138,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
 
         This is basically the reverse of `get_filterset_kwargs` above.
         """
-        result = super(DjangoFilterBackend, self).get_schema_operation_parameters(view)
+        result = super().get_schema_operation_parameters(view)
         for res in result:
             if "name" in res:
                 res["name"] = "filter[{}]".format(res["name"]).replace("__", ".")

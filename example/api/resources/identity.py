@@ -33,7 +33,7 @@ class Identity(viewsets.ModelViewSet):
     @action(detail=True)
     def manual_resource_name(self, request, *args, **kwargs):
         self.resource_name = "data"
-        return super(Identity, self).retrieve(request, args, kwargs)
+        return super().retrieve(request, args, kwargs)
 
     @action(detail=True)
     def validation(self, request, *args, **kwargs):

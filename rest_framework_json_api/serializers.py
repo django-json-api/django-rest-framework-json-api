@@ -328,7 +328,7 @@ class ModelSerializer(
             field = declared_fields[field_name]
             if field_name not in meta_fields:
                 declared[field_name] = field
-        fields = super(ModelSerializer, self).get_field_names(declared, info)
+        fields = super().get_field_names(declared, info)
         return list(fields) + list(getattr(self.Meta, "meta_fields", list()))
 
 

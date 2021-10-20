@@ -22,7 +22,7 @@ class DummyEntryViewSet(EntryViewSet):
     def __init__(self, **kwargs):
         # dummy up self.request since PreloadIncludesMixin expects it to be defined
         self.request = None
-        super(DummyEntryViewSet, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 
 def test_filters_get_schema_params():
