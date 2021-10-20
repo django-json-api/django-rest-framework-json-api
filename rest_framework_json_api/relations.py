@@ -359,7 +359,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
                 received_type=data["type"],
             )
 
-        return super().to_internal_value(data["id"])
+        return super(ResourceRelatedField, self).to_internal_value(data["id"])
 
 
 class SerializerMethodFieldBase(Field):
