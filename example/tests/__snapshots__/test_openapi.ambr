@@ -133,7 +133,7 @@
                       "entries": {
                         "$ref": "#/components/schemas/reltomany"
                       },
-                      "first_entry": {
+                      "firstEntry": {
                         "$ref": "#/components/schemas/reltoone"
                       },
                       "type": {
@@ -541,7 +541,7 @@
                       "entries": {
                         "$ref": "#/components/schemas/reltomany"
                       },
-                      "first_entry": {
+                      "firstEntry": {
                         "$ref": "#/components/schemas/reltoone"
                       },
                       "type": {
