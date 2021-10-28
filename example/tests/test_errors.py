@@ -79,7 +79,7 @@ def test_first_level_attribute_error(client, some_blog, snapshot):
             },
         }
     }
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_first_level_custom_attribute_error(client, some_blog, snapshot):
@@ -94,7 +94,7 @@ def test_first_level_custom_attribute_error(client, some_blog, snapshot):
         }
     }
     with override_settings(JSON_API_FORMAT_FIELD_NAMES="dasherize"):
-        snapshot.assert_match(perform_error_test(client, data))
+        assert snapshot == perform_error_test(client, data)
 
 
 def test_second_level_array_error(client, some_blog, snapshot):
@@ -110,7 +110,7 @@ def test_second_level_array_error(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_second_level_dict_error(client, some_blog, snapshot):
@@ -126,7 +126,7 @@ def test_second_level_dict_error(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_third_level_array_error(client, some_blog, snapshot):
@@ -142,7 +142,7 @@ def test_third_level_array_error(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_third_level_custom_array_error(client, some_blog, snapshot):
@@ -160,7 +160,7 @@ def test_third_level_custom_array_error(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_third_level_dict_error(client, some_blog, snapshot):
@@ -176,7 +176,7 @@ def test_third_level_dict_error(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_many_third_level_dict_errors(client, some_blog, snapshot):
@@ -192,7 +192,7 @@ def test_many_third_level_dict_errors(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
 
 
 def test_relationship_errors_has_correct_pointers(client, some_blog, snapshot):
@@ -210,4 +210,4 @@ def test_relationship_errors_has_correct_pointers(client, some_blog, snapshot):
         }
     }
 
-    snapshot.assert_match(perform_error_test(client, data))
+    assert snapshot == perform_error_test(client, data)
