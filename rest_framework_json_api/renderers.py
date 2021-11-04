@@ -270,7 +270,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
     @classmethod
     def extract_included(
-        cls, fields, resource, resource_instance, included_resources, included_cache
+        cls, fields, resource, resource_instance, included_resources, included_cache, serializer_cache
     ):
         """
         Adds related data to the top level included key when the request includes
@@ -317,8 +317,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, relations.ManyRelatedField):
                 serializer_class = included_serializers[field_name]
-                field = serializer_class(relation_instance, many=True, context=context)
-                serializer_data = field.data
+                field = serializer_cache[serializer_class].get(True)
+                if not field:
+                    field = serializer_cache[serializer_class].setdefault(True, serializer_class(many=True, context=context))
+                serializer_data = field.to_representation(relation_instance)
 
             if isinstance(field, relations.RelatedField):
                 if relation_instance is None or not serializer_data:
@@ -337,8 +339,10 @@ class JSONRenderer(renderers.JSONRenderer):
                         continue
 
                 serializer_class = included_serializers[field_name]
-                field = serializer_class(relation_instance, many=many, context=context)
-                serializer_data = field.data
+                field = serializer_cache[serializer_class].get(many)
+                if not field:
+                    field = serializer_cache[serializer_class].setdefault(many, serializer_class(many=many, context=context))
+                serializer_data = field.to_representation(relation_instance)
 
             new_included_resources = [
                 key.replace("%s." % field_name, "", 1)
@@ -382,6 +386,7 @@ class JSONRenderer(renderers.JSONRenderer):
                             nested_resource_instance,
                             new_included_resources,
                             included_cache,
+                            serializer_cache,
                         )
 
             if isinstance(field, Serializer):
@@ -406,6 +411,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         relation_instance,
                         new_included_resources,
                         included_cache,
+                        serializer_cache,
                     )
 
     @classmethod
@@ -534,6 +540,7 @@ class JSONRenderer(renderers.JSONRenderer):
         # initialize json_api_meta with pagination meta or an empty dict
         json_api_meta = data.get("meta", {}) if isinstance(data, dict) else {}
         included_cache = defaultdict(dict)
+        serializer_cache = defaultdict(dict)
 
         if data and "results" in data:
             serializer_data = data["results"]
@@ -591,6 +598,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         resource_instance,
                         included_resources,
                         included_cache,
+                        serializer_cache,
                     )
             else:
                 fields = utils.get_serializer_fields(serializer)
@@ -614,6 +622,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     resource_instance,
                     included_resources,
                     included_cache,
+                    serializer_cache,
                 )
 
         # Make sure we render data in a specific order
