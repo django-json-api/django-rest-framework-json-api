@@ -33,7 +33,7 @@ def test_path_without_parameters(snapshot):
     inspector.view = view
 
     operation = inspector.get_operation(path, method)
-    snapshot.assert_match(json.dumps(operation, indent=2, sort_keys=True))
+    assert snapshot == json.dumps(operation, indent=2, sort_keys=True)
 
 
 def test_path_with_id_parameter(snapshot):
@@ -47,7 +47,7 @@ def test_path_with_id_parameter(snapshot):
     inspector.view = view
 
     operation = inspector.get_operation(path, method)
-    snapshot.assert_match(json.dumps(operation, indent=2, sort_keys=True))
+    assert snapshot == json.dumps(operation, indent=2, sort_keys=True)
 
 
 def test_post_request(snapshot):
@@ -61,7 +61,7 @@ def test_post_request(snapshot):
     inspector.view = view
 
     operation = inspector.get_operation(path, method)
-    snapshot.assert_match(json.dumps(operation, indent=2, sort_keys=True))
+    assert snapshot == json.dumps(operation, indent=2, sort_keys=True)
 
 
 def test_patch_request(snapshot):
@@ -75,7 +75,7 @@ def test_patch_request(snapshot):
     inspector.view = view
 
     operation = inspector.get_operation(path, method)
-    snapshot.assert_match(json.dumps(operation, indent=2, sort_keys=True))
+    assert snapshot == json.dumps(operation, indent=2, sort_keys=True)
 
 
 def test_delete_request(snapshot):
@@ -89,7 +89,7 @@ def test_delete_request(snapshot):
     inspector.view = view
 
     operation = inspector.get_operation(path, method)
-    snapshot.assert_match(json.dumps(operation, indent=2, sort_keys=True))
+    assert snapshot == json.dumps(operation, indent=2, sort_keys=True)
 
 
 @override_settings(
