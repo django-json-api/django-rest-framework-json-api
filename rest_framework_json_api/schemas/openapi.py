@@ -7,6 +7,7 @@ from rest_framework.schemas import openapi as drf_openapi
 from rest_framework.schemas.utils import is_list_view
 
 from rest_framework_json_api import serializers, views
+from rest_framework_json_api.utils import format_field_name
 
 
 class SchemaGenerator(drf_openapi.SchemaGenerator):
@@ -655,12 +656,12 @@ class AutoSchema(drf_openapi.AutoSchema):
             if isinstance(field, serializers.HiddenField):
                 continue
             if isinstance(field, serializers.RelatedField):
-                relationships[field.field_name] = {
+                relationships[format_field_name(field.field_name)] = {
                     "$ref": "#/components/schemas/reltoone"
                 }
                 continue
             if isinstance(field, serializers.ManyRelatedField):
-                relationships[field.field_name] = {
+                relationships[format_field_name(field.field_name)] = {
                     "$ref": "#/components/schemas/reltomany"
                 }
                 continue
@@ -682,7 +683,7 @@ class AutoSchema(drf_openapi.AutoSchema):
                 schema["description"] = str(field.help_text)
             self.map_field_validators(field, schema)
 
-            attributes[field.field_name] = schema
+            attributes[format_field_name(field.field_name)] = schema
 
         result = {
             "type": "object",
