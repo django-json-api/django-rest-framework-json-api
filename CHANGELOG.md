@@ -16,6 +16,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Avoid error when `parser_context` is `None` while parsing.
 * Raise comprehensible error when reserved field names `meta` and `results` are used.
 * Use `relationships` in the error object `pointer` when the field is actually a relationship.
+* Added missing inflection to the generated OpenAPI schema.
 
 ### Changed
 
