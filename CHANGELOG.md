@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Added support for Django 4.0.
+
 ### Fixed
 
 * Adjusted error messages to correctly use capital "JSON:API" abbreviation as used in the specification.
