@@ -5,6 +5,7 @@ DEBUG = True
 
 MEDIA_ROOT = os.path.normcase(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = "/media/"
+USE_TZ = False
 
 DATABASE_ENGINE = "sqlite3"
 
