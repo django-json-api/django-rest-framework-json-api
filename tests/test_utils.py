@@ -1,4 +1,5 @@
 import pytest
+import inspect
 from django.db import models
 from rest_framework import status
 from rest_framework.fields import Field
@@ -384,11 +385,11 @@ def test_get_resource_type_from_serializer_error_message():
 
     class SerializerWithoutResourceName(serializers.Serializer):
         something = Field()
+    
+    serializer = SerializerWithoutResourceName()
         
     try:
-        get_resource_type_from_serializer(
-            SerializerWithoutResourceName()
-        )
+        get_resource_type_from_serializer(serializer=serializer)
         raise AssertionError('no AttributeError was raised')
     except AttributeError as ex:
-        assert str(ex) == f"can not detect 'resource_name' on serializer 'SerializerWithoutResourceName' in module 'tests.test_utils:385'"
+        assert str(ex) == f"can not detect 'resource_name' on serializer 'SerializerWithoutResourceName' in module 'tests.test_utils:{inspect.getsourcelines(serializer.__class__)[-1]}'"
