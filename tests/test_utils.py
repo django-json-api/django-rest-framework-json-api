@@ -1,6 +1,7 @@
 import pytest
 from django.db import models
 from rest_framework import status
+from rest_framework.fields import Field
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,7 @@ from rest_framework_json_api.utils import (
     get_included_serializers,
     get_related_resource_type,
     get_resource_name,
+    get_resource_type_from_serializer,
     undo_format_field_name,
     undo_format_field_names,
     undo_format_link_segment,
@@ -377,3 +379,16 @@ def test_get_included_serializers():
     }
 
     assert included_serializers == expected_included_serializers
+
+def test_get_resource_type_from_serializer_error_message():
+
+    class SerializerWithoutResourceName(serializers.Serializer):
+        something = Field()
+        
+    try:
+        get_resource_type_from_serializer(
+            SerializerWithoutResourceName()
+        )
+        raise AssertionError('no AttributeError was raised')
+    except AttributeError as ex:
+        assert str(ex) == f"can not detect 'resource_name' on serializer 'SerializerWithoutResourceName' in module 'tests.test_utils:385'"
