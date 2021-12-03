@@ -320,10 +320,9 @@ def get_resource_type_from_serializer(serializer):
         return meta.resource_name
     elif hasattr(meta, "model"):
         return get_resource_type_from_model(meta.model)
-    # inspect.currentframe().f_code.co_firstlineno
     raise AttributeError(
-        f"can not detect 'resource_name' on serializer '{serializer.__class__.__name__}'" 
-        f" in module '{serializer.__class__.__module__}:{inspect.getsourcelines(serializer.__class__)[-1]}'")
+        f"can not detect 'resource_name' on serializer '{serializer.__class__.__name__}'"
+        f" in module '{serializer.__class__.__module__}'")
 
 
 def get_included_resources(request, serializer=None):
