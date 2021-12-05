@@ -381,7 +381,7 @@ def test_get_included_serializers():
     assert included_serializers == expected_included_serializers
 
 
-def test_get_resource_type_from_serializer_error_message():
+def test_get_resource_type_from_serializer_without_resource_name_raises_error():
     class SerializerWithoutResourceName(serializers.Serializer):
         something = Field()
 
@@ -389,7 +389,7 @@ def test_get_resource_type_from_serializer_error_message():
 
     with pytest.raises(AttributeError) as excinfo:
         get_resource_type_from_serializer(serializer=serializer)
-    assert (
-        str(excinfo.value)
-        == "can not detect 'resource_name' on serializer 'SerializerWithoutResourceName' in module 'tests.test_utils'"
+    assert str(excinfo.value) == (
+        "can not detect 'resource_name' on serializer "
+        "'SerializerWithoutResourceName' in module 'tests.test_utils'"
     )

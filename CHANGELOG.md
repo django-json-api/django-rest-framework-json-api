@@ -22,7 +22,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Raise comprehensible error when reserved field names `meta` and `results` are used.
 * Use `relationships` in the error object `pointer` when the field is actually a relationship.
 * Added missing inflection to the generated OpenAPI schema.
-* Added error message if AttributeError is raised by `get_resource_type_from_serializer()`
+* Added missing error message when `resource_name` is not properly configured.
 
 ### Changed
 
