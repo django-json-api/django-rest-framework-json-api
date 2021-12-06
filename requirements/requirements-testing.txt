@@ -3,7 +3,7 @@ factory-boy==3.2.1
 Faker==9.9.0
 pytest==6.2.5
 pytest-cov==3.0.0
-pytest-django==4.4.0
+pytest-django==4.5.1
 pytest-factoryboy==2.1.0
 syrupy==1.4.7
 # TODO remove pytz dep again once DRF higher than 3.12.4 is released
