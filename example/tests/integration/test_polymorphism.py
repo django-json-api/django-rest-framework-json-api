@@ -24,12 +24,10 @@ def test_polymorphism_on_detail_relations(single_company, client):
         content["data"]["relationships"]["currentProject"]["data"]["type"]
         == "artProjects"
     )
-    assert set(
-        [
-            rel["type"]
-            for rel in content["data"]["relationships"]["futureProjects"]["data"]
-        ]
-    ) == set(["researchProjects", "artProjects"])
+    assert {
+        rel["type"]
+        for rel in content["data"]["relationships"]["futureProjects"]["data"]
+    } == {"researchProjects", "artProjects"}
 
 
 def test_polymorphism_on_included_relations(single_company, client):
@@ -47,15 +45,15 @@ def test_polymorphism_on_included_relations(single_company, client):
         == "artProjects"
     )
     assert content["data"]["relationships"]["currentResearchProject"]["data"] is None
-    assert set(
-        [
-            rel["type"]
-            for rel in content["data"]["relationships"]["futureProjects"]["data"]
-        ]
-    ) == set(["researchProjects", "artProjects"])
-    assert set([x.get("type") for x in content.get("included")]) == set(
-        ["artProjects", "artProjects", "researchProjects"]
-    ), "Detail included types are incorrect"
+    assert {
+        rel["type"]
+        for rel in content["data"]["relationships"]["futureProjects"]["data"]
+    } == {"researchProjects", "artProjects"}
+    assert {x.get("type") for x in content.get("included")} == {
+        "artProjects",
+        "artProjects",
+        "researchProjects",
+    }, "Detail included types are incorrect"
     # Ensure that the child fields are present.
     assert content.get("included")[0].get("attributes").get("artist") is not None
     assert content.get("included")[1].get("attributes").get("artist") is not None
