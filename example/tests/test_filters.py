@@ -600,7 +600,7 @@ class DJATestFilters(APITestCase):
             expected_ids = set.intersection(*union)
             expected_len = len(expected_ids)
             self.assertEqual(len(dja_response["data"]), expected_len)
-            returned_ids = set([k["id"] for k in dja_response["data"]])
+            returned_ids = {k["id"] for k in dja_response["data"]}
             self.assertEqual(returned_ids, expected_ids)
 
     def test_param_invalid(self):

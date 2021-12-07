@@ -21,7 +21,7 @@ def test_included_data_on_list(multiple_entries, client):
     comment_count = len(
         [resource for resource in included if resource["type"] == "comments"]
     )
-    expected_comment_count = sum([entry.comments.count() for entry in multiple_entries])
+    expected_comment_count = sum(entry.comments.count() for entry in multiple_entries)
     assert comment_count == expected_comment_count, "List comment count is incorrect"
 
 
@@ -135,17 +135,15 @@ def test_deep_included_data_on_list(multiple_entries, client):
     comment_count = len(
         [resource for resource in included if resource["type"] == "comments"]
     )
-    expected_comment_count = sum([entry.comments.count() for entry in multiple_entries])
+    expected_comment_count = sum(entry.comments.count() for entry in multiple_entries)
     assert comment_count == expected_comment_count, "List comment count is incorrect"
 
     author_count = len(
         [resource for resource in included if resource["type"] == "authors"]
     )
     expected_author_count = sum(
-        [
-            entry.comments.filter(author__isnull=False).count()
-            for entry in multiple_entries
-        ]
+        entry.comments.filter(author__isnull=False).count()
+        for entry in multiple_entries
     )
     assert author_count == expected_author_count, "List author count is incorrect"
 
@@ -153,10 +151,8 @@ def test_deep_included_data_on_list(multiple_entries, client):
         [resource for resource in included if resource["type"] == "authorBios"]
     )
     expected_author_bio_count = sum(
-        [
-            entry.comments.filter(author__bio__isnull=False).count()
-            for entry in multiple_entries
-        ]
+        entry.comments.filter(author__bio__isnull=False).count()
+        for entry in multiple_entries
     )
     assert (
         author_bio_count == expected_author_bio_count
@@ -166,10 +162,8 @@ def test_deep_included_data_on_list(multiple_entries, client):
         [resource for resource in included if resource["type"] == "writers"]
     )
     expected_writer_count = sum(
-        [
-            entry.comments.filter(author__isnull=False).count()
-            for entry in multiple_entries
-        ]
+        entry.comments.filter(author__isnull=False).count()
+        for entry in multiple_entries
     )
     assert writer_count == expected_writer_count, "List writer count is incorrect"
 
