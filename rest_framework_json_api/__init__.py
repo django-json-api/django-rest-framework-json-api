@@ -1,5 +1,5 @@
 __title__ = "djangorestframework-jsonapi"
-__version__ = "4.2.1"
+__version__ = "4.3.0"
 __author__ = ""
 __license__ = "BSD"
 __copyright__ = ""
