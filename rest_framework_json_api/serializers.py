@@ -165,12 +165,11 @@ class ReservedFieldNamesMixin:
         found_reserved_field_names = self._reserved_field_names.intersection(
             fields.keys()
         )
-        if found_reserved_field_names:
-            raise AttributeError(
-                f"Serializer class {self.__class__.__module__}.{self.__class__.__qualname__} "
-                f"uses following reserved field name(s) which is not allowed: "
-                f"{', '.join(sorted(found_reserved_field_names))}"
-            )
+        assert not found_reserved_field_names, (
+            f"Serializer class {self.__class__.__module__}.{self.__class__.__qualname__} "
+            f"uses following reserved field name(s) which is not allowed: "
+            f"{', '.join(sorted(found_reserved_field_names))}"
+        )
 
         if "type" in fields:
             # see https://jsonapi.org/format/#document-resource-object-fields
