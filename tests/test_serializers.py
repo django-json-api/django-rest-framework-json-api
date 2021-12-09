@@ -37,7 +37,7 @@ def test_get_included_serializers():
 
 
 def test_reserved_field_names():
-    with pytest.raises(AttributeError) as e:
+    with pytest.raises(AssertionError) as e:
 
         class ReservedFieldNamesSerializer(serializers.Serializer):
             meta = serializers.CharField()
