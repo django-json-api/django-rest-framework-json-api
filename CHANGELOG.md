@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Added support for Django REST framework 3.13.
+
 ### Changed
 
 * Adjusted to only use f-strings for slight performance improvement.

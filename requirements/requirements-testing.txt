@@ -6,8 +6,3 @@ pytest-cov==3.0.0
 pytest-django==4.5.1
 pytest-factoryboy==2.1.0
 syrupy==1.5.0
-# TODO remove pytz dep again once DRF higher than 3.12.4 is released
-# Django 4.0 removed dependency on pytz and made it optional but
-# DRF requires it and will define it as dependency in future versions
-# only adding this to testing though as DJA does not directly use pytz
-pytz==2021.3
