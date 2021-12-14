@@ -14,7 +14,14 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Adjusted to only use f-strings for slight performance improvement.
 
+### Removed
+
+* Removed support for Django 3.0.
+* Removed support for Django 3.1.
+
 ## [4.3.0] - 2021-12-10
+
+This is the last release supporting Django 3.0 and Django 3.1.
 
 ### Added
 
