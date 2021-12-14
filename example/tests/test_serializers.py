@@ -40,9 +40,9 @@ class TestResourceIdentifierObjectSerializer(TestCase):
             rating=3,
         )
         for i in range(1, 6):
-            name = "some_author{}".format(i)
+            name = f"some_author{i}"
             self.entry.authors.add(
-                Author.objects.create(name=name, email="{}@example.org".format(name))
+                Author.objects.create(name=name, email=f"{name}@example.org")
             )
 
     def test_forward_relationship_not_loaded_when_not_included(self):

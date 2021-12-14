@@ -76,15 +76,13 @@ class TestRelationshipView(APITestCase):
 
     def test_get_entry_relationship_invalid_field(self):
         response = self.client.get(
-            "/entries/{}/relationships/invalid_field".format(self.first_entry.id)
+            f"/entries/{self.first_entry.id}/relationships/invalid_field"
         )
 
         assert response.status_code == 404
 
     def test_get_blog_relationship_entry_set(self):
-        response = self.client.get(
-            "/blogs/{}/relationships/entry_set".format(self.blog.id)
-        )
+        response = self.client.get(f"/blogs/{self.blog.id}/relationships/entry_set")
         expected_data = [
             {"type": format_resource_type("Entry"), "id": str(self.first_entry.id)},
             {"type": format_resource_type("Entry"), "id": str(self.second_entry.id)},
@@ -94,9 +92,7 @@ class TestRelationshipView(APITestCase):
 
     @override_settings(JSON_API_FORMAT_RELATED_LINKS="dasherize")
     def test_get_blog_relationship_entry_set_with_formatted_link(self):
-        response = self.client.get(
-            "/blogs/{}/relationships/entry-set".format(self.blog.id)
-        )
+        response = self.client.get(f"/blogs/{self.blog.id}/relationships/entry-set")
         expected_data = [
             {"type": format_resource_type("Entry"), "id": str(self.first_entry.id)},
             {"type": format_resource_type("Entry"), "id": str(self.second_entry.id)},
@@ -105,17 +101,17 @@ class TestRelationshipView(APITestCase):
         assert response.data == expected_data
 
     def test_put_entry_relationship_blog_returns_405(self):
-        url = "/entries/{}/relationships/blog".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/blog"
         response = self.client.put(url, data={})
         assert response.status_code == 405
 
     def test_patch_invalid_entry_relationship_blog_returns_400(self):
-        url = "/entries/{}/relationships/blog".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/blog"
         response = self.client.patch(url, data={"data": {"invalid": ""}})
         assert response.status_code == 400
 
     def test_relationship_view_errors_format(self):
-        url = "/entries/{}/relationships/blog".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/blog"
         response = self.client.patch(url, data={"data": {"invalid": ""}})
         assert response.status_code == 400
 
@@ -125,14 +121,14 @@ class TestRelationshipView(APITestCase):
         assert "errors" in result
 
     def test_get_empty_to_one_relationship(self):
-        url = "/comments/{}/relationships/author".format(self.first_entry.id)
+        url = f"/comments/{self.first_entry.id}/relationships/author"
         response = self.client.get(url)
         expected_data = None
 
         assert response.data == expected_data
 
     def test_get_to_many_relationship_self_link(self):
-        url = "/authors/{}/relationships/comments".format(self.author.id)
+        url = f"/authors/{self.author.id}/relationships/comments"
 
         response = self.client.get(url)
         expected_data = {
@@ -147,7 +143,7 @@ class TestRelationshipView(APITestCase):
         assert json.loads(response.content.decode("utf-8")) == expected_data
 
     def test_patch_to_one_relationship(self):
-        url = "/entries/{}/relationships/blog".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/blog"
         request_data = {
             "data": {
                 "type": format_resource_type("Blog"),
@@ -162,7 +158,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == request_data["data"]
 
     def test_patch_one_to_many_relationship(self):
-        url = "/blogs/{}/relationships/entry_set".format(self.first_entry.id)
+        url = f"/blogs/{self.first_entry.id}/relationships/entry_set"
         request_data = {
             "data": [
                 {"type": format_resource_type("Entry"), "id": str(self.first_entry.id)},
@@ -184,7 +180,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == request_data["data"]
 
     def test_patch_one_to_many_relaitonship_with_none(self):
-        url = "/blogs/{}/relationships/entry_set".format(self.first_entry.id)
+        url = f"/blogs/{self.first_entry.id}/relationships/entry_set"
         request_data = {"data": None}
         response = self.client.patch(url, data=request_data)
         assert response.status_code == 200, response.content.decode()
@@ -194,7 +190,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == []
 
     def test_patch_many_to_many_relationship(self):
-        url = "/entries/{}/relationships/authors".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/authors"
         request_data = {
             "data": [
                 {"type": format_resource_type("Author"), "id": str(self.author.id)},
@@ -216,7 +212,7 @@ class TestRelationshipView(APITestCase):
         assert response.data == request_data["data"]
 
     def test_post_to_one_relationship_should_fail(self):
-        url = "/entries/{}/relationships/blog".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/blog"
         request_data = {
             "data": {
                 "type": format_resource_type("Blog"),
@@ -227,7 +223,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 405, response.content.decode()
 
     def test_post_to_many_relationship_with_no_change(self):
-        url = "/entries/{}/relationships/comments".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/comments"
         request_data = {
             "data": [
                 {
@@ -241,7 +237,7 @@ class TestRelationshipView(APITestCase):
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_post_to_many_relationship_with_change(self):
-        url = "/entries/{}/relationships/comments".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/comments"
         request_data = {
             "data": [
                 {
@@ -256,7 +252,7 @@ class TestRelationshipView(APITestCase):
         assert request_data["data"][0] in response.data
 
     def test_delete_to_one_relationship_should_fail(self):
-        url = "/entries/{}/relationships/blog".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/blog"
         request_data = {
             "data": {
                 "type": format_resource_type("Blog"),
@@ -267,7 +263,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 405, response.content.decode()
 
     def test_delete_relationship_overriding_with_none(self):
-        url = "/comments/{}".format(self.second_comment.id)
+        url = f"/comments/{self.second_comment.id}"
         request_data = {
             "data": {
                 "type": "comments",
@@ -280,7 +276,7 @@ class TestRelationshipView(APITestCase):
         assert response.data["author"] is None
 
     def test_delete_to_many_relationship_with_no_change(self):
-        url = "/entries/{}/relationships/comments".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/comments"
         request_data = {
             "data": [
                 {
@@ -294,7 +290,7 @@ class TestRelationshipView(APITestCase):
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
 
     def test_delete_one_to_many_relationship_with_not_null_constraint(self):
-        url = "/entries/{}/relationships/comments".format(self.first_entry.id)
+        url = f"/entries/{self.first_entry.id}/relationships/comments"
         request_data = {
             "data": [
                 {
@@ -307,7 +303,7 @@ class TestRelationshipView(APITestCase):
         assert response.status_code == 409, response.content.decode()
 
     def test_delete_to_many_relationship_with_change(self):
-        url = "/authors/{}/relationships/comments".format(self.author.id)
+        url = f"/authors/{self.author.id}/relationships/comments"
         request_data = {
             "data": [
                 {
@@ -323,7 +319,7 @@ class TestRelationshipView(APITestCase):
         entry = EntryFactory(blog=self.blog, authors=(self.author,))
         comment = CommentFactory(entry=entry)
 
-        url = "/authors/{}/relationships/comments".format(self.author.id)
+        url = f"/authors/{self.author.id}/relationships/comments"
         request_data = {
             "data": [
                 {"type": format_resource_type("Comment"), "id": str(comment.id)},
@@ -597,7 +593,7 @@ class TestModelViewSet(TestBase):
         self.blog = Blog.objects.create(name="Some Blog", tagline="It's a blog")
 
     def test_no_content_response(self):
-        url = "/blogs/{}".format(self.blog.pk)
+        url = f"/blogs/{self.blog.pk}"
         response = self.client.delete(url)
         assert response.status_code == 204, response.rendered_content.decode()
         assert len(response.rendered_content) == 0, response.rendered_content.decode()
@@ -618,8 +614,8 @@ class TestBlogViewSet(APITestCase):
         expected = {
             "data": {
                 "attributes": {"name": self.blog.name},
-                "id": "{}".format(self.blog.id),
-                "links": {"self": "http://testserver/blogs/{}".format(self.blog.id)},
+                "id": f"{self.blog.id}",
+                "links": {"self": f"http://testserver/blogs/{self.blog.id}"},
                 "meta": {"copyright": datetime.now().year},
                 "relationships": {"tags": {"data": [], "meta": {"count": 0}}},
                 "type": "blogs",
@@ -656,13 +652,13 @@ class TestEntryViewSet(APITestCase):
                     "modDate": self.second_entry.mod_date,
                     "pubDate": self.second_entry.pub_date,
                 },
-                "id": "{}".format(self.second_entry.id),
+                "id": f"{self.second_entry.id}",
                 "meta": {"bodyFormat": "text"},
                 "relationships": {
                     "authors": {"data": [], "meta": {"count": 0}},
                     "blog": {
                         "data": {
-                            "id": "{}".format(self.second_entry.blog_id),
+                            "id": f"{self.second_entry.blog_id}",
                             "type": "blogs",
                         }
                     },

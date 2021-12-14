@@ -78,7 +78,7 @@ class DjangoFilterBackend(DjangoFilterBackend):
         """
         for k in keys:
             if (not filterset_class) or (k not in filterset_class.base_filters):
-                raise ValidationError("invalid filter[{}]".format(k))
+                raise ValidationError(f"invalid filter[{k}]")
 
     def get_filterset(self, request, queryset, view):
         """
@@ -111,12 +111,10 @@ class DjangoFilterBackend(DjangoFilterBackend):
                 or m.groupdict()["ldelim"] != "["
                 or m.groupdict()["rdelim"] != "]"
             ):
-                raise ValidationError("invalid query parameter: {}".format(qp))
+                raise ValidationError(f"invalid query parameter: {qp}")
             if m and qp != self.search_param:
                 if not all(val):
-                    raise ValidationError(
-                        "missing value for query parameter {}".format(qp)
-                    )
+                    raise ValidationError(f"missing value for query parameter {qp}")
                 # convert JSON:API relationship path to Django ORM's __ notation
                 key = m.groupdict()["assoc"].replace(".", "__")
                 key = undo_format_field_name(key)
