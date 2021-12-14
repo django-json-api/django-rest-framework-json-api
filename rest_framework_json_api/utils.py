@@ -418,7 +418,7 @@ def format_drf_errors(response, context, exc):
             # pointer can be determined only if there's a serializer.
             if has_serializer:
                 rel = "relationships" if field in relationship_fields else "attributes"
-                pointer = "/data/{}/{}".format(rel, field)
+                pointer = f"/data/{rel}/{field}"
             if isinstance(exc, Http404) and isinstance(error, str):
                 # 404 errors don't have a pointer
                 errors.extend(format_error_object(error, None, response))
@@ -462,13 +462,11 @@ def format_error_object(message, pointer, response):
             errors.append(message)
         else:
             for k, v in message.items():
-                errors.extend(
-                    format_error_object(v, pointer + "/{}".format(k), response)
-                )
+                errors.extend(format_error_object(v, pointer + f"/{k}", response))
     elif isinstance(message, list):
         for num, error in enumerate(message):
             if isinstance(error, (list, dict)):
-                new_pointer = pointer + "/{}".format(num)
+                new_pointer = pointer + f"/{num}"
             else:
                 new_pointer = pointer
             if error:

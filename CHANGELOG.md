@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Changed
+
+* Adjusted to only use f-strings for slight performance improvement.
+
 ### Removed
 
 * Removed support for Django 3.0.

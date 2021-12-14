@@ -93,14 +93,12 @@ class QueryParameterValidationFilter(BaseFilterBackend):
         for qp in request.query_params.keys():
             m = self.query_regex.match(qp)
             if not m:
-                raise ValidationError("invalid query parameter: {}".format(qp))
+                raise ValidationError(f"invalid query parameter: {qp}")
             if (
                 not m.group("type") == "filter"
                 and len(request.query_params.getlist(qp)) > 1
             ):
-                raise ValidationError(
-                    "repeated query parameter not allowed: {}".format(qp)
-                )
+                raise ValidationError(f"repeated query parameter not allowed: {qp}")
 
     def filter_queryset(self, request, queryset, view):
         """

@@ -93,8 +93,8 @@ def test_blog_create(client):
     expected = {
         "data": {
             "attributes": {"name": blog.name, "tags": []},
-            "id": "{}".format(blog.id),
-            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "id": f"{blog.id}",
+            "links": {"self": f"http://testserver/blogs/{blog.id}"},
             "meta": {"copyright": datetime.now().year},
             "type": "blogs",
         },
@@ -113,8 +113,8 @@ def test_get_object_gives_correct_blog(client, blog, entry):
     expected = {
         "data": {
             "attributes": {"name": blog.name, "tags": []},
-            "id": "{}".format(blog.id),
-            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "id": f"{blog.id}",
+            "links": {"self": f"http://testserver/blogs/{blog.id}"},
             "meta": {"copyright": datetime.now().year},
             "type": "blogs",
         },
@@ -134,8 +134,8 @@ def test_get_object_patches_correct_blog(client, blog, entry):
     request_data = {
         "data": {
             "attributes": {"name": new_name},
-            "id": "{}".format(blog.id),
-            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "id": f"{blog.id}",
+            "links": {"self": f"http://testserver/blogs/{blog.id}"},
             "meta": {"copyright": datetime.now().year},
             "relationships": {"tags": {"data": []}},
             "type": "blogs",
@@ -150,8 +150,8 @@ def test_get_object_patches_correct_blog(client, blog, entry):
     expected = {
         "data": {
             "attributes": {"name": new_name, "tags": []},
-            "id": "{}".format(blog.id),
-            "links": {"self": "http://testserver/blogs/{}".format(blog.id)},
+            "id": f"{blog.id}",
+            "links": {"self": f"http://testserver/blogs/{blog.id}"},
             "meta": {"copyright": datetime.now().year},
             "type": "blogs",
         },

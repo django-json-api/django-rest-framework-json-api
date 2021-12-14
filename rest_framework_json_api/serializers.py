@@ -442,7 +442,7 @@ class PolymorphicModelSerializer(
             return cls._poly_type_serializer_map[obj_type]
         except KeyError:
             raise NotImplementedError(
-                "No polymorphic serializer has been found for type {}".format(obj_type)
+                f"No polymorphic serializer has been found for type {obj_type}"
             )
 
     @classmethod

@@ -64,8 +64,8 @@ def test_polymorphism_on_polymorphic_model_detail_patch(single_art_project, clie
     url = reverse("project-detail", kwargs={"pk": single_art_project.pk})
     response = client.get(url)
     content = response.json()
-    test_topic = "test-{}".format(random.randint(0, 999999))
-    test_artist = "test-{}".format(random.randint(0, 999999))
+    test_topic = f"test-{random.randint(0, 999999)}"
+    test_artist = f"test-{random.randint(0, 999999)}"
     content["data"]["attributes"]["topic"] = test_topic
     content["data"]["attributes"]["artist"] = test_artist
     response = client.patch(url, data=content)
@@ -92,8 +92,8 @@ def test_patch_on_polymorphic_model_without_including_required_field(
 
 
 def test_polymorphism_on_polymorphic_model_list_post(client):
-    test_topic = "New test topic {}".format(random.randint(0, 999999))
-    test_artist = "test-{}".format(random.randint(0, 999999))
+    test_topic = f"New test topic {random.randint(0, 999999)}"
+    test_artist = f"test-{random.randint(0, 999999)}"
     test_project_type = ProjectTypeFactory()
     url = reverse("project-list")
     data = {
@@ -152,8 +152,8 @@ def test_polymorphic_model_without_any_instance(client):
 
 
 def test_invalid_type_on_polymorphic_model(client):
-    test_topic = "New test topic {}".format(random.randint(0, 999999))
-    test_artist = "test-{}".format(random.randint(0, 999999))
+    test_topic = f"New test topic {random.randint(0, 999999)}"
+    test_artist = f"test-{random.randint(0, 999999)}"
     url = reverse("project-list")
     data = {
         "data": {

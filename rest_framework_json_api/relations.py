@@ -324,7 +324,7 @@ class PolymorphicResourceRelatedField(ResourceRelatedField):
                 "Incorrect relation type. Expected one of [{relation_type}], "
                 "received {received_type}."
             ),
-        }
+        },
     )
 
     def __init__(self, polymorphic_serializer, *args, **kwargs):
@@ -370,7 +370,7 @@ class SerializerMethodFieldBase(Field):
         super().__init__(**kwargs)
 
     def bind(self, field_name, parent):
-        default_method_name = "get_{field_name}".format(field_name=field_name)
+        default_method_name = f"get_{field_name}"
         if self.method_name is None:
             self.method_name = default_method_name
         super().bind(field_name, parent)
