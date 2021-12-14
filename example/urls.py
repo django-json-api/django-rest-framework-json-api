@@ -1,6 +1,5 @@
 from django.conf import settings
-from django.conf.urls import include, url
-from django.urls import path
+from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
@@ -36,53 +35,53 @@ router.register(r"project-types", ProjectTypeViewset)
 router.register(r"lab-results", LabResultViewSet)
 
 urlpatterns = [
-    url(r"^", include(router.urls)),
-    url(
+    path("", include(router.urls)),
+    re_path(
         r"^entries/(?P<entry_pk>[^/.]+)/suggested/$",
         EntryViewSet.as_view({"get": "list"}),
         name="entry-suggested",
     ),
-    url(
+    re_path(
         r"entries/(?P<entry_pk>[^/.]+)/blog$",
         BlogViewSet.as_view({"get": "retrieve"}),
         name="entry-blog",
     ),
-    url(
+    re_path(
         r"entries/(?P<entry_pk>[^/.]+)/comments$",
         CommentViewSet.as_view({"get": "list"}),
         name="entry-comments",
     ),
-    url(
+    re_path(
         r"entries/(?P<entry_pk>[^/.]+)/authors$",
         AuthorViewSet.as_view({"get": "list"}),
         name="entry-authors",
     ),
-    url(
+    re_path(
         r"entries/(?P<entry_pk>[^/.]+)/featured$",
         EntryViewSet.as_view({"get": "retrieve"}),
         name="entry-featured",
     ),
-    url(
+    re_path(
         r"^authors/(?P<pk>[^/.]+)/(?P<related_field>\w+)/$",
         AuthorViewSet.as_view({"get": "retrieve_related"}),
         name="author-related",
     ),
-    url(
+    re_path(
         r"^entries/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
         EntryRelationshipView.as_view(),
         name="entry-relationships",
     ),
-    url(
+    re_path(
         r"^blogs/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
         BlogRelationshipView.as_view(),
         name="blog-relationships",
     ),
-    url(
+    re_path(
         r"^comments/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
         CommentRelationshipView.as_view(),
         name="comment-relationships",
     ),
-    url(
+    re_path(
         r"^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
         AuthorRelationshipView.as_view(),
         name="author-relationships",
@@ -111,5 +110,5 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns = [
-        url(r"^__debug__/", include(debug_toolbar.urls)),
+        path("__debug__/", include(debug_toolbar.urls)),
     ] + urlpatterns
