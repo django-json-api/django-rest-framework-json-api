@@ -17,6 +17,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Adjusted to only use f-strings for slight performance improvement.
+* Set minimum required version of inflection to 0.5.0.
 
 ### Removed
 
