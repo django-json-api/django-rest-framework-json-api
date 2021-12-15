@@ -17,7 +17,10 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Adjusted to only use f-strings for slight performance improvement.
-* Set minimum required version of inflection to 0.5.0.
+* Set minimum required version of inflection to 0.5.
+* Set minimum required version of Django Filter to 2.4.
+* Set minimum required version of Polymorphic Models for Django to 3.0.
+* Set minimum required version of PyYAML to 5.4.
 
 ### Removed
 
