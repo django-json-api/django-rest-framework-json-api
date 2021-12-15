@@ -1054,7 +1054,7 @@ class MySchemaGenerator(JSONAPISchemaGenerator):
             },
             'license': {
                 'name': 'BSD 2 clause',
-                'url': 'https://github.com/django-json-api/django-rest-framework-json-api/blob/master/LICENSE',
+                'url': 'https://github.com/django-json-api/django-rest-framework-json-api/blob/main/LICENSE',
             }
         }
         schema['servers'] = [
