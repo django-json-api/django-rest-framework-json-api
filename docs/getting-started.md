@@ -59,6 +59,8 @@ We **highly** recommend and only officially support the latest patch release of 
 
 Generally Python and Django series are supported till the official end of life. For Django REST framework the last two series are supported.
 
+For optional dependencies such as Django Filter only the latest release is officially supported even though lower versions should work as well.
+
 ## Installation
 
 Install using `pip`...
