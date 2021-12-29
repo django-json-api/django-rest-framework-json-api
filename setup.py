@@ -14,7 +14,7 @@ def read(*paths):
     """
     Build a file path from paths and return the contents.
     """
-    with open(os.path.join(*paths), "r") as f:
+    with open(os.path.join(*paths)) as f:
         return f.read()
 
 
@@ -86,7 +86,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
@@ -106,6 +105,6 @@ setup(
         "openapi": ["pyyaml>=5.4", "uritemplate>=3.0.1"],
     },
     setup_requires=wheel,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     zip_safe=False,
 )
