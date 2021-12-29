@@ -26,10 +26,11 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Removed support for Django 3.0.
 * Removed support for Django 3.1.
+* Removed support for Python 3.6.
 
 ## [4.3.0] - 2021-12-10
 
-This is the last release supporting Django 3.0 and Django 3.1.
+This is the last release supporting Django 3.0, Django 3.1 and Python 3.6.
 
 ### Added
 
