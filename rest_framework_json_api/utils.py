@@ -1,6 +1,5 @@
 import inspect
 import operator
-import warnings
 from collections import OrderedDict
 
 import inflection
@@ -147,23 +146,14 @@ def undo_format_field_name(field_name):
     return field_name
 
 
-def format_link_segment(value, format_type=None):
+def format_link_segment(value):
     """
     Takes a string value and returns it with formatted keys as set in `format_type`
     or `JSON_API_FORMAT_RELATED_LINKS`.
 
     :format_type: Either 'dasherize', 'camelize', 'capitalize' or 'underscore'
     """
-    if format_type is None:
-        format_type = json_api_settings.FORMAT_RELATED_LINKS
-    else:
-        warnings.warn(
-            DeprecationWarning(
-                "Using `format_type` argument is deprecated."
-                "Use `format_value` instead."
-            )
-        )
-
+    format_type = json_api_settings.FORMAT_RELATED_LINKS
     return format_value(value, format_type)
 
 
@@ -179,15 +169,7 @@ def undo_format_link_segment(value):
     return value
 
 
-def format_value(value, format_type=None):
-    if format_type is None:
-        warnings.warn(
-            DeprecationWarning(
-                "Using `format_value` without passing on `format_type` argument is deprecated."
-                "Use `format_field_name` instead."
-            )
-        )
-        format_type = json_api_settings.FORMAT_FIELD_NAMES
+def format_value(value, format_type):
     if format_type == "dasherize":
         # inflection can't dasherize camelCase
         value = inflection.underscore(value)
@@ -340,17 +322,6 @@ def get_default_included_resources_from_serializer(serializer):
     if meta is None and getattr(serializer, "many", False):
         meta = getattr(serializer.child, "JSONAPIMeta", None)
     return list(getattr(meta, "included_resources", []))
-
-
-def get_included_serializers(serializer):
-    warnings.warn(
-        DeprecationWarning(
-            "Using of `get_included_serializers(serializer)` function is deprecated."
-            "Use `serializer.included_serializers` instead."
-        )
-    )
-
-    return getattr(serializer, "included_serializers", dict())
 
 
 def get_relation_instance(resource_instance, source, serializer):

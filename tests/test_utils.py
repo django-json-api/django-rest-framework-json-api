@@ -1,5 +1,4 @@
 import pytest
-from django.db import models
 from rest_framework import status
 from rest_framework.fields import Field
 from rest_framework.generics import GenericAPIView
@@ -13,7 +12,6 @@ from rest_framework_json_api.utils import (
     format_link_segment,
     format_resource_type,
     format_value,
-    get_included_serializers,
     get_related_resource_type,
     get_resource_name,
     get_resource_type_from_serializer,
@@ -23,13 +21,12 @@ from rest_framework_json_api.utils import (
 )
 from tests.models import (
     BasicModel,
-    DJAModel,
     ForeignKeySource,
     ForeignKeyTarget,
     ManyToManySource,
     ManyToManyTarget,
 )
-from tests.serializers import BasicModelSerializer, ManyToManyTargetSerializer
+from tests.serializers import BasicModelSerializer
 
 
 def test_get_resource_name_no_view():
@@ -256,11 +253,6 @@ def test_format_link_segment(settings, format_type, output):
     assert format_link_segment("first_Name") == output
 
 
-def test_format_link_segment_deprecates_format_type_argument():
-    with pytest.deprecated_call():
-        assert "first-name" == format_link_segment("first_name", "dasherize")
-
-
 @pytest.mark.parametrize(
     "format_links,output",
     [
@@ -287,11 +279,6 @@ def test_undo_format_link_segment(settings, format_links, output):
 )
 def test_format_value(settings, format_type, output):
     assert format_value("first_name", format_type) == output
-
-
-def test_format_value_deprecates_default_format_type_argument():
-    with pytest.deprecated_call():
-        assert "first_name" == format_value("first_name")
 
 
 @pytest.mark.parametrize(
@@ -345,40 +332,6 @@ def test_get_related_resource_type_from_plain_serializer_class(
     serializer = PlainRelatedResourceTypeSerializer()
     field = serializer.fields["basic_models"]
     assert get_related_resource_type(field) == output
-
-
-def test_get_included_serializers():
-    class DeprecatedIncludedSerializersModel(DJAModel):
-        self = models.ForeignKey("self", on_delete=models.CASCADE)
-        target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
-        other_target = models.ForeignKey(ManyToManyTarget, on_delete=models.CASCADE)
-
-        class Meta:
-            app_label = "tests"
-
-    class DeprecatedIncludedSerializersSerializer(serializers.ModelSerializer):
-        included_serializers = {
-            "self": "self",
-            "target": ManyToManyTargetSerializer,
-            "other_target": "tests.serializers.ManyToManyTargetSerializer",
-        }
-
-        class Meta:
-            model = DeprecatedIncludedSerializersModel
-            fields = ("self", "other_target", "target")
-
-    with pytest.deprecated_call():
-        included_serializers = get_included_serializers(
-            DeprecatedIncludedSerializersSerializer
-        )
-
-    expected_included_serializers = {
-        "self": DeprecatedIncludedSerializersSerializer,
-        "target": ManyToManyTargetSerializer,
-        "other_target": ManyToManyTargetSerializer,
-    }
-
-    assert included_serializers == expected_included_serializers
 
 
 def test_get_resource_type_from_serializer_without_resource_name_raises_error():

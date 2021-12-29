@@ -42,7 +42,7 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     email = factory.LazyAttribute(lambda x: faker.email())
 
     bio = factory.RelatedFactory("example.factories.AuthorBioFactory", "author")
-    type = factory.SubFactory(AuthorTypeFactory)
+    author_type = factory.SubFactory(AuthorTypeFactory)
 
 
 class AuthorBioFactory(factory.django.DjangoModelFactory):

@@ -63,6 +63,7 @@ class TestJSONParser:
         result = parse(data, parser_context)
         assert result == {
             "id": "123",
+            "type": "BasicModel",
             "test_attribute": "test-value",
             "test_relationship": {"id": "123", "type": "TestRelationship"},
         }
@@ -85,7 +86,7 @@ class TestJSONParser:
             },
         }
         result = parse(data, None)
-        assert result == {}
+        assert result == {"type": "BasicModel"}
 
     def test_parse_preserves_json_value_field_names(
         self, settings, parse, parser_context

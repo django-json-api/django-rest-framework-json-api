@@ -124,6 +124,9 @@
                   },
                   "relationships": {
                     "properties": {
+                      "authorType": {
+                        "$ref": "#/components/schemas/reltoone"
+                      },
                       "bio": {
                         "$ref": "#/components/schemas/reltoone"
                       },
@@ -134,9 +137,6 @@
                         "$ref": "#/components/schemas/reltomany"
                       },
                       "firstEntry": {
-                        "$ref": "#/components/schemas/reltoone"
-                      },
-                      "type": {
                         "$ref": "#/components/schemas/reltoone"
                       }
                     },
@@ -532,6 +532,9 @@
                   },
                   "relationships": {
                     "properties": {
+                      "authorType": {
+                        "$ref": "#/components/schemas/reltoone"
+                      },
                       "bio": {
                         "$ref": "#/components/schemas/reltoone"
                       },
@@ -542,9 +545,6 @@
                         "$ref": "#/components/schemas/reltomany"
                       },
                       "firstEntry": {
-                        "$ref": "#/components/schemas/reltoone"
-                      },
-                      "type": {
                         "$ref": "#/components/schemas/reltoone"
                       }
                     },

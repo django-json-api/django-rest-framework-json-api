@@ -252,10 +252,13 @@ class AuthorSerializer(serializers.ModelSerializer):
         help_text="help for defaults",
     )
     initials = serializers.SerializerMethodField()
-    included_serializers = {"bio": AuthorBioSerializer, "type": AuthorTypeSerializer}
+    included_serializers = {
+        "bio": AuthorBioSerializer,
+        "author_type": AuthorTypeSerializer,
+    }
     related_serializers = {
         "bio": "example.serializers.AuthorBioSerializer",
-        "type": "example.serializers.AuthorTypeSerializer",
+        "author_type": "example.serializers.AuthorTypeSerializer",
         "comments": "example.serializers.CommentSerializer",
         "entries": "example.serializers.EntrySerializer",
         "first_entry": "example.serializers.EntrySerializer",
@@ -270,7 +273,7 @@ class AuthorSerializer(serializers.ModelSerializer):
             "entries",
             "comments",
             "first_entry",
-            "type",
+            "author_type",
             "secrets",
             "defaults",
             "initials",

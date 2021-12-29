@@ -4,7 +4,7 @@ Parsers
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 
-from rest_framework_json_api import exceptions, renderers, serializers
+from rest_framework_json_api import exceptions, renderers
 from rest_framework_json_api.utils import get_resource_name, undo_format_field_names
 
 
@@ -160,12 +160,8 @@ class JSONParser(parsers.JSONParser):
                 )
 
         # Construct the return data
-        serializer_class = getattr(view, "serializer_class", None)
         parsed_data = {"id": data.get("id")} if "id" in data else {}
-        # TODO remove in next major version 5.0.0 see serializers.ReservedFieldNamesMixin
-        if serializer_class is not None:
-            if issubclass(serializer_class, serializers.PolymorphicModelSerializer):
-                parsed_data["type"] = data.get("type")
+        parsed_data["type"] = data.get("type")
         parsed_data.update(self.parse_attributes(data))
         parsed_data.update(self.parse_relationships(data))
         parsed_data.update(self.parse_metadata(result))
