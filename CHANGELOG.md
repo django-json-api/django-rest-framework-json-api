@@ -27,6 +27,9 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Django 3.0.
 * Removed support for Django 3.1.
 * Removed support for Python 3.6.
+* Removed obsolete method `utils.get_included_serializers`.
+* Removed optional `format_type` argument of `utils.format_link_segment`.
+* Removed `format_type`s default argument of `utils.format_value`. `format_type` is now required.
 
 ## [4.3.0] - 2021-12-10
 

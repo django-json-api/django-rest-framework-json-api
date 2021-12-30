@@ -1,4 +1,3 @@
-import pytest
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.urls import reverse
@@ -216,28 +215,3 @@ class ModelViewSetTests(TestBase):
         response = self.client.get(not_found_url)
         assert 404 == response.status_code
         assert errors == response.json()
-
-
-@pytest.mark.django_db
-def test_patch_allow_field_type(author, author_type_factory, client):
-    """
-    Verify that type field may be updated.
-    """
-    # TODO remove in next major version 5.0.0 see serializers.ReservedFieldNamesMixin
-    with pytest.deprecated_call():
-        author_type = author_type_factory()
-        url = reverse("author-detail", args=[author.id])
-
-        data = {
-            "data": {
-                "id": author.id,
-                "type": "authors",
-                "relationships": {
-                    "data": {"id": author_type.id, "type": "author-type"}
-                },
-            }
-        }
-
-        response = client.patch(url, data=data)
-
-        assert response.status_code == 200

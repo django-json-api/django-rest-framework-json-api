@@ -59,7 +59,7 @@ def test_options_format_field_names(db, client):
         "bio",
         "entries",
         "firstEntry",
-        "type",
+        "authorType",
         "comments",
         "secrets",
         "defaults",

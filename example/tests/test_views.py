@@ -423,7 +423,7 @@ class TestRelatedMixin(APITestCase):
         self.assertEqual(got, EntrySerializer)
 
     def test_get_serializer_comes_from_included_serializers(self):
-        kwargs = {"pk": self.author.id, "related_field": "type"}
+        kwargs = {"pk": self.author.id, "related_field": "author_type"}
         view = self._get_view(kwargs)
         related_serializers = view.get_serializer_class().related_serializers
         delattr(view.get_serializer_class(), "related_serializers")
@@ -470,14 +470,14 @@ class TestRelatedMixin(APITestCase):
     def test_retrieve_related_single(self):
         url = reverse(
             "author-related",
-            kwargs={"pk": self.author.type.pk, "related_field": "type"},
+            kwargs={"pk": self.author.author_type.pk, "related_field": "author_type"},
         )
         resp = self.client.get(url)
         expected = {
             "data": {
                 "type": "authorTypes",
-                "id": str(self.author.type.id),
-                "attributes": {"name": str(self.author.type.name)},
+                "id": str(self.author.author_type.id),
+                "attributes": {"name": str(self.author.author_type.name)},
             }
         }
         self.assertEqual(resp.status_code, 200)

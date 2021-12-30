@@ -1,4 +1,3 @@
-import warnings
 from collections import OrderedDict
 from collections.abc import Mapping
 
@@ -157,7 +156,7 @@ class IncludedResourcesValidationMixin:
 class ReservedFieldNamesMixin:
     """Ensures that reserved field names are not used and an error raised instead."""
 
-    _reserved_field_names = {"meta", "results"}
+    _reserved_field_names = {"meta", "results", "type"}
 
     def get_fields(self):
         fields = super().get_fields()
@@ -170,18 +169,6 @@ class ReservedFieldNamesMixin:
             f"uses following reserved field name(s) which is not allowed: "
             f"{', '.join(sorted(found_reserved_field_names))}"
         )
-
-        if "type" in fields:
-            # see https://jsonapi.org/format/#document-resource-object-fields
-            warnings.warn(
-                DeprecationWarning(
-                    f"Field name 'type'  found in serializer class "
-                    f"{self.__class__.__module__}.{self.__class__.__qualname__} "
-                    f"which is not allowed according to the JSON:API spec and "
-                    f"won't be supported anymore in the next major DJA release. "
-                    f"Rename 'type' field to something else. "
-                )
-            )
 
         return fields
 

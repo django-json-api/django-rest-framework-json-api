@@ -54,7 +54,7 @@ class AuthorType(BaseModel):
 class Author(BaseModel):
     name = models.CharField(max_length=50)
     email = models.EmailField()
-    type = models.ForeignKey(AuthorType, null=True, on_delete=models.CASCADE)
+    author_type = models.ForeignKey(AuthorType, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

@@ -50,12 +50,3 @@ def test_reserved_field_names():
         "ReservedFieldNamesSerializer uses following reserved field name(s) which is "
         "not allowed: meta, results"
     )
-
-
-def test_serializer_fields_deprecated_field_name_type():
-    with pytest.deprecated_call():
-
-        class TypeFieldNameSerializer(serializers.Serializer):
-            type = serializers.CharField()
-
-        TypeFieldNameSerializer().fields
