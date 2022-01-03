@@ -1,6 +1,6 @@
 django-debug-toolbar==3.2.4
 factory-boy==3.2.1
-Faker==10.0.0
+Faker==11.1.0
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-django==4.5.2
