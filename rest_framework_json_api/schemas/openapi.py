@@ -667,8 +667,8 @@ class AutoSchema(drf_openapi.AutoSchema):
                 continue
 
             if field.required:
-                required.append(field.field_name)
-
+                required.append(format_field_name(field.field_name))
+                
             schema = self.map_field(field)
             if field.read_only:
                 schema["readOnly"] = True
@@ -681,6 +681,9 @@ class AutoSchema(drf_openapi.AutoSchema):
             if field.help_text:
                 # Ensure django gettext_lazy is rendered correctly
                 schema["description"] = str(field.help_text)
+            if field.label:
+                # Ensure django gettext_lazy is rendered correctly
+                schema["title"] = str(field.label)
             self.map_field_validators(field, schema)
 
             attributes[format_field_name(field.field_name)] = schema
