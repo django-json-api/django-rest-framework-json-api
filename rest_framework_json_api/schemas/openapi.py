@@ -681,9 +681,6 @@ class AutoSchema(drf_openapi.AutoSchema):
             if field.help_text:
                 # Ensure django gettext_lazy is rendered correctly
                 schema["description"] = str(field.help_text)
-            if field.label:
-                # Ensure django gettext_lazy is rendered correctly
-                schema["title"] = str(field.label)
             self.map_field_validators(field, schema)
 
             attributes[format_field_name(field.field_name)] = schema
