@@ -377,8 +377,12 @@ def format_drf_errors(response, context, exc):
 
         has_serializer = isinstance(context["view"], generics.GenericAPIView)
         if has_serializer:
-            serializer = context["view"].get_serializer()
-            fields = get_serializer_fields(serializer) or dict()
+            try:
+                serializer_class = context["view"].get_serializer_class()
+                serializer = serializer_class()
+                fields = get_serializer_fields(serializer) or dict()
+            except Exception:
+                fields = []
             relationship_fields = [
                 name for name, field in fields.items() if is_relationship_field(field)
             ]

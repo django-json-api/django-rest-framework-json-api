@@ -1,4 +1,5 @@
 import pytest
+from django.http import Http404
 from django.test import override_settings
 from django.urls import path, reverse
 from rest_framework import generics
@@ -48,7 +49,10 @@ class DummyTestView(generics.CreateAPIView):
     resource_name = "entries"
 
     def get_serializer_context(self):
-        return {}
+        if self.request.GET.get("fail"):
+            raise Http404
+        else:
+            return {}
 
 
 urlpatterns = [
@@ -211,3 +215,20 @@ def test_relationship_errors_has_correct_pointers(client, some_blog, snapshot):
     }
 
     assert snapshot == perform_error_test(client, data)
+
+
+def test_404_during_serializer_context(client, some_blog, snapshot):
+    data = {
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+            },
+        }
+    }
+    with override_settings(ROOT_URLCONF=__name__):
+        url = reverse("entries-nested-list")
+        response = client.post(f"{url}?fail=1", data=data)
+
+    assert snapshot == response.json()

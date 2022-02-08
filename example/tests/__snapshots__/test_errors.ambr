@@ -61,6 +61,17 @@
     ],
   }
 ---
+# name: test_404_during_serializer_context
+  <class 'dict'> {
+    'errors': <class 'list'> [
+      <class 'dict'> {
+        'code': 'not_found',
+        'detail': 'Not found.',
+        'status': '404',
+      },
+    ],
+  }
+---
 # name: test_second_level_array_error
   <class 'dict'> {
     'errors': <class 'list'> [
