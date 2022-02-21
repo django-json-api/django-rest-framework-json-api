@@ -1,0 +1,6 @@
+# RTD only supports one requirements.txt file, therefore this has been created.
+# This file needs to keep in sync with tox testenv docs dependencies.
+
+-r ../requirements/requirements-optionals.txt
+-r ../requirements/requirements-testing.txt
+-r ../requirements/requirements-documentation.txt
