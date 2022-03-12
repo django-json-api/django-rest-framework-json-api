@@ -1,6 +1,7 @@
 import pytest
 from django.urls import path, reverse
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,8 +10,9 @@ from rest_framework_json_api.parsers import JSONParser
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.renderers import JSONRenderer
 from rest_framework_json_api.utils import format_link_segment
-from rest_framework_json_api.views import ModelViewSet
+from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
 from tests.models import BasicModel
+from tests.serializers import BasicModelSerializer
 
 
 class TestModelViewSet:
@@ -53,6 +55,43 @@ class TestModelViewSet:
         view.setup(request, related_field=url_segment)
 
         assert view.get_related_field_name() == related_model_field_name
+
+
+class TestReadonlyModelViewSet:
+    @pytest.mark.parametrize(
+        "method",
+        ["get", "post", "patch", "delete"],
+    )
+    @pytest.mark.parametrize(
+        "custom_action,action_kwargs",
+        [("list_action", {}), ("detail_action", {"pk": 1})],
+    )
+    def test_custom_action_allows_all_methods(
+        self, rf, method, custom_action, action_kwargs
+    ):
+        """
+        Test that write methods are allowed on custom list actions.
+
+        Even though a read only view only allows reading, custom actions
+        should be allowed to define other methods which are allowed.
+        """
+
+        class ReadOnlyModelViewSetWithCustomActions(ReadOnlyModelViewSet):
+            serializer_class = BasicModelSerializer
+            queryset = BasicModel.objects.all()
+
+            @action(detail=False, methods=["get", "post", "patch", "delete"])
+            def list_action(self, request):
+                return Response(status=status.HTTP_204_NO_CONTENT)
+
+            @action(detail=True, methods=["get", "post", "patch", "delete"])
+            def detail_action(self, request, pk):
+                return Response(status=status.HTTP_204_NO_CONTENT)
+
+        view = ReadOnlyModelViewSetWithCustomActions.as_view({method: custom_action})
+        request = getattr(rf, method)("/", data={})
+        response = view(request, **action_kwargs)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 class TestAPIView:
