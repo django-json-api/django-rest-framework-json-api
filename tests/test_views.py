@@ -3,6 +3,7 @@ from django.urls import path, reverse
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.routers import SimpleRouter
 from rest_framework.views import APIView
 
 from rest_framework_json_api import serializers
@@ -13,6 +14,7 @@ from rest_framework_json_api.utils import format_link_segment
 from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
 from tests.models import BasicModel
 from tests.serializers import BasicModelSerializer
+from tests.views import BasicModelViewSet
 
 
 class TestModelViewSet:
@@ -55,6 +57,70 @@ class TestModelViewSet:
         view.setup(request, related_field=url_segment)
 
         assert view.get_related_field_name() == related_model_field_name
+
+    @pytest.mark.urls(__name__)
+    def test_list(self, client, model):
+        url = reverse("basic-model-list")
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": [
+                {
+                    "type": "BasicModel",
+                    "id": str(model.pk),
+                    "attributes": {"text": "Model"},
+                }
+            ],
+            "links": {
+                "first": "http://testserver/basic_models/?page%5Bnumber%5D=1",
+                "last": "http://testserver/basic_models/?page%5Bnumber%5D=1",
+                "next": None,
+                "prev": None,
+            },
+            "meta": {"pagination": {"count": 1, "page": 1, "pages": 1}},
+        }
+
+    @pytest.mark.urls(__name__)
+    def test_retrieve(self, client, model):
+        url = reverse("basic-model-detail", kwargs={"pk": model.pk})
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": {
+                "type": "BasicModel",
+                "id": str(model.pk),
+                "attributes": {"text": "Model"},
+            }
+        }
+
+    @pytest.mark.urls(__name__)
+    def test_patch(self, client, model):
+        data = {
+            "data": {
+                "id": str(model.pk),
+                "type": "BasicModel",
+                "attributes": {"text": "changed"},
+            }
+        }
+
+        url = reverse("basic-model-detail", kwargs={"pk": model.pk})
+        response = client.patch(url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": {
+                "type": "BasicModel",
+                "id": str(model.pk),
+                "attributes": {"text": "changed"},
+            }
+        }
+
+    @pytest.mark.urls(__name__)
+    def test_delete(self, client, model):
+        url = reverse("basic-model-detail", kwargs={"pk": model.pk})
+        response = client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert BasicModel.objects.count() == 0
+        assert len(response.rendered_content) == 0
 
 
 class TestReadonlyModelViewSet:
@@ -108,11 +174,17 @@ class TestAPIView:
         url = reverse("custom")
 
         response = client.patch(url, data=data)
-        result = response.json()
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": {
+                "type": "custom",
+                "id": "123",
+                "attributes": {"body": "hello"},
+            }
+        }
 
-        assert result["data"]["id"] == str(123)
-        assert result["data"]["type"] == "custom"
-        assert result["data"]["attributes"]["body"] == "hello"
+
+# Routing setup
 
 
 class CustomModel:
@@ -140,6 +212,10 @@ class CustomAPIView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+router = SimpleRouter()
+router.register(r"basic_models", BasicModelViewSet, basename="basic-model")
+
 urlpatterns = [
     path("custom", CustomAPIView.as_view(), name="custom"),
 ]
+urlpatterns += router.urls

@@ -14,6 +14,9 @@ class DJAModel(models.Model):
 class BasicModel(DJAModel):
     text = models.CharField(max_length=100)
 
+    class Meta:
+        ordering = ("id",)
+
 
 # Models for relations tests
 # ManyToMany
