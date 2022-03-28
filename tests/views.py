@@ -5,6 +5,4 @@ from tests.serializers import BasicModelSerializer
 
 class BasicModelViewSet(ModelViewSet):
     serializer_class = BasicModelSerializer
-
-    class Meta:
-        model = BasicModel
+    queryset = BasicModel.objects.all()
