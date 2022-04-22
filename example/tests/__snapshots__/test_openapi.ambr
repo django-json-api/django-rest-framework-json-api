@@ -1,5 +1,5 @@
 # name: test_delete_request
-  '
+  '''
   {
     "description": "",
     "operationId": "destroy/authors/{id}",
@@ -63,10 +63,10 @@
       "authors"
     ]
   }
-  '
----
+  '''
+# ---
 # name: test_patch_request
-  '
+  '''
   {
     "description": "",
     "operationId": "update/authors/{id}",
@@ -245,10 +245,10 @@
       "authors"
     ]
   }
-  '
----
+  '''
+# ---
 # name: test_path_with_id_parameter
-  '
+  '''
   {
     "description": "",
     "operationId": "retrieve/authors/{id}/",
@@ -355,10 +355,10 @@
       "authors"
     ]
   }
-  '
----
+  '''
+# ---
 # name: test_path_without_parameters
-  '
+  '''
   {
     "description": "",
     "operationId": "List/authors/",
@@ -477,10 +477,10 @@
       "authors"
     ]
   }
-  '
----
+  '''
+# ---
 # name: test_post_request
-  '
+  '''
   {
     "description": "",
     "operationId": "create/authors/",
@@ -665,5 +665,5 @@
       "authors"
     ]
   }
-  '
----
+  '''
+# ---
