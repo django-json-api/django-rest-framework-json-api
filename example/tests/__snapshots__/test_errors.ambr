@@ -1,133 +1,133 @@
 # name: test_first_level_attribute_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/headline',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_first_level_custom_attribute_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'detail': 'Too short',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/body-text',
-        },
+        }),
         'title': 'Too Short title',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_many_third_level_dict_errors
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comments/0/attachment/data',
-        },
+        }),
         'status': '400',
-      },
-      <class 'dict'> {
+      }),
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comments/0/body',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_relationship_errors_has_correct_pointers
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'incorrect_type',
         'detail': 'Incorrect type. Expected resource identifier object, received str.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/relationships/author',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_second_level_array_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comments/0/body',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_second_level_dict_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comment/body',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_third_level_array_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comments/0/attachments/0/data',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_third_level_custom_array_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'invalid',
         'detail': 'Too short data',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comments/0/attachments/0/data',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
 # name: test_third_level_dict_error
-  <class 'dict'> {
-    'errors': <class 'list'> [
-      <class 'dict'> {
+  dict({
+    'errors': list([
+      dict({
         'code': 'required',
         'detail': 'This field is required.',
-        'source': <class 'dict'> {
+        'source': dict({
           'pointer': '/data/attributes/comments/0/attachment/data',
-        },
+        }),
         'status': '400',
-      },
-    ],
-  }
----
+      }),
+    ]),
+  })
+# ---
