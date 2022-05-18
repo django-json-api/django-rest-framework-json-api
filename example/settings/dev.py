@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "polymorphic",
     "example",
-    "debug_toolbar",
     "django_filters",
     "tests",
 ]
@@ -61,8 +60,6 @@ ROOT_URLCONF = "example.urls"
 SECRET_KEY = "abc123"
 
 PASSWORD_HASHERS = ("django.contrib.auth.hashers.UnsaltedMD5PasswordHasher",)
-
-MIDDLEWARE = ("debug_toolbar.middleware.DebugToolbarMiddleware",)
 
 INTERNAL_IPS = ("127.0.0.1",)
 
