@@ -648,6 +648,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         required = []
         attributes = {}
         relationships = {}
+        meta = {}
 
         for field in serializer.fields.values():
             if isinstance(field, serializers.HyperlinkedIdentityField):
@@ -683,7 +684,12 @@ class AutoSchema(drf_openapi.AutoSchema):
                 schema["description"] = str(field.help_text)
             self.map_field_validators(field, schema)
 
-            attributes[format_field_name(field.field_name)] = schema
+            if field.field_name in list(
+                getattr(serializer.Meta, "meta_fields", list())
+            ):
+                meta[format_field_name(field.field_name)] = schema
+            else:
+                attributes[format_field_name(field.field_name)] = schema
 
         result = {
             "type": "object",
