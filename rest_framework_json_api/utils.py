@@ -219,6 +219,12 @@ def get_related_resource_type(relation):
         # For ManyToMany relationships, get the model from the child
         # serializer of the list serializer
         relation_model = relation.child.Meta.model
+    elif (
+        hasattr(relation, "child_relation")
+        and hasattr(relation.child_relation, "model")
+    ):
+        # For ManyRelatedField relationships, get the model from the child relationship
+        relation_model = relation.child_relation.model
     else:
         parent_serializer = relation.parent
         parent_model = None
