@@ -30,8 +30,11 @@ class EntrySerializer(serializers.Serializer):
     comment = CommentSerializer(required=False)
     headline = serializers.CharField(allow_null=True, required=True)
     body_text = serializers.CharField()
-    author = serializers.ResourceRelatedField(
+    main_author = serializers.ResourceRelatedField(
         queryset=Author.objects.all(), required=False
+    )
+    authors = serializers.ResourceRelatedField(
+        queryset=Author.objects.all(), required=False, many=True
     )
 
     def validate(self, attrs):
@@ -195,7 +198,9 @@ def test_many_third_level_dict_errors(client, some_blog, snapshot):
     assert snapshot == perform_error_test(client, data)
 
 
-def test_relationship_errors_has_correct_pointers(client, some_blog, snapshot):
+def test_relationship_errors_has_correct_pointers_with_camelize(
+    client, some_blog, snapshot
+):
     data = {
         "data": {
             "type": "entries",
@@ -205,7 +210,52 @@ def test_relationship_errors_has_correct_pointers(client, some_blog, snapshot):
                 "headline": "headline",
             },
             "relationships": {
-                "author": {"data": {"id": "INVALID_ID", "type": "authors"}}
+                "mainAuthor": {"data": {"id": "INVALID_ID", "type": "authors"}},
+                "authors": {"data": [{"id": "INVALID_ID", "type": "authors"}]},
+            },
+        }
+    }
+
+    assert snapshot == perform_error_test(client, data)
+
+
+@override_settings(JSON_API_FORMAT_FIELD_NAMES="dasherize")
+def test_relationship_errors_has_correct_pointers_with_dasherize(
+    client, some_blog, snapshot
+):
+    data = {
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "bodyText": "body_text",
+                "headline": "headline",
+            },
+            "relationships": {
+                "main-author": {"data": {"id": "INVALID_ID", "type": "authors"}},
+                "authors": {"data": [{"id": "INVALID_ID", "type": "authors"}]},
+            },
+        }
+    }
+
+    assert snapshot == perform_error_test(client, data)
+
+
+@override_settings(JSON_API_FORMAT_FIELD_NAMES=None)
+def test_relationship_errors_has_correct_pointers_with_no_formatting(
+    client, some_blog, snapshot
+):
+    data = {
+        "data": {
+            "type": "entries",
+            "attributes": {
+                "blog": some_blog.pk,
+                "body_text": "body_text",
+                "headline": "headline",
+            },
+            "relationships": {
+                "main_author": {"data": {"id": "INVALID_ID", "type": "authors"}},
+                "authors": {"data": [{"id": "INVALID_ID", "type": "authors"}]},
             },
         }
     }

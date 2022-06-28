@@ -47,14 +47,66 @@
     ]),
   })
 # ---
-# name: test_relationship_errors_has_correct_pointers
+# name: test_relationship_errors_has_correct_pointers_with_camelize
   dict({
     'errors': list([
       dict({
         'code': 'incorrect_type',
         'detail': 'Incorrect type. Expected resource identifier object, received str.',
         'source': dict({
-          'pointer': '/data/relationships/author',
+          'pointer': '/data/relationships/authors',
+        }),
+        'status': '400',
+      }),
+      dict({
+        'code': 'incorrect_type',
+        'detail': 'Incorrect type. Expected resource identifier object, received str.',
+        'source': dict({
+          'pointer': '/data/relationships/mainAuthor',
+        }),
+        'status': '400',
+      }),
+    ]),
+  })
+# ---
+# name: test_relationship_errors_has_correct_pointers_with_dasherize
+  dict({
+    'errors': list([
+      dict({
+        'code': 'incorrect_type',
+        'detail': 'Incorrect type. Expected resource identifier object, received str.',
+        'source': dict({
+          'pointer': '/data/relationships/authors',
+        }),
+        'status': '400',
+      }),
+      dict({
+        'code': 'incorrect_type',
+        'detail': 'Incorrect type. Expected resource identifier object, received str.',
+        'source': dict({
+          'pointer': '/data/relationships/main-author',
+        }),
+        'status': '400',
+      }),
+    ]),
+  })
+# ---
+# name: test_relationship_errors_has_correct_pointers_with_no_formatting
+  dict({
+    'errors': list([
+      dict({
+        'code': 'incorrect_type',
+        'detail': 'Incorrect type. Expected resource identifier object, received str.',
+        'source': dict({
+          'pointer': '/data/relationships/authors',
+        }),
+        'status': '400',
+      }),
+      dict({
+        'code': 'incorrect_type',
+        'detail': 'Incorrect type. Expected resource identifier object, received str.',
+        'source': dict({
+          'pointer': '/data/relationships/main_author',
         }),
         'status': '400',
       }),
