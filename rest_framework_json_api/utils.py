@@ -380,7 +380,9 @@ def format_drf_errors(response, context, exc):
             serializer = context["view"].get_serializer()
             fields = get_serializer_fields(serializer) or dict()
             relationship_fields = [
-                name for name, field in fields.items() if is_relationship_field(field)
+                format_field_name(name)
+                for name, field in fields.items()
+                if is_relationship_field(field)
             ]
 
         for field, error in response.data.items():
