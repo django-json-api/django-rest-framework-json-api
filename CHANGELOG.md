@@ -14,10 +14,16 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Fixed invalid relationship pointer in error objects when field naming formatting is used.
 
+### Removed
+
+* Removed support for Django 2.2.
+
 ## [5.0.0] - 2022-01-03
 
 This release is not backwards compatible. For easy migration best upgrade first to version
 4.3.0 and resolve all deprecation warnings before updating to 5.0.0
+
+This is the last release supporting Django 2.2.
 
 ### Added
 
