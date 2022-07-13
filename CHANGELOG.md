@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Fixed invalid relationship pointer in error objects when field naming formatting is used.
+* Properly resolved related resource type when nested source field is defined.
 
 ## [5.0.0] - 2022-01-03
 

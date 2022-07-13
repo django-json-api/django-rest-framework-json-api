@@ -39,3 +39,14 @@ class ForeignKeySource(DJAModel):
     target = models.ForeignKey(
         ForeignKeyTarget, related_name="sources", on_delete=models.CASCADE
     )
+
+
+class NestedRelatedSource(DJAModel):
+    m2m_source = models.ManyToManyField(ManyToManySource, related_name="nested_source")
+    fk_source = models.ForeignKey(
+        ForeignKeySource, related_name="nested_source", on_delete=models.CASCADE
+    )
+    m2m_target = models.ManyToManyField(ManyToManySource, related_name="nested_source")
+    fk_target = models.ForeignKey(
+        ForeignKeySource, related_name="nested_source", on_delete=models.CASCADE
+    )
