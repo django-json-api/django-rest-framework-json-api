@@ -25,6 +25,7 @@ from tests.models import (
     ForeignKeyTarget,
     ManyToManySource,
     ManyToManyTarget,
+    NestedRelatedSource,
 )
 from tests.serializers import BasicModelSerializer
 
@@ -310,6 +311,48 @@ def test_get_related_resource_type(model_class, field, output):
 
     serializer = RelatedResourceTypeSerializer()
     field = serializer.fields[field]
+    assert get_related_resource_type(field) == output
+
+
+@pytest.mark.parametrize(
+    "field,output,related_field_kwargs",
+    [
+        (
+            "m2m_source.targets",
+            "ManyToManyTarget",
+            {"many": True, "queryset": ManyToManyTarget.objects.all()},
+        ),
+        (
+            "m2m_target.sources.",
+            "ManyToManySource",
+            {"many": True, "queryset": ManyToManySource.objects.all()},
+        ),
+        (
+            "fk_source.target",
+            "ForeignKeyTarget",
+            {"many": True, "queryset": ForeignKeyTarget.objects.all()},
+        ),
+        (
+            "fk_target.source",
+            "ForeignKeySource",
+            {"many": True, "queryset": ForeignKeySource.objects.all()},
+        ),
+    ],
+)
+def test_get_related_resource_type_from_nested_source(
+    db, field, output, related_field_kwargs
+):
+    class RelatedResourceTypeSerializer(serializers.ModelSerializer):
+        relation = serializers.ResourceRelatedField(
+            source=field, **related_field_kwargs
+        )
+
+        class Meta:
+            model = NestedRelatedSource
+            fields = ("relation",)
+
+    serializer = RelatedResourceTypeSerializer()
+    field = serializer.fields["relation"]
     assert get_related_resource_type(field) == output
 
 
