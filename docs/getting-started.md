@@ -52,7 +52,7 @@ like the following:
 ## Requirements
 
 1. Python (3.7, 3.8, 3.9, 3.10)
-2. Django (2.2, 3.2, 4.0)
+2. Django (3.2, 4.0)
 3. Django REST framework (3.12, 3.13)
 
 We **highly** recommend and only officially support the latest patch release of each Python, Django and REST framework series.
