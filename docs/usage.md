@@ -237,13 +237,28 @@ class MyViewset(ModelViewSet):
 
 ```
 
-### Exception handling
+### Error objects / Exception handling
 
 For the `exception_handler` class, if the optional `JSON_API_UNIFORM_EXCEPTIONS` is set to True,
 all exceptions will respond with the JSON:API [error format](https://jsonapi.org/format/#error-objects).
 
 When `JSON_API_UNIFORM_EXCEPTIONS` is False (the default), non-JSON:API views will respond
 with the normal DRF error format.
+
+In case you need a custom error object you can simply raise an `rest_framework.serializers.ValidationError` like the following:
+
+```python
+raise serializers.ValidationError(
+    {
+        "id": "your-id",
+        "detail": "your detail message",
+        "source": {
+            "pointer": "/data/attributes/your-pointer",
+        }
+
+    }
+)
+```
 
 ### Performance Testing
 
