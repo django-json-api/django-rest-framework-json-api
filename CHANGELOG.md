@@ -15,6 +15,10 @@ any parts of the framework not mentioned in the documentation should generally b
 * Fixed invalid relationship pointer in error objects when field naming formatting is used.
 * Properly resolved related resource type when nested source field is defined.
 
+### Added
+
+* Added support for Django 4.1.
+
 ### Removed
 
 * Removed support for Django 2.2.
