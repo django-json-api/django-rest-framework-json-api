@@ -44,26 +44,26 @@ class DummyTestViewSet(viewsets.ModelViewSet):
     serializer_class = DummyTestSerializer
 
 
-def render_dummy_test_serialized_view(view_class):
-    serializer = DummyTestSerializer(instance=Entry())
+def render_dummy_test_serialized_view(view_class, entry):
+    serializer = DummyTestSerializer(instance=entry)
     renderer = JSONRenderer()
     return renderer.render(serializer.data, renderer_context={"view": view_class()})
 
 
 # tests
-def test_simple_reverse_relation_included_renderer():
+def test_simple_reverse_relation_included_renderer(db, entry):
     """
     Test renderer when a single reverse fk relation is passed.
     """
-    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet, entry)
 
     assert rendered
 
 
-def test_render_format_field_names(settings):
+def test_render_format_field_names(db, settings, entry):
     """Test that json field is kept untouched."""
     settings.JSON_API_FORMAT_FIELD_NAMES = "dasherize"
-    rendered = render_dummy_test_serialized_view(DummyTestViewSet)
+    rendered = render_dummy_test_serialized_view(DummyTestViewSet, entry)
 
     result = json.loads(rendered.decode())
     assert result["data"]["attributes"]["json-field"] == {"JsonKey": "JsonValue"}
