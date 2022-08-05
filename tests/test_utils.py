@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from rest_framework_json_api import serializers
 from rest_framework_json_api.utils import (
+    format_error_object,
     format_field_name,
     format_field_names,
     format_link_segment,
@@ -389,3 +390,45 @@ def test_get_resource_type_from_serializer_without_resource_name_raises_error():
         "can not detect 'resource_name' on serializer "
         "'SerializerWithoutResourceName' in module 'tests.test_utils'"
     )
+
+
+@pytest.mark.parametrize(
+    "message,pointer,response,result",
+    [
+        # Test that pointer does not get overridden in custom error
+        (
+            {
+                "status": "400",
+                "source": {
+                    "pointer": "/data/custom-pointer",
+                },
+                "meta": {"key": "value"},
+            },
+            "/data/default-pointer",
+            Response(status.HTTP_400_BAD_REQUEST),
+            [
+                {
+                    "status": "400",
+                    "source": {"pointer": "/data/custom-pointer"},
+                    "meta": {"key": "value"},
+                }
+            ],
+        ),
+        # Test that pointer gets added to custom error
+        (
+            {
+                "detail": "custom message",
+            },
+            "/data/default-pointer",
+            Response(status.HTTP_400_BAD_REQUEST),
+            [
+                {
+                    "detail": "custom message",
+                    "source": {"pointer": "/data/default-pointer"},
+                }
+            ],
+        ),
+    ],
+)
+def test_format_error_object(message, pointer, response, result):
+    assert result == format_error_object(message, pointer, response)

@@ -417,21 +417,20 @@ def format_error_object(message, pointer, response):
     if isinstance(message, dict):
 
         # as there is no required field in error object we check that all fields are string
-        # except links and source which might be a dict
+        # except links, source or meta which might be a dict
         is_custom_error = all(
             [
                 isinstance(value, str)
                 for key, value in message.items()
-                if key not in ["links", "source"]
+                if key not in ["links", "source", "meta"]
             ]
         )
 
         if is_custom_error:
             if "source" not in message:
                 message["source"] = {}
-            message["source"] = {
-                "pointer": pointer,
-            }
+            if "pointer" not in message["source"]:
+                message["source"]["pointer"] = pointer
             errors.append(message)
         else:
             for k, v in message.items():
