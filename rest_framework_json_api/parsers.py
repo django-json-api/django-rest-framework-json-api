@@ -72,7 +72,7 @@ class JSONParser(parsers.JSONParser):
 
     def parse_data(self, result, parser_context):
         """
-        Formats the output of calling JSONParser to match the JSON:API specification 
+        Formats the output of calling JSONParser to match the JSON:API specification
         and returns the result.
         """
         if not isinstance(result, dict) or "data" not in result:
