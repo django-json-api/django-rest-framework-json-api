@@ -70,14 +70,11 @@ class JSONParser(parsers.JSONParser):
         else:
             return {}
 
-    def parse(self, stream, media_type=None, parser_context=None):
+    def parse_data(self, result, parser_context):
         """
-        Parses the incoming bytestream as JSON and returns the resulting data
+        Formats the output of calling JSONParser to match the JSON:API specification
+        and returns the result.
         """
-        result = super().parse(
-            stream, media_type=media_type, parser_context=parser_context
-        )
-
         if not isinstance(result, dict) or "data" not in result:
             raise ParseError("Received document does not contain primary data")
 
@@ -166,3 +163,13 @@ class JSONParser(parsers.JSONParser):
         parsed_data.update(self.parse_relationships(data))
         parsed_data.update(self.parse_metadata(result))
         return parsed_data
+
+    def parse(self, stream, media_type=None, parser_context=None):
+        """
+        Parses the incoming bytestream as JSON and returns the resulting data
+        """
+        result = super().parse(
+            stream, media_type=media_type, parser_context=parser_context
+        )
+
+        return self.parse_data(result, parser_context)
