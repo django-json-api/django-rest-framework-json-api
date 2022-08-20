@@ -19,6 +19,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Django 4.1.
+* Expanded JSONParser API with `parse_data` method
 
 ### Removed
 
