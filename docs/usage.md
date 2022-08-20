@@ -1085,11 +1085,10 @@ class MySchemaGenerator(JSONAPISchemaGenerator):
 ### Generate a Static Schema on Command Line
 
 See [DRF documentation for generateschema](https://www.django-rest-framework.org/api-guide/schemas/#generating-a-static-schema-with-the-generateschema-management-command)
-To generate an OAS schema document, use something like:
+To generate a static OAS schema document, using the `generateschema` management command, you **must override DRF's default** `generator_class` with the DJA-specific version:
 
 ```text
-$ django-admin generateschema --settings=example.settings \
-                              --generator_class myapp.views.MySchemaGenerator >myschema.yaml
+$ ./manage.py generateschema --generator_class rest_framework_json_api.schemas.openapi.SchemaGenerator
 ```
 
 You can then use any number of OAS tools such as
