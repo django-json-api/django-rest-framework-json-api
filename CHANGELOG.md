@@ -21,6 +21,10 @@ any parts of the framework not mentioned in the documentation should generally b
 * Added support for Django 4.1.
 * Expanded JSONParser API with `parse_data` method
 
+### Changed
+
+* Improved documentation of how to override DRF's generateschema `--generator_class` to generate a proper DJA OAS schema.
+
 ### Removed
 
 * Removed support for Django 2.2.
