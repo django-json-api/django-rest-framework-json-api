@@ -55,6 +55,7 @@ def test_options_format_field_names(db, client):
     data = response.json()["data"]
     expected_keys = {
         "name",
+        "fullName",
         "email",
         "bio",
         "entries",

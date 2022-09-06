@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from rest_framework_json_api.utils import format_field_names, undo_format_field_name
+from rest_framework_json_api.utils import format_field_name, undo_format_field_name
 
 
 class DjangoFilterBackend(DjangoFilterBackend):
@@ -139,6 +139,6 @@ class DjangoFilterBackend(DjangoFilterBackend):
         result = super().get_schema_operation_parameters(view)
         for res in result:
             if "name" in res:
-                name = format_field_names(res["name"].replace("__", "."))
+                name = format_field_name(res["name"].replace("__", "."))
                 res["name"] = "filter[{}]".format(name)
         return result
