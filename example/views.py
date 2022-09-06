@@ -222,6 +222,7 @@ class NoFiltersetEntryViewSet(EntryViewSet):
 
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
+    filterset_fields = ("author_type", "name")
 
     def get_serializer_class(self):
         serializer_classes = {

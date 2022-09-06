@@ -667,7 +667,7 @@ class AutoSchema(drf_openapi.AutoSchema):
                 continue
 
             if field.required:
-                required.append(field.field_name)
+                required.append(format_field_name(field.field_name))
 
             schema = self.map_field(field)
             if field.read_only:

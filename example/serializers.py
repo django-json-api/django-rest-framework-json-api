@@ -268,6 +268,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = Author
         fields = (
             "name",
+            "full_name",
             "email",
             "bio",
             "entries",

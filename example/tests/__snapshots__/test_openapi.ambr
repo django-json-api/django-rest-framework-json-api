@@ -104,6 +104,10 @@
                         "maxLength": 254,
                         "type": "string"
                       },
+                      "fullName": {
+                        "maxLength": 50,
+                        "type": "string"
+                      },
                       "name": {
                         "maxLength": 50,
                         "type": "string"
@@ -281,6 +285,24 @@
         }
       },
       {
+        "description": "author_type",
+        "in": "query",
+        "name": "filter[authorType]",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "description": "name",
+        "in": "query",
+        "name": "filter[name]",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
         "description": "A search term.",
         "in": "query",
         "name": "filter[search]",
@@ -400,6 +422,24 @@
         }
       },
       {
+        "description": "author_type",
+        "in": "query",
+        "name": "filter[authorType]",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "description": "name",
+        "in": "query",
+        "name": "filter[name]",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
         "description": "A search term.",
         "in": "query",
         "name": "filter[search]",
@@ -508,6 +548,10 @@
                         "maxLength": 254,
                         "type": "string"
                       },
+                      "fullName": {
+                        "maxLength": 50,
+                        "type": "string"
+                      },
                       "name": {
                         "maxLength": 50,
                         "type": "string"
@@ -515,6 +559,7 @@
                     },
                     "required": [
                       "name",
+                      "fullName",
                       "email"
                     ],
                     "type": "object"

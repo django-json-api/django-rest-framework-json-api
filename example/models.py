@@ -53,6 +53,7 @@ class AuthorType(BaseModel):
 
 class Author(BaseModel):
     name = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=50)
     email = models.EmailField()
     author_type = models.ForeignKey(AuthorType, null=True, on_delete=models.CASCADE)
 
