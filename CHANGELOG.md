@@ -20,6 +20,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Django 4.1.
+* Added support for Django REST framework 3.14.
 * Expanded JSONParser API with `parse_data` method
 
 ### Changed
@@ -29,13 +30,14 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Removed
 
 * Removed support for Django 2.2.
+* Removed support for Django REST framework 3.12.
 
 ## [5.0.0] - 2022-01-03
 
 This release is not backwards compatible. For easy migration best upgrade first to version
 4.3.0 and resolve all deprecation warnings before updating to 5.0.0
 
-This is the last release supporting Django 2.2.
+This is the last release supporting Django 2.2 and Django REST framework 3.12.
 
 ### Added
 
