@@ -7,6 +7,7 @@ from rest_framework.schemas import openapi as drf_openapi
 from rest_framework.schemas.utils import is_list_view
 
 from rest_framework_json_api import serializers, views
+from rest_framework_json_api.compat import get_reference
 from rest_framework_json_api.utils import format_field_name
 
 
@@ -515,10 +516,10 @@ class AutoSchema(drf_openapi.AutoSchema):
         if collection:
             data = {
                 "type": "array",
-                "items": self._get_reference(self.view.get_serializer()),
+                "items": get_reference(self, self.view.get_serializer()),
             }
         else:
-            data = self._get_reference(self.view.get_serializer())
+            data = get_reference(self, self.view.get_serializer())
 
         return {
             "description": operation["operationId"],
