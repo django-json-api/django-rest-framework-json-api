@@ -10,6 +10,8 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+## [6.0.0] - 2022-09-24
+
 ### Fixed
 
 * Fixed invalid relationship pointer in error objects when field naming formatting is used.
