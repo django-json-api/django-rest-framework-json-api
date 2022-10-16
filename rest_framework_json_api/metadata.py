@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from django.db.models.fields import related
 from django.utils.encoding import force_str
 from rest_framework import serializers
@@ -65,7 +63,7 @@ class JSONAPIMetadata(SimpleMetadata):
         )
 
     def determine_metadata(self, request, view):
-        metadata = OrderedDict()
+        metadata = {}
         metadata["name"] = view.get_view_name()
         metadata["description"] = view.get_view_description()
         metadata["renders"] = [
@@ -92,19 +90,19 @@ class JSONAPIMetadata(SimpleMetadata):
         # Remove the URL field if present
         serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
-        return OrderedDict(
+        return {
             [
                 (format_field_name(field_name), self.get_field_info(field))
                 for field_name, field in serializer.fields.items()
             ]
-        )
+        }
 
     def get_field_info(self, field):
         """
         Given an instance of a serializer field, return a dictionary
         of metadata about it.
         """
-        field_info = OrderedDict()
+        field_info = {}
         serializer = field.parent
 
         if isinstance(field, serializers.ManyRelatedField):
