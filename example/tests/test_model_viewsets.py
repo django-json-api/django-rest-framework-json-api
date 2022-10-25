@@ -208,10 +208,14 @@ class ModelViewSetTests(TestBase):
     def test_404_error_pointer(self):
         self.client.login(username="miles", password="pw")
         not_found_url = reverse("user-detail", kwargs={"pk": 12345})
-        errors = {
-            "errors": [{"detail": "Not found.", "status": "404", "code": "not_found"}]
-        }
 
         response = self.client.get(not_found_url)
         assert 404 == response.status_code
+        result = response.json()
+
+        # exact detail message differs between Python versions
+        # but only relevant is that there is a message
+        assert result["errors"][0].pop("detail") is not None
+
+        errors = {"errors": [{"status": "404", "code": "not_found"}]}
         assert errors == response.json()

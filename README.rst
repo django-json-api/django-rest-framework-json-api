@@ -88,7 +88,7 @@ As a Django REST framework JSON:API (short DJA) we are trying to address followi
 Requirements
 ------------
 
-1. Python (3.7, 3.8, 3.9, 3.10)
+1. Python (3.7, 3.8, 3.9, 3.10, 3.11)
 2. Django (3.2, 4.0, 4.1)
 3. Django REST framework (3.13, 3.14)
 
