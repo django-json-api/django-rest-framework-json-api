@@ -1128,3 +1128,16 @@ urlpatterns = [
 ]
 ```
 
+## Third Party Packages
+
+### About Third Party Packages
+
+Following the example of [Django REST framework](https://www.django-rest-framework.org/community/third-party-packages/) we also support, encourage and strongly favor the creation of Third Party Packages to encapsulate new behavior rather than adding additional functionality directly to Django REST framework JSON:API especially when it involves adding new dependencies.
+
+We aim to make creating third party packages as easy as possible, whilst keeping a simple and well maintained core API. By promoting third party packages we ensure that the responsibility for a package remains with its author. If a package proves suitably popular it can always be considered for inclusion into the DJA core.
+
+### Existing Third Party Packages
+
+To submit new content, [open an issue](https://github.com/django-json-api/django-rest-framework-json-api/issues/new/choose) or [create a pull request](https://github.com/django-json-api/django-rest-framework-json-api/compare).
+
+* [drf-yasg-json-api](https://github.com/glowka/drf-yasg-json-api) - Automated generation of Swagger/OpenAPI 2.0 from Django REST framework JSON:API endpoints.
