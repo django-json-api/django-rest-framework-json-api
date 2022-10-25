@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Added support for Python 3.11.
+
 ## [6.0.0] - 2022-09-24
 
 ### Fixed
