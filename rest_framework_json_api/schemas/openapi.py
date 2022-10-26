@@ -427,9 +427,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         # get request and response code schemas
         if method == "GET":
             if is_list_view(path, method, self.view):
-                self._add_get_collection_response(operation)
+                self._add_get_collection_response(operation, path)
             else:
-                self._add_get_item_response(operation)
+                self._add_get_item_response(operation, path)
         elif method == "POST":
             self._add_post_item_response(operation, path)
         elif method == "PATCH":
@@ -487,25 +487,29 @@ class AutoSchema(drf_openapi.AutoSchema):
         """
         return [{"$ref": "#/components/parameters/sort"}]
 
-    def _add_get_collection_response(self, operation):
+    def _add_get_collection_response(self, operation, path):
         """
         Add GET 200 response for a collection to operation
         """
         operation["responses"] = {
-            "200": self._get_toplevel_200_response(operation, collection=True)
+            "200": self._get_toplevel_200_response(
+                operation, path, "GET", collection=True
+            )
         }
         self._add_get_4xx_responses(operation)
 
-    def _add_get_item_response(self, operation):
+    def _add_get_item_response(self, operation, path):
         """
         add GET 200 response for an item to operation
         """
         operation["responses"] = {
-            "200": self._get_toplevel_200_response(operation, collection=False)
+            "200": self._get_toplevel_200_response(
+                operation, path, "GET", collection=False
+            )
         }
         self._add_get_4xx_responses(operation)
 
-    def _get_toplevel_200_response(self, operation, collection=True):
+    def _get_toplevel_200_response(self, operation, path, method, collection=True):
         """
         return top-level JSON:API GET 200 response
 
@@ -516,10 +520,12 @@ class AutoSchema(drf_openapi.AutoSchema):
         if collection:
             data = {
                 "type": "array",
-                "items": get_reference(self, self.view.get_serializer()),
+                "items": get_reference(
+                    self, self.get_response_serializer(path, method)
+                ),
             }
         else:
-            data = get_reference(self, self.view.get_serializer())
+            data = get_reference(self, self.get_response_serializer(path, method))
 
         return {
             "description": operation["operationId"],
@@ -555,7 +561,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         """
         operation["requestBody"] = self.get_request_body(path, "POST")
         operation["responses"] = {
-            "201": self._get_toplevel_200_response(operation, collection=False)
+            "201": self._get_toplevel_200_response(
+                operation, path, "POST", collection=False
+            )
         }
         operation["responses"]["201"]["description"] = (
             "[Created](https://jsonapi.org/format/#crud-creating-responses-201). "
@@ -574,7 +582,9 @@ class AutoSchema(drf_openapi.AutoSchema):
         """
         operation["requestBody"] = self.get_request_body(path, "PATCH")
         operation["responses"] = {
-            "200": self._get_toplevel_200_response(operation, collection=False)
+            "200": self._get_toplevel_200_response(
+                operation, path, "PATCH", collection=False
+            )
         }
         self._add_patch_4xx_responses(operation)
 
@@ -591,7 +601,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         """
         A request body is required by JSON:API for POST, PATCH, and DELETE methods.
         """
-        serializer = self.get_serializer(path, method)
+        serializer = self.get_request_serializer(path, method)
         if not isinstance(serializer, (serializers.BaseSerializer,)):
             return {}
         is_relationship = isinstance(self.view, views.RelationshipView)
