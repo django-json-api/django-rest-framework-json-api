@@ -278,18 +278,15 @@ class MyModelSerializer(serializers.ModelSerializer):
     # ...
 ```
 
-### Setting the resource_name
+### Setting resource identifier object type
 
-You may manually set the `resource_name` property on views, serializers, or
-models to specify the `type` key in the json output. In the case of setting the
-`resource_name` property for models you must include the property inside a
-`JSONAPIMeta` class on the model. It is automatically set for you as the plural
-of the view or model name except on resources that do not subclass
-`rest_framework.viewsets.ModelViewSet`:
-
+You may manually set resource identifier object type by using `resource_name` property on views, serializers, or
+models. In case of setting the `resource_name` property for models you must include the property inside a
+`JSONAPIMeta` class on the model. It is usually automatically set for you as the plural of the view or model name except
+on resources that do not subclass `rest_framework.viewsets.ModelViewSet`:
 
 Example - `resource_name` on View:
-``` python
+```python
 class Me(generics.GenericAPIView):
     """
     Current user's identity endpoint.
@@ -301,12 +298,9 @@ class Me(generics.GenericAPIView):
     allowed_methods = ['GET']
     permission_classes = (permissions.IsAuthenticated, )
 ```
-If you set the `resource_name` property on the object to `False` the data
-will be returned without modification.
-
 
 Example - `resource_name` on Model:
-``` python
+```python
 class Me(models.Model):
     """
     A simple model
@@ -324,11 +318,25 @@ on the view should be used sparingly as serializers and models are shared betwee
 multiple endpoints. Setting the `resource_name` on views may result in a different
 `type` being set depending on which endpoint the resource is fetched from.
 
+### Build JSON:API view output manually
+
+If in a view you want to build the output manually, you can set `resource_name` to `False`.
+
+Example:
+```python
+class User(ModelViewSet):
+    resource_name = False
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = [{"id": 1, "type": "users", "attributes": {"fullName": "Test User"}}])
+```
 
 ### Inflecting object and relation keys
 
-This package includes the ability (off by default) to automatically convert [JSON:API field names](https://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the python/rest_framework's preferred underscore to
-a format of your choice. To hook this up include the following setting in your
+This package includes the ability (off by default) to automatically convert [JSON:API field names](https://jsonapi.org/format/#document-resource-object-fields) of requests and responses from the Django REST framework's preferred underscore to a format of your choice. To hook this up include the following setting in your
 project settings:
 
 ``` python
