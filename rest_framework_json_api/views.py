@@ -129,7 +129,10 @@ class AutoPrefetchMixin:
 
 class RelatedMixin:
     """
-    This mixin handles all related entities, whose Serializers are declared in "related_serializers"
+    Mixing handling related links.
+
+    This mixin handles all related entities, whose Serializers are declared
+    in "related_serializers".
     """
 
     def retrieve_related(self, request, *args, **kwargs):

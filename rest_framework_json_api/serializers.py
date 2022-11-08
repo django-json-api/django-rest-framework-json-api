@@ -330,10 +330,9 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
             return new_class
 
         polymorphic_serializers = getattr(new_class, "polymorphic_serializers", None)
-        if not polymorphic_serializers:
-            raise NotImplementedError(
-                "A PolymorphicModelSerializer must define a `polymorphic_serializers` attribute."
-            )
+        assert (
+            polymorphic_serializers is not None
+        ), "A PolymorphicModelSerializer must define a `polymorphic_serializers` attribute."
         serializer_to_model = {
             serializer: serializer.Meta.model for serializer in polymorphic_serializers
         }

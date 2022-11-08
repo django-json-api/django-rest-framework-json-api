@@ -159,8 +159,8 @@ def format_link_segment(value):
 
 def undo_format_link_segment(value):
     """
-    Takes a link segment and undos format link segment to underscore which is the Python convention
-    but only in case `JSON_API_FORMAT_RELATED_LINKS` is actually configured.
+    Takes a link segment and undos format link segment to underscore which is the Python
+    convention but only in case `JSON_API_FORMAT_RELATED_LINKS` is actually configured.
     """
 
     if json_api_settings.FORMAT_RELATED_LINKS:
@@ -356,8 +356,8 @@ class Hyperlink(str):
     https://github.com/tomchristie/django-rest-framework
     """
 
-    def __new__(self, url, name):
-        ret = str.__new__(self, url)
+    def __new__(cls, url, name):
+        ret = str.__new__(cls, url)
         ret.name = name
         return ret
 

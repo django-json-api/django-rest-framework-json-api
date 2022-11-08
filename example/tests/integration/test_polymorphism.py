@@ -33,7 +33,7 @@ def test_polymorphism_on_detail_relations(single_company, client):
 def test_polymorphism_on_included_relations(single_company, client):
     response = client.get(
         reverse("company-detail", kwargs={"pk": single_company.pk})
-        + "?include=current_project,future_projects,current_art_project,current_research_project"
+        + "?include=current_project,future_projects,current_art_project,current_research_project"  # noqa: B950
     )
     content = response.json()
     assert (
@@ -169,14 +169,14 @@ def test_invalid_type_on_polymorphic_model(client):
     try:
         assert (
             content["errors"][0]["detail"]
-            == "The resource object's type (invalidProjects) is not the type that constitute the "
+            == "The resource object's type (invalidProjects) is not the type that constitute the "  # noqa: B950
             "collection represented by the endpoint (one of [researchProjects, artProjects])."
         )
     except AssertionError:
         # Available type list order isn't enforced
         assert (
             content["errors"][0]["detail"]
-            == "The resource object's type (invalidProjects) is not the type that constitute the "
+            == "The resource object's type (invalidProjects) is not the type that constitute the "  # noqa: B950
             "collection represented by the endpoint (one of [artProjects, researchProjects])."
         )
 

@@ -144,8 +144,8 @@ class NoPagination(JsonApiPageNumberPagination):
 
 class NonPaginatedEntryViewSet(EntryViewSet):
     pagination_class = NoPagination
-    # override the default filter backends in order to test QueryParameterValidationFilter without
-    # breaking older usage of non-standard query params like `page_size`.
+    # override the default filter backends in order to test QueryParameterValidationFilter
+    # without breaking older usage of non-standard query params like `page_size`.
     filter_backends = (
         QueryParameterValidationFilter,
         OrderingFilter,

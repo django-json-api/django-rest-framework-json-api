@@ -115,11 +115,11 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                 "uniqueItems": True,
             },
             # A RelationshipView uses a ResourceIdentifierObjectSerializer (hence the name
-            # ResourceIdentifierObject returned by get_component_name()) which serializes type and
-            # id. These can be lists or individual items depending on whether the relationship is
-            # toMany or toOne so offer both options since we are not iterating over all the
-            # possible {related_field}'s but rather rendering one path schema which may represent
-            # toMany and toOne relationships.
+            # ResourceIdentifierObject returned by get_component_name()) which serializes type
+            # and id. These can be lists or individual items depending on whether the
+            # relationship is toMany or toOne so offer both options since we are not iterating
+            # over all the possible {related_field}'s but rather rendering one path schema
+            # which may represent toMany and toOne relationships.
             "ResourceIdentifierObject": {
                 "oneOf": [
                     {"$ref": "#/components/schemas/relationshipToOne"},
@@ -181,10 +181,12 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                         "properties": {
                             "pointer": {
                                 "type": "string",
-                                "description": "A [JSON Pointer](https://tools.ietf.org/html/rfc6901) "
-                                "to the associated entity in the request document "
-                                "[e.g. `/data` for a primary data object, or "
-                                "`/data/attributes/title` for a specific attribute.",
+                                "description": (
+                                    "A [JSON Pointer](https://tools.ietf.org/html/rfc6901) "
+                                    "to the associated entity in the request document "
+                                    "[e.g. `/data` for a primary data object, or "
+                                    "`/data/attributes/title` for a specific attribute.",
+                                ),
                             },
                             "parameter": {
                                 "type": "string",
@@ -273,7 +275,8 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
         _, view_endpoints = self._get_paths_and_endpoints(None if public else request)
 
         #: `expanded_endpoints` is like view_endpoints with one extra field tacked on:
-        #: - 'action' copy of current view.action (list/fetch) as this gets reset for each request.
+        #: - 'action' copy of current view.action (list/fetch) as this gets reset for
+        # each request.
         expanded_endpoints = []
         for path, method, view in view_endpoints:
             if hasattr(view, "action") and view.action == "retrieve_related":
@@ -371,7 +374,8 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
 
     def _find_related_view(self, view_endpoints, related_serializer, parent_view):
         """
-        For a given related_serializer, try to find it's "parent" view instance in view_endpoints.
+        For a given related_serializer, try to find it's "parent" view instance.
+
         :param view_endpoints: list of all view endpoints
         :param related_serializer: the related serializer for a given related field
         :param parent_view: the parent view (used to find toMany vs. toOne).
@@ -468,7 +472,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         # TODO: See if able to identify the specific types for fields[type]=... and return this:
         # name: fields
         # in: query
-        # description: '[sparse fieldsets](https://jsonapi.org/format/#fetching-sparse-fieldsets)'
+        # description: '[sparse fieldsets](https://jsonapi.org/format/#fetching-sparse-fieldsets)'  # noqa: B950
         # required: true
         # style: deepObject
         # schema:
@@ -609,10 +613,11 @@ class AutoSchema(drf_openapi.AutoSchema):
         # DRF uses a $ref to the component schema definition, but this
         # doesn't work for JSON:API due to the different required fields based on
         # the method, so make those changes and inline another copy of the schema.
+
         # TODO: A future improvement could make this DRYer with multiple component schemas:
-        #   A base schema for each viewset that has no required fields
-        #   One subclassed from the base that requires some fields (`type` but not `id` for POST)
-        #   Another subclassed from base with required type/id but no required attributes (PATCH)
+        # A base schema for each viewset that has no required fields
+        # One subclassed from the base that requires some fields (`type` but not `id` for POST)
+        # Another subclassed from base with required type/id but no required attributes (PATCH)
 
         if is_relationship:
             item_schema = {"$ref": "#/components/schemas/ResourceIdentifierObject"}
@@ -653,7 +658,9 @@ class AutoSchema(drf_openapi.AutoSchema):
     def map_serializer(self, serializer):
         """
         Custom map_serializer that serializes the schema using the JSON:API spec.
-        Non-attributes like related and identity fields, are move to 'relationships' and 'links'.
+
+        Non-attributes like related and identity fields, are moved to 'relationships'
+        and 'links'.
         """
         # TODO: remove attributes, etc. for relationshipView??
         required = []
@@ -830,7 +837,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         }
         self._add_async_response(operation)
         operation["responses"]["204"] = {
-            "description": "[no content](https://jsonapi.org/format/#crud-deleting-responses-204)",
+            "description": "[no content](https://jsonapi.org/format/#crud-deleting-responses-204)",  # noqa: B950
         }
         # the 4xx errors:
         self._add_generic_failure_responses(operation)

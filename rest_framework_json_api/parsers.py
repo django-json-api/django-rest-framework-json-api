@@ -85,8 +85,8 @@ class JSONParser(parsers.JSONParser):
         from rest_framework_json_api.views import RelationshipView
 
         if isinstance(view, RelationshipView):
-            # We skip parsing the object as JSON:API Resource Identifier Object and not a regular
-            # Resource Object
+            # We skip parsing the object as JSON:API Resource Identifier Object and not
+            # a regular Resource Object
             if isinstance(data, list):
                 for resource_identifier_object in data:
                     if not (
