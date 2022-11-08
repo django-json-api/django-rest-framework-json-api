@@ -562,8 +562,8 @@ class TestValidationErrorResponses(TestBase):
         expected = [
             {
                 "detail": (
-                    "The resource object's type (bad) is not the type that constitute the collection "
-                    "represented by the endpoint (blogs)."
+                    "The resource object's type (bad) is not the type that constitute the "
+                    "collection represented by the endpoint (blogs)."
                 ),
                 "source": {"pointer": "/data"},
                 "status": "409",

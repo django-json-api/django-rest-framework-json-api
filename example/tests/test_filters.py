@@ -482,7 +482,7 @@ class DJATestFilters(APITestCase):
                         "blog": {"data": {"type": "blogs", "id": "1"}},
                         "blogHyperlinked": {
                             "links": {
-                                "self": "http://testserver/entries/7/relationships/blog_hyperlinked",  # noqa: E501
+                                "self": "http://testserver/entries/7/relationships/blog_hyperlinked",  # noqa: B950
                                 "related": "http://testserver/entries/7/blog",
                             }
                         },
@@ -490,7 +490,7 @@ class DJATestFilters(APITestCase):
                         "comments": {"meta": {"count": 0}, "data": []},
                         "commentsHyperlinked": {
                             "links": {
-                                "self": "http://testserver/entries/7/relationships/comments_hyperlinked",  # noqa: E501
+                                "self": "http://testserver/entries/7/relationships/comments_hyperlinked",  # noqa: B950
                                 "related": "http://testserver/entries/7/comments",
                             }
                         },
@@ -515,14 +515,14 @@ class DJATestFilters(APITestCase):
                         },
                         "suggestedHyperlinked": {
                             "links": {
-                                "self": "http://testserver/entries/7/relationships/suggested_hyperlinked",  # noqa: E501
+                                "self": "http://testserver/entries/7/relationships/suggested_hyperlinked",  # noqa: B950
                                 "related": "http://testserver/entries/7/suggested/",
                             }
                         },
                         "tags": {"data": [], "meta": {"count": 0}},
                         "featuredHyperlinked": {
                             "links": {
-                                "self": "http://testserver/entries/7/relationships/featured_hyperlinked",  # noqa: E501
+                                "self": "http://testserver/entries/7/relationships/featured_hyperlinked",  # noqa: B950
                                 "related": "http://testserver/entries/7/featured",
                             }
                         },
@@ -550,7 +550,7 @@ class DJATestFilters(APITestCase):
         1. For each keyword, search the 4 search_fields for a match and then get the result
            set which is the union of all results for the given keyword.
         2. Intersect those results sets such that *all* keywords are represented.
-        See `example/fixtures/blogentry.json` for the test content that the searches are based on.
+        See `example/fixtures/blogentry.json` for what test content the searches are based on.
         The searches test for both direct entries and related blogs across multiple fields.
         """
         for searches in (

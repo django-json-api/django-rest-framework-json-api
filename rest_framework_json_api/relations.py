@@ -123,7 +123,7 @@ class HyperlinkedMixin:
         #         AuthorViewSet.as_view({'get': 'retrieve_related'}))
         # 2. url(r'^authors/(?P<author_pk>[^/.]+)/bio/$',
         #         AuthorBioViewSet.as_view({'get': 'retrieve'}))
-        # So, if related_link_url_kwarg == 'pk' it will add 'related_field' parameter to reverse()
+        # So, if related_link_url_kwarg == 'pk' it adds 'related_field' parameter to reverse()
         if self.related_link_url_kwarg == "pk":
             related_kwargs = self_kwargs
         else:

@@ -29,7 +29,7 @@ def test_pagination_with_single_entry(single_entry, client):
                     "blogHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/blog",
-                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked",
+                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked",  # noqa: B950
                         }
                     },
                     "authors": {
@@ -43,7 +43,7 @@ def test_pagination_with_single_entry(single_entry, client):
                     "commentsHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/comments",
-                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked",
+                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked",  # noqa: B950
                         }
                     },
                     "suggested": {
@@ -63,7 +63,7 @@ def test_pagination_with_single_entry(single_entry, client):
                     "featuredHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/featured",
-                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked",
+                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked",  # noqa: B950
                         }
                     },
                     "tags": {

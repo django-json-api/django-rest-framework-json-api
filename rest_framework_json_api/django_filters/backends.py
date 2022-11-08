@@ -44,7 +44,9 @@ class DjangoFilterBackend(DjangoFilterBackend):
     - A related resource path
       can be used:
 
-      ``?filter[inventory.item.partNum]=123456`` (where `inventory.item` is the relationship path)
+      ``?filter[inventory.item.partNum]=123456``
+
+      where `inventory.item` is the relationship path.
 
     If you are also using rest_framework.filters.SearchFilter you'll want to customize
     the name of the query parameter for searching to make sure it doesn't conflict

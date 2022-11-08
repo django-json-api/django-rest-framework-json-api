@@ -98,7 +98,7 @@ class SparseFieldsetsMixin:
                 # iterate over a *copy* of self.fields' underlying OrderedDict, because we may
                 # modify the original during the iteration.
                 # self.fields is a `rest_framework.utils.serializer_helpers.BindingDict`
-                for field_name, field in self.fields.fields.copy().items():
+                for field_name, _field in self.fields.fields.copy().items():
                     if (
                         field_name == api_settings.URL_FIELD_NAME
                     ):  # leave self link there
@@ -208,17 +208,13 @@ class SerializerMetaclass(SerializerMetaclass):
         serializer = super().__new__(cls, name, bases, attrs)
 
         if attrs.get("included_serializers", None):
-            setattr(
-                serializer,
-                "included_serializers",
-                LazySerializersDict(serializer, attrs["included_serializers"]),
+            serializer.included_serializers = LazySerializersDict(
+                serializer, attrs["included_serializers"]
             )
 
         if attrs.get("related_serializers", None):
-            setattr(
-                serializer,
-                "related_serializers",
-                LazySerializersDict(serializer, attrs["related_serializers"]),
+            serializer.related_serializers = LazySerializersDict(
+                serializer, attrs["related_serializers"]
             )
 
         return serializer
@@ -334,10 +330,9 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
             return new_class
 
         polymorphic_serializers = getattr(new_class, "polymorphic_serializers", None)
-        if not polymorphic_serializers:
-            raise NotImplementedError(
-                "A PolymorphicModelSerializer must define a `polymorphic_serializers` attribute."
-            )
+        assert (
+            polymorphic_serializers is not None
+        ), "A PolymorphicModelSerializer must define a `polymorphic_serializers` attribute."
         serializer_to_model = {
             serializer: serializer.Meta.model for serializer in polymorphic_serializers
         }

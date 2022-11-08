@@ -29,7 +29,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "blogHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/blog",
-                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked",
+                            "self": "http://testserver/entries/1/relationships/blog_hyperlinked",  # noqa: B950
                         }
                     },
                     "authors": {
@@ -43,7 +43,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "commentsHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/comments",
-                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked",
+                            "self": "http://testserver/entries/1/relationships/comments_hyperlinked",  # noqa: B950
                         }
                     },
                     "suggested": {
@@ -63,7 +63,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "featuredHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/1/featured",
-                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked",
+                            "self": "http://testserver/entries/1/relationships/featured_hyperlinked",  # noqa: B950
                         }
                     },
                     "tags": {"data": [], "meta": {"count": 0}},
@@ -84,7 +84,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "blogHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/2/blog",
-                            "self": "http://testserver/entries/2/relationships/blog_hyperlinked",
+                            "self": "http://testserver/entries/2/relationships/blog_hyperlinked",  # noqa: B950
                         }
                     },
                     "authors": {
@@ -98,7 +98,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "commentsHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/2/comments",
-                            "self": "http://testserver/entries/2/relationships/comments_hyperlinked",
+                            "self": "http://testserver/entries/2/relationships/comments_hyperlinked",  # noqa: B950
                         }
                     },
                     "suggested": {
@@ -118,7 +118,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                     "featuredHyperlinked": {
                         "links": {
                             "related": "http://testserver/entries/2/featured",
-                            "self": "http://testserver/entries/2/relationships/featured_hyperlinked",
+                            "self": "http://testserver/entries/2/relationships/featured_hyperlinked",  # noqa: B950
                         }
                     },
                     "tags": {"data": [], "meta": {"count": 0}},

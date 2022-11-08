@@ -48,7 +48,7 @@ def get_resource_name(context, expand_polymorphic_types=False):
             return "errors"
 
     try:
-        resource_name = getattr(view, "resource_name")
+        resource_name = view.resource_name
     except AttributeError:
         try:
             if "kwargs" in context and "related_field" in context["kwargs"]:
@@ -80,10 +80,10 @@ def get_resource_name(context, expand_polymorphic_types=False):
 def get_serializer_fields(serializer):
     fields = None
     if hasattr(serializer, "child"):
-        fields = getattr(serializer.child, "fields")
+        fields = serializer.child.fields
         meta = getattr(serializer.child, "Meta", None)
     if hasattr(serializer, "fields"):
-        fields = getattr(serializer, "fields")
+        fields = serializer.fields
         meta = getattr(serializer, "Meta", None)
 
     if fields is not None:
@@ -159,8 +159,8 @@ def format_link_segment(value):
 
 def undo_format_link_segment(value):
     """
-    Takes a link segment and undos format link segment to underscore which is the Python convention
-    but only in case `JSON_API_FORMAT_RELATED_LINKS` is actually configured.
+    Takes a link segment and undos format link segment to underscore which is the Python
+    convention but only in case `JSON_API_FORMAT_RELATED_LINKS` is actually configured.
     """
 
     if json_api_settings.FORMAT_RELATED_LINKS:
@@ -331,7 +331,7 @@ def get_relation_instance(resource_instance, source, serializer):
         # if the field is not defined on the model then we check the serializer
         # and if no value is there we skip over the field completely
         serializer_method = getattr(serializer, source, None)
-        if serializer_method and hasattr(serializer_method, "__call__"):
+        if serializer_method and callable(serializer_method):
             relation_instance = serializer_method(resource_instance)
         else:
             return False, None
@@ -356,8 +356,8 @@ class Hyperlink(str):
     https://github.com/tomchristie/django-rest-framework
     """
 
-    def __new__(self, url, name):
-        ret = str.__new__(self, url)
+    def __new__(cls, url, name):
+        ret = str.__new__(cls, url)
         ret.name = name
         return ret
 

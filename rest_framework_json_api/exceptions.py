@@ -18,8 +18,9 @@ def rendered_with_json_api(view):
 def exception_handler(exc, context):
     # Import this here to avoid potential edge-case circular imports, which
     # crashes with:
-    # "ImportError: Could not import 'rest_framework_json_api.parsers.JSONParser' for API setting
-    # 'DEFAULT_PARSER_CLASSES'. ImportError: cannot import name 'exceptions'.'"
+    # "ImportError: Could not import 'rest_framework_json_api.parsers.JSONParser' for
+    # API setting 'DEFAULT_PARSER_CLASSES'.
+    # ImportError: cannot import name 'exceptions'.'"
     #
     # Also see: https://github.com/django-json-api/django-rest-framework-json-api/issues/158
     from rest_framework.views import exception_handler as drf_exception_handler
