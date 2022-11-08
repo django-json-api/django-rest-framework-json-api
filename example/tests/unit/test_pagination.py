@@ -14,7 +14,7 @@ class TestLimitOffset:
     Unit tests for `pagination.JsonApiLimitOffsetPagination`.
     """
 
-    def setup(self):
+    def setup_method(self):
         class ExamplePagination(pagination.JsonApiLimitOffsetPagination):
             default_limit = 10
             max_limit = 15
