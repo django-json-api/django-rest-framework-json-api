@@ -162,6 +162,10 @@ class RelatedMixin:
         if "related_field" in self.kwargs:
             field_name = self.get_related_field_name()
 
+            assert hasattr(parent_serializer_class, "included_serializers") or hasattr(
+                parent_serializer_class, "related_serializers"
+            ), 'Either "included_serializers" or "related_serializers" should be configured'
+
             # Try get the class from related_serializers
             if hasattr(parent_serializer_class, "related_serializers"):
                 _class = parent_serializer_class.related_serializers.get(
@@ -176,11 +180,6 @@ class RelatedMixin:
                 )
                 if _class is None:
                     raise NotFound
-
-            else:
-                assert (
-                    False
-                ), 'Either "included_serializers" or "related_serializers" should be configured'
 
             return _class
 

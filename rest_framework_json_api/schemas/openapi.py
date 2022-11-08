@@ -378,7 +378,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                TODO: not actually used.
         :return:view
         """
-        for path, method, view in view_endpoints:
+        for _path, _method, view in view_endpoints:
             view_serializer = view.get_serializer()
             if isinstance(view_serializer, related_serializer):
                 return view
