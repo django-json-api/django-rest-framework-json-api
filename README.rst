@@ -24,7 +24,9 @@ Overview
 * Format specification: https://jsonapi.org/format/
 
 
-By default, Django REST framework will produce a response like::
+By default, Django REST framework will produce a response like:
+
+.. code:: JSON
 
     {
         "count": 20,
@@ -39,7 +41,9 @@ By default, Django REST framework will produce a response like::
 
 
 However, for an ``identity`` model in JSON:API format the response should look
-like the following::
+like the following:
+
+.. code:: JSON
 
     {
         "links": {
@@ -104,7 +108,7 @@ Installation
 
 Install using ``pip``...
 
-::
+.. code:: sh
 
     $ pip install djangorestframework-jsonapi
     $ # for optional package integrations
@@ -115,7 +119,7 @@ Install using ``pip``...
 
 or from source...
 
-::
+.. code:: sh
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     $ cd django-rest-framework-json-api
@@ -124,7 +128,7 @@ or from source...
 
 and add ``rest_framework_json_api`` to your ``INSTALLED_APPS`` setting below ``rest_framework``.
 
-::
+.. code:: python
 
     INSTALLED_APPS = [
         ...
@@ -140,7 +144,7 @@ Running the example app
 It is recommended to create a virtualenv for testing. Assuming it is already
 installed and activated:
 
-::
+.. code:: sh
 
     $ git clone https://github.com/django-json-api/django-rest-framework-json-api.git
     $ cd django-rest-framework-json-api
@@ -172,7 +176,7 @@ One can either add ``rest_framework_json_api.parsers.JSONParser`` and
 ``rest_framework_json_api.renderers.JSONRenderer`` to each ``ViewSet`` class, or
 override ``settings.REST_FRAMEWORK``
 
-::
+.. code:: python
 
     REST_FRAMEWORK = {
         'PAGE_SIZE': 10,
