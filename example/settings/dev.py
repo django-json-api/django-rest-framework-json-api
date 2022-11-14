@@ -6,6 +6,7 @@ DEBUG = True
 MEDIA_ROOT = os.path.normcase(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = "/media/"
 USE_TZ = False
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 DATABASE_ENGINE = "sqlite3"
 

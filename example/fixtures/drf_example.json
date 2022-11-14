@@ -26,8 +26,9 @@
     "created_at": "2016-05-02T10:09:48.277",
     "modified_at": "2016-05-02T10:09:48.277",
     "name": "Alice",
+    "full_name": "Alice Test",
     "email": "alice@example.com",
-    "type": null
+    "author_type": null
   }
 },
 {
@@ -37,8 +38,9 @@
     "created_at": "2016-05-02T10:09:57.133",
     "modified_at": "2016-05-02T10:09:57.133",
     "name": "Bob",
+    "full_name": "Bob Test",
     "email": "bob@example.com",
-    "type": null
+    "author_type": null
   }
 },
 {
