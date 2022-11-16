@@ -69,4 +69,3 @@ In case a new maintainer joins our team we need to consider to what of following
 * [Github organization](https://github.com/django-json-api)
 * [Read the Docs project](https://django-rest-framework-json-api.readthedocs.io/)
 * [PyPi project](https://pypi.org/project/djangorestframework-jsonapi/)
-* [Google Groups security mailing list](https://groups.google.com/g/rest-framework-jsonapi-security)
