@@ -303,8 +303,8 @@ def get_resource_type_from_serializer(serializer):
     elif hasattr(meta, "model"):
         return get_resource_type_from_model(meta.model)
     raise AttributeError(
-        f"can not detect 'resource_name' on serializer '{serializer.__class__.__name__}'"
-        f" in module '{serializer.__class__.__module__}'"
+        f"can not detect 'resource_name' on serializer {serializer.__class__.__name__!r}"
+        f" in module {serializer.__class__.__module__!r}"
     )
 
 
