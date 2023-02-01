@@ -72,7 +72,8 @@ def test_filters_get_schema_params():
                     "name": "sort",
                     "required": False,
                     "in": "query",
-                    "description": "Which field to use when ordering the results.",
+                    "description": "[list of fields to sort by]"
+                    "(https://jsonapi.org/format/#fetching-sorting)",
                     "schema": {"type": "string"},
                 }
             ],

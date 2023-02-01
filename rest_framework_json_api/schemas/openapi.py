@@ -248,15 +248,6 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                 },
                 "explode": True,
             },
-            "sort": {
-                "name": "sort",
-                "in": "query",
-                "description": "[list of fields to sort by]"
-                "(https://jsonapi.org/format/#fetching-sorting)",
-                "required": False,
-                "style": "form",
-                "schema": {"type": "string"},
-            },
         },
     }
 
@@ -422,7 +413,6 @@ class AutoSchema(drf_openapi.AutoSchema):
         if method in ["GET", "HEAD"]:
             parameters += self._get_include_parameters(path, method)
             parameters += self._get_fields_parameters(path, method)
-            parameters += self._get_sort_parameters(path, method)
             parameters += self.get_pagination_parameters(path, method)
             parameters += self.get_filter_parameters(path, method)
         operation["parameters"] = parameters
@@ -484,12 +474,6 @@ class AutoSchema(drf_openapi.AutoSchema):
         #       type: string  # noqa F821
         # explode: true
         return [{"$ref": "#/components/parameters/fields"}]
-
-    def _get_sort_parameters(self, path, method):
-        """
-        sort parameter: https://jsonapi.org/format/#fetching-sorting
-        """
-        return [{"$ref": "#/components/parameters/sort"}]
 
     def _add_get_collection_response(self, operation, path):
         """

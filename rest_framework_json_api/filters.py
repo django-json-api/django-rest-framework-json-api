@@ -22,6 +22,9 @@ class OrderingFilter(OrderingFilter):
     #: override :py:attr:`rest_framework.filters.OrderingFilter.ordering_param`
     #: with JSON:API-compliant query parameter name.
     ordering_param = "sort"
+    ordering_description = (
+        "[list of fields to sort by]" "(https://jsonapi.org/format/#fetching-sorting)"
+    )
 
     def remove_invalid_fields(self, queryset, fields, view, request):
         """

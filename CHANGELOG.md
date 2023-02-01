@@ -18,6 +18,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added support to overwrite serializer methods in customized schema class
 
+### Fixed
+
+* Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition
+
 ## [6.0.0] - 2022-09-24
 
 ### Fixed
