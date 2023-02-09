@@ -21,6 +21,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition
+* Serialization of non-model `Serializer` results, e.g. `dict` without a `pk` attribute
 
 ## [6.0.0] - 2022-09-24
 
