@@ -183,6 +183,28 @@ class TestAPIView:
             }
         }
 
+    @pytest.mark.urls(__name__)
+    def test_post_with_missing_id(self, client):
+        data = {
+            "data": {
+                "id": None,
+                "type": "custom",
+                "attributes": {"body": "hello"},
+            }
+        }
+
+        url = reverse("custom")
+
+        response = client.post(url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": {
+                "type": "custom",
+                "id": None,
+                "attributes": {"body": "hello"},
+            }
+        }
+
 
 # Routing setup
 
@@ -209,6 +231,10 @@ class CustomAPIView(APIView):
 
     def patch(self, request, *args, **kwargs):
         serializer = CustomModelSerializer(CustomModel(request.data))
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = CustomModelSerializer(request.data)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 

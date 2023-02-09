@@ -459,10 +459,7 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_name = utils.get_resource_type_from_instance(resource_instance)
         resource_data = [
             ("type", resource_name),
-            (
-                "id",
-                encoding.force_str(resource_instance.pk) if resource_instance else None,
-            ),
+            ("id", utils.get_resource_id_from_instance(resource_instance)),
             ("attributes", cls.extract_attributes(fields, resource)),
         ]
         relationships = cls.extract_relationships(fields, resource, resource_instance)
