@@ -23,7 +23,6 @@ from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import (
     Hyperlink,
-    OrderedDict,
     get_included_resources,
     get_resource_type_from_instance,
     undo_format_link_segment,
@@ -275,7 +274,7 @@ class RelationshipView(generics.GenericAPIView):
         return Hyperlink(url, name)
 
     def get_links(self):
-        return_data = OrderedDict()
+        return_data = {}
         self_link = self.get_url(
             "self", self.self_link_view_name, self.kwargs, self.request
         )
@@ -284,9 +283,9 @@ class RelationshipView(generics.GenericAPIView):
             "related", self.related_link_view_name, related_kwargs, self.request
         )
         if self_link:
-            return_data.update({"self": self_link})
+            return_data["self"] = self_link
         if related_link:
-            return_data.update({"related": related_link})
+            return_data["related"] = related_link
         return return_data
 
     def get(self, request, *args, **kwargs):

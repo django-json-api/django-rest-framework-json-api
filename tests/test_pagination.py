@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from rest_framework.request import Request
 
 from rest_framework_json_api.pagination import JsonApiLimitOffsetPagination
@@ -27,28 +25,18 @@ class TestLimitOffsetPagination:
 
         expected_content = {
             "results": list(range(11, 16)),
-            "links": OrderedDict(
-                [
-                    ("first", "http://testserver/?page%5Blimit%5D=5"),
-                    (
-                        "last",
-                        "http://testserver/?page%5Blimit%5D=5&page%5Boffset%5D=100",
-                    ),
-                    (
-                        "next",
-                        "http://testserver/?page%5Blimit%5D=5&page%5Boffset%5D=15",
-                    ),
-                    ("prev", "http://testserver/?page%5Blimit%5D=5&page%5Boffset%5D=5"),
-                ]
-            ),
+            "links": {
+                "first": "http://testserver/?page%5Blimit%5D=5",
+                "last": "http://testserver/?page%5Blimit%5D=5&page%5Boffset%5D=100",
+                "next": "http://testserver/?page%5Blimit%5D=5&page%5Boffset%5D=15",
+                "prev": "http://testserver/?page%5Blimit%5D=5&page%5Boffset%5D=5",
+            },
             "meta": {
-                "pagination": OrderedDict(
-                    [
-                        ("count", count),
-                        ("limit", limit),
-                        ("offset", offset),
-                    ]
-                )
+                "pagination": {
+                    "count": count,
+                    "limit": limit,
+                    "offset": offset,
+                }
             },
         }
 
