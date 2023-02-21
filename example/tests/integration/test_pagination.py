@@ -11,7 +11,6 @@ pytestmark = pytest.mark.django_db
     new=lambda s: [],
 )
 def test_pagination_with_single_entry(single_entry, client):
-
     expected = {
         "data": [
             {

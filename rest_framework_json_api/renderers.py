@@ -499,7 +499,6 @@ class JSONRenderer(renderers.JSONRenderer):
         )
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-
         renderer_context = renderer_context or {}
 
         view = renderer_context.get("view", None)
@@ -545,7 +544,6 @@ class JSONRenderer(renderers.JSONRenderer):
         included_resources = utils.get_included_resources(request, serializer)
 
         if serializer is not None:
-
             # Extract root meta for any type of serializer
             json_api_meta.update(self.extract_root_meta(serializer, serializer_data))
 

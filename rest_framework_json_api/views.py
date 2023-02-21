@@ -66,7 +66,6 @@ class PreloadIncludesMixin:
             self.request, self.get_serializer_class()
         )
         for included in included_resources + ["__all__"]:
-
             select_related = self.get_select_related(included)
             if select_related is not None:
                 qs = qs.select_related(*select_related)
@@ -110,7 +109,6 @@ class AutoPrefetchMixin:
                 if level == levels[-1]:
                     included_model = field
                 else:
-
                     if issubclass(field_class, ReverseOneToOneDescriptor):
                         model_field = field.related.field
                     else:

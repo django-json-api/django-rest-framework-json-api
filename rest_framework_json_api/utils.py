@@ -415,7 +415,6 @@ def format_drf_errors(response, context, exc):
 def format_error_object(message, pointer, response):
     errors = []
     if isinstance(message, dict):
-
         # as there is no required field in error object we check that all fields are string
         # except links, source or meta which might be a dict
         is_custom_error = all(
