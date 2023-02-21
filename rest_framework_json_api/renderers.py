@@ -8,7 +8,7 @@ from collections.abc import Iterable
 import inflection
 from django.db.models import Manager
 from django.template import loader
-from django.utils import encoding
+from django.utils.encoding import force_str
 from rest_framework import relations, renderers
 from rest_framework.fields import SkipField, get_attribute
 from rest_framework.relations import PKOnlyObject
@@ -125,14 +125,10 @@ class JSONRenderer(renderers.JSONRenderer):
                     relation_instance if relation_instance is not None else list()
                 )
 
-                for related_object in relation_queryset:
-                    relation_data.append(
-                        {
-                            "type": relation_type,
-                            "id": encoding.force_str(related_object.pk),
-                        }
-                    )
-
+                relation_data = [
+                    {"type": relation_type, "id": force_str(related_object.pk)}
+                    for related_object in relation_queryset
+                ]
                 data.update(
                     {
                         field_name: {
@@ -173,7 +169,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 if relation_id is not None:
                     relation_data["data"] = {
                         "type": relation_type,
-                        "id": encoding.force_str(relation_id),
+                        "id": force_str(relation_id),
                     }
 
                 if isinstance(
@@ -227,7 +223,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     relation_data.append(
                         {
                             "type": nested_resource_instance_type,
-                            "id": encoding.force_str(nested_resource_instance.pk),
+                            "id": force_str(nested_resource_instance.pk),
                         }
                     )
                 data.update(
@@ -447,9 +443,7 @@ class JSONRenderer(renderers.JSONRenderer):
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)
-        resource_id = (
-            encoding.force_str(resource_instance.pk) if resource_instance else None
-        )
+        resource_id = force_str(resource_instance.pk) if resource_instance else None
         resource_data = {
             "type": resource_name,
             "id": resource_id,
