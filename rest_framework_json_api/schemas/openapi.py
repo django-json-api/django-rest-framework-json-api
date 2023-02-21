@@ -298,9 +298,8 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                 if components_schemas[k] == components[k]:
                     continue
                 warnings.warn(
-                    'Schema component "{}" has been overriden with a different value.'.format(
-                        k
-                    )
+                    f'Schema component "{k}" has been overriden with a different value.',
+                    stacklevel=1,
                 )
 
             components_schemas.update(components)
