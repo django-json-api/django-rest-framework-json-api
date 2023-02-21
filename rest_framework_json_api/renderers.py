@@ -2,7 +2,7 @@
 Renderers
 """
 import copy
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from collections.abc import Iterable
 
 import inflection
@@ -56,7 +56,7 @@ class JSONRenderer(renderers.JSONRenderer):
         """
         Builds the `attributes` object of the JSON:API resource object.
         """
-        data = OrderedDict()
+        data = {}
         for field_name, field in iter(fields.items()):
             # ID is always provided in the root of JSON:API so remove it from attributes
             if field_name == "id":
@@ -89,7 +89,7 @@ class JSONRenderer(renderers.JSONRenderer):
         # Avoid circular deps
         from rest_framework_json_api.relations import ResourceRelatedField
 
-        data = OrderedDict()
+        data = {}
 
         # Don't try to extract relationships from a non-existent resource
         if resource_instance is None:
@@ -127,12 +127,10 @@ class JSONRenderer(renderers.JSONRenderer):
 
                 for related_object in relation_queryset:
                     relation_data.append(
-                        OrderedDict(
-                            [
-                                ("type", relation_type),
-                                ("id", encoding.force_str(related_object.pk)),
-                            ]
-                        )
+                        {
+                            "type": relation_type,
+                            "id": encoding.force_str(related_object.pk),
+                        }
                     )
 
                 data.update(
@@ -171,18 +169,12 @@ class JSONRenderer(renderers.JSONRenderer):
                 if not resolved:
                     continue
                 relation_id = relation if resource.get(field_name) else None
-                relation_data = {
-                    "data": (
-                        OrderedDict(
-                            [
-                                ("type", relation_type),
-                                ("id", encoding.force_str(relation_id)),
-                            ]
-                        )
-                        if relation_id is not None
-                        else None
-                    )
-                }
+                relation_data = {"data": None}
+                if relation_id is not None:
+                    relation_data["data"] = {
+                        "type": relation_type,
+                        "id": encoding.force_str(relation_id),
+                    }
 
                 if isinstance(
                     field, relations.HyperlinkedRelatedField
@@ -233,12 +225,10 @@ class JSONRenderer(renderers.JSONRenderer):
                     )
 
                     relation_data.append(
-                        OrderedDict(
-                            [
-                                ("type", nested_resource_instance_type),
-                                ("id", encoding.force_str(nested_resource_instance.pk)),
-                            ]
-                        )
+                        {
+                            "type": nested_resource_instance_type,
+                            "id": encoding.force_str(nested_resource_instance.pk),
+                        }
                     )
                 data.update(
                     {
@@ -419,7 +409,7 @@ class JSONRenderer(renderers.JSONRenderer):
         else:
             meta = getattr(serializer, "Meta", None)
         meta_fields = getattr(meta, "meta_fields", [])
-        data = OrderedDict()
+        data = {}
         for field_name in meta_fields:
             data.update({field_name: resource.get(field_name)})
         return data
@@ -457,37 +447,35 @@ class JSONRenderer(renderers.JSONRenderer):
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)
-        resource_data = [
-            ("type", resource_name),
-            (
-                "id",
-                encoding.force_str(resource_instance.pk) if resource_instance else None,
-            ),
-            ("attributes", cls.extract_attributes(fields, resource)),
-        ]
+        resource_id = (
+            encoding.force_str(resource_instance.pk) if resource_instance else None
+        )
+        resource_data = {
+            "type": resource_name,
+            "id": resource_id,
+            "attributes": cls.extract_attributes(fields, resource),
+        }
         relationships = cls.extract_relationships(fields, resource, resource_instance)
         if relationships:
-            resource_data.append(("relationships", relationships))
+            resource_data["relationships"] = relationships
         # Add 'self' link if field is present and valid
         if api_settings.URL_FIELD_NAME in resource and isinstance(
             fields[api_settings.URL_FIELD_NAME], relations.RelatedField
         ):
-            resource_data.append(
-                ("links", {"self": resource[api_settings.URL_FIELD_NAME]})
-            )
+            resource_data["links"] = {"self": resource[api_settings.URL_FIELD_NAME]}
 
         meta = cls.extract_meta(serializer, resource)
         if meta:
-            resource_data.append(("meta", utils.format_field_names(meta)))
+            resource_data["meta"] = utils.format_field_names(meta)
 
-        return OrderedDict(resource_data)
+        return resource_data
 
     def render_relationship_view(
         self, data, accepted_media_type=None, renderer_context=None
     ):
         # Special case for RelationshipView
         view = renderer_context.get("view", None)
-        render_data = OrderedDict([("data", data)])
+        render_data = {"data": data}
         links = view.get_links()
         if links:
             render_data.update({"links": links}),
@@ -615,7 +603,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 )
 
         # Make sure we render data in a specific order
-        render_data = OrderedDict()
+        render_data = {}
 
         if isinstance(data, dict) and data.get("links"):
             render_data["links"] = data.get("links")
