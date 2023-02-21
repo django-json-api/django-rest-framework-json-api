@@ -7,7 +7,6 @@ pytestmark = pytest.mark.django_db
 
 
 def test_top_level_meta_for_list_view(blog, client):
-
     expected = {
         "data": [
             {
@@ -37,7 +36,6 @@ def test_top_level_meta_for_list_view(blog, client):
 
 
 def test_top_level_meta_for_detail_view(blog, client):
-
     expected = {
         "data": {
             "type": "blogs",
