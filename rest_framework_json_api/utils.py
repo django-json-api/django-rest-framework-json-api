@@ -269,7 +269,7 @@ def get_related_resource_type(relation):
         if hasattr(relation, "child_relation"):
             return get_related_resource_type(relation.child_relation)
         raise APIException(
-            _("Could not resolve resource type for relation %s" % relation)
+            _(f"Could not resolve resource type for relation {relation}")
         )
 
     return get_resource_type_from_model(relation_model)

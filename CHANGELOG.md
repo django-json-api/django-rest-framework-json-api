@@ -17,6 +17,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Added support to overwrite serializer methods in customized schema class
+* Adjusted some still old formatted strings to f-strings.
 
 ### Fixed
 

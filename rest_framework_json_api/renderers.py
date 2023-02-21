@@ -166,7 +166,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 (relations.PrimaryKeyRelatedField, relations.HyperlinkedRelatedField),
             ):
                 resolved, relation = utils.get_relation_instance(
-                    resource_instance, "%s_id" % source, field.parent
+                    resource_instance, f"{source}_id", field.parent
                 )
                 if not resolved:
                     continue
@@ -341,7 +341,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 serializer_data = field.data
 
             new_included_resources = [
-                key.replace("%s." % field_name, "", 1)
+                key.replace(f"{field_name}.", "", 1)
                 for key in included_resources
                 if field_name == key.split(".")[0]
             ]
