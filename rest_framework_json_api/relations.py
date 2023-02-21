@@ -256,7 +256,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
         if resource_type is None or not self._skip_polymorphic_optimization:
             resource_type = get_resource_type_from_instance(value)
 
-        return {[("type", resource_type), ("id", str(pk))]}
+        return {"type": resource_type, "id": str(pk)}
 
     def get_resource_type_from_included_serializer(self):
         """
@@ -301,10 +301,8 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
             queryset = queryset[:cutoff]
 
         return {
-            [
-                (json.dumps(self.to_representation(item)), self.display_value(item))
-                for item in queryset
-            ]
+            json.dumps(self.to_representation(item)): self.display_value(item)
+            for item in queryset
         }
 
 

@@ -36,20 +36,16 @@ class JsonApiPageNumberPagination(PageNumberPagination):
                 "results": data,
                 "meta": {
                     "pagination": {
-                        [
-                            ("page", self.page.number),
-                            ("pages", self.page.paginator.num_pages),
-                            ("count", self.page.paginator.count),
-                        ]
+                        "page": self.page.number,
+                        "pages": self.page.paginator.num_pages,
+                        "count": self.page.paginator.count,
                     }
                 },
                 "links": {
-                    [
-                        ("first", self.build_link(1)),
-                        ("last", self.build_link(self.page.paginator.num_pages)),
-                        ("next", self.build_link(next)),
-                        ("prev", self.build_link(previous)),
-                    ]
+                    "first": self.build_link(1),
+                    "last": self.build_link(self.page.paginator.num_pages),
+                    "next": self.build_link(next),
+                    "prev": self.build_link(previous),
                 },
             }
         )
@@ -97,20 +93,16 @@ class JsonApiLimitOffsetPagination(LimitOffsetPagination):
                 "results": data,
                 "meta": {
                     "pagination": {
-                        [
-                            ("count", self.count),
-                            ("limit", self.limit),
-                            ("offset", self.offset),
-                        ]
+                        "count": self.count,
+                        "limit": self.limit,
+                        "offset": self.offset,
                     }
                 },
                 "links": {
-                    [
-                        ("first", self.get_first_link()),
-                        ("last", self.get_last_link()),
-                        ("next", self.get_next_link()),
-                        ("prev", self.get_previous_link()),
-                    ]
+                    "first": self.get_first_link(),
+                    "last": self.get_last_link(),
+                    "next": self.get_next_link(),
+                    "prev": self.get_previous_link(),
                 },
             }
         )

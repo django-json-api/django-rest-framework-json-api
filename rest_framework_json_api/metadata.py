@@ -91,10 +91,8 @@ class JSONAPIMetadata(SimpleMetadata):
         serializer.fields.pop(api_settings.URL_FIELD_NAME, None)
 
         return {
-            [
-                (format_field_name(field_name), self.get_field_info(field))
-                for field_name, field in serializer.fields.items()
-            ]
+            format_field_name(field_name): self.get_field_info(field)
+            for field_name, field in serializer.fields.items()
         }
 
     def get_field_info(self, field):
