@@ -1,6 +1,5 @@
 import inspect
 import operator
-from collections import OrderedDict
 
 import inflection
 from django.conf import settings
@@ -107,11 +106,7 @@ def format_field_names(obj, format_type=None):
         format_type = json_api_settings.FORMAT_FIELD_NAMES
 
     if isinstance(obj, dict):
-        formatted = OrderedDict()
-        for key, value in obj.items():
-            key = format_value(key, format_type)
-            formatted[key] = value
-        return formatted
+        return {format_value(key, format_type): value for key, value in obj.items()}
 
     return obj
 
