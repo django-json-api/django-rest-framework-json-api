@@ -13,6 +13,7 @@ from django.utils import encoding
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, relations
 from rest_framework.exceptions import APIException
+from rest_framework.settings import api_settings
 
 from .settings import json_api_settings
 
@@ -381,10 +382,14 @@ def format_drf_errors(response, context, exc):
             ]
 
         for field, error in response.data.items():
+            non_field_error = field == api_settings.NON_FIELD_ERRORS_KEY
             field = format_field_name(field)
             pointer = None
-            # pointer can be determined only if there's a serializer.
-            if has_serializer:
+            if non_field_error:
+                # Serializer error does not refer to a specific field.
+                pointer = "/data"
+            elif has_serializer:
+                # pointer can be determined only if there's a serializer.
                 rel = "relationships" if field in relationship_fields else "attributes"
                 pointer = f"/data/{rel}/{field}"
             if isinstance(exc, Http404) and isinstance(error, str):
