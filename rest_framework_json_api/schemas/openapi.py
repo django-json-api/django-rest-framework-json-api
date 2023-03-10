@@ -185,7 +185,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                                     "A [JSON Pointer](https://tools.ietf.org/html/rfc6901) "
                                     "to the associated entity in the request document "
                                     "[e.g. `/data` for a primary data object, or "
-                                    "`/data/attributes/title` for a specific attribute.",
+                                    "`/data/attributes/title` for a specific attribute."
                                 ),
                             },
                             "parameter": {
