@@ -23,6 +23,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition
+* Non-field serializer errors are given a source.pointer value of "/data".
 
 ## [6.0.0] - 2022-09-24
 
