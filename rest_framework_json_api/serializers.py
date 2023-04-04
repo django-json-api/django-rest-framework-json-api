@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from collections.abc import Mapping
 
 import inflection
@@ -95,7 +94,7 @@ class SparseFieldsetsMixin:
                 pass
             else:
                 fieldset = request.query_params.get(param_name).split(",")
-                # iterate over a *copy* of self.fields' underlying OrderedDict, because we may
+                # iterate over a *copy* of self.fields' underlying dict, because we may
                 # modify the original during the iteration.
                 # self.fields is a `rest_framework.utils.serializer_helpers.BindingDict`
                 for field_name, _field in self.fields.fields.copy().items():
@@ -156,7 +155,12 @@ class IncludedResourcesValidationMixin:
 class ReservedFieldNamesMixin:
     """Ensures that reserved field names are not used and an error raised instead."""
 
-    _reserved_field_names = {"meta", "results", "type"}
+    _reserved_field_names = {
+        "meta",
+        "results",
+        "type",
+        api_settings.NON_FIELD_ERRORS_KEY,
+    }
 
     def get_fields(self):
         fields = super().get_fields()
@@ -305,7 +309,7 @@ class ModelSerializer(
         """
         meta_fields = getattr(self.Meta, "meta_fields", [])
 
-        declared = OrderedDict()
+        declared = {}
         for field_name in set(declared_fields.keys()):
             field = declared_fields[field_name]
             if field_name not in meta_fields:

@@ -11,7 +11,6 @@ pytestmark = pytest.mark.django_db
     new=lambda s: [],
 )
 def test_multiple_entries_no_pagination(multiple_entries, client):
-
     expected = {
         "data": [
             {

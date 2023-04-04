@@ -1,6 +1,5 @@
 import inspect
 import operator
-from collections import OrderedDict
 
 import inflection
 from django.conf import settings
@@ -14,6 +13,7 @@ from django.utils import encoding
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, relations
 from rest_framework.exceptions import APIException
+from rest_framework.settings import api_settings
 
 from .settings import json_api_settings
 
@@ -107,11 +107,7 @@ def format_field_names(obj, format_type=None):
         format_type = json_api_settings.FORMAT_FIELD_NAMES
 
     if isinstance(obj, dict):
-        formatted = OrderedDict()
-        for key, value in obj.items():
-            key = format_value(key, format_type)
-            formatted[key] = value
-        return formatted
+        return {format_value(key, format_type): value for key, value in obj.items()}
 
     return obj
 
@@ -269,7 +265,7 @@ def get_related_resource_type(relation):
         if hasattr(relation, "child_relation"):
             return get_related_resource_type(relation.child_relation)
         raise APIException(
-            _("Could not resolve resource type for relation %s" % relation)
+            _(f"Could not resolve resource type for relation {relation}")
         )
 
     return get_resource_type_from_model(relation_model)
@@ -399,10 +395,14 @@ def format_drf_errors(response, context, exc):
             ]
 
         for field, error in response.data.items():
+            non_field_error = field == api_settings.NON_FIELD_ERRORS_KEY
             field = format_field_name(field)
             pointer = None
-            # pointer can be determined only if there's a serializer.
-            if has_serializer:
+            if non_field_error:
+                # Serializer error does not refer to a specific field.
+                pointer = "/data"
+            elif has_serializer:
+                # pointer can be determined only if there's a serializer.
                 rel = "relationships" if field in relationship_fields else "attributes"
                 pointer = f"/data/{rel}/{field}"
             if isinstance(exc, Http404) and isinstance(error, str):
@@ -428,7 +428,6 @@ def format_drf_errors(response, context, exc):
 def format_error_object(message, pointer, response):
     errors = []
     if isinstance(message, dict):
-
         # as there is no required field in error object we check that all fields are string
         # except links, source or meta which might be a dict
         is_custom_error = all(

@@ -97,7 +97,7 @@ def test_delete_request(snapshot):
         "DEFAULT_SCHEMA_CLASS": "rest_framework_json_api.schemas.openapi.AutoSchema"
     }
 )
-def test_schema_construction():
+def test_schema_construction(snapshot):
     """Construction of the top level dictionary."""
     patterns = [
         re_path("^authors/?$", views.AuthorViewSet.as_view({"get": "list"})),
@@ -107,10 +107,7 @@ def test_schema_construction():
     request = create_request("/")
     schema = generator.get_schema(request=request)
 
-    assert "openapi" in schema
-    assert "info" in schema
-    assert "paths" in schema
-    assert "components" in schema
+    assert snapshot == json.dumps(schema, indent=2, sort_keys=True)
 
 
 def test_schema_related_serializers():

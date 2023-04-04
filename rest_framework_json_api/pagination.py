@@ -1,7 +1,6 @@
 """
 Pagination fields
 """
-from collections import OrderedDict
 
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.utils.urls import remove_query_param, replace_query_param
@@ -36,22 +35,18 @@ class JsonApiPageNumberPagination(PageNumberPagination):
             {
                 "results": data,
                 "meta": {
-                    "pagination": OrderedDict(
-                        [
-                            ("page", self.page.number),
-                            ("pages", self.page.paginator.num_pages),
-                            ("count", self.page.paginator.count),
-                        ]
-                    )
+                    "pagination": {
+                        "page": self.page.number,
+                        "pages": self.page.paginator.num_pages,
+                        "count": self.page.paginator.count,
+                    }
                 },
-                "links": OrderedDict(
-                    [
-                        ("first", self.build_link(1)),
-                        ("last", self.build_link(self.page.paginator.num_pages)),
-                        ("next", self.build_link(next)),
-                        ("prev", self.build_link(previous)),
-                    ]
-                ),
+                "links": {
+                    "first": self.build_link(1),
+                    "last": self.build_link(self.page.paginator.num_pages),
+                    "next": self.build_link(next),
+                    "prev": self.build_link(previous),
+                },
             }
         )
 
@@ -97,21 +92,17 @@ class JsonApiLimitOffsetPagination(LimitOffsetPagination):
             {
                 "results": data,
                 "meta": {
-                    "pagination": OrderedDict(
-                        [
-                            ("count", self.count),
-                            ("limit", self.limit),
-                            ("offset", self.offset),
-                        ]
-                    )
+                    "pagination": {
+                        "count": self.count,
+                        "limit": self.limit,
+                        "offset": self.offset,
+                    }
                 },
-                "links": OrderedDict(
-                    [
-                        ("first", self.get_first_link()),
-                        ("last", self.get_last_link()),
-                        ("next", self.get_next_link()),
-                        ("prev", self.get_previous_link()),
-                    ]
-                ),
+                "links": {
+                    "first": self.get_first_link(),
+                    "last": self.get_last_link(),
+                    "next": self.get_next_link(),
+                    "prev": self.get_previous_link(),
+                },
             }
         )

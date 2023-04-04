@@ -181,7 +181,6 @@ class EntrySerializer(serializers.ModelSerializer):
 
 
 class EntryDRFSerializers(drf_serilazers.ModelSerializer):
-
     tags = TaggedItemDRFSerializer(many=True, read_only=True)
     url = drf_serilazers.HyperlinkedIdentityField(
         view_name="drf-entry-blog-detail",

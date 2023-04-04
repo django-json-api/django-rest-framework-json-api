@@ -61,7 +61,7 @@ master_doc = "index"
 # General information about the project.
 project = "Django REST framework JSON:API"
 year = datetime.date.today().year
-copyright = "{}, Django REST framework JSON:API contributors".format(year)
+copyright = f"{year}, Django REST framework JSON:API contributors"
 author = "Django REST framework JSON:API contributors"
 
 # The version info for the project you're documenting, acts as replacement for

@@ -706,3 +706,548 @@
   }
   '''
 # ---
+# name: test_schema_construction
+  '''
+  {
+    "components": {
+      "parameters": {
+        "fields": {
+          "description": "[sparse fieldsets](https://jsonapi.org/format/#fetching-sparse-fieldsets).\nUse fields[\\<typename\\>]=field1,field2,...,fieldN",
+          "explode": true,
+          "in": "query",
+          "name": "fields",
+          "required": false,
+          "schema": {
+            "type": "object"
+          },
+          "style": "deepObject"
+        },
+        "include": {
+          "description": "[list of included related resources](https://jsonapi.org/format/#fetching-includes)",
+          "in": "query",
+          "name": "include",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "style": "form"
+        }
+      },
+      "schemas": {
+        "AuthorList": {
+          "additionalProperties": false,
+          "properties": {
+            "attributes": {
+              "properties": {
+                "defaults": {
+                  "default": "default",
+                  "description": "help for defaults",
+                  "maxLength": 20,
+                  "minLength": 3,
+                  "type": "string",
+                  "writeOnly": true
+                },
+                "email": {
+                  "format": "email",
+                  "maxLength": 254,
+                  "type": "string"
+                },
+                "fullName": {
+                  "maxLength": 50,
+                  "type": "string"
+                },
+                "initials": {
+                  "readOnly": true,
+                  "type": "string"
+                },
+                "name": {
+                  "maxLength": 50,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "fullName",
+                "email"
+              ],
+              "type": "object"
+            },
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "links": {
+              "properties": {
+                "self": {
+                  "$ref": "#/components/schemas/link"
+                }
+              },
+              "type": "object"
+            },
+            "relationships": {
+              "properties": {
+                "authorType": {
+                  "$ref": "#/components/schemas/reltoone"
+                },
+                "bio": {
+                  "$ref": "#/components/schemas/reltoone"
+                },
+                "comments": {
+                  "$ref": "#/components/schemas/reltomany"
+                },
+                "entries": {
+                  "$ref": "#/components/schemas/reltomany"
+                },
+                "firstEntry": {
+                  "$ref": "#/components/schemas/reltoone"
+                }
+              },
+              "type": "object"
+            },
+            "type": {
+              "$ref": "#/components/schemas/type"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "type": "object"
+        },
+        "ResourceIdentifierObject": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/relationshipToOne"
+            },
+            {
+              "$ref": "#/components/schemas/relationshipToMany"
+            }
+          ]
+        },
+        "datum": {
+          "description": "singular item",
+          "properties": {
+            "data": {
+              "$ref": "#/components/schemas/resource"
+            }
+          }
+        },
+        "error": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "detail": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "links": {
+              "$ref": "#/components/schemas/links"
+            },
+            "source": {
+              "properties": {
+                "meta": {
+                  "$ref": "#/components/schemas/meta"
+                },
+                "parameter": {
+                  "description": "A string indicating which query parameter caused the error.",
+                  "type": "string"
+                },
+                "pointer": {
+                  "description": "A [JSON Pointer](https://tools.ietf.org/html/rfc6901) to the associated entity in the request document [e.g. `/data` for a primary data object, or `/data/attributes/title` for a specific attribute.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "status": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "errors": {
+          "items": {
+            "$ref": "#/components/schemas/error"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "failure": {
+          "properties": {
+            "errors": {
+              "$ref": "#/components/schemas/errors"
+            },
+            "jsonapi": {
+              "$ref": "#/components/schemas/jsonapi"
+            },
+            "links": {
+              "$ref": "#/components/schemas/links"
+            },
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            }
+          },
+          "required": [
+            "errors"
+          ],
+          "type": "object"
+        },
+        "id": {
+          "description": "Each resource object\u2019s type and id pair MUST [identify](https://jsonapi.org/format/#document-resource-object-identification) a single, unique resource.",
+          "type": "string"
+        },
+        "jsonapi": {
+          "additionalProperties": false,
+          "description": "The server's implementation",
+          "properties": {
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "link": {
+          "oneOf": [
+            {
+              "description": "a string containing the link's URL",
+              "format": "uri-reference",
+              "type": "string"
+            },
+            {
+              "properties": {
+                "href": {
+                  "description": "a string containing the link's URL",
+                  "format": "uri-reference",
+                  "type": "string"
+                },
+                "meta": {
+                  "$ref": "#/components/schemas/meta"
+                }
+              },
+              "required": [
+                "href"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "linkage": {
+          "description": "the 'type' and 'id'",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            },
+            "type": {
+              "$ref": "#/components/schemas/type"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "type": "object"
+        },
+        "links": {
+          "additionalProperties": {
+            "$ref": "#/components/schemas/link"
+          },
+          "type": "object"
+        },
+        "meta": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "nulltype": {
+          "default": null,
+          "nullable": true,
+          "type": "object"
+        },
+        "onlymeta": {
+          "additionalProperties": false,
+          "properties": {
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            }
+          }
+        },
+        "pageref": {
+          "oneOf": [
+            {
+              "format": "uri-reference",
+              "type": "string"
+            },
+            {
+              "$ref": "#/components/schemas/nulltype"
+            }
+          ]
+        },
+        "pagination": {
+          "properties": {
+            "first": {
+              "$ref": "#/components/schemas/pageref"
+            },
+            "last": {
+              "$ref": "#/components/schemas/pageref"
+            },
+            "next": {
+              "$ref": "#/components/schemas/pageref"
+            },
+            "prev": {
+              "$ref": "#/components/schemas/pageref"
+            }
+          },
+          "type": "object"
+        },
+        "relationshipLinks": {
+          "additionalProperties": true,
+          "description": "optional references to other resource objects",
+          "properties": {
+            "related": {
+              "$ref": "#/components/schemas/link"
+            },
+            "self": {
+              "$ref": "#/components/schemas/link"
+            }
+          },
+          "type": "object"
+        },
+        "relationshipToMany": {
+          "description": "An array of objects each containing the 'type' and 'id' for to-many relationships",
+          "items": {
+            "$ref": "#/components/schemas/linkage"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "relationshipToOne": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/nulltype"
+            },
+            {
+              "$ref": "#/components/schemas/linkage"
+            }
+          ],
+          "description": "reference to other resource in a to-one relationship"
+        },
+        "reltomany": {
+          "description": "a multiple 'to-many' relationship",
+          "properties": {
+            "data": {
+              "$ref": "#/components/schemas/relationshipToMany"
+            },
+            "links": {
+              "$ref": "#/components/schemas/relationshipLinks"
+            },
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            }
+          },
+          "type": "object"
+        },
+        "reltoone": {
+          "description": "a singular 'to-one' relationship",
+          "properties": {
+            "data": {
+              "$ref": "#/components/schemas/relationshipToOne"
+            },
+            "links": {
+              "$ref": "#/components/schemas/relationshipLinks"
+            },
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            }
+          },
+          "type": "object"
+        },
+        "resource": {
+          "additionalProperties": false,
+          "properties": {
+            "attributes": {
+              "type": "object"
+            },
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "links": {
+              "$ref": "#/components/schemas/links"
+            },
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            },
+            "relationships": {
+              "type": "object"
+            },
+            "type": {
+              "$ref": "#/components/schemas/type"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "type": "object"
+        },
+        "type": {
+          "description": "The [type](https://jsonapi.org/format/#document-resource-object-identification) member is used to describe resource objects that share common attributes and relationships.",
+          "type": "string"
+        }
+      }
+    },
+    "info": {
+      "title": "",
+      "version": ""
+    },
+    "openapi": "3.0.2",
+    "paths": {
+      "/authors/": {
+        "get": {
+          "description": "",
+          "operationId": "List/authors/",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/include"
+            },
+            {
+              "$ref": "#/components/parameters/fields"
+            },
+            {
+              "description": "A page number within the paginated result set.",
+              "in": "query",
+              "name": "page[number]",
+              "required": false,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "description": "Number of results to return per page.",
+              "in": "query",
+              "name": "page[size]",
+              "required": false,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "description": "[list of fields to sort by](https://jsonapi.org/format/#fetching-sorting)",
+              "in": "query",
+              "name": "sort",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "description": "author_type",
+              "in": "query",
+              "name": "filter[authorType]",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "description": "name",
+              "in": "query",
+              "name": "filter[name]",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "description": "A search term.",
+              "in": "query",
+              "name": "filter[search]",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "content": {
+                "application/vnd.api+json": {
+                  "schema": {
+                    "properties": {
+                      "data": {
+                        "items": {
+                          "$ref": "#/components/schemas/AuthorList"
+                        },
+                        "type": "array"
+                      },
+                      "included": {
+                        "items": {
+                          "$ref": "#/components/schemas/resource"
+                        },
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "jsonapi": {
+                        "$ref": "#/components/schemas/jsonapi"
+                      },
+                      "links": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/links"
+                          },
+                          {
+                            "$ref": "#/components/schemas/pagination"
+                          }
+                        ],
+                        "description": "Link members related to primary data"
+                      }
+                    },
+                    "required": [
+                      "data"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "List/authors/"
+            },
+            "401": {
+              "content": {
+                "application/vnd.api+json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/failure"
+                  }
+                }
+              },
+              "description": "not authorized"
+            },
+            "404": {
+              "content": {
+                "application/vnd.api+json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/failure"
+                  }
+                }
+              },
+              "description": "not found"
+            }
+          },
+          "tags": [
+            "authors"
+          ]
+        }
+      }
+    }
+  }
+  '''
+# ---

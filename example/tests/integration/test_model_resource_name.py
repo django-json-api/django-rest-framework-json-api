@@ -50,7 +50,6 @@ def _check_relationship_and_included_comment_type_are_the_same(django_client, ur
 
 @pytest.mark.usefixtures("single_entry")
 class TestModelResourceName:
-
     create_data = {
         "data": {
             "type": "resource_name_from_JSONAPIMeta",
@@ -147,7 +146,6 @@ class TestModelResourceName:
 
 @pytest.mark.usefixtures("single_entry")
 class TestResourceNameConsistency:
-
     # Included rename tests
     def test_type_match_on_included_and_inline_base(self, client):
         _check_relationship_and_included_comment_type_are_the_same(

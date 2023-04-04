@@ -129,3 +129,35 @@ class GenericViewSet(TestBase):
         )
 
         assert expected == response.json()
+
+    def test_nonfield_validation_exceptions(self):
+        """
+        Non-field errors should be attributed to /data source.pointer.
+        """
+        expected = {
+            "errors": [
+                {
+                    "status": "400",
+                    "source": {
+                        "pointer": "/data",
+                    },
+                    "detail": "First name cannot be the same as last name!",
+                    "code": "invalid",
+                },
+            ]
+        }
+        response = self.client.post(
+            "/identities",
+            {
+                "data": {
+                    "type": "users",
+                    "attributes": {
+                        "email": "miles@example.com",
+                        "first_name": "Miles",
+                        "last_name": "Miles",
+                    },
+                }
+            },
+        )
+
+        assert expected == response.json()

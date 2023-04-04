@@ -185,7 +185,7 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                                     "A [JSON Pointer](https://tools.ietf.org/html/rfc6901) "
                                     "to the associated entity in the request document "
                                     "[e.g. `/data` for a primary data object, or "
-                                    "`/data/attributes/title` for a specific attribute.",
+                                    "`/data/attributes/title` for a specific attribute."
                                 ),
                             },
                             "parameter": {
@@ -298,9 +298,8 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                 if components_schemas[k] == components[k]:
                     continue
                 warnings.warn(
-                    'Schema component "{}" has been overriden with a different value.'.format(
-                        k
-                    )
+                    f'Schema component "{k}" has been overriden with a different value.',
+                    stacklevel=1,
                 )
 
             components_schemas.update(components)

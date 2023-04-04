@@ -142,5 +142,5 @@ class DjangoFilterBackend(DjangoFilterBackend):
         for res in result:
             if "name" in res:
                 name = format_field_name(res["name"].replace("__", "."))
-                res["name"] = "filter[{}]".format(name)
+                res["name"] = f"filter[{name}]"
         return result

@@ -71,7 +71,6 @@ def test_render_format_field_names(db, settings, entry):
 
 @pytest.mark.django_db
 def test_blog_create(client):
-
     url = reverse("drf-entry-blog-list")
     name = "Dummy Name"
 
@@ -107,7 +106,6 @@ def test_blog_create(client):
 
 @pytest.mark.django_db
 def test_get_object_gives_correct_blog(client, blog, entry):
-
     url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
     resp = client.get(url)
     expected = {
@@ -126,7 +124,6 @@ def test_get_object_gives_correct_blog(client, blog, entry):
 
 @pytest.mark.django_db
 def test_get_object_patches_correct_blog(client, blog, entry):
-
     url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
     new_name = blog.name + " update"
     assert not new_name == blog.name
@@ -163,7 +160,6 @@ def test_get_object_patches_correct_blog(client, blog, entry):
 
 @pytest.mark.django_db
 def test_get_object_deletes_correct_blog(client, entry):
-
     url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
 
     resp = client.delete(url)

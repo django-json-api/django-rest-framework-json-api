@@ -23,7 +23,6 @@ from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.serializers import ResourceIdentifierObjectSerializer
 from rest_framework_json_api.utils import (
     Hyperlink,
-    OrderedDict,
     get_included_resources,
     get_resource_type_from_instance,
     undo_format_link_segment,
@@ -66,7 +65,6 @@ class PreloadIncludesMixin:
             self.request, self.get_serializer_class()
         )
         for included in included_resources + ["__all__"]:
-
             select_related = self.get_select_related(included)
             if select_related is not None:
                 qs = qs.select_related(*select_related)
@@ -110,7 +108,6 @@ class AutoPrefetchMixin:
                 if level == levels[-1]:
                     included_model = field
                 else:
-
                     if issubclass(field_class, ReverseOneToOneDescriptor):
                         model_field = field.related.field
                     else:
@@ -277,7 +274,7 @@ class RelationshipView(generics.GenericAPIView):
         return Hyperlink(url, name)
 
     def get_links(self):
-        return_data = OrderedDict()
+        return_data = {}
         self_link = self.get_url(
             "self", self.self_link_view_name, self.kwargs, self.request
         )
@@ -286,9 +283,9 @@ class RelationshipView(generics.GenericAPIView):
             "related", self.related_link_view_name, related_kwargs, self.request
         )
         if self_link:
-            return_data.update({"self": self_link})
+            return_data["self"] = self_link
         if related_link:
-            return_data.update({"related": related_link})
+            return_data["related"] = related_link
         return return_data
 
     def get(self, request, *args, **kwargs):
