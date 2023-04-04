@@ -60,8 +60,6 @@ ROOT_URLCONF = "example.urls"
 
 SECRET_KEY = "abc123"
 
-PASSWORD_HASHERS = ("django.contrib.auth.hashers.UnsaltedMD5PasswordHasher",)
-
 INTERNAL_IPS = ("127.0.0.1",)
 
 JSON_API_FORMAT_FIELD_NAMES = "camelize"
