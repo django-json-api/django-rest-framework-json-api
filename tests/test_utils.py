@@ -14,6 +14,7 @@ from rest_framework_json_api.utils import (
     format_resource_type,
     format_value,
     get_related_resource_type,
+    get_resource_id_from_instance,
     get_resource_name,
     get_resource_type_from_serializer,
     undo_format_field_name,
@@ -390,6 +391,35 @@ def test_get_resource_type_from_serializer_without_resource_name_raises_error():
         "can not detect 'resource_name' on serializer "
         "'SerializerWithoutResourceName' in module 'tests.test_utils'"
     )
+
+
+class ObjectWithId:
+    id: int = 9
+
+
+class ObjectWithPk:
+    pk: int = 7
+
+
+class ObjectWithPkAndId(ObjectWithId, ObjectWithPk):
+    pass
+
+
+@pytest.mark.parametrize(
+    "instance, expected",
+    [
+        (None, None),
+        (BasicModel(id=5), 5),
+        (ObjectWithId(), 9),
+        (ObjectWithPk(), 7),
+        (ObjectWithPkAndId(), 9),
+        ({"id": 11}, 11),
+        ({"pk": 13}, 13),
+        ({"pk": 11, "id": 13}, 13),
+    ],
+)
+def test_get_resource_id_from_instance(instance, expected):
+    assert get_resource_id_from_instance(instance) == expected
 
 
 @pytest.mark.parametrize(

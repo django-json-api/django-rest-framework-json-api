@@ -309,9 +309,9 @@ def get_resource_id_from_instance(instance):
     if not instance:
         return None
     elif hasattr(instance, "id"):
-        return encoding.force_str(instance.id)
+        return instance.id
     elif hasattr(instance, "pk"):
-        return encoding.force_str(instance.pk)
+        return instance.pk
     elif isinstance(instance, dict):
         return instance.get("id", instance.get("pk", None))
     return None
