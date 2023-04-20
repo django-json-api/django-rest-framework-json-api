@@ -443,12 +443,9 @@ class JSONRenderer(renderers.JSONRenderer):
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
             resource_name = utils.get_resource_type_from_instance(resource_instance)
-        resource_id = utils.get_resource_id_from_instance(
-            resource
-        ) or utils.get_resource_id_from_instance(resource_instance)
         resource_data = {
             "type": resource_name,
-            "id": force_str(resource_id) if resource_id is not None else None,
+            "id": utils.get_resource_id_from_instance(resource_instance, resource),
             "attributes": cls.extract_attributes(fields, resource),
         }
         relationships = cls.extract_relationships(fields, resource, resource_instance)

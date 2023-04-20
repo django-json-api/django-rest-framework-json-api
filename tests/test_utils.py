@@ -406,20 +406,23 @@ class ObjectWithPkAndId(ObjectWithId, ObjectWithPk):
 
 
 @pytest.mark.parametrize(
-    "instance, expected",
+    "resource_instance, resource, expected",
     [
-        (None, None),
-        (BasicModel(id=5), 5),
-        (ObjectWithId(), 9),
-        (ObjectWithPk(), 7),
-        (ObjectWithPkAndId(), 9),
-        ({"id": 11}, 11),
-        ({"pk": 13}, 13),
-        ({"pk": 11, "id": 13}, 13),
+        (None, None, None),
+        (object(), {}, None),
+        (BasicModel(id=5), None, "5"),
+        (ObjectWithId(), {}, "9"),
+        (ObjectWithPk(), None, "7"),
+        (ObjectWithPkAndId(), None, "9"),
+        (None, {"id": 11}, "11"),
+        (object(), {"pk": 11}, None),
+        (ObjectWithId(), {"id": 11}, "11"),
+        (ObjectWithPk(), {"pk": 13}, "7"),
+        (ObjectWithPkAndId(), {"id": 12, "pk": 13}, "12"),
     ],
 )
-def test_get_resource_id_from_instance(instance, expected):
-    assert get_resource_id_from_instance(instance) == expected
+def test_get_resource_id_from_instance(resource_instance, resource, expected):
+    assert get_resource_id_from_instance(resource_instance, resource) == expected
 
 
 @pytest.mark.parametrize(

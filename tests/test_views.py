@@ -205,6 +205,28 @@ class TestAPIView:
             }
         }
 
+    @pytest.mark.urls(__name__)
+    def test_custom_id(self, client):
+        data = {
+            "data": {
+                "id": 2_193_102,
+                "type": "custom",
+                "attributes": {"body": "hello"},
+            }
+        }
+
+        url = reverse("custom-id")
+
+        response = client.patch(url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": {
+                "type": "custom",
+                "id": "2176ce",  # get_id() -> hex
+                "attributes": {"body": "hello"},
+            }
+        }
+
 
 # Routing setup
 
@@ -224,6 +246,14 @@ class CustomModelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
 
+class CustomIdModelSerializer(serializers.Serializer):
+    body = serializers.CharField()
+    id = serializers.IntegerField()
+
+    def get_id(self):
+        return hex(self.validated_data["id"])[2:]
+
+
 class CustomAPIView(APIView):
     parser_classes = [JSONParser]
     renderer_classes = [JSONRenderer]
@@ -238,10 +268,21 @@ class CustomAPIView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+class CustomIdAPIView(APIView):
+    parser_classes = [JSONParser]
+    renderer_classes = [JSONRenderer]
+    resource_name = "custom"
+
+    def patch(self, request, *args, **kwargs):
+        serializer = CustomIdModelSerializer(CustomModel(request.data))
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+
 router = SimpleRouter()
 router.register(r"basic_models", BasicModelViewSet, basename="basic-model")
 
 urlpatterns = [
     path("custom", CustomAPIView.as_view(), name="custom"),
+    path("custom-id", CustomIdAPIView.as_view(), name="custom-id"),
 ]
 urlpatterns += router.urls
