@@ -23,6 +23,13 @@ class IdentitySerializer(serializers.ModelSerializer):
             )
         return data
 
+    def validate(self, data):
+        if data["first_name"] == data["last_name"]:
+            raise serializers.ValidationError(
+                "First name cannot be the same as last name!"
+            )
+        return data
+
     class Meta:
         model = auth_models.User
         fields = (

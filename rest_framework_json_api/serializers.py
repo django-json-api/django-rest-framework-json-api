@@ -155,7 +155,12 @@ class IncludedResourcesValidationMixin:
 class ReservedFieldNamesMixin:
     """Ensures that reserved field names are not used and an error raised instead."""
 
-    _reserved_field_names = {"meta", "results", "type"}
+    _reserved_field_names = {
+        "meta",
+        "results",
+        "type",
+        api_settings.NON_FIELD_ERRORS_KEY,
+    }
 
     def get_fields(self):
         fields = super().get_fields()
