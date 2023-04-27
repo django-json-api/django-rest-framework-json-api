@@ -4,6 +4,7 @@ from collections import OrderedDict
 import inflection
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch
+from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import MISSING_ERROR_MESSAGE, Field, SkipField
 from rest_framework.relations import MANY_RELATION_KWARGS
@@ -276,7 +277,8 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
             includes = getattr(parent, "included_serializers", dict())
             for field in field_names:
                 if field in includes.keys():
-                    return get_resource_type_from_serializer(includes[field])
+                    serializer = import_class_from_dotted_path(serializer) if isinstance(serializer, str) else serializer
+                    return get_resource_type_from_serializer(serializer)
 
         return None
 
