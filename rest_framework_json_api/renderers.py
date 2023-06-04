@@ -647,7 +647,11 @@ class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
 
         context["includes_form"] = self.get_includes_form(view)
 
+        if "included" not in context:       # Adds the included field if it is not present
+            context["included"] = []
+
         return context
+
 
     @classmethod
     def _get_included_serializers(cls, serializer, prefix="", already_seen=None):
