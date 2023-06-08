@@ -670,6 +670,10 @@ class AutoSchema(drf_openapi.AutoSchema):
                     "$ref": "#/components/schemas/reltomany"
                 }
                 continue
+            if field.field_name == "id":
+                # ID is always provided in the root of JSON:API and removed from the
+                # attributes in JSONRenderer.
+                continue
 
             if field.required:
                 required.append(format_field_name(field.field_name))

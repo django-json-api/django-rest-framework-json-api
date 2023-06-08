@@ -110,6 +110,21 @@ def test_schema_construction(snapshot):
     assert snapshot == json.dumps(schema, indent=2, sort_keys=True)
 
 
+def test_schema_id_field():
+    """ID field is only included in the root, not the attributes."""
+    patterns = [
+        re_path("^companies/?$", views.CompanyViewset.as_view({"get": "list"})),
+    ]
+    generator = SchemaGenerator(patterns=patterns)
+
+    request = create_request("/")
+    schema = generator.get_schema(request=request)
+
+    company_properties = schema["components"]["schemas"]["Company"]["properties"]
+    assert company_properties["id"] == {"$ref": "#/components/schemas/id"}
+    assert "id" not in company_properties["attributes"]["properties"]
+
+
 def test_schema_parameters_include():
     """Include paramater is only used when serializer defines included_serializers."""
     patterns = [

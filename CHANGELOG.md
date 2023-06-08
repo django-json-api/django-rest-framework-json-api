@@ -27,6 +27,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition
 * Non-field serializer errors are given a source.pointer value of "/data".
+* Fixed "id" field being added to /data/attributes in the OpenAPI schema when it is not rendered there.
 
 ## [6.0.0] - 2022-09-24
 
