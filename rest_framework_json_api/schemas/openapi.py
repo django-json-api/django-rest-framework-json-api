@@ -406,11 +406,13 @@ class AutoSchema(drf_openapi.AutoSchema):
         operation["operationId"] = self.get_operation_id(path, method)
         operation["description"] = self.get_description(path, method)
 
+        serializer = self.get_response_serializer(path, method)
+
         parameters = []
         parameters += self.get_path_parameters(path, method)
         # pagination, filters only apply to GET/HEAD of collections and items
         if method in ["GET", "HEAD"]:
-            parameters += self._get_include_parameters(path, method)
+            parameters += self._get_include_parameters(path, method, serializer)
             parameters += self._get_fields_parameters(path, method)
             parameters += self.get_pagination_parameters(path, method)
             parameters += self.get_filter_parameters(path, method)
@@ -448,11 +450,13 @@ class AutoSchema(drf_openapi.AutoSchema):
             action = self.method_mapping[method.lower()]
         return action + path
 
-    def _get_include_parameters(self, path, method):
+    def _get_include_parameters(self, path, method, serializer):
         """
         includes parameter: https://jsonapi.org/format/#fetching-includes
         """
-        return [{"$ref": "#/components/parameters/include"}]
+        if getattr(serializer, "included_serializers", {}):
+            return [{"$ref": "#/components/parameters/include"}]
+        return []
 
     def _get_fields_parameters(self, path, method):
         """
