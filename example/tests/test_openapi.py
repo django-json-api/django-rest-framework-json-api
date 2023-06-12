@@ -110,6 +110,22 @@ def test_schema_construction(snapshot):
     assert snapshot == json.dumps(schema, indent=2, sort_keys=True)
 
 
+def test_schema_parameters_include():
+    """Include paramater is only used when serializer defines included_serializers."""
+    patterns = [
+        re_path("^authors/?$", views.AuthorViewSet.as_view({"get": "list"})),
+        re_path("^project-types/?$", views.ProjectTypeViewset.as_view({"get": "list"})),
+    ]
+    generator = SchemaGenerator(patterns=patterns)
+
+    request = create_request("/")
+    schema = generator.get_schema(request=request)
+
+    include_ref = {"$ref": "#/components/parameters/include"}
+    assert include_ref in schema["paths"]["/authors/"]["get"]["parameters"]
+    assert include_ref not in schema["paths"]["/project-types/"]["get"]["parameters"]
+
+
 def test_schema_related_serializers():
     """
     Confirm that paths are generated for related fields. For example:
