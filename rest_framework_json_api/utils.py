@@ -304,6 +304,19 @@ def get_resource_type_from_serializer(serializer):
     )
 
 
+def get_resource_id(resource_instance, resource):
+    """Returns the resource identifier for a given instance (`id` takes priority over `pk`)."""
+    if resource and "id" in resource:
+        return resource["id"] and encoding.force_str(resource["id"]) or None
+    if resource_instance:
+        return (
+            hasattr(resource_instance, "pk")
+            and encoding.force_str(resource_instance.pk)
+            or None
+        )
+    return None
+
+
 def get_included_resources(request, serializer=None):
     """Build a list of included resources."""
     include_resources_param = request.query_params.get("include") if request else None

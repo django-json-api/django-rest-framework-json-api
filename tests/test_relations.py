@@ -10,9 +10,10 @@ from rest_framework_json_api.relations import (
     HyperlinkedRelatedField,
     SerializerMethodHyperlinkedRelatedField,
 )
+from rest_framework_json_api.serializers import ModelSerializer, ResourceRelatedField
 from rest_framework_json_api.utils import format_link_segment
 from rest_framework_json_api.views import RelationshipView
-from tests.models import BasicModel
+from tests.models import BasicModel, ForeignKeySource, ForeignKeyTarget
 from tests.serializers import (
     ForeignKeySourceSerializer,
     ManyToManySourceReadOnlySerializer,
@@ -42,6 +43,28 @@ class TestResourceRelatedField:
         expected = {
             "type": resource_type,
             "id": str(foreign_key_target.pk),
+        }
+
+        assert serializer.data["target"] == expected
+
+    def test_get_resource_id(self, foreign_key_target):
+        class CustomResourceRelatedField(ResourceRelatedField):
+            def get_resource_id(self, value):
+                return value.name
+
+        class CustomPkFieldSerializer(ModelSerializer):
+            target = CustomResourceRelatedField(
+                queryset=ForeignKeyTarget.objects, pk_field="name"
+            )
+
+            class Meta:
+                model = ForeignKeySource
+                fields = ("target",)
+
+        serializer = CustomPkFieldSerializer(instance={"target": foreign_key_target})
+        expected = {
+            "type": "ForeignKeyTarget",
+            "id": "Target",
         }
 
         assert serializer.data["target"] == expected
