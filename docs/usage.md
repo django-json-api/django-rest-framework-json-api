@@ -278,6 +278,45 @@ class MyModelSerializer(serializers.ModelSerializer):
     # ...
 ```
 
+### Overwriting the resource object's id
+
+Per default the primary key property `pk` on the instance is used as the resource identifier.
+
+It is possible to overwrite this by defining an `id` field on the serializer like:
+
+```python
+class UserSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='email')
+    name = serializers.CharField()
+
+    class Meta:
+        model = User
+```
+
+This also works on generic serializers.
+
+In case you also use a model as a resource related field make sure to overwrite `get_resource_id` by creating a custom `ResourceRelatedField` class:
+
+```python
+class UserResourceRelatedField(ResourceRelatedField):
+    def get_resource_id(self, value):
+        return value.email
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    user = UserResourceRelatedField(queryset=User.objects)
+    name = serializers.CharField()
+
+    class Meta:
+        model = Group
+```
+
+<div class="warning">
+    <strong>Note:</strong>
+    When using different id than primary key, make sure that your view
+    manages it properly by overwriting `get_object`.
+</div>
+
 ### Setting resource identifier object type
 
 You may manually set resource identifier object type by using `resource_name` property on views, serializers, or

@@ -247,16 +247,20 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
         return super().to_internal_value(data["id"])
 
     def to_representation(self, value):
-        if getattr(self, "pk_field", None) is not None:
-            pk = self.pk_field.to_representation(value.pk)
-        else:
-            pk = value.pk
-
+        pk = self.get_resource_id(value)
         resource_type = self.get_resource_type_from_included_serializer()
         if resource_type is None or not self._skip_polymorphic_optimization:
             resource_type = get_resource_type_from_instance(value)
 
         return {"type": resource_type, "id": str(pk)}
+
+    def get_resource_id(self, value):
+        """
+        Get resource id of related field.
+
+        Per default pk of value is returned.
+        """
+        return super().to_representation(value)
 
     def get_resource_type_from_included_serializer(self):
         """
