@@ -13,18 +13,22 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Python 3.11.
+* Added support for Django 4.2.
 
 ### Changed
 
 * Added support to overwrite serializer methods in customized schema class
 * Adjusted some still old formatted strings to f-strings.
 * Replaced `OrderedDict` with `dict` which is also ordered since Python 3.7.
+* Compound document "include" parameter is only included in the OpenAPI schema if serializer
+  implements `included_serializers`.
 
 ### Fixed
 
 * Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition
 * Non-field serializer errors are given a source.pointer value of "/data".
 * Serialization of non-model `Serializer` results, e.g. `dict` without a `pk` attribute
+* Fixed "id" field being added to /data/attributes in the OpenAPI schema when it is not rendered there.
 
 ## [6.0.0] - 2022-09-24
 
