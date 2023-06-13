@@ -282,7 +282,7 @@ class MyModelSerializer(serializers.ModelSerializer):
 
 Per default the primary key property `pk` on the instance is used as the resource identifier.
 
-It is possible to overwrite this by defining an `id` field on the serializer like:
+It is possible to overwrite the resource id by defining an `id` field on the serializer like:
 
 ```python
 class UserSerializer(serializers.ModelSerializer):
@@ -301,7 +301,6 @@ In case you also use a model as a resource related field make sure to overwrite 
 class UserResourceRelatedField(ResourceRelatedField):
     def get_resource_id(self, value):
         return value.email
-
 
 class GroupSerializer(serializers.ModelSerializer):
     user = UserResourceRelatedField(queryset=User.objects)

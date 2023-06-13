@@ -24,20 +24,21 @@ any parts of the framework not mentioned in the documentation should generally b
   implements `included_serializers`.
 * Allowed overwriting of resource id by defining an `id` field on the serializer.
 
-Example:
-```python
-class CustomIdSerializer(serializers.Serializer):
-    id = serializers.CharField(source='name')
-    body = serializers.CharField()
-```
+    Example:
+    ```python
+    class CustomIdSerializer(serializers.Serializer):
+        id = serializers.CharField(source='name')
+        body = serializers.CharField()
+    ```
+
 * Allowed overwriting resource id on resource related fields by creating custom `ResourceRelatedField`.
 
-Example:
-```python
-class CustomResourceRelatedField(relations.ResourceRelatedField):
-    def get_resource_id(self, value):
-        return value.name
-```
+    Example:
+    ```python
+    class CustomResourceRelatedField(relations.ResourceRelatedField):
+        def get_resource_id(self, value):
+            return value.name
+    ```
 
 ### Fixed
 
