@@ -206,7 +206,7 @@ class TestAPIView:
         }
 
     @pytest.mark.urls(__name__)
-    def test_custom_id(self, client):
+    def test_patch_with_custom_id(self, client):
         data = {
             "data": {
                 "id": 2_193_102,
@@ -247,11 +247,11 @@ class CustomModelSerializer(serializers.Serializer):
 
 
 class CustomIdModelSerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField()
     body = serializers.CharField()
-    id = serializers.IntegerField()
 
-    def get_id(self):
-        return hex(self.validated_data["id"])[2:]
+    def get_id(self, obj):
+        return hex(obj.id)[2:]
 
 
 class CustomAPIView(APIView):

@@ -304,13 +304,11 @@ def get_resource_type_from_serializer(serializer):
     )
 
 
-def get_resource_id_from_instance(resource_instance, resource):
+def get_resource_id(resource_instance, resource):
     """Returns the resource identifier for a given instance (`id` takes priority over `pk`)."""
     if resource and "id" in resource:
         return resource["id"] and encoding.force_str(resource["id"]) or None
     if resource_instance:
-        if hasattr(resource_instance, "get_id") and callable(resource_instance.get_id):
-            return encoding.force_str(resource_instance.get_id())
         return (
             hasattr(resource_instance, "pk")
             and encoding.force_str(resource_instance.pk)

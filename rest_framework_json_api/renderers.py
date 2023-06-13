@@ -445,7 +445,7 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_name = utils.get_resource_type_from_instance(resource_instance)
         resource_data = {
             "type": resource_name,
-            "id": utils.get_resource_id_from_instance(resource_instance, resource),
+            "id": utils.get_resource_id(resource_instance, resource),
             "attributes": cls.extract_attributes(fields, resource),
         }
         relationships = cls.extract_relationships(fields, resource, resource_instance)

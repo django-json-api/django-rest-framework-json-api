@@ -14,7 +14,7 @@ from rest_framework_json_api.utils import (
     format_resource_type,
     format_value,
     get_related_resource_type,
-    get_resource_id_from_instance,
+    get_resource_id,
     get_resource_name,
     get_resource_type_from_serializer,
     undo_format_field_name,
@@ -393,36 +393,20 @@ def test_get_resource_type_from_serializer_without_resource_name_raises_error():
     )
 
 
-class ObjectWithId:
-    id: int = 9
-
-
-class ObjectWithPk:
-    pk: int = 7
-
-
-class ObjectWithPkAndId(ObjectWithId, ObjectWithPk):
-    pass
-
-
 @pytest.mark.parametrize(
     "resource_instance, resource, expected",
     [
         (None, None, None),
         (object(), {}, None),
         (BasicModel(id=5), None, "5"),
-        (ObjectWithId(), {}, "9"),
-        (ObjectWithPk(), None, "7"),
-        (ObjectWithPkAndId(), None, "9"),
+        (BasicModel(id=9), {}, "9"),
         (None, {"id": 11}, "11"),
         (object(), {"pk": 11}, None),
-        (ObjectWithId(), {"id": 11}, "11"),
-        (ObjectWithPk(), {"pk": 13}, "7"),
-        (ObjectWithPkAndId(), {"id": 12, "pk": 13}, "12"),
+        (BasicModel(id=6), {"id": 11}, "11"),
     ],
 )
-def test_get_resource_id_from_instance(resource_instance, resource, expected):
-    assert get_resource_id_from_instance(resource_instance, resource) == expected
+def test_get_resource_id(resource_instance, resource, expected):
+    assert get_resource_id(resource_instance, resource) == expected
 
 
 @pytest.mark.parametrize(
