@@ -118,7 +118,7 @@ If you want to change the list of valid query parameters, override the `.query_r
 ```python
 # compiled regex that matches the allowed https://jsonapi.org/format/#query-parameters
 # `sort` and `include` stand alone; `filter`, `fields`, and `page` have []'s
-query_regex = re.compile(r'^(sort|include)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+query_regex = re.compile(r"^(sort|include)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$")
 ```
 For example:
 ```python
@@ -126,7 +126,7 @@ import re
 from rest_framework_json_api.filters import QueryParameterValidationFilter
 
 class MyQPValidator(QueryParameterValidationFilter):
-    query_regex = re.compile(r'^(sort|include|page|page_size)$|^(filter|fields|page)(\[[\w\.\-]+\])?$')
+    query_regex = re.compile(r"^(sort|include|page|page_size)$|^(?P<type>filter|fields|page)(\[[\w\.\-]+\])?$")
 ```
 
 If you don't care if non-JSON:API query parameters are allowed (and potentially silently ignored),
