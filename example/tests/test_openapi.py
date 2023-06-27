@@ -141,6 +141,28 @@ def test_schema_parameters_include():
     assert include_ref not in schema["paths"]["/project-types/"]["get"]["parameters"]
 
 
+def test_schema_serializer_method_resource_related_field():
+    """SerializerMethodResourceRelatedField fieds have the correct relation ref."""
+    patterns = [
+        re_path("^entries/?$", views.EntryViewSet.as_view({"get": "list"})),
+    ]
+    generator = SchemaGenerator(patterns=patterns)
+
+    request = Request(RequestFactory().get("/", {"include": "featured"}))
+    schema = generator.get_schema(request=request)
+
+    entry_schema = schema["components"]["schemas"]["Entry"]
+    entry_relationships = entry_schema["properties"]["relationships"]["properties"]
+
+    rel_to_many_ref = {"$ref": "#/components/schemas/reltomany"}
+    assert entry_relationships["suggested"] == rel_to_many_ref
+    assert entry_relationships["suggestedHyperlinked"] == rel_to_many_ref
+
+    rel_to_one_ref = {"$ref": "#/components/schemas/reltoone"}
+    assert entry_relationships["featured"] == rel_to_one_ref
+    assert entry_relationships["featuredHyperlinked"] == rel_to_one_ref
+
+
 def test_schema_related_serializers():
     """
     Confirm that paths are generated for related fields. For example:

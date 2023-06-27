@@ -8,6 +8,7 @@ from rest_framework.schemas.utils import is_list_view
 
 from rest_framework_json_api import serializers, views
 from rest_framework_json_api.compat import get_reference
+from rest_framework_json_api.relations import ManySerializerMethodResourceRelatedField
 from rest_framework_json_api.utils import format_field_name
 
 
@@ -660,14 +661,20 @@ class AutoSchema(drf_openapi.AutoSchema):
                 continue
             if isinstance(field, serializers.HiddenField):
                 continue
+            if isinstance(
+                field,
+                (
+                    serializers.ManyRelatedField,
+                    ManySerializerMethodResourceRelatedField,
+                ),
+            ):
+                relationships[format_field_name(field.field_name)] = {
+                    "$ref": "#/components/schemas/reltomany"
+                }
+                continue
             if isinstance(field, serializers.RelatedField):
                 relationships[format_field_name(field.field_name)] = {
                     "$ref": "#/components/schemas/reltoone"
-                }
-                continue
-            if isinstance(field, serializers.ManyRelatedField):
-                relationships[format_field_name(field.field_name)] = {
-                    "$ref": "#/components/schemas/reltomany"
                 }
                 continue
             if field.field_name == "id":
