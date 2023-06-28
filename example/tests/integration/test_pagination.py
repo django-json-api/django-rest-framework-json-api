@@ -51,6 +51,7 @@ def test_pagination_with_single_entry(single_entry, client):
                             "related": "http://testserver/entries/1/suggested/",
                             "self": "http://testserver/entries/1/relationships/suggested",
                         },
+                        "meta": {"count": 0},
                     },
                     "suggestedHyperlinked": {
                         "links": {

@@ -19,6 +19,7 @@ import rest_framework_json_api
 from rest_framework_json_api import utils
 from rest_framework_json_api.relations import (
     HyperlinkedMixin,
+    ManySerializerMethodResourceRelatedField,
     ResourceRelatedField,
     SkipDataMixin,
 )
@@ -151,6 +152,11 @@ class JSONRenderer(renderers.JSONRenderer):
             if isinstance(field, (ResourceRelatedField,)):
                 if not isinstance(field, SkipDataMixin):
                     relation_data.update({"data": resource.get(field_name)})
+
+                    if isinstance(field, ManySerializerMethodResourceRelatedField):
+                        relation_data.update(
+                            {"meta": {"count": len(resource.get(field_name))}}
+                        )
 
                 data.update({field_name: relation_data})
                 continue

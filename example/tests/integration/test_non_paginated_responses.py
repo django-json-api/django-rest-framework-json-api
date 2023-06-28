@@ -51,6 +51,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                             "related": "http://testserver/entries/1/suggested/",
                             "self": "http://testserver/entries/1/relationships/suggested",
                         },
+                        "meta": {"count": 1},
                     },
                     "suggestedHyperlinked": {
                         "links": {
@@ -106,6 +107,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                             "related": "http://testserver/entries/2/suggested/",
                             "self": "http://testserver/entries/2/relationships/suggested",
                         },
+                        "meta": {"count": 1},
                     },
                     "suggestedHyperlinked": {
                         "links": {
