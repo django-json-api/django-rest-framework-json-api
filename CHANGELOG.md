@@ -40,6 +40,8 @@ any parts of the framework not mentioned in the documentation should generally b
             return value.name
     ```
 
+* `SerializerMethodResourceRelatedField(many=True)` relationship data now includes a meta section.
+
 ### Fixed
 
 * Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition

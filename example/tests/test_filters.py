@@ -512,6 +512,7 @@ class DJATestFilters(APITestCase):
                                 {"type": "entries", "id": "11"},
                                 {"type": "entries", "id": "12"},
                             ],
+                            "meta": {"count": 11},
                         },
                         "suggestedHyperlinked": {
                             "links": {
