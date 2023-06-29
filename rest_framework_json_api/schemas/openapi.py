@@ -631,6 +631,15 @@ class AutoSchema(drf_openapi.AutoSchema):
             ):  # noqa E501
                 if "readOnly" in schema:
                     del item_schema["properties"]["attributes"]["properties"][name]
+
+        if "properties" in item_schema and "relationships" in item_schema["properties"]:
+            # No required relationships for PATCH
+            if (
+                method in ["PATCH", "PUT"]
+                and "required" in item_schema["properties"]["relationships"]
+            ):
+                del item_schema["properties"]["relationships"]["required"]
+
         return {
             "content": {
                 ct: {
@@ -653,6 +662,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         # TODO: remove attributes, etc. for relationshipView??
         required = []
         attributes = {}
+        relationships_required = []
         relationships = {}
 
         for field in serializer.fields.values():
@@ -668,11 +678,15 @@ class AutoSchema(drf_openapi.AutoSchema):
                     ManySerializerMethodResourceRelatedField,
                 ),
             ):
+                if field.required:
+                    relationships_required.append(format_field_name(field.field_name))
                 relationships[format_field_name(field.field_name)] = {
                     "$ref": "#/components/schemas/reltomany"
                 }
                 continue
             if isinstance(field, serializers.RelatedField):
+                if field.required:
+                    relationships_required.append(format_field_name(field.field_name))
                 relationships[format_field_name(field.field_name)] = {
                     "$ref": "#/components/schemas/reltoone"
                 }
@@ -727,6 +741,10 @@ class AutoSchema(drf_openapi.AutoSchema):
                 "type": "object",
                 "properties": relationships,
             }
+            if relationships_required:
+                result["properties"]["relationships"][
+                    "required"
+                ] = relationships_required
         return result
 
     def _add_async_response(self, operation):

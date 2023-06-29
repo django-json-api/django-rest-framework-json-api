@@ -587,6 +587,11 @@
                         "$ref": "#/components/schemas/reltoone"
                       }
                     },
+                    "required": [
+                      "bio",
+                      "entries",
+                      "comments"
+                    ],
                     "type": "object"
                   },
                   "type": {
@@ -801,6 +806,11 @@
                   "$ref": "#/components/schemas/reltoone"
                 }
               },
+              "required": [
+                "bio",
+                "entries",
+                "comments"
+              ],
               "type": "object"
             },
             "type": {

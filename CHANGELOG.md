@@ -41,6 +41,7 @@ any parts of the framework not mentioned in the documentation should generally b
     ```
 
 * `SerializerMethodResourceRelatedField(many=True)` relationship data now includes a meta section.
+* Required relationship fields are now marked as required in the OpenAPI schema.
 
 ### Fixed
 
