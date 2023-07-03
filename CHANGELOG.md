@@ -14,6 +14,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added support for Python 3.11.
 * Added support for Django 4.2.
+* Added `400 Bad Request` as a possible error response in the OpenAPI schema.
 
 ### Changed
 
