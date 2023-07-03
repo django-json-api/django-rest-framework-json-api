@@ -779,6 +779,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         Add generic failure response(s) to operation
         """
         for code, reason in [
+            ("400", "bad request"),
             ("401", "not authorized"),
         ]:
             operation["responses"][code] = self._failure_response(reason)

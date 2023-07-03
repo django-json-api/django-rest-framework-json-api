@@ -38,6 +38,16 @@
       "204": {
         "description": "[no content](https://jsonapi.org/format/#crud-deleting-responses-204)"
       },
+      "400": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "bad request"
+      },
       "401": {
         "content": {
           "application/vnd.api+json": {
@@ -204,6 +214,16 @@
         },
         "description": "update/authors/{id}"
       },
+      "400": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "bad request"
+      },
       "401": {
         "content": {
           "application/vnd.api+json": {
@@ -349,6 +369,16 @@
         },
         "description": "retrieve/authors/{id}/"
       },
+      "400": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "bad request"
+      },
       "401": {
         "content": {
           "application/vnd.api+json": {
@@ -485,6 +515,16 @@
           }
         },
         "description": "List/authors/"
+      },
+      "400": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "bad request"
       },
       "401": {
         "content": {
@@ -663,6 +703,16 @@
       },
       "204": {
         "description": "[Created](https://jsonapi.org/format/#crud-creating-responses-204) with the supplied `id`. No other changes from what was POSTed."
+      },
+      "400": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "bad request"
       },
       "401": {
         "content": {
@@ -1230,6 +1280,16 @@
                 }
               },
               "description": "List/authors/"
+            },
+            "400": {
+              "content": {
+                "application/vnd.api+json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/failure"
+                  }
+                }
+              },
+              "description": "bad request"
             },
             "401": {
               "content": {
