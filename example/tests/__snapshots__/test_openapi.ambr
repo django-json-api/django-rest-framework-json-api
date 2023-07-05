@@ -185,7 +185,7 @@
                 },
                 "included": {
                   "items": {
-                    "$ref": "#/components/schemas/resource"
+                    "$ref": "#/components/schemas/include"
                   },
                   "type": "array",
                   "uniqueItems": true
@@ -340,7 +340,7 @@
                 },
                 "included": {
                   "items": {
-                    "$ref": "#/components/schemas/resource"
+                    "$ref": "#/components/schemas/include"
                   },
                   "type": "array",
                   "uniqueItems": true
@@ -487,7 +487,7 @@
                 },
                 "included": {
                   "items": {
-                    "$ref": "#/components/schemas/resource"
+                    "$ref": "#/components/schemas/include"
                   },
                   "type": "array",
                   "uniqueItems": true
@@ -662,7 +662,7 @@
                 },
                 "included": {
                   "items": {
-                    "$ref": "#/components/schemas/resource"
+                    "$ref": "#/components/schemas/include"
                   },
                   "type": "array",
                   "uniqueItems": true
@@ -962,6 +962,36 @@
           "description": "Each resource object\u2019s type and id pair MUST [identify](https://jsonapi.org/format/#document-resource-object-identification) a single, unique resource.",
           "type": "string"
         },
+        "include": {
+          "additionalProperties": false,
+          "properties": {
+            "attributes": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "links": {
+              "$ref": "#/components/schemas/links"
+            },
+            "meta": {
+              "$ref": "#/components/schemas/meta"
+            },
+            "relationships": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": {
+              "$ref": "#/components/schemas/type"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "type": "object"
+        },
         "jsonapi": {
           "additionalProperties": false,
           "description": "The server's implementation",
@@ -1252,7 +1282,7 @@
                       },
                       "included": {
                         "items": {
-                          "$ref": "#/components/schemas/resource"
+                          "$ref": "#/components/schemas/include"
                         },
                         "type": "array",
                         "uniqueItems": true

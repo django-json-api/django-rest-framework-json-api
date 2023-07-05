@@ -49,6 +49,27 @@ class SchemaGenerator(drf_openapi.SchemaGenerator):
                     "meta": {"$ref": "#/components/schemas/meta"},
                 },
             },
+            "include": {
+                "type": "object",
+                "required": ["type", "id"],
+                "additionalProperties": False,
+                "properties": {
+                    "type": {"$ref": "#/components/schemas/type"},
+                    "id": {"$ref": "#/components/schemas/id"},
+                    "attributes": {
+                        "type": "object",
+                        "additionalProperties": True,
+                        # ...
+                    },
+                    "relationships": {
+                        "type": "object",
+                        "additionalProperties": True,
+                        # ...
+                    },
+                    "links": {"$ref": "#/components/schemas/links"},
+                    "meta": {"$ref": "#/components/schemas/meta"},
+                },
+            },
             "link": {
                 "oneOf": [
                     {
@@ -531,7 +552,7 @@ class AutoSchema(drf_openapi.AutoSchema):
                             "included": {
                                 "type": "array",
                                 "uniqueItems": True,
-                                "items": {"$ref": "#/components/schemas/resource"},
+                                "items": {"$ref": "#/components/schemas/include"},
                             },
                             "links": {
                                 "description": "Link members related to primary data",
