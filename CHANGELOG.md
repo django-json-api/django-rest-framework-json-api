@@ -53,6 +53,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Fixed "id" field being added to /data/attributes in the OpenAPI schema when it is not rendered there.
 * Fixed `SerializerMethodResourceRelatedField(many=True)` fields being given
   a "reltoone" schema reference instead of "reltomany".
+* Callable field default values are excluded from the OpenAPI schema, as they don't resolve to YAML data types.
 
 ## [6.0.0] - 2022-09-24
 
