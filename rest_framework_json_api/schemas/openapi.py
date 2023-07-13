@@ -727,7 +727,7 @@ class AutoSchema(drf_openapi.AutoSchema):
                 schema["writeOnly"] = True
             if field.allow_null:
                 schema["nullable"] = True
-            if field.default and field.default != empty:
+            if field.default and field.default != empty and not callable(field.default):
                 schema["default"] = field.default
             if field.help_text:
                 # Ensure django gettext_lazy is rendered correctly
