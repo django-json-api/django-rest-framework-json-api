@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [6.1.0] - 2023-08-25
 
 ### Added
 
@@ -48,7 +48,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated schema definition
+* Refactored handling of the `sort` query parameter to fix duplicate declaration in the generated OpenAPI schema definition
 * Non-field serializer errors are given a source.pointer value of "/data".
 * Fixed "id" field being added to /data/attributes in the OpenAPI schema when it is not rendered there.
 * Fixed `SerializerMethodResourceRelatedField(many=True)` fields being given
