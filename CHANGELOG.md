@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased]
+
+### Fixed
+
+* Fixed OpenAPI schema generation for `Serializer` children of `ListField`.
+
 ## [6.1.0] - 2023-08-25
 
 ### Added

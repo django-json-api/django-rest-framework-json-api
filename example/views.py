@@ -29,6 +29,7 @@ from example.models import (
     LabResults,
     Project,
     ProjectType,
+    Questionnaire,
 )
 from example.serializers import (
     AuthorDetailSerializer,
@@ -43,6 +44,7 @@ from example.serializers import (
     LabResultsSerializer,
     ProjectSerializer,
     ProjectTypeSerializer,
+    QuestionnaireSerializer,
 )
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
@@ -292,3 +294,8 @@ class LabResultViewSet(ReadOnlyModelViewSet):
         "__all__": [],
         "author": ["author__bio", "author__entries"],
     }
+
+
+class QuestionnaireViewset(ModelViewSet):
+    queryset = Questionnaire.objects.all()
+    serializer_class = QuestionnaireSerializer

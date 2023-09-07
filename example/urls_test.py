@@ -20,6 +20,7 @@ from example.views import (
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
     ProjectViewset,
+    QuestionnaireViewset,
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -38,6 +39,7 @@ router.register(r"companies", CompanyViewset)
 router.register(r"projects", ProjectViewset)
 router.register(r"project-types", ProjectTypeViewset)
 router.register(r"lab-results", LabResultViewSet)
+router.register(r"questionnaires", QuestionnaireViewset)
 
 # for the old tests
 router.register(r"identities", Identity)

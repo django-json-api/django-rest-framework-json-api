@@ -224,6 +224,38 @@ class TestModelSerializer:
         assert response.status_code == 200
         assert expected == response.json()
 
+    def test_model_serializer_with_list_of_objects(self, questionnaire, client):
+        expected = {
+            "data": {
+                "type": "questionnaires",
+                "id": str(questionnaire.pk),
+                "attributes": {
+                    "name": questionnaire.name,
+                    "questions": [
+                        {
+                            "text": "What is your name?",
+                            "required": True,
+                        },
+                        {
+                            "text": "What is your quest?",
+                            "required": False,
+                        },
+                        {
+                            "text": "What is the air-speed velocity of an unladen swallow?",
+                            "required": False,
+                        },
+                    ],
+                },
+            },
+        }
+
+        response = client.get(
+            reverse("questionnaire-detail", kwargs={"pk": questionnaire.pk})
+        )
+
+        assert response.status_code == 200
+        assert expected == response.json()
+
 
 class TestPolymorphicModelSerializer(TestCase):
     def setUp(self):

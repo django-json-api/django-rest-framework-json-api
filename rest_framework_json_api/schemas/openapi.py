@@ -681,6 +681,11 @@ class AutoSchema(drf_openapi.AutoSchema):
         and 'links'.
         """
         # TODO: remove attributes, etc. for relationshipView??
+        if isinstance(serializer.parent, serializers.ListField):
+            # Return plain non-JSON:API serializer schema for serializers nested inside
+            # a ListField, as those don't use the full JSON:API serializer schemas.
+            return super().map_serializer(serializer)
+
         required = []
         attributes = {}
         relationships_required = []

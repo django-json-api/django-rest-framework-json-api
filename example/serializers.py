@@ -18,6 +18,7 @@ from example.models import (
     LabResults,
     Project,
     ProjectType,
+    Questionnaire,
     ResearchProject,
     TaggedItem,
 )
@@ -420,4 +421,17 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
+        fields = "__all__"
+
+
+class QuestionSerializer(serializers.Serializer):
+    text = serializers.CharField()
+    required = serializers.BooleanField(default=False)
+
+
+class QuestionnaireSerializer(serializers.ModelSerializer):
+    questions = serializers.ListField(child=QuestionSerializer())
+
+    class Meta:
+        model = Questionnaire
         fields = "__all__"
