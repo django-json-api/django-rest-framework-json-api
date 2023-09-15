@@ -224,7 +224,7 @@ class TestModelSerializer:
         assert response.status_code == 200
         assert expected == response.json()
 
-    def test_model_serializer_with_list_of_objects(self, questionnaire, client):
+    def test_model_serializer_with_subserializers(self, questionnaire, client):
         expected = {
             "data": {
                 "type": "questionnaires",
@@ -245,6 +245,7 @@ class TestModelSerializer:
                             "required": False,
                         },
                     ],
+                    "metadata": {"author": "Bridgekeeper", "producer": None},
                 },
             },
         }

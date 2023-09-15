@@ -12,7 +12,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Fixed OpenAPI schema generation for `Serializer` children of `ListField`.
+* Fixed OpenAPI schema generation for `Serializer` when used inside another `Serializer` or as a child of `ListField`.
 
 ## [6.1.0] - 2023-08-25
 

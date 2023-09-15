@@ -429,9 +429,15 @@ class QuestionSerializer(serializers.Serializer):
     required = serializers.BooleanField(default=False)
 
 
+class QuestionnaireMetadataSerializer(serializers.Serializer):
+    author = serializers.CharField()
+    producer = serializers.CharField(default=None)
+
+
 class QuestionnaireSerializer(serializers.ModelSerializer):
     questions = serializers.ListField(child=QuestionSerializer())
+    metadata = QuestionnaireMetadataSerializer()
 
     class Meta:
         model = Questionnaire
-        fields = "__all__"
+        fields = ("name", "questions", "metadata")

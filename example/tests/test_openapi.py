@@ -125,8 +125,8 @@ def test_schema_id_field():
     assert "id" not in company_properties["attributes"]["properties"]
 
 
-def test_schema_list_of_objects():
-    """Schema for ListField child Serializer reflects the actual response structure."""
+def test_schema_subserializers():
+    """Schema for child Serializers reflects the actual response structure."""
     patterns = [
         re_path(
             "^questionnaires/?$", views.QuestionnaireViewset.as_view({"get": "list"})
@@ -140,6 +140,14 @@ def test_schema_list_of_objects():
     assert {
         "type": "object",
         "properties": {
+            "metadata": {
+                "type": "object",
+                "properties": {
+                    "author": {"type": "string"},
+                    "producer": {"type": "string"},
+                },
+                "required": ["author"],
+            },
             "questions": {
                 "type": "array",
                 "items": {
@@ -153,7 +161,7 @@ def test_schema_list_of_objects():
             },
             "name": {"type": "string", "maxLength": 100},
         },
-        "required": ["questions", "name"],
+        "required": ["name", "questions", "metadata"],
     } == schema["components"]["schemas"]["Questionnaire"]["properties"]["attributes"]
 
 

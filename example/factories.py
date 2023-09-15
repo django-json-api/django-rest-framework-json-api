@@ -161,3 +161,4 @@ class QuestionnaireFactory(factory.django.DjangoModelFactory):
             "text": "What is the air-speed velocity of an unladen swallow?",
         },
     ]
+    metadata = {"author": "Bridgekeeper"}
