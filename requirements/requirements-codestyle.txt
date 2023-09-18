@@ -1,5 +1,5 @@
 black==23.9.1
 flake8==6.1.0
 flake8-bugbear==23.9.16
-flake8-isort==6.0.0
+flake8-isort==6.1.0
 isort==5.12.0
