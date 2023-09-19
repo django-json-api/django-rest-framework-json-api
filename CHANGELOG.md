@@ -14,7 +14,13 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Fixed OpenAPI schema generation for `Serializer` when used inside another `Serializer` or as a child of `ListField`.
 
+### Removed
+
+* Removed support for Python 3.7.
+
 ## [6.1.0] - 2023-08-25
+
+This is the last release supporting Python 3.7.
 
 ### Added
 
