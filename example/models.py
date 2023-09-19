@@ -180,3 +180,9 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Questionnaire(models.Model):
+    name = models.CharField(max_length=100)
+    questions = models.JSONField()
+    metadata = models.JSONField()

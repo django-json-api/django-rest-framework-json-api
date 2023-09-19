@@ -12,6 +12,7 @@ from example.models import (
     Company,
     Entry,
     ProjectType,
+    Questionnaire,
     ResearchProject,
     TaggedItem,
 )
@@ -140,3 +141,24 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         if extracted:
             for project in extracted:
                 self.future_projects.add(project)
+
+
+class QuestionnaireFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Questionnaire
+
+    name = factory.LazyAttribute(lambda x: faker.text())
+    questions = [
+        {
+            "text": "What is your name?",
+            "required": True,
+        },
+        {
+            "text": "What is your quest?",
+            "required": False,
+        },
+        {
+            "text": "What is the air-speed velocity of an unladen swallow?",
+        },
+    ]
+    metadata = {"author": "Bridgekeeper"}

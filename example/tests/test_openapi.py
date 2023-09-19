@@ -125,6 +125,46 @@ def test_schema_id_field():
     assert "id" not in company_properties["attributes"]["properties"]
 
 
+def test_schema_subserializers():
+    """Schema for child Serializers reflects the actual response structure."""
+    patterns = [
+        re_path(
+            "^questionnaires/?$", views.QuestionnaireViewset.as_view({"get": "list"})
+        ),
+    ]
+    generator = SchemaGenerator(patterns=patterns)
+
+    request = create_request("/")
+    schema = generator.get_schema(request=request)
+
+    assert {
+        "type": "object",
+        "properties": {
+            "metadata": {
+                "type": "object",
+                "properties": {
+                    "author": {"type": "string"},
+                    "producer": {"type": "string"},
+                },
+                "required": ["author"],
+            },
+            "questions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "text": {"type": "string"},
+                        "required": {"type": "boolean", "default": False},
+                    },
+                    "required": ["text"],
+                },
+            },
+            "name": {"type": "string", "maxLength": 100},
+        },
+        "required": ["name", "questions", "metadata"],
+    } == schema["components"]["schemas"]["Questionnaire"]["properties"]["attributes"]
+
+
 def test_schema_parameters_include():
     """Include paramater is only used when serializer defines included_serializers."""
     patterns = [

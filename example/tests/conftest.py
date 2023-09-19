@@ -12,6 +12,7 @@ from example.factories import (
     CommentFactory,
     CompanyFactory,
     EntryFactory,
+    QuestionnaireFactory,
     ResearchProjectFactory,
     TaggedItemFactory,
 )
@@ -27,6 +28,7 @@ register(TaggedItemFactory)
 register(ArtProjectFactory)
 register(ResearchProjectFactory)
 register(CompanyFactory)
+register(QuestionnaireFactory)
 
 
 @pytest.fixture
