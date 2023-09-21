@@ -37,6 +37,7 @@ class AuthorTypeFactory(factory.django.DjangoModelFactory):
 
 class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
+        skip_postgeneration_save = True
         model = Author
 
     name = factory.LazyAttribute(lambda x: faker.name())
@@ -49,6 +50,7 @@ class AuthorFactory(factory.django.DjangoModelFactory):
 class AuthorBioFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = AuthorBio
+        skip_postgeneration_save = True
 
     author = factory.SubFactory(AuthorFactory)
     body = factory.LazyAttribute(lambda x: faker.text())
@@ -69,6 +71,7 @@ class AuthorBioMetadataFactory(factory.django.DjangoModelFactory):
 class EntryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Entry
+        skip_postgeneration_save = True
 
     headline = factory.LazyAttribute(lambda x: faker.sentence(nb_words=4))
     body_text = factory.LazyAttribute(lambda x: faker.text())
@@ -130,6 +133,7 @@ class ResearchProjectFactory(factory.django.DjangoModelFactory):
 class CompanyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Company
+        skip_postgeneration_save = True
 
     name = factory.LazyAttribute(lambda x: faker.company())
     current_project = factory.SubFactory(ArtProjectFactory)
