@@ -51,7 +51,6 @@ def test_polymorphism_on_included_relations(single_company, client):
     } == {"researchProjects", "artProjects"}
     assert {x.get("type") for x in content.get("included")} == {
         "artProjects",
-        "artProjects",
         "researchProjects",
     }, "Detail included types are incorrect"
     # Ensure that the child fields are present.
