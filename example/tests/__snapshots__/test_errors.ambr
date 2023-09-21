@@ -1,3 +1,4 @@
+# serializer version: 1
 # name: test_first_level_attribute_error
   dict({
     'errors': list([
