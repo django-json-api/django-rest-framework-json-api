@@ -17,10 +17,11 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Removed
 
 * Removed support for Python 3.7.
+* Removed support for Django 4.0.
 
 ## [6.1.0] - 2023-08-25
 
-This is the last release supporting Python 3.7.
+This is the last release supporting Python 3.7 and Django 4.0.
 
 ### Added
 
