@@ -96,9 +96,11 @@ setup(
     ],
     project_urls={
         "Documentation": "https://django-rest-framework-json-api.readthedocs.org/",
-        "Changelog": "https://github.com/django-json-api/django-rest-framework-json-api/blob/main/CHANGELOG.md",
+        "Changelog": "https://github.com/django-json-api/"
+        "django-rest-framework-json-api/blob/main/CHANGELOG.md",
         "Source": "https://github.com/django-json-api/django-rest-framework-json-api",
-        "Tracker": "https://github.com/django-json-api/django-rest-framework-json-api/issues",
+        "Tracker": "https://github.com/django-json-api/"
+        "django-rest-framework-json-api/issues",
     },
     install_requires=[
         "inflection>=0.5.0",
