@@ -309,11 +309,11 @@ class ModelSerializer(
         """
         meta_fields = getattr(self.Meta, "meta_fields", [])
 
-        declared = {}
-        for field_name in set(declared_fields.keys()):
-            field = declared_fields[field_name]
-            if field_name not in meta_fields:
-                declared[field_name] = field
+        declared = {
+            field_name: field
+            for field_name, field in declared_fields.items()
+            if field_name not in meta_fields
+        }
         fields = super().get_field_names(declared, info)
         return list(fields) + list(getattr(self.Meta, "meta_fields", list()))
 
