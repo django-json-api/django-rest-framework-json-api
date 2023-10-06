@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Fixed OpenAPI schema generation for `Serializer` when used inside another `Serializer` or as a child of `ListField`.
+* `ModelSerializer` fields are now returned in the same order than DRF
 
 ### Removed
 
