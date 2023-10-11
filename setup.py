@@ -94,6 +94,15 @@ setup(
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    project_urls={
+        "Documentation": "https://django-rest-framework-json-api.readthedocs.org/",
+        "Changelog": (
+            "https://github.com/django-json-api/django-rest-framework-json-api/"
+            "blob/main/CHANGELOG.md"
+        ),
+        "Source": "https://github.com/django-json-api/django-rest-framework-json-api",
+        "Tracker": "https://github.com/django-json-api/django-rest-framework-json-api/issues",
+    },
     install_requires=[
         "inflection>=0.5.0",
         "djangorestframework>=3.13",
