@@ -1,5 +1,6 @@
 import pytest
 from django.db import models
+from rest_framework.utils import model_meta
 
 from rest_framework_json_api import serializers
 from tests.models import DJAModel, ManyToManyTarget
@@ -50,3 +51,36 @@ def test_reserved_field_names():
         "ReservedFieldNamesSerializer uses following reserved field name(s) which is "
         "not allowed: meta, results"
     )
+
+
+def test_get_field_names():
+    class MyTestModel(DJAModel):
+        verified = models.BooleanField(default=False)
+        uuid = models.UUIDField()
+
+    class AnotherSerializer(serializers.Serializer):
+        ref_id = serializers.CharField()
+        reference_string = serializers.CharField()
+
+    class MyTestModelSerializer(AnotherSerializer, serializers.ModelSerializer):
+        an_extra_field = serializers.CharField()
+
+        class Meta:
+            model = MyTestModel
+            fields = "__all__"
+            extra_kwargs = {
+                "verified": {"read_only": True},
+            }
+
+    # Same logic than in DRF get_fields() method
+    declared_fields = MyTestModelSerializer._declared_fields
+    info = model_meta.get_field_info(MyTestModel)
+
+    assert MyTestModelSerializer().get_field_names(declared_fields, info) == [
+        "id",
+        "ref_id",
+        "reference_string",
+        "an_extra_field",
+        "verified",
+        "uuid",
+    ]
