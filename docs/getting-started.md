@@ -51,7 +51,7 @@ like the following:
 
 ## Requirements
 
-1. Python (3.8, 3.9, 3.10, 3.11)
+1. Python (3.8, 3.9, 3.10, 3.11, 3.12)
 2. Django (3.2, 4.1, 4.2)
 3. Django REST framework (3.13, 3.14)
 
