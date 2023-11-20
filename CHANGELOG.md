@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Added support for Python 3.12
+
 ### Fixed
 
 * Fixed OpenAPI schema generation for `Serializer` when used inside another `Serializer` or as a child of `ListField`.
