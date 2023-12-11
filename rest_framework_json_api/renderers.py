@@ -477,7 +477,7 @@ class JSONRenderer(renderers.JSONRenderer):
         render_data = {"data": data}
         links = view.get_links()
         if links:
-            render_data.update({"links": links}),
+            render_data["links"] = links
         return super().render(render_data, accepted_media_type, renderer_context)
 
     def render_errors(self, data, accepted_media_type=None, renderer_context=None):
