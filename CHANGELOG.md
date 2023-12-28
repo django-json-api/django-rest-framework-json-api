@@ -19,6 +19,8 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Fixed OpenAPI schema generation for `Serializer` when used inside another `Serializer` or as a child of `ListField`.
 * `ModelSerializer` fields are now returned in the same order than DRF
+* Avoided that an empty attributes dict is rendered in case serializer does not
+  provide any attribute fields.
 
 ### Removed
 

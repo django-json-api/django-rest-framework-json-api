@@ -126,7 +126,7 @@ def test_writeonly_not_in_response():
 
         class Meta:
             model = Entry
-            fields = ("comments", "rating")
+            fields = ("headline", "comments", "rating")
 
     class WriteOnlyDummyTestViewSet(views.ReadOnlyModelViewSet):
         queryset = Entry.objects.all()
@@ -136,6 +136,7 @@ def test_writeonly_not_in_response():
     result = json.loads(rendered.decode())
 
     assert "rating" not in result["data"]["attributes"]
+    assert "headline" in result["data"]["attributes"]
     assert "relationships" not in result["data"]
 
 
@@ -153,6 +154,7 @@ def test_render_empty_relationship_reverse_lookup():
 
     rendered = render_dummy_test_serialized_view(EmptyRelationshipViewSet, Author())
     result = json.loads(rendered.decode())
+    assert "attributes" not in result["data"]
     assert "relationships" in result["data"]
     assert "bio" in result["data"]["relationships"]
     assert result["data"]["relationships"]["bio"] == {"data": None}
