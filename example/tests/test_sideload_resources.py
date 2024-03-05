@@ -1,6 +1,7 @@
 """
 Test sideloading resources
 """
+
 import json
 
 from django.urls import reverse
