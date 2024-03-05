@@ -106,9 +106,9 @@ class HyperlinkedMixin:
         return_data = {}
 
         kwargs = {
-            lookup_field: getattr(obj, lookup_field)
-            if obj
-            else view.kwargs[lookup_field]
+            lookup_field: (
+                getattr(obj, lookup_field) if obj else view.kwargs[lookup_field]
+            )
         }
 
         field_name = self.field_name if self.field_name else self.parent.field_name
