@@ -14,6 +14,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added support for Python 3.12
 * Added support for Django 5.0
+* Added support for Django REST framework 3.15
 
 ### Fixed
 
@@ -26,10 +27,11 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Removed support for Python 3.7.
 * Removed support for Django 4.0.
+* Removed support for Django REST framework 3.13.
 
 ## [6.1.0] - 2023-08-25
 
-This is the last release supporting Python 3.7 and Django 4.0.
+This is the last release supporting Python 3.7, Django 4.0 and Django REST framework 3.13.
 
 ### Added
 

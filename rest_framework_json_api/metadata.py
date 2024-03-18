@@ -5,7 +5,6 @@ from rest_framework.metadata import SimpleMetadata
 from rest_framework.settings import api_settings
 from rest_framework.utils.field_mapping import ClassLookupDict
 
-from rest_framework_json_api.compat import NullBooleanField
 from rest_framework_json_api.utils import format_field_name, get_related_resource_type
 
 
@@ -22,7 +21,6 @@ class JSONAPIMetadata(SimpleMetadata):
             serializers.Field: "GenericField",
             serializers.RelatedField: "Relationship",
             serializers.BooleanField: "Boolean",
-            NullBooleanField: "Boolean",
             serializers.CharField: "String",
             serializers.URLField: "URL",
             serializers.EmailField: "Email",

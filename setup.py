@@ -106,7 +106,7 @@ setup(
     },
     install_requires=[
         "inflection>=0.5.0",
-        "djangorestframework>=3.13",
+        "djangorestframework>=3.14",
         "django>=3.2",
     ],
     extras_require={
