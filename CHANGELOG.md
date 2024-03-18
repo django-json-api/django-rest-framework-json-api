@@ -28,6 +28,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Python 3.7.
 * Removed support for Django 4.0.
 * Removed support for Django REST framework 3.13.
+* Removed obsolete compat `NullBooleanField` and `get_reference` definitions.
 
 ## [6.1.0] - 2023-08-25
 
