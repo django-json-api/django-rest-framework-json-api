@@ -325,7 +325,7 @@ def test_get_related_resource_type(model_class, field, output):
             {"many": True, "queryset": ManyToManyTarget.objects.all()},
         ),
         (
-            "m2m_target.sources.",
+            "m2m_target.sources",
             "ManyToManySource",
             {"many": True, "queryset": ManyToManySource.objects.all()},
         ),
