@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path, re_path
 from rest_framework import routers
 
 from .api.resources.identity import GenericIdentity, Identity
@@ -46,8 +46,8 @@ router.register(r"identities", Identity)
 
 urlpatterns = [
     # old tests
-    re_path(
-        r"identities/default/(?P<pk>\d+)$",
+    path(
+        "identities/default/<int:pk>",
         GenericIdentity.as_view(),
         name="user-default",
     ),
