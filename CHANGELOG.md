@@ -22,6 +22,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * `ModelSerializer` fields are now returned in the same order than DRF
 * Avoided that an empty attributes dict is rendered in case serializer does not
   provide any attribute fields.
+* Avoided shadowing of exception when rendering errors (regression since 4.3.0).
 
 ### Removed
 

@@ -155,6 +155,17 @@ class TestModelViewSet:
         ]
 
     @pytest.mark.urls(__name__)
+    def test_list_with_invalid_include(self, client, foreign_key_source):
+        url = reverse("foreign-key-source-list")
+        response = client.get(url, data={"include": "invalid"})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        result = response.json()
+        assert (
+            result["errors"][0]["detail"]
+            == "This endpoint does not support the include parameter for path invalid"
+        )
+
+    @pytest.mark.urls(__name__)
     def test_list_with_default_included_resources(self, client, foreign_key_source):
         url = reverse("default-included-resources-list")
         response = client.get(url)
