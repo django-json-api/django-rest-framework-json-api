@@ -1,11 +1,11 @@
 from rest_framework_json_api import serializers
-from rest_framework_json_api.relations import ResourceRelatedField
 from tests.models import (
     BasicModel,
     ForeignKeySource,
     ForeignKeyTarget,
     ManyToManySource,
     ManyToManyTarget,
+    NestedRelatedSource,
 )
 
 
@@ -15,33 +15,51 @@ class BasicModelSerializer(serializers.ModelSerializer):
         model = BasicModel
 
 
+class ForeignKeyTargetSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("name",)
+        model = ForeignKeyTarget
+
+
 class ForeignKeySourceSerializer(serializers.ModelSerializer):
-    target = ResourceRelatedField(queryset=ForeignKeyTarget.objects)
+    included_serializers = {"target": ForeignKeyTargetSerializer}
 
     class Meta:
         model = ForeignKeySource
         fields = ("target",)
 
 
-class ManyToManySourceSerializer(serializers.ModelSerializer):
-    targets = ResourceRelatedField(many=True, queryset=ManyToManyTarget.objects)
-
-    class Meta:
-        model = ManyToManySource
-        fields = ("targets",)
-
-
 class ManyToManyTargetSerializer(serializers.ModelSerializer):
     class Meta:
+        fields = ("name",)
         model = ManyToManyTarget
 
 
-class ManyToManySourceReadOnlySerializer(serializers.ModelSerializer):
-    targets = ResourceRelatedField(many=True, read_only=True)
+class ManyToManySourceSerializer(serializers.ModelSerializer):
+    included_serializers = {"targets": "tests.serializers.ManyToManyTargetSerializer"}
 
     class Meta:
         model = ManyToManySource
         fields = ("targets",)
+
+
+class ManyToManySourceReadOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ManyToManySource
+        fields = ("targets",)
+
+
+class NestedRelatedSourceSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        "m2m_sources": ManyToManySourceSerializer,
+        "fk_source": ForeignKeySourceSerializer,
+        "m2m_targets": ManyToManyTargetSerializer,
+        "fk_target": ForeignKeyTargetSerializer,
+    }
+
+    class Meta:
+        model = NestedRelatedSource
+        fields = ("m2m_sources", "fk_source", "m2m_targets", "fk_target")
 
 
 class CallableDefaultSerializer(serializers.Serializer):

@@ -12,9 +12,14 @@ from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.renderers import JSONRenderer
 from rest_framework_json_api.utils import format_link_segment
 from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
-from tests.models import BasicModel
-from tests.serializers import BasicModelSerializer
-from tests.views import BasicModelViewSet
+from tests.models import BasicModel, ForeignKeySource
+from tests.serializers import BasicModelSerializer, ForeignKeyTargetSerializer
+from tests.views import (
+    BasicModelViewSet,
+    ForeignKeySourceViewSet,
+    ManyToManySourceViewSet,
+    NestedRelatedSourceViewSet,
+)
 
 
 class TestModelViewSet:
@@ -81,6 +86,90 @@ class TestModelViewSet:
         }
 
     @pytest.mark.urls(__name__)
+    def test_list_with_include_foreign_key(self, client, foreign_key_source):
+        url = reverse("foreign-key-source-list")
+        response = client.get(url, data={"include": "target"})
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert "included" in result
+        assert [
+            {
+                "type": "ForeignKeyTarget",
+                "id": str(foreign_key_source.target.pk),
+                "attributes": {"name": foreign_key_source.target.name},
+            }
+        ] == result["included"]
+
+    @pytest.mark.urls(__name__)
+    def test_list_with_include_many_to_many_field(
+        self, client, many_to_many_source, many_to_many_targets
+    ):
+        url = reverse("many-to-many-source-list")
+        response = client.get(url, data={"include": "targets"})
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert "included" in result
+        assert [
+            {
+                "type": "ManyToManyTarget",
+                "id": str(target.pk),
+                "attributes": {"name": target.name},
+            }
+            for target in many_to_many_targets
+        ] == result["included"]
+
+    @pytest.mark.urls(__name__)
+    def test_list_with_include_nested_related_field(
+        self, client, nested_related_source, many_to_many_sources, many_to_many_targets
+    ):
+        url = reverse("nested-related-source-list")
+        response = client.get(url, data={"include": "m2m_sources,m2m_sources.targets"})
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert "included" in result
+
+        assert [
+            {
+                "type": "ManyToManySource",
+                "id": str(source.pk),
+                "relationships": {
+                    "targets": {
+                        "data": [
+                            {"id": str(target.pk), "type": "ManyToManyTarget"}
+                            for target in source.targets.all()
+                        ],
+                        "meta": {"count": source.targets.count()},
+                    }
+                },
+            }
+            for source in many_to_many_sources
+        ] + [
+            {
+                "type": "ManyToManyTarget",
+                "id": str(target.pk),
+                "attributes": {"name": target.name},
+            }
+            for target in many_to_many_targets
+        ] == result[
+            "included"
+        ]
+
+    @pytest.mark.urls(__name__)
+    def test_list_with_default_included_resources(self, client, foreign_key_source):
+        url = reverse("default-included-resources-list")
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert "included" in result
+        assert [
+            {
+                "type": "ForeignKeyTarget",
+                "id": str(foreign_key_source.target.pk),
+                "attributes": {"name": foreign_key_source.target.name},
+            }
+        ] == result["included"]
+
+    @pytest.mark.urls(__name__)
     def test_retrieve(self, client, model):
         url = reverse("basic-model-detail", kwargs={"pk": model.pk})
         response = client.get(url)
@@ -92,6 +181,21 @@ class TestModelViewSet:
                 "attributes": {"text": "Model"},
             }
         }
+
+    @pytest.mark.urls(__name__)
+    def test_retrieve_with_include_foreign_key(self, client, foreign_key_source):
+        url = reverse("foreign-key-source-detail", kwargs={"pk": foreign_key_source.pk})
+        response = client.get(url, data={"include": "target"})
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert "included" in result
+        assert [
+            {
+                "type": "ForeignKeyTarget",
+                "id": str(foreign_key_source.target.pk),
+                "attributes": {"name": foreign_key_source.target.name},
+            }
+        ] == result["included"]
 
     @pytest.mark.urls(__name__)
     def test_patch(self, client, model):
@@ -231,6 +335,23 @@ class TestAPIView:
 # Routing setup
 
 
+class DefaultIncludedResourcesSerializer(serializers.ModelSerializer):
+    included_serializers = {"target": ForeignKeyTargetSerializer}
+
+    class Meta:
+        model = ForeignKeySource
+        fields = ("target",)
+
+    class JSONAPIMeta:
+        included_resources = ["target"]
+
+
+class DefaultIncludedResourcesViewSet(ModelViewSet):
+    serializer_class = DefaultIncludedResourcesSerializer
+    queryset = ForeignKeySource.objects.all()
+    ordering = ["id"]
+
+
 class CustomModel:
     def __init__(self, response_dict):
         for k, v in response_dict.items():
@@ -280,6 +401,22 @@ class CustomIdAPIView(APIView):
 
 router = SimpleRouter()
 router.register(r"basic_models", BasicModelViewSet, basename="basic-model")
+router.register(
+    r"foreign_key_sources", ForeignKeySourceViewSet, basename="foreign-key-source"
+)
+router.register(
+    r"many_to_many_sources", ManyToManySourceViewSet, basename="many-to-many-source"
+)
+router.register(
+    r"nested_related_sources",
+    NestedRelatedSourceViewSet,
+    basename="nested-related-source",
+)
+router.register(
+    r"default_included_resources",
+    DefaultIncludedResourcesViewSet,
+    basename="default-included-resources",
+)
 
 urlpatterns = [
     path("custom", CustomAPIView.as_view(), name="custom"),
