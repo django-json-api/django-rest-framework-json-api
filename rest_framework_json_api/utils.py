@@ -381,11 +381,7 @@ def format_drf_errors(response, context, exc):
             errors.extend(format_error_object(message, "/data", response))
     # handle all errors thrown from serializers
     else:
-        # Avoid circular deps
-        from rest_framework import generics
-
-        has_serializer = isinstance(context["view"], generics.GenericAPIView)
-        if has_serializer:
+        try:
             serializer = context["view"].get_serializer()
             fields = get_serializer_fields(serializer) or dict()
             relationship_fields = [
@@ -393,6 +389,11 @@ def format_drf_errors(response, context, exc):
                 for name, field in fields.items()
                 if is_relationship_field(field)
             ]
+        except Exception:
+            # ignore potential errors when retrieving serializer
+            # as it might shadow error which is currently being
+            # formatted
+            serializer = None
 
         for field, error in response.data.items():
             non_field_error = field == api_settings.NON_FIELD_ERRORS_KEY
@@ -401,7 +402,7 @@ def format_drf_errors(response, context, exc):
             if non_field_error:
                 # Serializer error does not refer to a specific field.
                 pointer = "/data"
-            elif has_serializer:
+            elif serializer:
                 # pointer can be determined only if there's a serializer.
                 rel = "relationships" if field in relationship_fields else "attributes"
                 pointer = f"/data/{rel}/{field}"
