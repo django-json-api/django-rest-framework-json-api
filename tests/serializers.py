@@ -26,7 +26,10 @@ class ForeignKeySourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ForeignKeySource
-        fields = ("target",)
+        fields = (
+            "name",
+            "target",
+        )
 
 
 class ManyToManyTargetSerializer(serializers.ModelSerializer):
