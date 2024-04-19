@@ -17,12 +17,25 @@ from rest_framework.serializers import ListSerializer, Serializer
 from rest_framework.settings import api_settings
 
 import rest_framework_json_api
-from rest_framework_json_api import utils
 from rest_framework_json_api.relations import (
     HyperlinkedMixin,
     ManySerializerMethodResourceRelatedField,
     ResourceRelatedField,
     SkipDataMixin,
+)
+from rest_framework_json_api.utils import (
+    format_errors,
+    format_field_name,
+    format_field_names,
+    get_included_resources,
+    get_related_resource_type,
+    get_relation_instance,
+    get_resource_id,
+    get_resource_name,
+    get_resource_type_from_instance,
+    get_resource_type_from_serializer,
+    get_serializer_fields,
+    is_relationship_field,
 )
 
 
@@ -57,31 +70,20 @@ class JSONRenderer(renderers.JSONRenderer):
     def extract_attributes(cls, fields, resource):
         """
         Builds the `attributes` object of the JSON:API resource object.
+
+        Ensures that ID which is always provided in a JSON:API resource object
+        and relationships are not returned.
         """
-        data = {}
-        for field_name, field in iter(fields.items()):
-            # ID is always provided in the root of JSON:API so remove it from attributes
-            if field_name == "id":
-                continue
-            # don't output a key for write only fields
-            if fields[field_name].write_only:
-                continue
-            # Skip fields with relations
-            if utils.is_relationship_field(field):
-                continue
 
-            # Skip read_only attribute fields when `resource` is an empty
-            # serializer. Prevents the "Raw Data" form of the browsable API
-            # from rendering `"foo": null` for read only fields
-            try:
-                resource[field_name]
-            except KeyError:
-                if fields[field_name].read_only:
-                    continue
+        invalid_fields = {"id", api_settings.URL_FIELD_NAME}
 
-            data.update({field_name: resource.get(field_name)})
-
-        return utils.format_field_names(data)
+        return {
+            format_field_name(field_name): value
+            for field_name, value in resource.items()
+            if field_name in fields
+            and field_name not in invalid_fields
+            and not is_relationship_field(fields[field_name])
+        }
 
     @classmethod
     def extract_relationships(cls, fields, resource, resource_instance):
@@ -107,14 +109,14 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             # Skip fields without relations
-            if not utils.is_relationship_field(field):
+            if not is_relationship_field(field):
                 continue
 
             source = field.source
-            relation_type = utils.get_related_resource_type(field)
+            relation_type = get_related_resource_type(field)
 
             if isinstance(field, relations.HyperlinkedIdentityField):
-                resolved, relation_instance = utils.get_relation_instance(
+                resolved, relation_instance = get_relation_instance(
                     resource_instance, source, field.parent
                 )
                 if not resolved:
@@ -166,7 +168,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 field,
                 (relations.PrimaryKeyRelatedField, relations.HyperlinkedRelatedField),
             ):
-                resolved, relation = utils.get_relation_instance(
+                resolved, relation = get_relation_instance(
                     resource_instance, f"{source}_id", field.parent
                 )
                 if not resolved:
@@ -189,7 +191,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             if isinstance(field, relations.ManyRelatedField):
-                resolved, relation_instance = utils.get_relation_instance(
+                resolved, relation_instance = get_relation_instance(
                     resource_instance, source, field.parent
                 )
                 if not resolved:
@@ -222,9 +224,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 for nested_resource_instance in relation_instance:
                     nested_resource_instance_type = (
                         relation_type
-                        or utils.get_resource_type_from_instance(
-                            nested_resource_instance
-                        )
+                        or get_resource_type_from_instance(nested_resource_instance)
                     )
 
                     relation_data.append(
@@ -243,7 +243,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 )
                 continue
 
-        return utils.format_field_names(data)
+        return format_field_names(data)
 
     @classmethod
     def extract_relation_instance(cls, field, resource_instance):
@@ -289,7 +289,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 continue
 
             # Skip fields without relations
-            if not utils.is_relationship_field(field):
+            if not is_relationship_field(field):
                 continue
 
             try:
@@ -341,7 +341,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
             if isinstance(field, ListSerializer):
                 serializer = field.child
-                relation_type = utils.get_resource_type_from_serializer(serializer)
+                relation_type = get_resource_type_from_serializer(serializer)
                 relation_queryset = list(relation_instance)
 
                 if serializer_data:
@@ -350,11 +350,9 @@ class JSONRenderer(renderers.JSONRenderer):
                         nested_resource_instance = relation_queryset[position]
                         resource_type = (
                             relation_type
-                            or utils.get_resource_type_from_instance(
-                                nested_resource_instance
-                            )
+                            or get_resource_type_from_instance(nested_resource_instance)
                         )
-                        serializer_fields = utils.get_serializer_fields(
+                        serializer_fields = get_serializer_fields(
                             serializer.__class__(
                                 nested_resource_instance, context=serializer.context
                             )
@@ -378,10 +376,10 @@ class JSONRenderer(renderers.JSONRenderer):
                         )
 
             if isinstance(field, Serializer):
-                relation_type = utils.get_resource_type_from_serializer(field)
+                relation_type = get_resource_type_from_serializer(field)
 
                 # Get the serializer fields
-                serializer_fields = utils.get_serializer_fields(field)
+                serializer_fields = get_serializer_fields(field)
                 if serializer_data:
                     new_item = cls.build_json_resource_obj(
                         serializer_fields,
@@ -414,7 +412,8 @@ class JSONRenderer(renderers.JSONRenderer):
         meta_fields = getattr(meta, "meta_fields", [])
         data = {}
         for field_name in meta_fields:
-            data.update({field_name: resource.get(field_name)})
+            if field_name in resource:
+                data.update({field_name: resource[field_name]})
         return data
 
     @classmethod
@@ -435,6 +434,24 @@ class JSONRenderer(renderers.JSONRenderer):
         return data
 
     @classmethod
+    def _filter_sparse_fields(cls, serializer, fields, resource_name):
+        request = serializer.context.get("request")
+        if request:
+            sparse_fieldset_query_param = f"fields[{resource_name}]"
+            sparse_fieldset_value = request.query_params.get(
+                sparse_fieldset_query_param
+            )
+            if sparse_fieldset_value:
+                sparse_fields = sparse_fieldset_value.split(",")
+                return {
+                    field_name: field
+                    for field_name, field, in fields.items()
+                    if field_name in sparse_fields
+                }
+
+        return fields
+
+    @classmethod
     def build_json_resource_obj(
         cls,
         fields,
@@ -449,11 +466,15 @@ class JSONRenderer(renderers.JSONRenderer):
         """
         # Determine type from the instance if the underlying model is polymorphic
         if force_type_resolution:
-            resource_name = utils.get_resource_type_from_instance(resource_instance)
+            resource_name = get_resource_type_from_instance(resource_instance)
         resource_data = {
             "type": resource_name,
-            "id": utils.get_resource_id(resource_instance, resource),
+            "id": get_resource_id(resource_instance, resource),
         }
+
+        # TODO remove this filter by rewriting extract_relationships
+        # so it uses the serialized data as a basis
+        fields = cls._filter_sparse_fields(serializer, fields, resource_name)
         attributes = cls.extract_attributes(fields, resource)
         if attributes:
             resource_data["attributes"] = attributes
@@ -468,7 +489,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         meta = cls.extract_meta(serializer, resource)
         if meta:
-            resource_data["meta"] = utils.format_field_names(meta)
+            resource_data["meta"] = format_field_names(meta)
 
         return resource_data
 
@@ -485,7 +506,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
     def render_errors(self, data, accepted_media_type=None, renderer_context=None):
         return super().render(
-            utils.format_errors(data), accepted_media_type, renderer_context
+            format_errors(data), accepted_media_type, renderer_context
         )
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
@@ -495,7 +516,7 @@ class JSONRenderer(renderers.JSONRenderer):
         request = renderer_context.get("request", None)
 
         # Get the resource name.
-        resource_name = utils.get_resource_name(renderer_context)
+        resource_name = get_resource_name(renderer_context)
 
         # If this is an error response, skip the rest.
         if resource_name == "errors":
@@ -531,7 +552,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
         serializer = getattr(serializer_data, "serializer", None)
 
-        included_resources = utils.get_included_resources(request, serializer)
+        included_resources = get_included_resources(request, serializer)
 
         if serializer is not None:
             # Extract root meta for any type of serializer
@@ -558,7 +579,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     else:
                         resource_serializer_class = serializer.child
 
-                    fields = utils.get_serializer_fields(resource_serializer_class)
+                    fields = get_serializer_fields(resource_serializer_class)
                     force_type_resolution = getattr(
                         resource_serializer_class, "_poly_force_type_resolution", False
                     )
@@ -581,7 +602,7 @@ class JSONRenderer(renderers.JSONRenderer):
                         included_cache,
                     )
             else:
-                fields = utils.get_serializer_fields(serializer)
+                fields = get_serializer_fields(serializer)
                 force_type_resolution = getattr(
                     serializer, "_poly_force_type_resolution", False
                 )
@@ -640,7 +661,7 @@ class JSONRenderer(renderers.JSONRenderer):
                     )
 
         if json_api_meta:
-            render_data["meta"] = utils.format_field_names(json_api_meta)
+            render_data["meta"] = format_field_names(json_api_meta)
 
         return super().render(render_data, accepted_media_type, renderer_context)
 
@@ -690,7 +711,6 @@ class BrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
                 serializer_class = view.get_serializer_class()
         except AttributeError:
             return
-
         if not hasattr(serializer_class, "included_serializers"):
             return
 

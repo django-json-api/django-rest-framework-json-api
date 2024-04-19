@@ -14,7 +14,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
     expected = {
         "data": [
             {
-                "type": "posts",
+                "type": "entries",
                 "id": "1",
                 "attributes": {
                     "headline": multiple_entries[0].headline,
@@ -70,7 +70,7 @@ def test_multiple_entries_no_pagination(multiple_entries, client):
                 },
             },
             {
-                "type": "posts",
+                "type": "entries",
                 "id": "2",
                 "attributes": {
                     "headline": multiple_entries[1].headline,
