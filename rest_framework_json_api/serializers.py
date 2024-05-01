@@ -75,35 +75,32 @@ class SparseFieldsetsMixin:
     Specification: https://jsonapi.org/format/#fetching-sparse-fieldsets
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        context = kwargs.get("context")
-        request = context.get("request") if context else None
+    @property
+    def _readable_fields(self):
+        request = self.context.get("request") if self.context else None
+        readable_fields = super()._readable_fields
 
         if request:
-            sparse_fieldset_query_param = "fields[{}]".format(
-                get_resource_type_from_serializer(self)
-            )
             try:
-                param_name = next(
-                    key
-                    for key in request.query_params
-                    if sparse_fieldset_query_param == key
+                resource_type = get_resource_type_from_serializer(self)
+                sparse_fieldset_query_param = f"fields[{resource_type}]"
+
+                sparse_fieldset_value = request.query_params.get(
+                    sparse_fieldset_query_param
                 )
-            except StopIteration:
+                if sparse_fieldset_value:
+                    sparse_fields = sparse_fieldset_value.split(",")
+                    return (
+                        field
+                        for field in readable_fields
+                        if field.field_name in sparse_fields
+                        or field.field_name == api_settings.URL_FIELD_NAME
+                    )
+            except AttributeError:
+                # no type on serializer, must be used only as only nested
                 pass
-            else:
-                fieldset = request.query_params.get(param_name).split(",")
-                # iterate over a *copy* of self.fields' underlying dict, because we may
-                # modify the original during the iteration.
-                # self.fields is a `rest_framework.utils.serializer_helpers.BindingDict`
-                for field_name, _field in self.fields.fields.copy().items():
-                    if (
-                        field_name == api_settings.URL_FIELD_NAME
-                    ):  # leave self link there
-                        continue
-                    if field_name not in fieldset:
-                        self.fields.pop(field_name)
+
+        return readable_fields
 
 
 class IncludedResourcesValidationMixin:

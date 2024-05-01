@@ -14,7 +14,7 @@ def test_pagination_with_single_entry(single_entry, client):
     expected = {
         "data": [
             {
-                "type": "posts",
+                "type": "entries",
                 "id": "1",
                 "attributes": {
                     "headline": single_entry.headline,

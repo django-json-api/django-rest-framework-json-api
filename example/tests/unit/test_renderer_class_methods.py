@@ -102,8 +102,8 @@ def test_extract_attributes():
     assert sorted(JSONRenderer.extract_attributes(fields, resource)) == sorted(
         expected
     ), "Regular fields should be extracted"
-    assert sorted(JSONRenderer.extract_attributes(fields, {})) == sorted(
-        {"username": ""}
+    assert (
+        JSONRenderer.extract_attributes(fields, {}) == {}
     ), "Should not extract read_only fields on empty serializer"
 
 

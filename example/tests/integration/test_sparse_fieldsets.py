@@ -15,6 +15,7 @@ def test_sparse_fieldset_valid_fields(client, entry):
     entry = data[0]
     assert entry["attributes"].keys() == {"headline"}
     assert entry["relationships"].keys() == {"blog"}
+    assert "meta" not in entry
 
 
 @pytest.mark.parametrize(
