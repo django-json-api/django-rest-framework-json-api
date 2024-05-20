@@ -68,6 +68,16 @@
           }
         },
         "description": "[Resource does not exist](https://jsonapi.org/format/#crud-deleting-responses-404)"
+      },
+      "429": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "too many requests"
       }
     },
     "tags": [
@@ -264,6 +274,16 @@
           }
         },
         "description": "[Conflict]([Conflict](https://jsonapi.org/format/#crud-updating-responses-409)"
+      },
+      "429": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "too many requests"
       }
     },
     "tags": [
@@ -399,6 +419,16 @@
           }
         },
         "description": "not found"
+      },
+      "429": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "too many requests"
       }
     },
     "tags": [
@@ -546,6 +576,16 @@
           }
         },
         "description": "not found"
+      },
+      "429": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "too many requests"
       }
     },
     "tags": [
@@ -754,6 +794,16 @@
           }
         },
         "description": "[Conflict](https://jsonapi.org/format/#crud-creating-responses-409)"
+      },
+      "429": {
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "$ref": "#/components/schemas/failure"
+            }
+          }
+        },
+        "description": "too many requests"
       }
     },
     "tags": [
@@ -1341,6 +1391,16 @@
                 }
               },
               "description": "not found"
+            },
+            "429": {
+              "content": {
+                "application/vnd.api+json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/failure"
+                  }
+                }
+              },
+              "description": "too many requests"
             }
           },
           "tags": [
