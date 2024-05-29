@@ -807,6 +807,7 @@ class AutoSchema(drf_openapi.AutoSchema):
         for code, reason in [
             ("400", "bad request"),
             ("401", "not authorized"),
+            ("429", "too many requests"),
         ]:
             operation["responses"][code] = self._failure_response(reason)
 
