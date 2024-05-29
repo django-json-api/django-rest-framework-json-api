@@ -10,9 +10,9 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
-* Added `429 Too Many Requests` as a possible error response in the OpenAPI schema.
+### Added
 
-### Added 
+* Added `429 Too Many Requests` as a possible error response in the OpenAPI schema.
 
 ## [7.0.0] - 2024-05-02
 
