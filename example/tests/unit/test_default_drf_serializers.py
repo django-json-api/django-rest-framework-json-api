@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import logging
 
 import pytest
 from django.urls import reverse
@@ -73,7 +74,6 @@ def test_render_format_field_names(db, settings, entry):
 def test_blog_create(client):
     url = reverse("drf-entry-blog-list")
     name = "Dummy Name"
-
     request_data = {
         "data": {"attributes": {"name": name}, "type": "blogs"},
     }
@@ -102,6 +102,19 @@ def test_blog_create(client):
 
     assert resp.status_code == 201
     assert resp.json() == expected
+
+
+@pytest.mark.django_db
+def test_rest_action_request(client):
+    url = reverse("drf-entry-blog-list") + "/actions/custom_response"
+    name = "Dummy Name"
+    request_data = {
+        "data": {"attributes": {"name": name}, "type": "blogs"},
+    }
+
+    resp = client.post(url, request_data)
+
+    assert resp.status_code == 400
 
 
 @pytest.mark.django_db
