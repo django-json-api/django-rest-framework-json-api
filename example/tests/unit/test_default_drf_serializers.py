@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-import logging
 
 import pytest
 from django.urls import reverse
@@ -74,6 +73,7 @@ def test_render_format_field_names(db, settings, entry):
 def test_blog_create(client):
     url = reverse("drf-entry-blog-list")
     name = "Dummy Name"
+
     request_data = {
         "data": {"attributes": {"name": name}, "type": "blogs"},
     }
