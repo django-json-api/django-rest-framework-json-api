@@ -237,6 +237,43 @@ class TestModelViewSet:
         assert BasicModel.objects.count() == 0
         assert len(response.rendered_content) == 0
 
+    @pytest.mark.urls(__name__)
+    def test_create_with_sparse_fields(self, client, foreign_key_target):
+        url = reverse("foreign-key-source-list")
+        data = {
+            "data": {
+                "id": None,
+                "type": "ForeignKeySource",
+                "attributes": {"name": "Test"},
+                "relationships": {
+                    "target": {
+                        "data": {
+                            "id": str(foreign_key_target.pk),
+                            "type": "ForeignKeyTarget",
+                        }
+                    }
+                },
+            }
+        }
+        response = client.post(f"{url}?fields[ForeignKeySource]=target", data=data)
+        assert response.status_code == status.HTTP_201_CREATED
+        foreign_key_source = ForeignKeySource.objects.first()
+        assert foreign_key_source.name == "Test"
+        assert response.json() == {
+            "data": {
+                "id": str(foreign_key_source.pk),
+                "type": "ForeignKeySource",
+                "relationships": {
+                    "target": {
+                        "data": {
+                            "id": str(foreign_key_target.pk),
+                            "type": "ForeignKeyTarget",
+                        }
+                    }
+                },
+            }
+        }
+
 
 class TestReadonlyModelViewSet:
     @pytest.mark.parametrize(

@@ -39,7 +39,9 @@ class TestResourceRelatedField:
         settings.JSON_API_FORMAT_TYPES = format_type
         settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
-        serializer = ForeignKeySourceSerializer(instance={"target": foreign_key_target})
+        serializer = ForeignKeySourceSerializer(
+            instance={"target": foreign_key_target, "name": "Test"}
+        )
         expected = {
             "type": resource_type,
             "id": str(foreign_key_target.pk),
@@ -85,7 +87,10 @@ class TestResourceRelatedField:
         settings.JSON_API_PLURALIZE_TYPES = pluralize_type
 
         serializer = ForeignKeySourceSerializer(
-            data={"target": {"type": resource_type, "id": str(foreign_key_target.pk)}}
+            data={
+                "target": {"type": resource_type, "id": str(foreign_key_target.pk)},
+                "name": "Test",
+            }
         )
 
         assert serializer.is_valid()
@@ -191,7 +196,9 @@ class TestResourceRelatedField:
         ],
     )
     def test_invalid_resource_id_object(self, resource_identifier, error):
-        serializer = ForeignKeySourceSerializer(data={"target": resource_identifier})
+        serializer = ForeignKeySourceSerializer(
+            data={"target": resource_identifier, "name": "Test"}
+        )
         assert not serializer.is_valid()
         assert serializer.errors == {"target": [error]}
 

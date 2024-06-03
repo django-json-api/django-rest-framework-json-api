@@ -12,6 +12,12 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Added
 
+* Added `429 Too Many Requests` as a possible error response in the OpenAPI schema.
+
+## [7.0.0] - 2024-05-02
+
+### Added
+
 * Added support for Python 3.12
 * Added support for Django 5.0
 * Added support for Django REST framework 3.15
@@ -23,6 +29,8 @@ any parts of the framework not mentioned in the documentation should generally b
 * Avoided that an empty attributes dict is rendered in case serializer does not
   provide any attribute fields.
 * Avoided shadowing of exception when rendering errors (regression since 4.3.0).
+* Ensured that sparse fields only applies when rendering, not when parsing.
+* Adjusted that sparse fields properly removes meta fields when not defined.
 
 ### Removed
 

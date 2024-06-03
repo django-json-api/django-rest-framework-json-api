@@ -126,7 +126,10 @@ class BlogCustomViewSet(JsonApiViewSet):
 
 class EntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
-    resource_name = "posts"
+    # TODO it should not be supported to overwrite resource name
+    # of endpoints with serializers as includes and sparse fields
+    # cannot be aware of it
+    # resource_name = "posts"
 
     def get_serializer_class(self):
         return EntrySerializer

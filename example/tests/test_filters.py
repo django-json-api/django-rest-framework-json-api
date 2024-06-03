@@ -470,7 +470,7 @@ class DJATestFilters(APITestCase):
         expected_result = {
             "data": [
                 {
-                    "type": "posts",
+                    "type": "entries",
                     "id": "7",
                     "attributes": {
                         "headline": "ANTH3868X",
