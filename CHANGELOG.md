@@ -14,6 +14,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added `429 Too Many Requests` as a possible error response in the OpenAPI schema.
 
+### Fixed
+
+* Ensured that URL and id field are kept when using sparse fields (regression since 7.0.0)
+
 ## [7.0.0] - 2024-05-02
 
 ### Added

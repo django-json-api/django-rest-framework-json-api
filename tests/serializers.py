@@ -1,3 +1,5 @@
+from rest_framework.settings import api_settings
+
 from rest_framework_json_api import serializers
 from tests.models import (
     BasicModel,
@@ -29,6 +31,16 @@ class ForeignKeySourceSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "target",
+        )
+
+
+class ForeignKeySourcetHyperlinkedSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ForeignKeySource
+        fields = (
+            "name",
+            "target",
+            api_settings.URL_FIELD_NAME,
         )
 
 

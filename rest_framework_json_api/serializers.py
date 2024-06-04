@@ -94,10 +94,15 @@ class SparseFieldsetsMixin:
                         field
                         for field in readable_fields
                         if field.field_name in sparse_fields
+                        # URL field is not considered a field in JSON:API spec
+                        # but a link so need to keep it
                         or field.field_name == api_settings.URL_FIELD_NAME
+                        # ID is a required field which might have been overwritten
+                        # so need to keep it
+                        or field.field_name == "id"
                     )
             except AttributeError:
-                # no type on serializer, must be used only as only nested
+                # no type on serializer, may only be used nested
                 pass
 
         return readable_fields
