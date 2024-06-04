@@ -446,7 +446,10 @@ class JSONRenderer(renderers.JSONRenderer):
                 return {
                     field_name: field
                     for field_name, field, in fields.items()
-                    if field_name in sparse_fields
+                    if field.field_name in sparse_fields
+                    # URL field is not considered a field in JSON:API spec
+                    # but a link so need to keep it
+                    or field.field_name == api_settings.URL_FIELD_NAME
                 }
 
         return fields

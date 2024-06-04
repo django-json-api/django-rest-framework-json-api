@@ -16,7 +16,9 @@ from tests.models import BasicModel, ForeignKeySource
 from tests.serializers import BasicModelSerializer, ForeignKeyTargetSerializer
 from tests.views import (
     BasicModelViewSet,
+    ForeignKeySourcetHyperlinkedViewSet,
     ForeignKeySourceViewSet,
+    ForeignKeyTargetViewSet,
     ManyToManySourceViewSet,
     NestedRelatedSourceViewSet,
 )
@@ -87,7 +89,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_list_with_include_foreign_key(self, client, foreign_key_source):
-        url = reverse("foreign-key-source-list")
+        url = reverse("foreignkeysource-list")
         response = client.get(url, data={"include": "target"})
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
@@ -156,7 +158,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_list_with_invalid_include(self, client, foreign_key_source):
-        url = reverse("foreign-key-source-list")
+        url = reverse("foreignkeysource-list")
         response = client.get(url, data={"include": "invalid"})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         result = response.json()
@@ -195,7 +197,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_retrieve_with_include_foreign_key(self, client, foreign_key_source):
-        url = reverse("foreign-key-source-detail", kwargs={"pk": foreign_key_source.pk})
+        url = reverse("foreignkeysource-detail", kwargs={"pk": foreign_key_source.pk})
         response = client.get(url, data={"include": "target"})
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
@@ -207,6 +209,20 @@ class TestModelViewSet:
                 "attributes": {"name": foreign_key_source.target.name},
             }
         ] == result["included"]
+
+    @pytest.mark.urls(__name__)
+    def test_retrieve_hyperlinked_with_sparse_fields(self, client, foreign_key_source):
+        url = reverse(
+            "foreignkeysourcehyperlinked-detail", kwargs={"pk": foreign_key_source.pk}
+        )
+        response = client.get(url, data={"fields[ForeignKeySource]": "name"})
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()["data"]
+        assert data["attributes"] == {"name": foreign_key_source.name}
+        assert "relationships" not in data
+        assert data["links"] == {
+            "self": f"http://testserver/foreign_key_sources/{foreign_key_source.pk}/"
+        }
 
     @pytest.mark.urls(__name__)
     def test_patch(self, client, model):
@@ -239,7 +255,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_create_with_sparse_fields(self, client, foreign_key_target):
-        url = reverse("foreign-key-source-list")
+        url = reverse("foreignkeysource-list")
         data = {
             "data": {
                 "id": None,
@@ -379,6 +395,28 @@ class TestAPIView:
             }
         }
 
+    @pytest.mark.urls(__name__)
+    def test_patch_with_custom_id_with_sparse_fields(self, client):
+        data = {
+            "data": {
+                "id": 2_193_102,
+                "type": "custom",
+                "attributes": {"body": "hello"},
+            }
+        }
+
+        url = reverse("custom-id")
+
+        response = client.patch(f"{url}?fields[custom]=body", data=data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "data": {
+                "type": "custom",
+                "id": "2176ce",  # get_id() -> hex
+                "attributes": {"body": "hello"},
+            }
+        }
+
 
 # Routing setup
 
@@ -415,12 +453,15 @@ class CustomModelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
 
-class CustomIdModelSerializer(serializers.Serializer):
+class CustomIdSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     body = serializers.CharField()
 
     def get_id(self, obj):
         return hex(obj.id)[2:]
+
+    class Meta:
+        resource_name = "custom"
 
 
 class CustomAPIView(APIView):
@@ -443,14 +484,23 @@ class CustomIdAPIView(APIView):
     resource_name = "custom"
 
     def patch(self, request, *args, **kwargs):
-        serializer = CustomIdModelSerializer(CustomModel(request.data))
+        serializer = CustomIdSerializer(
+            CustomModel(request.data), context={"request": self.request}
+        )
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+# TODO remove basename and use default (lowercase of model)
+# this makes using HyperlinkedIdentityField easier and reduces
+# configuration in general
 router = SimpleRouter()
 router.register(r"basic_models", BasicModelViewSet, basename="basic-model")
+router.register(r"foreign_key_sources", ForeignKeySourceViewSet)
+router.register(r"foreign_key_targets", ForeignKeyTargetViewSet)
 router.register(
-    r"foreign_key_sources", ForeignKeySourceViewSet, basename="foreign-key-source"
+    r"foreign_key_sources_hyperlinked",
+    ForeignKeySourcetHyperlinkedViewSet,
+    "foreignkeysourcehyperlinked",
 )
 router.register(
     r"many_to_many_sources", ManyToManySourceViewSet, basename="many-to-many-source"
