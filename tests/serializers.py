@@ -8,6 +8,7 @@ from tests.models import (
     ManyToManySource,
     ManyToManyTarget,
     NestedRelatedSource,
+    URLModel,
 )
 
 
@@ -15,6 +16,15 @@ class BasicModelSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("text",)
         model = BasicModel
+
+
+class URLModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            "text",
+            "url",
+        )
+        model = URLModel
 
 
 class ForeignKeyTargetSerializer(serializers.ModelSerializer):

@@ -21,6 +21,7 @@ from tests.views import (
     ForeignKeyTargetViewSet,
     ManyToManySourceViewSet,
     NestedRelatedSourceViewSet,
+    URLModelViewSet,
 )
 
 
@@ -181,6 +182,42 @@ class TestModelViewSet:
                 "attributes": {"name": foreign_key_source.target.name},
             }
         ] == result["included"]
+
+    @pytest.mark.urls(__name__)
+    def test_list_allow_overwriting_url_field(self, client, url_instance):
+        """
+        Test overwriting of url is possible.
+
+        URL_FIELD_NAME which is set to 'url' per default is used as self in links.
+        However if field is overwritten and not a HyperlinkedIdentityField it should be allowed
+        to use as a attribute as well.
+        """
+
+        url = reverse("urlmodel-list")
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()["data"]
+        assert data == [
+            {
+                "type": "URLModel",
+                "id": str(url_instance.pk),
+                "attributes": {"text": "Url", "url": "https://example.com"},
+            }
+        ]
+
+    @pytest.mark.urls(__name__)
+    def test_list_allow_overwiritng_url_with_sparse_fields(self, client, url_instance):
+        url = reverse("urlmodel-list")
+        response = client.get(url, data={"fields[URLModel]": "text"})
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()["data"]
+        assert data == [
+            {
+                "type": "URLModel",
+                "id": str(url_instance.pk),
+                "attributes": {"text": "Url"},
+            }
+        ]
 
     @pytest.mark.urls(__name__)
     def test_retrieve(self, client, model):
@@ -495,6 +532,7 @@ class CustomIdAPIView(APIView):
 # configuration in general
 router = SimpleRouter()
 router.register(r"basic_models", BasicModelViewSet, basename="basic-model")
+router.register(r"url_models", URLModelViewSet)
 router.register(r"foreign_key_sources", ForeignKeySourceViewSet)
 router.register(r"foreign_key_targets", ForeignKeyTargetViewSet)
 router.register(

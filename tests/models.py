@@ -18,6 +18,14 @@ class BasicModel(DJAModel):
         ordering = ("id",)
 
 
+class URLModel(DJAModel):
+    url = models.URLField()
+    text = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ("id",)
+
+
 # Models for relations tests
 # ManyToMany
 class ManyToManyTarget(DJAModel):

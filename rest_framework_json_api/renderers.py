@@ -75,13 +75,11 @@ class JSONRenderer(renderers.JSONRenderer):
         and relationships are not returned.
         """
 
-        invalid_fields = {"id", api_settings.URL_FIELD_NAME}
-
         return {
             format_field_name(field_name): value
             for field_name, value in resource.items()
             if field_name in fields
-            and field_name not in invalid_fields
+            and field_name != "id"
             and not is_relationship_field(fields[field_name])
         }
 
@@ -449,7 +447,10 @@ class JSONRenderer(renderers.JSONRenderer):
                     if field.field_name in sparse_fields
                     # URL field is not considered a field in JSON:API spec
                     # but a link so need to keep it
-                    or field.field_name == api_settings.URL_FIELD_NAME
+                    or (
+                        field.field_name == api_settings.URL_FIELD_NAME
+                        and isinstance(field, relations.HyperlinkedIdentityField)
+                    )
                 }
 
         return fields
@@ -486,7 +487,7 @@ class JSONRenderer(renderers.JSONRenderer):
             resource_data["relationships"] = relationships
         # Add 'self' link if field is present and valid
         if api_settings.URL_FIELD_NAME in resource and isinstance(
-            fields[api_settings.URL_FIELD_NAME], relations.RelatedField
+            fields[api_settings.URL_FIELD_NAME], relations.HyperlinkedIdentityField
         ):
             resource_data["links"] = {"self": resource[api_settings.URL_FIELD_NAME]}
 
