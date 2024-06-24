@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.utils.module_loading import import_string as import_class_from_dotted_path
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ParseError
+from rest_framework.relations import HyperlinkedIdentityField
 
 # star import defined so `rest_framework_json_api.serializers` can be
 # a simple drop in for `rest_framework.serializers`
@@ -94,9 +95,12 @@ class SparseFieldsetsMixin:
                         field
                         for field in readable_fields
                         if field.field_name in sparse_fields
-                        # URL field is not considered a field in JSON:API spec
-                        # but a link so need to keep it
-                        or field.field_name == api_settings.URL_FIELD_NAME
+                        # URL_FIELD_NAME is the field used as self-link to resource
+                        # however only when it is a HyperlinkedIdentityField
+                        or (
+                            field.field_name == api_settings.URL_FIELD_NAME
+                            and isinstance(field, HyperlinkedIdentityField)
+                        )
                         # ID is a required field which might have been overwritten
                         # so need to keep it
                         or field.field_name == "id"

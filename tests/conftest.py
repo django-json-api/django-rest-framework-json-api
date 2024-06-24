@@ -8,6 +8,7 @@ from tests.models import (
     ManyToManySource,
     ManyToManyTarget,
     NestedRelatedSource,
+    URLModel,
 )
 
 
@@ -34,6 +35,11 @@ def use_rest_framework_json_api_defaults(settings):
 @pytest.fixture
 def model(db):
     return BasicModel.objects.create(text="Model")
+
+
+@pytest.fixture
+def url_instance(db):
+    return URLModel.objects.create(text="Url", url="https://example.com")
 
 
 @pytest.fixture

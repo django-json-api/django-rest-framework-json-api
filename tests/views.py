@@ -5,6 +5,7 @@ from tests.models import (
     ForeignKeyTarget,
     ManyToManySource,
     NestedRelatedSource,
+    URLModel,
 )
 from tests.serializers import (
     BasicModelSerializer,
@@ -13,6 +14,7 @@ from tests.serializers import (
     ForeignKeyTargetSerializer,
     ManyToManySourceSerializer,
     NestedRelatedSourceSerializer,
+    URLModelSerializer,
 )
 
 
@@ -20,6 +22,12 @@ class BasicModelViewSet(ModelViewSet):
     serializer_class = BasicModelSerializer
     queryset = BasicModel.objects.all()
     ordering = ["text"]
+
+
+class URLModelViewSet(ModelViewSet):
+    serializer_class = URLModelSerializer
+    queryset = URLModel.objects.all()
+    ordering = ["url"]
 
 
 class ForeignKeySourceViewSet(ModelViewSet):
