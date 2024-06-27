@@ -439,7 +439,7 @@ class JSONRenderer(renderers.JSONRenderer):
             sparse_fieldset_value = request.query_params.get(
                 sparse_fieldset_query_param
             )
-            if sparse_fieldset_value:
+            if sparse_fieldset_value is not None:
                 sparse_fields = sparse_fieldset_value.split(",")
                 return {
                     field_name: field
