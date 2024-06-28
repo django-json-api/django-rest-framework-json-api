@@ -13,7 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Re-enabled overwriting of url field (regression since 7.0.0)
-* Ensured that no fields are rendered when sparse fields is set to an empty value.
+* Ensured that no fields are rendered when sparse fields is set to an empty value. (regression since 7.0.0)
 
 ## [7.0.1] - 2024-06-06
 
