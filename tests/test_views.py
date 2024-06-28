@@ -220,6 +220,19 @@ class TestModelViewSet:
         ]
 
     @pytest.mark.urls(__name__)
+    def test_list_with_sparse_fields_empty_value(self, client, model):
+        url = reverse("basic-model-list")
+        response = client.get(url, data={"fields[BasicModel]": ""})
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()["data"]
+        assert data == [
+            {
+                "type": "BasicModel",
+                "id": str(model.pk),
+            }
+        ]
+
+    @pytest.mark.urls(__name__)
     def test_retrieve(self, client, model):
         url = reverse("basic-model-detail", kwargs={"pk": model.pk})
         response = client.get(url)
