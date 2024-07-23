@@ -403,6 +403,13 @@ def test_get_resource_type_from_serializer_without_resource_name_raises_error():
         (None, {"id": 11}, "11"),
         (object(), {"pk": 11}, None),
         (BasicModel(id=6), {"id": 11}, "11"),
+        (BasicModel(id=0), None, "0"),
+        (None, {"id": 0}, "0"),
+        (
+            BasicModel(id=0),
+            {"id": 0},
+            "0",
+        ),
     ],
 )
 def test_get_resource_id(resource_instance, resource, expected):
