@@ -8,13 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased]
+
+### Fixed
+
+* Handled zero as a valid ID for resource (regression since 6.1.0)
+
 ## [7.0.2] - 2024-06-28
 
 ### Fixed
 
 * Allow overwriting of url field again (regression since 7.0.0)
 * Ensured that no fields are rendered when sparse fields is set to an empty value. (regression since 7.0.0)
-* Handled zero as a valid ID in `get_resource_id` function.
 
 ## [7.0.1] - 2024-06-06
 
