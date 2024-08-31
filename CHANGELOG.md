@@ -14,6 +14,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Handled zero as a valid ID for resource (regression since 6.1.0)
 
+### Added
+
+* Added support for Django 5.1
+
 ## [7.0.2] - 2024-06-28
 
 ### Fixed
