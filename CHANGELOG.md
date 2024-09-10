@@ -13,6 +13,8 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Fixed
 
 * Handled zero as a valid ID for resource (regression since 6.1.0)
+* Ensured that patching a To-Many relationship with the `RelationshipView` correctly raises request error when passing in `None`.
+  For emptying a To-Many relationship an empty array should be used as per [JSON:API spec](https://jsonapi.org/format/#crud-updating-to-many-relationships)
 
 ### Added
 

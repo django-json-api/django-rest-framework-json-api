@@ -2,6 +2,7 @@ import json
 
 from django.test import RequestFactory, override_settings
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
 from rest_framework.reverse import reverse
@@ -174,15 +175,29 @@ class TestRelationshipView(APITestCase):
         response = self.client.get(url)
         assert response.data == request_data["data"]
 
-    def test_patch_one_to_many_relaitonship_with_none(self):
+    def test_patch_one_to_many_relaitonship_with_empty(self):
         url = f"/blogs/{self.first_entry.id}/relationships/entry_set"
-        request_data = {"data": None}
+
+        request_data = {"data": []}
         response = self.client.patch(url, data=request_data)
-        assert response.status_code == 200, response.content.decode()
+        assert response.status_code == status.HTTP_200_OK
         assert response.data == []
 
         response = self.client.get(url)
         assert response.data == []
+
+    def test_patch_one_to_many_relaitonship_with_none(self):
+        """
+        None for a to many relationship is invalid and should return a request error.
+
+        see https://jsonapi.org/format/#crud-updating-to-many-relationships
+        """
+
+        url = f"/blogs/{self.first_entry.id}/relationships/entry_set"
+
+        request_data = {"data": None}
+        response = self.client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_patch_many_to_many_relationship(self):
         url = f"/entries/{self.first_entry.id}/relationships/authors"
