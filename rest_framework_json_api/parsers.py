@@ -98,7 +98,7 @@ class JSONParser(parsers.JSONParser):
                             "Received data contains one or more malformed JSON:API "
                             "Resource Identifier Object(s)"
                         )
-            elif not (data.get("id") and data.get("type")):
+            elif isinstance(data, dict) and not (data.get("id") and data.get("type")):
                 raise ParseError(
                     "Received data is not a valid JSON:API Resource Identifier Object"
                 )
