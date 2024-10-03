@@ -423,6 +423,16 @@ class AutoSchema(drf_openapi.AutoSchema):
         - collections
         - special handling for POST, PATCH, DELETE
         """
+
+        warnings.warn(
+            DeprecationWarning(
+                "Built-in support for generating OpenAPI schema is deprecated. "
+                "Use drf-spectacular-json-api instead see "
+                "https://github.com/jokiefer/drf-spectacular-json-api/"
+            ),
+            stacklevel=2,
+        )
+
         operation = {}
         operation["operationId"] = self.get_operation_id(path, method)
         operation["description"] = self.get_description(path, method)

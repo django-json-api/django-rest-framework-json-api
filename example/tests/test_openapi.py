@@ -1,6 +1,7 @@
 # largely based on DRF's test_openapi
 import json
 
+import pytest
 from django.test import RequestFactory, override_settings
 from django.urls import re_path
 from rest_framework.request import Request
@@ -8,6 +9,8 @@ from rest_framework.request import Request
 from rest_framework_json_api.schemas.openapi import AutoSchema, SchemaGenerator
 
 from example import views
+
+pytestmark = pytest.mark.filterwarnings("ignore:Built-in support")
 
 
 def create_request(path):

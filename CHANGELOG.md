@@ -20,6 +20,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Added support for Django 5.1
 
+### Deprecated
+
+* Deprecated built-in support for generating OpenAPI schema. Use [drf-spectacular-json-api](https://github.com/jokiefer/drf-spectacular-json-api/) instead.
+
 ## [7.0.2] - 2024-06-28
 
 ### Fixed

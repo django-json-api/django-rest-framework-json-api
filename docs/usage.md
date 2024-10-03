@@ -31,7 +31,6 @@ REST_FRAMEWORK = {
         'rest_framework_json_api.renderers.BrowsableAPIRenderer'
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework_json_api.schemas.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.QueryParameterValidationFilter',
         'rest_framework_json_api.filters.OrderingFilter',
@@ -1057,6 +1056,20 @@ The `prefetch_related` case will issue 4 queries, but they will be small and fas
 
 ## Generating an OpenAPI Specification (OAS) 3.0 schema document
 
+---
+
+**Deprecation notice:**
+
+REST framework's built-in support for generating OpenAPI schemas is
+**deprecated** in favor of 3rd party packages that can provide this
+functionality instead. Therefore we have also deprecated the schema support in
+Django REST framework JSON:API. The built-in support will be retired over the
+next releases.
+
+As a full-fledged replacement, we recommend the [drf-spectacular-json-api] package.
+
+---
+
 DRF has a [OAS schema functionality](https://www.django-rest-framework.org/api-guide/schemas/) to generate an
 [OAS 3.0 schema](https://www.openapis.org/) as a YAML or JSON file.
 
@@ -1187,3 +1200,8 @@ We aim to make creating third party packages as easy as possible, whilst keeping
 To submit new content, [open an issue](https://github.com/django-json-api/django-rest-framework-json-api/issues/new/choose) or [create a pull request](https://github.com/django-json-api/django-rest-framework-json-api/compare).
 
 * [drf-yasg-json-api](https://github.com/glowka/drf-yasg-json-api) - Automated generation of Swagger/OpenAPI 2.0 from Django REST framework JSON:API endpoints.
+* [drf-spectacular-json-api] - OpenAPI 3 schema generator for Django REST framework JSON:API based on drf-spectacular.
+
+
+
+[drf-spectacular-json-api]: https://github.com/jokiefer/drf-spectacular-json-api/
