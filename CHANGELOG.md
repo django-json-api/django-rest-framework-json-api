@@ -19,6 +19,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Django 5.1
+* Added support for Python 3.13
 
 ### Deprecated
 
