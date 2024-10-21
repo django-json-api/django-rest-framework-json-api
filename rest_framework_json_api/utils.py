@@ -472,6 +472,6 @@ def format_error_object(message, pointer, response):
 
 
 def format_errors(data):
-    if len(data) > 1 and isinstance(data, list):
+    if isinstance(data, list) and len(data) > 1:
         data.sort(key=lambda x: x.get("source", {}).get("pointer", ""))
     return {"errors": data}

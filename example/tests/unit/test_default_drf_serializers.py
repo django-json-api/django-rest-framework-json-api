@@ -105,6 +105,19 @@ def test_blog_create(client):
 
 
 @pytest.mark.django_db
+def test_rest_action_request(client):
+    url = reverse("drf-entry-blog-list") + "/actions/custom_response"
+    name = "Dummy Name"
+    request_data = {
+        "data": {"attributes": {"name": name}, "type": "blogs"},
+    }
+
+    resp = client.post(url, request_data)
+
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
 def test_get_object_gives_correct_blog(client, blog, entry):
     url = reverse("drf-entry-blog-detail", kwargs={"entry_pk": entry.id})
     resp = client.get(url)
