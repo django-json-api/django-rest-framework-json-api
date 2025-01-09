@@ -17,6 +17,8 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [7.1.0] - 2024-10-25
 
+This is the last release supporting Python 3.8.
+
 ### Fixed
 
 * Handled zero as a valid ID for resource (regression since 6.1.0)
