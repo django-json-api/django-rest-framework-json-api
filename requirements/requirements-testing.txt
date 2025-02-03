@@ -1,5 +1,5 @@
-factory-boy==3.3.1
-Faker==33.3.1
+factory-boy==3.3.3
+Faker==35.2.0
 pytest==8.3.4
 pytest-cov==6.0.0
 pytest-django==4.9.0
