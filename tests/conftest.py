@@ -1,5 +1,5 @@
 import pytest
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 
 from tests.models import (
     BasicModel,
@@ -98,3 +98,8 @@ def nested_related_source(
 @pytest.fixture
 def client():
     return APIClient()
+
+
+@pytest.fixture
+def rf():
+    return APIRequestFactory()

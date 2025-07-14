@@ -1,6 +1,5 @@
 from collections.abc import Mapping
 
-import inflection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.utils.module_loading import import_string as import_class_from_dotted_path
@@ -129,7 +128,7 @@ class IncludedResourcesValidationMixin:
             serializers = getattr(serializer_class, "included_serializers", None)
             if serializers is None:
                 raise ParseError("This endpoint does not support the include parameter")
-            this_field_name = inflection.underscore(field_path[0])
+            this_field_name = field_path[0]
             this_included_serializer = serializers.get(this_field_name)
             if this_included_serializer is None:
                 raise ParseError(
