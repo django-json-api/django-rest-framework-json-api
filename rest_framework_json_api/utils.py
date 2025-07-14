@@ -316,10 +316,18 @@ def get_resource_id(resource_instance, resource):
 
 
 def get_included_resources(request, serializer=None):
-    """Build a list of included resources."""
+    """
+    Build a list of included resources.
+
+    This method ensures that returned includes are in Python internally used
+    format.
+    """
     include_resources_param = request.query_params.get("include") if request else None
     if include_resources_param:
-        return include_resources_param.split(",")
+        return [
+            undo_format_field_name(include)
+            for include in include_resources_param.split(",")
+        ]
     else:
         return get_default_included_resources_from_serializer(serializer)
 

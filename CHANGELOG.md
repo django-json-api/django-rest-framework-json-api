@@ -15,6 +15,11 @@ any parts of the framework not mentioned in the documentation should generally b
 * Added support for Django REST framework 3.16.
 * Added support for Django 5.2.
 
+### Fixed
+
+* Ensured that interpreting `include` query parameter is done in internal Python naming.
+  This adds full support for using multipart field names for includes while configuring `JSON_API_FORMAT_FIELD_NAMES`.
+
 ### Removed
 
 * Removed support for Python 3.8.

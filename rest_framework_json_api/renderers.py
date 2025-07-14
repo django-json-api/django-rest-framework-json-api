@@ -6,7 +6,6 @@ import copy
 from collections import defaultdict
 from collections.abc import Iterable
 
-import inflection
 from django.db.models import Manager
 from django.template import loader
 from django.utils.encoding import force_str
@@ -277,9 +276,6 @@ class JSONRenderer(renderers.JSONRenderer):
             current_serializer, "included_serializers", dict()
         )
         included_resources = copy.copy(included_resources)
-        included_resources = [
-            inflection.underscore(value) for value in included_resources
-        ]
 
         for field_name, field in iter(fields.items()):
             # Skip URL field

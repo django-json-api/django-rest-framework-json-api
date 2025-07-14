@@ -2,6 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.fields import Field
 from rest_framework.generics import GenericAPIView
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,6 +14,7 @@ from rest_framework_json_api.utils import (
     format_link_segment,
     format_resource_type,
     format_value,
+    get_included_resources,
     get_related_resource_type,
     get_resource_id,
     get_resource_name,
@@ -456,3 +458,22 @@ def test_get_resource_id(resource_instance, resource, expected):
 )
 def test_format_error_object(message, pointer, response, result):
     assert result == format_error_object(message, pointer, response)
+
+
+@pytest.mark.parametrize(
+    "format_type,include_param,expected_includes",
+    [
+        ("dasherize", "author-bio", ["author_bio"]),
+        ("dasherize", "author-bio,author-type", ["author_bio", "author_type"]),
+        ("dasherize", "author-bio.author-type", ["author_bio.author_type"]),
+        ("camelize", "authorBio", ["author_bio"]),
+    ],
+)
+def test_get_included_resources(
+    rf, include_param, expected_includes, format_type, settings
+):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    request = Request(rf.get("/test/", {"include": include_param}))
+    includes = get_included_resources(request)
+    assert includes == expected_includes
