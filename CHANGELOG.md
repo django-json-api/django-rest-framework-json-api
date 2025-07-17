@@ -19,6 +19,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Ensured that interpreting `include` query parameter is done in internal Python naming.
   This adds full support for using multipart field names for includes while configuring `JSON_API_FORMAT_FIELD_NAMES`.
+* Ensured that sparse fieldset fully supports `JSON_API_FORMAT_FIELD_NAMES`.
 
 ### Removed
 
