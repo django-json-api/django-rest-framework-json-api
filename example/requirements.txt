@@ -8,5 +8,4 @@ pluggy
 py
 pyparsing
 pytz
-sqlparse
 django-filter>=2.0
