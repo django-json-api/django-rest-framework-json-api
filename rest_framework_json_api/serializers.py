@@ -26,6 +26,7 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_instance,
     get_resource_type_from_model,
     get_resource_type_from_serializer,
+    undo_format_field_name,
 )
 
 
@@ -89,7 +90,10 @@ class SparseFieldsetsMixin:
                     sparse_fieldset_query_param
                 )
                 if sparse_fieldset_value is not None:
-                    sparse_fields = sparse_fieldset_value.split(",")
+                    sparse_fields = [
+                        undo_format_field_name(sparse_field)
+                        for sparse_field in sparse_fieldset_value.split(",")
+                    ]
                     return (
                         field
                         for field in readable_fields

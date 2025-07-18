@@ -1,5 +1,6 @@
 import pytest
 from django.db import models
+from rest_framework.request import Request
 from rest_framework.utils import model_meta
 
 from rest_framework_json_api import serializers
@@ -83,4 +84,23 @@ def test_get_field_names():
         "an_extra_field",
         "verified",
         "uuid",
+    ]
+
+
+def test_readable_fields_with_sparse_fields(client, rf, settings):
+    class TestSerializer(serializers.Serializer):
+        name = serializers.CharField()
+        value = serializers.CharField()
+        multi_part_name = serializers.CharField()
+
+        class Meta:
+            resource_name = "test"
+
+    settings.JSON_API_FORMAT_FIELD_NAMES = "camelize"
+    request = Request(rf.get("/test/", {"fields[test]": "value,multiPartName"}))
+    context = {"request": request}
+    serializer = TestSerializer(context=context)
+    assert [field.field_name for field in serializer._readable_fields] == [
+        "value",
+        "multi_part_name",
     ]
