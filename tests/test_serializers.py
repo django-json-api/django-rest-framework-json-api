@@ -96,7 +96,7 @@ def test_readable_fields_with_sparse_fields(client, rf, settings):
         class Meta:
             resource_name = "test"
 
-    settings.JSON_API_FORMAT_FIELD_NAMES = "camelCase"
+    settings.JSON_API_FORMAT_FIELD_NAMES = "camelize"
     request = Request(rf.get("/test/", {"fields[test]": "value,multiPartName"}))
     context = {"request": request}
     serializer = TestSerializer(context=context)
