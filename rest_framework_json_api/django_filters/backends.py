@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from rest_framework_json_api.utils import format_field_name, undo_format_field_name
+from rest_framework_json_api.utils import undo_format_field_name
 
 
 class DjangoFilterBackend(DjangoFilterBackend):
@@ -129,18 +129,3 @@ class DjangoFilterBackend(DjangoFilterBackend):
             "request": request,
             "filter_keys": filter_keys,
         }
-
-    def get_schema_operation_parameters(self, view):
-        """
-        Convert backend filter `name` to JSON:API-style `filter[name]`.
-        For filters that are relationship paths, rewrite ORM-style `__` to our preferred `.`.
-        For example: `blog__name__contains` becomes `filter[blog.name.contains]`.
-
-        This is basically the reverse of `get_filterset_kwargs` above.
-        """
-        result = super().get_schema_operation_parameters(view)
-        for res in result:
-            if "name" in res:
-                name = format_field_name(res["name"].replace("__", "."))
-                res["name"] = f"filter[{name}]"
-        return result

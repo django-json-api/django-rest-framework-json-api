@@ -1,9 +1,5 @@
 from django.urls import include, path, re_path
-from django.views.generic import TemplateView
 from rest_framework import routers
-from rest_framework.schemas import get_schema_view
-
-from rest_framework_json_api.schemas.openapi import SchemaGenerator
 
 from example.views import (
     AuthorRelationshipView,
@@ -86,23 +82,5 @@ urlpatterns = [
         r"^authors/(?P<pk>[^/.]+)/relationships/(?P<related_field>\w+)$",
         AuthorRelationshipView.as_view(),
         name="author-relationships",
-    ),
-    path(
-        "openapi",
-        get_schema_view(
-            title="Example API",
-            description="API for all things …",
-            version="1.0.0",
-            generator_class=SchemaGenerator,
-        ),
-        name="openapi-schema",
-    ),
-    path(
-        "swagger-ui/",
-        TemplateView.as_view(
-            template_name="swagger-ui.html",
-            extra_context={"schema_url": "openapi-schema"},
-        ),
-        name="swagger-ui",
     ),
 ]
