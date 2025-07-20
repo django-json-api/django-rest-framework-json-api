@@ -110,7 +110,7 @@ setup(
         "django>=4.2",
     ],
     extras_require={
-        "django-polymorphic": ["django-polymorphic>=3.0"],
+        "django-polymorphic": ["django-polymorphic>=4.0.0"],
         "django-filter": ["django-filter>=2.4"],
         "openapi": ["pyyaml>=5.4", "uritemplate>=3.0.1"],
     },

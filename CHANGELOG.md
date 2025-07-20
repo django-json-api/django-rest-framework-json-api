@@ -21,6 +21,10 @@ any parts of the framework not mentioned in the documentation should generally b
   This adds full support for using multipart field names for includes while configuring `JSON_API_FORMAT_FIELD_NAMES`.
 * Ensured that sparse fieldset fully supports `JSON_API_FORMAT_FIELD_NAMES`.
 
+### Changed
+
+* Set minimum required version of optional Polymorphic Models for Django to 4.0.0.
+
 ### Removed
 
 * Removed support for Python 3.8.
