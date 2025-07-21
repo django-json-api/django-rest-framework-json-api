@@ -30,7 +30,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Python 3.8.
 * Removed support for Django REST framework 3.14.
 * Removed support for Django 5.0.
-
+* Removed built-in support for generating OpenAPI schema. Use [drf-spectacular-json-api](https://github.com/jokiefer/drf-spectacular-json-api/) instead.
 
 ## [7.1.0] - 2024-10-25
 

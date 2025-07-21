@@ -112,7 +112,6 @@ setup(
     extras_require={
         "django-polymorphic": ["django-polymorphic>=4.0.0"],
         "django-filter": ["django-filter>=2.4"],
-        "openapi": ["pyyaml>=5.4", "uritemplate>=3.0.1"],
     },
     setup_requires=wheel,
     python_requires=">=3.9",
