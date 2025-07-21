@@ -114,7 +114,6 @@ Install using ``pip``...
     $ # for optional package integrations
     $ pip install djangorestframework-jsonapi['django-filter']
     $ pip install djangorestframework-jsonapi['django-polymorphic']
-    $ pip install djangorestframework-jsonapi['openapi']
 
 
 or from source...
@@ -156,8 +155,6 @@ installed and activated:
 Browse to
 
 * http://localhost:8000 for the list of available collections (in a non-JSON:API format!),
-* http://localhost:8000/swagger-ui/ for a Swagger user interface to the dynamic schema view, or
-* http://localhost:8000/openapi for the schema view's OpenAPI specification document.
 
 
 -----
