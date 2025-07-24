@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [8.0.0] - 2025-07-24
 
 ### Added
 
@@ -17,9 +17,8 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Ensured that interpreting `include` query parameter is done in internal Python naming.
-  This adds full support for using multipart field names for includes while configuring `JSON_API_FORMAT_FIELD_NAMES`.
-* Ensured that sparse fieldset fully supports `JSON_API_FORMAT_FIELD_NAMES`.
+* Ensured that compound documents' `include` query parameter fully support `JSON_API_FORMAT_FIELD_NAMES`.
+* Ensured that sparse fieldset's `fields` query parameter fully supports `JSON_API_FORMAT_FIELD_NAMES`.
 
 ### Changed
 
