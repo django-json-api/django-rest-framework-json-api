@@ -3,5 +3,5 @@ Faker==37.1.0
 pytest==8.3.5
 pytest-cov==6.1.1
 pytest-django==4.11.1
-pytest-factoryboy==2.7.0
+pytest-factoryboy==2.8.1
 syrupy==4.9.1
