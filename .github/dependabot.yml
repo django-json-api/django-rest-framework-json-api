@@ -4,3 +4,6 @@ updates:
     directory: "/requirements"
     schedule:
       interval: "monthly"
+    groups:
+      all-deps:
+        patterns: ["*"]
