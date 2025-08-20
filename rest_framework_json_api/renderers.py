@@ -659,6 +659,10 @@ class JSONRenderer(renderers.JSONRenderer):
                     render_data["included"].append(
                         included_cache[included_type][included_id]
                     )
+        else:
+            request = renderer_context.get("request")
+            if request and "include" in request.query_params:
+                render_data["included"] = []
 
         if json_api_meta:
             render_data["meta"] = format_field_names(json_api_meta)

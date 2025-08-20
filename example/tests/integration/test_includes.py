@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
 
+
+
 pytestmark = pytest.mark.django_db
 
 
@@ -36,7 +38,10 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
     # First author does not have a bio
     author = author_factory(bio=None)
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")
-    assert "included" not in response.json()
+    ###
+    content = response.json()
+    assert "included" in content
+    assert content["included"] == []
     # Second author does
     author = author_factory()
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")
@@ -204,3 +209,24 @@ def test_meta_object_added_to_included_resources(single_entry, client):
     )
     assert response.json()["included"][0].get("meta")
     assert response.json()["included"][1].get("meta")
+
+
+def test_included_empty_array_when_requested(client, author_factory):
+    author = author_factory(bio=None)  # explicitly ensure no related bio
+    url = reverse("author-detail", args=[author.pk]) + "?include=bio"
+    response = client.get(url)
+    assert response.status_code == 200
+
+    content = response.json()
+    assert "included" in content
+    assert content["included"] == []
+
+
+def test_included_absent_when_not_requested(client, author_factory):
+    # Create an author (bio can be None or default, doesn't matter here)
+    author = author_factory(bio=None)
+    url = reverse("author-detail", args=[author.pk])
+    response = client.get(url)
+    assert response.status_code == 200
+    content = response.json()
+    assert "included" not in content

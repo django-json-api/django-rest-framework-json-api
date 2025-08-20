@@ -43,6 +43,8 @@ coverage.xml
 
 # VirtualEnv
 .venv/
+venv/
+
 
 # Developers
 *.sw*
@@ -51,3 +53,5 @@ manage.py
 
 # example database
 drf_example
+
+pytest.ini
