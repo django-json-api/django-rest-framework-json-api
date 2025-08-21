@@ -1,8 +1,6 @@
 import pytest
 from django.urls import reverse
 
-
-
 pytestmark = pytest.mark.django_db
 
 
@@ -38,7 +36,6 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
     # First author does not have a bio
     author = author_factory(bio=None)
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")
-    ###
     content = response.json()
     assert "included" in content
     assert content["included"] == []

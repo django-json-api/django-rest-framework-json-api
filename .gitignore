@@ -46,6 +46,7 @@ coverage.xml
 venv/
 
 
+
 # Developers
 *.sw*
 manage.py
@@ -55,3 +56,5 @@ manage.py
 drf_example
 
 pytest.ini
+
+
