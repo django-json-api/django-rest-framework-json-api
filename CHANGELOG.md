@@ -1,4 +1,4 @@
-# Changelog
+# _Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
+
+## [Unreleased]
+
+### Fixed
+
+* Ensured that an empty `included` array is returned in responses when the `include` query parameter is present but no related resources exist.
 
 ## [8.0.0] - 2025-07-24
 
@@ -31,7 +37,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Django 5.0.
 * Removed built-in support for generating OpenAPI schema. Use [drf-spectacular-json-api](https://github.com/jokiefer/drf-spectacular-json-api/) instead.
 
-## [7.1.0] - 2024-10-25
+## [7.1.0] - 2024-10-25_
 
 This is the last release supporting Python 3.8, Django 5.0 and Django REST framework 3.14.
 

@@ -652,17 +652,13 @@ class JSONRenderer(renderers.JSONRenderer):
                 if not included_cache[obj_type]:
                     del included_cache[obj_type]
 
-        if included_cache:
+        if included_resources:
             render_data["included"] = list()
             for included_type in sorted(included_cache.keys()):
                 for included_id in sorted(included_cache[included_type].keys()):
                     render_data["included"].append(
                         included_cache[included_type][included_id]
                     )
-        else:
-            request = renderer_context.get("request")
-            if request and "include" in request.query_params:
-                render_data["included"] = []
 
         if json_api_meta:
             render_data["meta"] = format_field_names(json_api_meta)
