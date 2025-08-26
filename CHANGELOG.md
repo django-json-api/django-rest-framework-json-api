@@ -1,4 +1,4 @@
-# _Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -37,7 +37,7 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Django 5.0.
 * Removed built-in support for generating OpenAPI schema. Use [drf-spectacular-json-api](https://github.com/jokiefer/drf-spectacular-json-api/) instead.
 
-## [7.1.0] - 2024-10-25_
+## [7.1.0] - 2024-10-25
 
 This is the last release supporting Python 3.8, Django 5.0 and Django REST framework 3.14.
 
