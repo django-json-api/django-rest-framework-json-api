@@ -1,9 +1,11 @@
+import logging
 import rest_framework.exceptions as exceptions
 import rest_framework.parsers
 import rest_framework.renderers
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
-
+from rest_framework.response import Response
+from rest_framework.decorators import action
 import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
@@ -74,6 +76,18 @@ class DRFBlogViewSet(ModelViewSet):
 
         return super().get_object()
 
+    @action(url_path="actions/custom_response", detail=False, methods=["post"])
+    def custom_response(self, request):
+        data = request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        try:
+            test = 1/0
+        except Exception:
+            return Response(status=400)
+
+        return Response(status=201)
 
 class JsonApiViewSet(ModelViewSet):
     """
@@ -257,7 +271,6 @@ class CommentViewSet(ModelViewSet):
 
         return queryset
 
-
 class CompanyViewset(ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
@@ -275,7 +288,6 @@ class ProjectTypeViewset(ModelViewSet):
 
 class EntryRelationshipView(RelationshipView):
     queryset = Entry.objects.all()
-
 
 class BlogRelationshipView(RelationshipView):
     queryset = Blog.objects.all()
