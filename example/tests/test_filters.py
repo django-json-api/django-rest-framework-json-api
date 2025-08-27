@@ -530,7 +530,8 @@ class DJATestFilters(APITestCase):
                     },
                     "meta": {"bodyFormat": "text"},
                 }
-            ]
+            ],
+            "included": [],
         }
         assert response.json() == expected_result
 

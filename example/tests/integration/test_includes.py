@@ -36,7 +36,9 @@ def test_missing_field_not_included(author_bio_factory, author_factory, client):
     # First author does not have a bio
     author = author_factory(bio=None)
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")
-    assert "included" not in response.json()
+    content = response.json()
+    assert "included" in content
+    assert content["included"] == []
     # Second author does
     author = author_factory()
     response = client.get(reverse("author-detail", args=[author.pk]) + "?include=bio")
@@ -204,3 +206,47 @@ def test_meta_object_added_to_included_resources(single_entry, client):
     )
     assert response.json()["included"][0].get("meta")
     assert response.json()["included"][1].get("meta")
+
+
+def test_included_array_empty_when_requested_but_no_data(blog_factory, client):
+    blog = blog_factory()
+    response = client.get(
+        reverse("blog-detail", kwargs={"pk": blog.pk}) + "?include=tags"
+    )
+    content = response.json()
+
+    assert "included" in content
+    assert content["included"] == []
+
+
+def test_included_array_populated_when_related_data_exists(
+    blog_factory, tagged_item_factory, client
+):
+    blog = blog_factory()
+    tag = tagged_item_factory(tag="django")
+    blog.tags.add(tag)
+
+    response = client.get(
+        reverse("blog-detail", kwargs={"pk": blog.pk}) + "?include=tags"
+    )
+    included = response.json()["included"]
+
+    assert included, "Expected included array to be populated"
+    assert [x.get("type") for x in included] == [
+        "taggedItems"
+    ], "Included types incorrect"
+    assert included[0]["attributes"]["tag"] == "django"
+
+
+def test_included_array_present_via_jsonapimeta_defaults(
+    single_entry, comment_factory, author_factory, client
+):
+    author = author_factory()
+    comment_factory(entry=single_entry, author=author)
+
+    response = client.get(reverse("entry-detail", kwargs={"pk": single_entry.pk}))
+
+    included = response.json()["included"]
+
+    assert included, "Expected included array due to JSONAPIMeta defaults"
+    assert any(resource["type"] == "comments" for resource in included)

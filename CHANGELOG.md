@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
+## [Unreleased]
+
+### Fixed
+
+* Ensured that an empty `included` array is returned in responses when the `include` query parameter is present but no related resources exist.
+
 ## [8.0.0] - 2025-07-24
 
 ### Added

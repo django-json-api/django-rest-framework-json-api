@@ -652,7 +652,7 @@ class JSONRenderer(renderers.JSONRenderer):
                 if not included_cache[obj_type]:
                     del included_cache[obj_type]
 
-        if included_cache:
+        if included_resources:
             render_data["included"] = list()
             for included_type in sorted(included_cache.keys()):
                 for included_id in sorted(included_cache[included_type].keys()):
