@@ -863,6 +863,17 @@ field_name_mapping = {
 
 ### Working with polymorphic resources
 
+--
+
+**Deprecation notice:**
+
+
+Support for using Polymorphic resources through [django-polymorphic](https://github.com/jazzband/django-polymorphic) is deprecated and will be removed in a future release.
+
+There is currently no replacement. In case you are affected of this change please join [our discussion](https://github.com/django-json-api/django-rest-framework-json-api/discussions/1194).
+
+---
+
 Polymorphic resources allow you to use specialized subclasses without requiring
 special endpoints to expose the specialized versions. For example, if you had a
 `Project` that could be either an `ArtProject` or a `ResearchProject`, you can

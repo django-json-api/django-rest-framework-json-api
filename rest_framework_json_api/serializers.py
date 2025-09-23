@@ -1,3 +1,4 @@
+import warnings
 from collections.abc import Mapping
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -341,6 +342,16 @@ class PolymorphicSerializerMetaclass(SerializerMetaclass):
         parents = [b for b in bases if isinstance(b, PolymorphicSerializerMetaclass)]
         if not parents:
             return new_class
+
+        warnings.warn(
+            DeprecationWarning(
+                "Support for polymorphic resources is deprecated."
+                "There is currently no replacement. In case you are affected of this "
+                "change please join discussion at "
+                "https://github.com/django-json-api/django-rest-framework-json-api/discussions/1194."
+            ),
+            stacklevel=2,
+        )
 
         polymorphic_serializers = getattr(new_class, "polymorphic_serializers", None)
         assert (
