@@ -14,6 +14,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Ensured that an empty `included` array is returned in responses when the `include` query parameter is present but no related resources exist.
 
+### Added
+
+* Added support for Python 3.14.
+
 ### Deprecated
 
 * Deprecated support for using Polymorphic resources through [django-polymorphic](https://github.com/jazzband/django-polymorphic). There is currently no replacement. In case you are affected of this change please join [our discussion](https://github.com/django-json-api/django-rest-framework-json-api/discussions/1194).
