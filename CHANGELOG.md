@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Note that in line with [Django REST framework policy](https://www.django-rest-framework.org/topics/release-notes/),
 any parts of the framework not mentioned in the documentation should generally be considered private API, and may be subject to change.
 
-## [Unreleased]
+## [8.1.0] - 2025-10-17
 
 ### Fixed
 
@@ -20,7 +20,9 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Deprecated
 
-* Deprecated support for using Polymorphic resources through [django-polymorphic](https://github.com/jazzband/django-polymorphic). There is currently no replacement. In case you are affected of this change please join [our discussion](https://github.com/django-json-api/django-rest-framework-json-api/discussions/1194).
+* Deprecated support for exposing Polymorphic resources through [django-polymorphic](https://github.com/jazzband/django-polymorphic) as JSON:API endpoints.
+  There is currently no replacement. In case you are affected of this change please
+  join [our discussion](https://github.com/django-json-api/django-rest-framework-json-api/discussions/1194).
 
 ## [8.0.0] - 2025-07-24
 
