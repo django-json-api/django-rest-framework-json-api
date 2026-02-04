@@ -222,6 +222,6 @@ class TestResourceNameConsistency:
     def teardown_method(self, method):
         models.Comment.__bases__ = (models.Comment.__bases__[0],)
         try:
-            delattr(serializers.CommentSerializer.Meta, "resource_name")
+            del serializers.CommentSerializer.Meta.resource_name
         except AttributeError:
             pass

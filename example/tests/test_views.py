@@ -436,7 +436,7 @@ class TestRelatedMixin(APITestCase):
         kwargs = {"pk": self.author.id, "related_field": "author_type"}
         view = self._get_view(kwargs)
         related_serializers = view.get_serializer_class().related_serializers
-        delattr(view.get_serializer_class(), "related_serializers")
+        del view.get_serializer_class().related_serializers
         got = view.get_related_serializer_class()
         self.assertEqual(got, AuthorTypeSerializer)
         view.get_serializer_class().related_serializers = related_serializers
