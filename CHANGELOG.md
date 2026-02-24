@@ -10,6 +10,10 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Added
+
+* Added support for Django 6.0.
+
 ### Removed
 
 * Removed support for Python 3.9.
