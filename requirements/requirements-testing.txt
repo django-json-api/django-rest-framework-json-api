@@ -1,7 +1,7 @@
 factory-boy==3.3.3
-Faker==40.1.2
+Faker==40.8.0
 pytest==9.0.2
 pytest-cov==7.0.0
-pytest-django==4.11.1
+pytest-django==4.12.0
 pytest-factoryboy==2.8.1
 syrupy==5.1.0
