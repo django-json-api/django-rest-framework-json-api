@@ -19,10 +19,12 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Removed support for Python 3.9.
 * Removed support for Django REST framework 3.15.
+* Removed support for Django 4.2.
+* Removed support for Django 5.1.
 
 ## [8.1.0] - 2025-10-17
 
-This is the last release supporting Python 3.9 and Django REST framework 3.15.
+This is the last release supporting Python 3.9, Django 4.2, Django 5.1 and Django REST framework 3.15.
 
 ### Fixed
 
