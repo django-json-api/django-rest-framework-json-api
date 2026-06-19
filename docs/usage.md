@@ -1079,7 +1079,8 @@ To submit new content, [open an issue](https://github.com/django-json-api/django
 
 * [drf-yasg-json-api](https://github.com/glowka/drf-yasg-json-api) - Automated generation of Swagger/OpenAPI 2.0 from Django REST framework JSON:API endpoints.
 * [drf-spectacular-json-api] - OpenAPI 3 schema generator for Django REST framework JSON:API based on drf-spectacular.
-
+* [drf-json-api-atomic-operations] - Extension for django-rest-framework-json-api to support atomic operations.
 
 
 [drf-spectacular-json-api]: https://github.com/jokiefer/drf-spectacular-json-api/
+[drf-json-api-atomic-operations]: https://github.com/jokiefer/drf-json-api-atomic-operations
