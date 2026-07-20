@@ -89,12 +89,10 @@ and add `rest_framework_json_api` to your `INSTALLED_APPS` setting below `rest_f
 
 	git clone https://github.com/django-json-api/django-rest-framework-json-api.git
 	cd django-rest-framework-json-api
-	python3 -m venv env
-	source env/bin/activate
 	pip install -Ur requirements.txt
-	django-admin migrate --settings=example.settings
-	django-admin loaddata drf_example --settings=example.settings
-	django-admin runserver --settings=example.settings
+	django-admin migrate --settings=example.settings --pythonpath .
+	django-admin loaddata drf_example --settings=example.settings --pythonpath .
+	django-admin runserver --settings=example.settings --pythonpath .
 
 
 Browse to
