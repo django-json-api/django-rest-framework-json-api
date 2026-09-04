@@ -1,2 +1,2 @@
 django-filter==26.1
-django-polymorphic==4.11.6
+django-polymorphic==4.11.7
