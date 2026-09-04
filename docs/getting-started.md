@@ -53,7 +53,7 @@ like the following:
 
 1. Python (3.10, 3.11, 3.12, 3.13, 3.14)
 2. Django (5.2, 6.0)
-3. Django REST framework (3.16, 3.17)
+3. Django REST framework (3.17, 3.18)
 
 We **highly** recommend and only officially support the latest patch release of each Python, Django and REST framework series.
 
