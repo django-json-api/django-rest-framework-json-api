@@ -13,6 +13,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Added
 
 * Added support for Django 6.0.
+* Added support for Django 6.1.
 * Added support for Django REST framework 3.17.
 * Added support for Django REST framework 3.18.
 
