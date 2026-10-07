@@ -14,7 +14,7 @@ from tests.models import (
 
 class BasicModelSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ("text",)
+        fields = ("text", "long_text")
         model = BasicModel
 
 

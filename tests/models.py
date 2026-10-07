@@ -13,6 +13,7 @@ class DJAModel(models.Model):
 
 class BasicModel(DJAModel):
     text = models.CharField(max_length=100)
+    long_text = models.CharField(max_length=100)
 
     class Meta:
         ordering = ("id",)

@@ -1,5 +1,6 @@
 import pytest
 from django.urls import path, reverse
+from inline_snapshot import snapshot
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -71,22 +72,24 @@ class TestModelViewSet:
         url = reverse("basic-model-list")
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "data": [
-                {
-                    "type": "BasicModel",
-                    "id": str(model.pk),
-                    "attributes": {"text": "Model"},
-                }
-            ],
-            "links": {
-                "first": "http://testserver/basic_models/?page%5Bnumber%5D=1",
-                "last": "http://testserver/basic_models/?page%5Bnumber%5D=1",
-                "next": None,
-                "prev": None,
-            },
-            "meta": {"pagination": {"count": 1, "page": 1, "pages": 1}},
-        }
+        assert response.json() == snapshot(
+            {
+                "data": [
+                    {
+                        "type": "BasicModel",
+                        "id": str(model.pk),
+                        "attributes": {"text": "Model", "long_text": "LongText"},
+                    }
+                ],
+                "links": {
+                    "first": "http://testserver/basic_models/?page%5Bnumber%5D=1",
+                    "last": "http://testserver/basic_models/?page%5Bnumber%5D=1",
+                    "next": None,
+                    "prev": None,
+                },
+                "meta": {"pagination": {"count": 1, "page": 1, "pages": 1}},
+            }
+        )
 
     @pytest.mark.urls(__name__)
     def test_list_with_include_foreign_key(self, client, foreign_key_source):
@@ -237,13 +240,15 @@ class TestModelViewSet:
         url = reverse("basic-model-detail", kwargs={"pk": model.pk})
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "data": {
-                "type": "BasicModel",
-                "id": str(model.pk),
-                "attributes": {"text": "Model"},
+        assert response.json() == snapshot(
+            {
+                "data": {
+                    "type": "BasicModel",
+                    "id": str(model.pk),
+                    "attributes": {"text": "Model", "long_text": "LongText"},
+                }
             }
-        }
+        )
 
     @pytest.mark.urls(__name__)
     def test_retrieve_with_include_foreign_key(self, client, foreign_key_source):
@@ -287,13 +292,15 @@ class TestModelViewSet:
         url = reverse("basic-model-detail", kwargs={"pk": model.pk})
         response = client.patch(url, data=data)
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "data": {
-                "type": "BasicModel",
-                "id": str(model.pk),
-                "attributes": {"text": "changed"},
+        assert response.json() == snapshot(
+            {
+                "data": {
+                    "type": "BasicModel",
+                    "id": str(model.pk),
+                    "attributes": {"text": "changed", "long_text": "LongText"},
+                }
             }
-        }
+        )
 
     @pytest.mark.urls(__name__)
     def test_delete(self, client, model):
@@ -541,6 +548,7 @@ class CustomIdAPIView(APIView):
 
 
 # TODO remove basename and use default (lowercase of model)
+# TODO merge with router of tests/urls.py
 # this makes using HyperlinkedIdentityField easier and reduces
 # configuration in general
 router = SimpleRouter()
