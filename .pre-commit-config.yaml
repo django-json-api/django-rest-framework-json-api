@@ -2,19 +2,19 @@ repos:
   - repo: local
     hooks:
       - id: black
-        stages: [commit]
+        stages: [pre-commit]
         name: black
         language: system
         entry: black
         types: [python]
       - id: isort
-        stages: [commit]
+        stages: [pre-commit]
         name: isort
         language: system
         entry: isort
         types: [python]
       - id: flake8
-        stages: [commit]
+        stages: [pre-commit]
         name: flake8
         language: system
         entry: flake8
