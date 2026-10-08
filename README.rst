@@ -92,7 +92,7 @@ As a Django REST framework JSON:API (short DJA) we are trying to address followi
 Requirements
 ------------
 
-1. Python (3.10, 3.11, 3.12, 3.13, 3.14)
+1. Python (3.11, 3.12, 3.13, 3.14)
 2. Django (5.2, 6.0, 6.1)
 3. Django REST framework (3.17, 3.18)
 
