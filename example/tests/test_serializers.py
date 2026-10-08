@@ -12,13 +12,11 @@ from rest_framework_json_api.serializers import (
     DateField,
     ModelSerializer,
     ResourceIdentifierObjectSerializer,
-    empty,
 )
 from rest_framework_json_api.utils import format_resource_type
 
-from example.factories import ArtProjectFactory
 from example.models import Author, Blog, Entry
-from example.serializers import ArtProjectSerializer, BlogSerializer, ProjectSerializer
+from example.serializers import BlogSerializer
 
 request_factory = APIRequestFactory()
 pytestmark = pytest.mark.django_db
@@ -256,51 +254,3 @@ class TestModelSerializer:
 
         assert response.status_code == 200
         assert expected == response.json()
-
-
-class TestPolymorphicModelSerializer(TestCase):
-    def setUp(self):
-        self.project = ArtProjectFactory.create()
-        self.child_init_args = {}
-
-        # Override `__init__` with our own method
-        def overridden_init(child_self, instance=None, data=empty, **kwargs):
-            """
-            Override `ArtProjectSerializer.__init__` with the same signature that
-            `BaseSerializer.__init__` has to assert that it receives the parameters
-            that `BaseSerializer` expects
-            """
-            self.child_init_args = dict(instance=instance, data=data, **kwargs)
-
-            return super(ArtProjectSerializer, child_self).__init__(
-                instance, data, **kwargs
-            )
-
-        self.child_serializer_init = ArtProjectSerializer.__init__
-        ArtProjectSerializer.__init__ = overridden_init
-
-    def tearDown(self):
-        # Restore original init to avoid affecting other tests
-        ArtProjectSerializer.__init__ = self.child_serializer_init
-
-    def test_polymorphic_model_serializer_passes_instance_to_child(self):
-        """
-        Ensure that `PolymorphicModelSerializer` is passing the instance to the
-        child serializer when initializing them
-        """
-        # Initialize a serializer that would partially update a model instance
-        initial_data = {"artist": "Mark Bishop", "type": "artProjects"}
-        parent_serializer = ProjectSerializer(
-            instance=self.project, data=initial_data, partial=True
-        )
-
-        parent_serializer.is_valid(raise_exception=True)
-
-        # Run save to force `ProjectSerializer` to init `ArtProjectSerializer`
-        parent_serializer.save()
-
-        # Assert that child init received the expected arguments
-        assert self.child_init_args["instance"] == self.project
-        assert self.child_init_args["data"] == initial_data
-        assert self.child_init_args["partial"] == parent_serializer.partial
-        assert self.child_init_args["context"] == parent_serializer.context

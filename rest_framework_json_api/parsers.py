@@ -116,9 +116,7 @@ class JSONParser(parsers.JSONParser):
 
         # Check for inconsistencies
         if method in ("PUT", "POST", "PATCH"):
-            resource_name = get_resource_name(
-                parser_context, expand_polymorphic_types=True
-            )
+            resource_name = get_resource_name(parser_context)
             if isinstance(resource_name, str):
                 if data.get("type") != resource_name:
                     raise exceptions.Conflict(

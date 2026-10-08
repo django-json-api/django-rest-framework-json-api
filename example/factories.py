@@ -2,18 +2,15 @@ import factory
 from faker import Factory as FakerFactory
 
 from example.models import (
-    ArtProject,
     Author,
     AuthorBio,
     AuthorBioMetadata,
     AuthorType,
     Blog,
     Comment,
-    Company,
     Entry,
     ProjectType,
     Questionnaire,
-    ResearchProject,
     TaggedItem,
 )
 
@@ -110,41 +107,6 @@ class ProjectTypeFactory(factory.django.DjangoModelFactory):
         model = ProjectType
 
     name = factory.LazyAttribute(lambda x: faker.name())
-
-
-class ArtProjectFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = ArtProject
-
-    topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
-    artist = factory.LazyAttribute(lambda x: faker.name())
-    project_type = factory.SubFactory(ProjectTypeFactory)
-
-
-class ResearchProjectFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = ResearchProject
-
-    topic = factory.LazyAttribute(lambda x: faker.catch_phrase())
-    supervisor = factory.LazyAttribute(lambda x: faker.name())
-    project_type = factory.SubFactory(ProjectTypeFactory)
-
-
-class CompanyFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Company
-        skip_postgeneration_save = True
-
-    name = factory.LazyAttribute(lambda x: faker.company())
-    current_project = factory.SubFactory(ArtProjectFactory)
-
-    @factory.post_generation
-    def future_projects(self, create, extracted, **kwargs):
-        if not create:  # pragma: no cover
-            return
-        if extracted:
-            for project in extracted:
-                self.future_projects.add(project)
 
 
 class QuestionnaireFactory(factory.django.DjangoModelFactory):

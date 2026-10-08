@@ -1,25 +1,19 @@
 from datetime import datetime
 
-from rest_framework import fields as drf_fields
 from rest_framework import serializers as drf_serilazers
 
 from rest_framework_json_api import relations, serializers
 
 from example.models import (
-    ArtProject,
     Author,
     AuthorBio,
     AuthorBioMetadata,
     AuthorType,
     Blog,
     Comment,
-    Company,
     Entry,
-    LabResults,
-    Project,
     ProjectType,
     Questionnaire,
-    ResearchProject,
     TaggedItem,
 )
 
@@ -345,83 +339,6 @@ class BaseProjectSerializer(serializers.ModelSerializer):
     included_serializers = {
         "project_type": ProjectTypeSerializer,
     }
-
-
-class ArtProjectSerializer(BaseProjectSerializer):
-    class Meta:
-        model = ArtProject
-        exclude = ("polymorphic_ctype",)
-
-
-class ResearchProjectSerializer(BaseProjectSerializer):
-    # testing exclusive related field on inherited polymorphic model
-    lab_results = relations.ResourceRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = ResearchProject
-        exclude = ("polymorphic_ctype",)
-
-
-class LabResultsSerializer(serializers.ModelSerializer):
-    included_serializers = {"author": AuthorSerializer}
-
-    class Meta:
-        model = LabResults
-        fields = ("date", "measurements", "author")
-
-
-class ProjectSerializer(serializers.PolymorphicModelSerializer):
-    included_serializers = {
-        "project_type": ProjectTypeSerializer,
-    }
-    polymorphic_serializers = [ArtProjectSerializer, ResearchProjectSerializer]
-
-    class Meta:
-        model = Project
-        exclude = ("polymorphic_ctype",)
-
-
-class CurrentProjectRelatedField(relations.PolymorphicResourceRelatedField):
-    def get_attribute(self, instance):
-        obj = super().get_attribute(instance)
-
-        is_art = self.field_name == "current_art_project" and isinstance(
-            obj, ArtProject
-        )
-        is_res = self.field_name == "current_research_project" and isinstance(
-            obj, ResearchProject
-        )
-
-        if is_art or is_res:
-            return obj
-
-        raise drf_fields.SkipField()
-
-
-class CompanySerializer(serializers.ModelSerializer):
-    current_project = relations.PolymorphicResourceRelatedField(
-        ProjectSerializer, queryset=Project.objects.all()
-    )
-    current_art_project = CurrentProjectRelatedField(
-        ProjectSerializer, source="current_project", read_only=True
-    )
-    current_research_project = CurrentProjectRelatedField(
-        ProjectSerializer, source="current_project", read_only=True
-    )
-    future_projects = relations.PolymorphicResourceRelatedField(
-        ProjectSerializer, queryset=Project.objects.all(), many=True
-    )
-
-    included_serializers = {
-        "current_project": ProjectSerializer,
-        "future_projects": ProjectSerializer,
-        "current_art_project": ProjectSerializer,
-        "current_research_project": ProjectSerializer,
-    }
-
-    class Meta:
-        model = Company
-        fields = "__all__"
 
 
 class QuestionSerializer(serializers.Serializer):

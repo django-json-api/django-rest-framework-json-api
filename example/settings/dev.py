@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "rest_framework_json_api",
     "rest_framework",
-    "polymorphic",
     "example",
     "django_filters",
     "tests",

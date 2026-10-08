@@ -110,7 +110,6 @@ setup(
         "django>=5.2",
     ],
     extras_require={
-        "django-polymorphic": ["django-polymorphic>=4.0.0"],
         "django-filter": ["django-filter>=2.4"],
     },
     setup_requires=wheel,

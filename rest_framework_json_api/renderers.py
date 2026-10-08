@@ -1,7 +1,3 @@
-"""
-Renderers
-"""
-
 import copy
 from collections import defaultdict
 from collections.abc import Iterable
@@ -15,7 +11,6 @@ from rest_framework.relations import PKOnlyObject
 from rest_framework.serializers import ListSerializer, Serializer
 from rest_framework.settings import api_settings
 
-import rest_framework_json_api
 from rest_framework_json_api.relations import (
     HyperlinkedMixin,
     ManySerializerMethodResourceRelatedField,
@@ -357,7 +352,6 @@ class JSONRenderer(renderers.JSONRenderer):
                             nested_resource_instance,
                             resource_type,
                             serializer,
-                            getattr(serializer, "_poly_force_type_resolution", False),
                         )
                         included_cache[new_item["type"]][new_item["id"]] = new_item
 
@@ -381,7 +375,6 @@ class JSONRenderer(renderers.JSONRenderer):
                         relation_instance,
                         relation_type,
                         field,
-                        getattr(field, "_poly_force_type_resolution", False),
                     )
                     included_cache[new_item["type"]][new_item["id"]] = new_item
 
@@ -459,14 +452,8 @@ class JSONRenderer(renderers.JSONRenderer):
         resource_instance,
         resource_name,
         serializer,
-        force_type_resolution=False,
     ):
-        """
-        Builds the resource object (type, id, attributes) and extracts relationships.
-        """
-        # Determine type from the instance if the underlying model is polymorphic
-        if force_type_resolution:
-            resource_name = get_resource_type_from_instance(resource_instance)
+        """Builds the resource object (type, id, attributes) and extracts relationships."""
         resource_data = {
             "type": resource_name,
             "id": get_resource_id(resource_instance, resource),
@@ -567,22 +554,8 @@ class JSONRenderer(renderers.JSONRenderer):
                         position
                     ]  # Get current instance
 
-                    if isinstance(
-                        serializer.child,
-                        rest_framework_json_api.serializers.PolymorphicModelSerializer,
-                    ):
-                        resource_serializer_class = (
-                            serializer.child.get_polymorphic_serializer_for_instance(
-                                resource_instance
-                            )(context=serializer.child.context)
-                        )
-                    else:
-                        resource_serializer_class = serializer.child
-
+                    resource_serializer_class = serializer.child
                     fields = get_serializer_fields(resource_serializer_class)
-                    force_type_resolution = getattr(
-                        resource_serializer_class, "_poly_force_type_resolution", False
-                    )
 
                     json_resource_obj = self.build_json_resource_obj(
                         fields,
@@ -590,7 +563,6 @@ class JSONRenderer(renderers.JSONRenderer):
                         resource_instance,
                         resource_name,
                         serializer,
-                        force_type_resolution,
                     )
                     json_api_data.append(json_resource_obj)
 
@@ -603,9 +575,6 @@ class JSONRenderer(renderers.JSONRenderer):
                     )
             else:
                 fields = get_serializer_fields(serializer)
-                force_type_resolution = getattr(
-                    serializer, "_poly_force_type_resolution", False
-                )
 
                 resource_instance = serializer.instance
                 json_api_data = self.build_json_resource_obj(
@@ -614,7 +583,6 @@ class JSONRenderer(renderers.JSONRenderer):
                     resource_instance,
                     resource_name,
                     serializer,
-                    force_type_resolution,
                 )
 
                 self.extract_included(
