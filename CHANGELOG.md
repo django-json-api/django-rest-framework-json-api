@@ -20,6 +20,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Removed
 
 * Removed support for Python 3.9.
+* Removed support for Python 3.10.
 * Removed support for Django REST framework 3.15.
 * Removed support for Django REST framework 3.16.
 * Removed support for Django 4.2.
