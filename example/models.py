@@ -1,7 +1,6 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from polymorphic.models import PolymorphicModel
 
 
 class BaseModel(models.Model):
@@ -137,49 +136,6 @@ class ProjectType(BaseModel):
 
     class Meta:
         ordering = ("id",)
-
-
-class Project(PolymorphicModel):
-    topic = models.CharField(max_length=30)
-    project_type = models.ForeignKey(ProjectType, null=True, on_delete=models.CASCADE)
-
-
-class ArtProject(Project):
-    artist = models.CharField(max_length=30)
-    description = models.CharField(max_length=100, null=True)
-
-
-class ResearchProject(Project):
-    supervisor = models.CharField(max_length=30)
-
-
-class LabResults(models.Model):
-    research_project = models.ForeignKey(
-        ResearchProject, related_name="lab_results", on_delete=models.CASCADE
-    )
-    date = models.DateField()
-    measurements = models.TextField()
-    author = models.ForeignKey(
-        Author,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="lab_results",
-    )
-
-    class Meta:
-        ordering = ("id",)
-
-
-class Company(models.Model):
-    name = models.CharField(max_length=100)
-    current_project = models.ForeignKey(
-        Project, related_name="companies", on_delete=models.CASCADE
-    )
-    future_projects = models.ManyToManyField(Project)
-
-    def __str__(self):
-        return self.name
 
 
 class Questionnaire(models.Model):

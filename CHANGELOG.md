@@ -25,6 +25,10 @@ any parts of the framework not mentioned in the documentation should generally b
 * Removed support for Django 4.2.
 * Removed support for Django 5.1.
 
+### Removed
+
+* Removed support for exposing Polymorphic resources through [django-polymorphic](https://github.com/django-commons/django-polymorphic) as JSON:API endpoints.
+
 ## [8.1.0] - 2025-10-17
 
 This is the last release supporting Python 3.9, Django 4.2, Django 5.1, Django REST framework 3.15 and Django REST framework 3.16.
@@ -39,7 +43,7 @@ This is the last release supporting Python 3.9, Django 4.2, Django 5.1, Django R
 
 ### Deprecated
 
-* Deprecated support for exposing Polymorphic resources through [django-polymorphic](https://github.com/jazzband/django-polymorphic) as JSON:API endpoints.
+* Deprecated support for exposing Polymorphic resources through [django-polymorphic](https://github.com/django-commons/django-polymorphic) as JSON:API endpoints.
   There is currently no replacement. In case you are affected of this change please
   join [our discussion](https://github.com/django-json-api/django-rest-framework-json-api/discussions/1194).
 

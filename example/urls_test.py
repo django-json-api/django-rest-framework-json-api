@@ -9,17 +9,14 @@ from example.views import (
     BlogViewSet,
     CommentRelationshipView,
     CommentViewSet,
-    CompanyViewset,
     DRFBlogViewSet,
     DRFEntryViewSet,
     EntryRelationshipView,
     EntryViewSet,
     FiltersetEntryViewSet,
-    LabResultViewSet,
     NoFiltersetEntryViewSet,
     NonPaginatedEntryViewSet,
     ProjectTypeViewset,
-    ProjectViewset,
     QuestionnaireViewset,
 )
 
@@ -35,10 +32,7 @@ router.register(r"filterset-entries", FiltersetEntryViewSet, "filterset-entry")
 router.register(r"nofilterset-entries", NoFiltersetEntryViewSet, "nofilterset-entry")
 router.register(r"authors", AuthorViewSet)
 router.register(r"comments", CommentViewSet)
-router.register(r"companies", CompanyViewset)
-router.register(r"projects", ProjectViewset)
 router.register(r"project-types", ProjectTypeViewset)
-router.register(r"lab-results", LabResultViewSet)
 router.register(r"questionnaires", QuestionnaireViewset)
 
 # for the old tests

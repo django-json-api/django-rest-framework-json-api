@@ -25,11 +25,10 @@ else:
     from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
 
 
-def get_resource_name(context, expand_polymorphic_types=False):
+def get_resource_name(context):
     """
     Return the name of a resource.
     """
-    from rest_framework_json_api.serializers import PolymorphicModelSerializer
 
     view = context.get("view")
 
@@ -55,12 +54,7 @@ def get_resource_name(context, expand_polymorphic_types=False):
                 serializer = view.get_related_serializer_class()
             else:
                 serializer = view.get_serializer_class()
-            if expand_polymorphic_types and issubclass(
-                serializer, PolymorphicModelSerializer
-            ):
-                return serializer.get_polymorphic_types()
-            else:
-                return get_resource_type_from_serializer(serializer)
+            return get_resource_type_from_serializer(serializer)
         except AttributeError:
             try:
                 resource_name = get_resource_type_from_model(view.model)
@@ -193,8 +187,6 @@ def format_resource_type(value, format_type=None, pluralize=None):
 
 
 def get_related_resource_type(relation):
-    from rest_framework_json_api.serializers import PolymorphicModelSerializer
-
     try:
         return get_resource_type_from_serializer(relation)
     except AttributeError:
@@ -218,11 +210,7 @@ def get_related_resource_type(relation):
     if not relation_model:
         parent_serializer = relation.parent
         parent_model = None
-        if isinstance(parent_serializer, PolymorphicModelSerializer):
-            parent_model = parent_serializer.get_polymorphic_serializer_for_instance(
-                parent_serializer.instance
-            ).Meta.model
-        elif hasattr(parent_serializer, "Meta"):
+        if hasattr(parent_serializer, "Meta"):
             parent_model = getattr(parent_serializer.Meta, "model", None)
         elif hasattr(parent_serializer, "parent") and hasattr(
             parent_serializer.parent, "Meta"

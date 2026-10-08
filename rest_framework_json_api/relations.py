@@ -169,7 +169,6 @@ class HyperlinkedRelatedField(HyperlinkedMixin, SkipDataMixin, RelatedField):
 
 
 class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
-    _skip_polymorphic_optimization = True
     self_link_view_name = None
     related_link_view_name = None
     related_link_lookup_field = "pk"
@@ -249,7 +248,7 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
     def to_representation(self, value):
         pk = self.get_resource_id(value)
         resource_type = self.get_resource_type_from_included_serializer()
-        if resource_type is None or not self._skip_polymorphic_optimization:
+        if resource_type is None:
             resource_type = get_resource_type_from_instance(value)
 
         return {"type": resource_type, "id": str(pk)}
@@ -308,59 +307,6 @@ class ResourceRelatedField(HyperlinkedMixin, PrimaryKeyRelatedField):
             json.dumps(self.to_representation(item)): self.display_value(item)
             for item in queryset
         }
-
-
-class PolymorphicResourceRelatedField(ResourceRelatedField):
-    """
-    Inform DRF that the relation must be considered polymorphic.
-    Takes a `polymorphic_serializer` as the first positional argument to
-    retrieve then validate the accepted types set.
-    """
-
-    _skip_polymorphic_optimization = False
-    default_error_messages = dict(
-        ResourceRelatedField.default_error_messages,
-        **{
-            "incorrect_relation_type": _(
-                "Incorrect relation type. Expected one of [{relation_type}], "
-                "received {received_type}."
-            ),
-        },
-    )
-
-    def __init__(self, polymorphic_serializer, *args, **kwargs):
-        self.polymorphic_serializer = polymorphic_serializer
-        super().__init__(*args, **kwargs)
-
-    def use_pk_only_optimization(self):
-        return False
-
-    def to_internal_value(self, data):
-        if isinstance(data, str):
-            try:
-                data = json.loads(data)
-            except ValueError:
-                # show a useful error if they send a `pk` instead of resource object
-                self.fail("incorrect_type", data_type=type(data).__name__)
-        if not isinstance(data, dict):
-            self.fail("incorrect_type", data_type=type(data).__name__)
-
-        if "type" not in data:
-            self.fail("missing_type")
-
-        if "id" not in data:
-            self.fail("missing_id")
-
-        expected_relation_types = self.polymorphic_serializer.get_polymorphic_types()
-
-        if data["type"] not in expected_relation_types:
-            self.conflict(
-                "incorrect_relation_type",
-                relation_type=", ".join(expected_relation_types),
-                received_type=data["type"],
-            )
-
-        return super(ResourceRelatedField, self).to_internal_value(data["id"])
 
 
 class SerializerMethodFieldBase(Field):

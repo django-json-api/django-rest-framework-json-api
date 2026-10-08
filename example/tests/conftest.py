@@ -3,17 +3,14 @@ from pytest_factoryboy import register
 from rest_framework.test import APIClient
 
 from example.factories import (
-    ArtProjectFactory,
     AuthorBioFactory,
     AuthorBioMetadataFactory,
     AuthorFactory,
     AuthorTypeFactory,
     BlogFactory,
     CommentFactory,
-    CompanyFactory,
     EntryFactory,
     QuestionnaireFactory,
-    ResearchProjectFactory,
     TaggedItemFactory,
 )
 
@@ -25,9 +22,6 @@ register(AuthorTypeFactory)
 register(EntryFactory)
 register(CommentFactory)
 register(TaggedItemFactory)
-register(ArtProjectFactory)
-register(ResearchProjectFactory)
-register(CompanyFactory)
 register(QuestionnaireFactory)
 
 
