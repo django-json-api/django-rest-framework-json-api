@@ -109,7 +109,7 @@ setup(
         "django>=5.2",
     ],
     extras_require={
-        "django-filter": ["django-filter>=2.4"],
+        "django-filter": ["django-filter>=25.1"],
     },
     setup_requires=wheel,
     python_requires=">=3.11",

@@ -17,6 +17,10 @@ any parts of the framework not mentioned in the documentation should generally b
 * Added support for Django REST framework 3.17.
 * Added support for Django REST framework 3.18.
 
+### Changed
+
+* Set minimum required version of django-filter to 25.1, recommended is newest.
+
 ### Removed
 
 * Removed support for Python 3.9.
