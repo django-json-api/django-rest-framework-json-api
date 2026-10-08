@@ -34,7 +34,7 @@ def use_rest_framework_json_api_defaults(settings):
 
 @pytest.fixture
 def model(db):
-    return BasicModel.objects.create(text="Model")
+    return BasicModel.objects.create(text="Model", long_text="LongText")
 
 
 @pytest.fixture

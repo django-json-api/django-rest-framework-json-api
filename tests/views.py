@@ -34,6 +34,7 @@ class ForeignKeySourceViewSet(ModelViewSet):
     serializer_class = ForeignKeySourceSerializer
     queryset = ForeignKeySource.objects.all()
     ordering = ["name"]
+    ordering_fields = ["target__name", "name"]
 
 
 class ForeignKeySourcetHyperlinkedViewSet(ModelViewSet):
