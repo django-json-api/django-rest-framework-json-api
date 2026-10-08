@@ -133,12 +133,28 @@ simply don't use this filter backend.
 
 #### OrderingFilter
 
-`OrderingFilter` implements the [JSON:API `sort`](https://jsonapi.org/format/#fetching-sorting) and uses
-DRF's [ordering filter](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter).
+`OrderingFilter` implements [JSON:API `sorting`](https://jsonapi.org/format/#fetching-sorting) and uses
+Django REST framework's [ordering filter](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter) as a basis.
 
-Per the JSON:API specification, "If the server does not support sorting as specified in the query parameter `sort`,
-it **MUST** return `400 Bad Request`." For example, for `?sort=abc,foo,def` where `foo` is a valid
-field name and the other two are not valid:
+Define `ordering_fields` on your view to define what fields are supported for sorting. If not defined per default only direct readable fields
+will be allowed.
+
+Example:
+
+```python
+class BookViewSet(views.ModelViewSet):
+    queryset = Book.objects.all()
+    ordering_fields = ['name', 'author__name']
+```
+
+For sorting of relationship fields the dot notation can be used. For instance in above example to
+sort by name of author, `sort` query parameter needs to be `?sort=author.name`.
+
+Unlike in DRF, it needs to be noted that in JSON:API when the `sort` query parameter
+contains invalid field names, a `400 Bad Request` will be returned.
+
+A error response will look like the following.
+
 ```json
 {
     "errors": [
@@ -152,9 +168,6 @@ field name and the other two are not valid:
     ]
 }
 ```
-
-If you want to silently ignore bad sort fields, just use `rest_framework.filters.OrderingFilter` and set
-`ordering_param` to `sort`.
 
 #### DjangoFilterBackend
 
