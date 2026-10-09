@@ -4,7 +4,6 @@ from inline_snapshot import snapshot
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.routers import SimpleRouter
 from rest_framework.views import APIView
 
 from rest_framework_json_api import serializers
@@ -15,15 +14,7 @@ from rest_framework_json_api.utils import format_link_segment
 from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
 from tests.models import BasicModel, ForeignKeySource
 from tests.serializers import BasicModelSerializer, ForeignKeyTargetSerializer
-from tests.views import (
-    BasicModelViewSet,
-    ForeignKeySourcetHyperlinkedViewSet,
-    ForeignKeySourceViewSet,
-    ForeignKeyTargetViewSet,
-    ManyToManySourceViewSet,
-    NestedRelatedSourceViewSet,
-    URLModelViewSet,
-)
+from tests.urls import router
 
 
 class TestModelViewSet:
@@ -69,7 +60,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_list(self, client, model):
-        url = reverse("basic-model-list")
+        url = reverse("basicmodel-list")
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == snapshot(
@@ -224,7 +215,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_list_with_sparse_fields_empty_value(self, client, model):
-        url = reverse("basic-model-list")
+        url = reverse("basicmodel-list")
         response = client.get(url, data={"fields[BasicModel]": ""})
         assert response.status_code == status.HTTP_200_OK
         data = response.json()["data"]
@@ -237,7 +228,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_retrieve(self, client, model):
-        url = reverse("basic-model-detail", kwargs={"pk": model.pk})
+        url = reverse("basicmodel-detail", kwargs={"pk": model.pk})
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == snapshot(
@@ -289,7 +280,7 @@ class TestModelViewSet:
             }
         }
 
-        url = reverse("basic-model-detail", kwargs={"pk": model.pk})
+        url = reverse("basicmodel-detail", kwargs={"pk": model.pk})
         response = client.patch(url, data=data)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == snapshot(
@@ -304,7 +295,7 @@ class TestModelViewSet:
 
     @pytest.mark.urls(__name__)
     def test_delete(self, client, model):
-        url = reverse("basic-model-detail", kwargs={"pk": model.pk})
+        url = reverse("basicmodel-detail", kwargs={"pk": model.pk})
         response = client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert BasicModel.objects.count() == 0
@@ -547,28 +538,6 @@ class CustomIdAPIView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
-# TODO remove basename and use default (lowercase of model)
-# TODO merge with router of tests/urls.py
-# this makes using HyperlinkedIdentityField easier and reduces
-# configuration in general
-router = SimpleRouter()
-router.register(r"basic_models", BasicModelViewSet, basename="basic-model")
-router.register(r"url_models", URLModelViewSet)
-router.register(r"foreign_key_sources", ForeignKeySourceViewSet)
-router.register(r"foreign_key_targets", ForeignKeyTargetViewSet)
-router.register(
-    r"foreign_key_sources_hyperlinked",
-    ForeignKeySourcetHyperlinkedViewSet,
-    "foreignkeysourcehyperlinked",
-)
-router.register(
-    r"many_to_many_sources", ManyToManySourceViewSet, basename="many-to-many-source"
-)
-router.register(
-    r"nested_related_sources",
-    NestedRelatedSourceViewSet,
-    basename="nested-related-source",
-)
 router.register(
     r"default_included_resources",
     DefaultIncludedResourcesViewSet,
