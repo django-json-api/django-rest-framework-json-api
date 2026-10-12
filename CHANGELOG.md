@@ -10,6 +10,11 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [Unreleased]
 
+### Fixed
+
+* Ensured that none validation errors are rendered correctly (e.g. AuthenticationFailed).
+* Ensured that code of APIException is always added to error object if set.
+
 ### Added
 
 * Added support for Django 6.0.
@@ -20,6 +25,7 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Changed
 
 * Set minimum required version of django-filter to 25.1, recommended is newest.
+* HTTP status code is now always added to error object.
 
 ### Removed
 
@@ -36,7 +42,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ## [8.1.0] - 2025-10-17
 
-This is the last release supporting Python 3.9, Django 4.2, Django 5.1, Django REST framework 3.15 and Django REST framework 3.16.
+This is the last release supporting Python 3.9, Python 3.10, Django 4.2, Django 5.1, Django REST framework 3.15 and Django REST framework 3.16.
 
 ### Fixed
 

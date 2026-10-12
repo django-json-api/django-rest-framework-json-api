@@ -546,7 +546,6 @@ class TestValidationErrorResponses(TestBase):
             {
                 "detail": "Received document does not contain primary data",
                 "status": "400",
-                "source": {"pointer": "/data"},
                 "code": "parse_error",
             }
         ]
@@ -580,7 +579,6 @@ class TestValidationErrorResponses(TestBase):
                     "The resource object's type (bad) is not the type that constitute the "
                     "collection represented by the endpoint (blogs)."
                 ),
-                "source": {"pointer": "/data"},
                 "status": "409",
                 "code": "error",
             }

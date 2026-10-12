@@ -112,6 +112,8 @@ class GenericViewSet(TestBase):
                     "detail": "Hey! You need a last name!",
                     "meta": "something",
                     "source": {"pointer": "/data/attributes/lastName"},
+                    "status": "400",
+                    "code": "invalid",
                 },
             ]
         }

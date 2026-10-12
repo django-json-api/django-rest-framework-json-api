@@ -1,7 +1,8 @@
 from django.utils.translation import gettext_lazy as _
-from rest_framework import exceptions, status
+from rest_framework import status
+from rest_framework.exceptions import APIException
 
-from rest_framework_json_api import utils
+from rest_framework_json_api.utils import format_drf_errors, format_errors
 
 from .settings import json_api_settings
 
@@ -37,15 +38,15 @@ def exception_handler(exc, context):
         return response
 
     # Convert to DRF JSON:API error format
-    response = utils.format_drf_errors(response, context, exc)
+    response = format_drf_errors(response, context, exc)
 
     # Add top-level 'errors' object when not rendered by DRF JSON:API
     if not is_json_api_view:
-        response.data = utils.format_errors(response.data)
+        response.data = format_errors(response.data)
 
     return response
 
 
-class Conflict(exceptions.APIException):
+class Conflict(APIException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = _("Conflict.")

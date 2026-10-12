@@ -451,6 +451,7 @@ def test_get_resource_id(resource_instance, resource, expected):
                 {
                     "detail": "custom message",
                     "source": {"pointer": "/data/default-pointer"},
+                    "status": "200",
                 }
             ],
         ),

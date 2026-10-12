@@ -272,6 +272,8 @@ raise serializers.ValidationError(
 )
 ```
 
+In case those are not provided `code`, `status` and `pointer` will be added to custom error while rendering.
+
 ### Performance Testing
 
 If you are trying to see if your viewsets are configured properly to optimize performance,

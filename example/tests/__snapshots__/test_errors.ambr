@@ -17,10 +17,12 @@
   dict({
     'errors': list([
       dict({
+        'code': 'invalid',
         'detail': 'Too short',
         'source': dict({
           'pointer': '/data/attributes/body-text',
         }),
+        'status': '400',
         'title': 'Too Short title',
       }),
     ]),
