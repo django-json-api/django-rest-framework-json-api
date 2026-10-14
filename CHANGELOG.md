@@ -14,6 +14,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Ensured that none validation errors are rendered correctly (e.g. AuthenticationFailed).
 * Ensured that code of APIException is always added to error object if set.
+* Allowed empty response with error codes (e.g. return Response(status=400) in a view).
 
 ### Added
 

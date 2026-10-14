@@ -4,6 +4,7 @@ from django.urls import reverse
 from inline_snapshot import snapshot
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.response import Response
 
 from tests.serializers import BasicModelSerializer
 from tests.views import BasicModelViewSet
@@ -259,3 +260,21 @@ def test_exception_handler_different_exceptions(
     response = client.post(url, data=data)
 
     assert response.json() == expected
+
+
+@pytest.mark.urls("tests.urls")
+def test_exception_handler_empty_response(client, monkeypatch):
+    def mock_list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    monkeypatch.setattr(
+        BasicModelViewSet,
+        "list",
+        mock_list,
+    )
+
+    url = reverse("basicmodel-list")
+    response = client.get(url)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data is None
