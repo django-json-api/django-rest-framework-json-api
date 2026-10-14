@@ -4,6 +4,7 @@ from inline_snapshot import snapshot
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.routers import SimpleRouter
 from rest_framework.views import APIView
 
 from rest_framework_json_api import serializers
@@ -14,7 +15,6 @@ from rest_framework_json_api.utils import format_link_segment
 from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
 from tests.models import BasicModel, ForeignKeySource
 from tests.serializers import BasicModelSerializer, ForeignKeyTargetSerializer
-from tests.urls import router
 
 
 class TestModelViewSet:
@@ -58,7 +58,7 @@ class TestModelViewSet:
 
         assert view.get_related_field_name() == related_model_field_name
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list(self, client, model):
         url = reverse("basicmodel-list")
         response = client.get(url)
@@ -82,7 +82,7 @@ class TestModelViewSet:
             }
         )
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_with_include_foreign_key(self, client, foreign_key_source):
         url = reverse("foreignkeysource-list")
         response = client.get(url, data={"include": "target"})
@@ -97,7 +97,7 @@ class TestModelViewSet:
             }
         ] == result["included"]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_with_include_many_to_many_field(
         self, client, many_to_many_source, many_to_many_targets
     ):
@@ -115,7 +115,7 @@ class TestModelViewSet:
             for target in many_to_many_targets
         ] == result["included"]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_with_include_nested_related_field(
         self, client, nested_related_source, many_to_many_sources, many_to_many_targets
     ):
@@ -151,7 +151,7 @@ class TestModelViewSet:
             "included"
         ]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_with_invalid_include(self, client, foreign_key_source):
         url = reverse("foreignkeysource-list")
         response = client.get(url, data={"include": "invalid"})
@@ -177,7 +177,7 @@ class TestModelViewSet:
             }
         ] == result["included"]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_allow_overwriting_url_field(self, client, url_instance):
         """
         Test overwriting of url is possible.
@@ -199,7 +199,7 @@ class TestModelViewSet:
             }
         ]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_allow_overwiritng_url_with_sparse_fields(self, client, url_instance):
         url = reverse("urlmodel-list")
         response = client.get(url, data={"fields[URLModel]": "text"})
@@ -213,7 +213,7 @@ class TestModelViewSet:
             }
         ]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_list_with_sparse_fields_empty_value(self, client, model):
         url = reverse("basicmodel-list")
         response = client.get(url, data={"fields[BasicModel]": ""})
@@ -226,7 +226,7 @@ class TestModelViewSet:
             }
         ]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_retrieve(self, client, model):
         url = reverse("basicmodel-detail", kwargs={"pk": model.pk})
         response = client.get(url)
@@ -241,7 +241,7 @@ class TestModelViewSet:
             }
         )
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_retrieve_with_include_foreign_key(self, client, foreign_key_source):
         url = reverse("foreignkeysource-detail", kwargs={"pk": foreign_key_source.pk})
         response = client.get(url, data={"include": "target"})
@@ -256,7 +256,7 @@ class TestModelViewSet:
             }
         ] == result["included"]
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_retrieve_hyperlinked_with_sparse_fields(self, client, foreign_key_source):
         url = reverse(
             "foreignkeysourcehyperlinked-detail", kwargs={"pk": foreign_key_source.pk}
@@ -270,7 +270,7 @@ class TestModelViewSet:
             "self": f"http://testserver/foreign_key_sources/{foreign_key_source.pk}/"
         }
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_patch(self, client, model):
         data = {
             "data": {
@@ -293,7 +293,7 @@ class TestModelViewSet:
             }
         )
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_delete(self, client, model):
         url = reverse("basicmodel-detail", kwargs={"pk": model.pk})
         response = client.delete(url)
@@ -301,7 +301,7 @@ class TestModelViewSet:
         assert BasicModel.objects.count() == 0
         assert len(response.rendered_content) == 0
 
-    @pytest.mark.urls(__name__)
+    @pytest.mark.urls("tests.urls")
     def test_create_with_sparse_fields(self, client, foreign_key_target):
         url = reverse("foreignkeysource-list")
         data = {
@@ -538,6 +538,7 @@ class CustomIdAPIView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+router = SimpleRouter()
 router.register(
     r"default_included_resources",
     DefaultIncludedResourcesViewSet,
