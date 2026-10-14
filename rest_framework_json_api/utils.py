@@ -471,6 +471,9 @@ def format_error_object(error, pointer, response):
 
 
 def format_errors(data):
-    if len(data) > 1 and isinstance(data, list):
+    # error array needs to be keyed by errors
+    if isinstance(data, list):
         data.sort(key=lambda x: x.get("source", {}).get("pointer", ""))
-    return {"errors": data}
+        return {"errors": data}
+
+    return data
