@@ -26,6 +26,5 @@ router.register(
 router.register(
     r"nested_related_sources",
     NestedRelatedSourceViewSet,
-    basename="nested-related-source",
 )
 urlpatterns = router.urls
