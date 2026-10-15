@@ -119,7 +119,7 @@ class TestModelViewSet:
     def test_list_with_include_nested_related_field(
         self, client, nested_related_source, many_to_many_sources, many_to_many_targets
     ):
-        url = reverse("nested-related-source-list")
+        url = reverse("nestedrelatedsource-list")
         response = client.get(url, data={"include": "m2m_sources,m2m_sources.targets"})
         assert response.status_code == status.HTTP_200_OK
         result = response.json()

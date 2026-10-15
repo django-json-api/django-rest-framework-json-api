@@ -1,8 +1,8 @@
 import pytest
 from django.http import Http404
-from django.urls import reverse
+from django.urls import path, reverse
 from inline_snapshot import snapshot
-from rest_framework import status
+from rest_framework import generics, serializers, status
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.response import Response
 
@@ -56,6 +56,65 @@ def test_exception_handler_validation_errors(client, viewname, data, errors):
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert errors == response.json()
+
+
+@pytest.mark.parametrize(
+    "format_type,pointer",
+    [
+        (False, "/data/attributes/long_text"),
+        ("underscore", "/data/attributes/long_text"),
+        ("dasherize", "/data/attributes/long-text"),
+        ("camelize", "/data/attributes/longText"),
+        ("capitalize", "/data/attributes/LongText"),
+    ],
+)
+@pytest.mark.urls("tests.urls")
+def test_exception_handler_validation_errors_format_attributes_pointer(
+    client, format_type, pointer, settings
+):
+    """Check that attribute pointers are formatted correctly."""
+
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    data = ({"data": {"type": "BasicModel", "attributes": {"text": "text"}}},)
+    url = reverse("basicmodel-list")
+    response = client.post(url, json=data)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert pointer == response.json()["errors"][0]["source"]["pointer"]
+
+
+@pytest.mark.parametrize(
+    "format_type,pointer",
+    [
+        (False, "/data/relationships/fk_source"),
+        ("underscore", "/data/relationships/fk_source"),
+        ("dasherize", "/data/relationships/fk-source"),
+        ("camelize", "/data/relationships/fkSource"),
+        ("capitalize", "/data/relationships/FkSource"),
+    ],
+)
+@pytest.mark.urls("tests.urls")
+def test_exception_handler_validation_errors_format_relationships_pointer(
+    client, format_type, pointer, settings
+):
+    """Check that relationship pointers are formatted correctly."""
+
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    data = (
+        {
+            "data": {
+                "type": "NestedRelatedSource",
+                "relationships": {"fk_source": {}},
+            }
+        },
+    )
+    url = reverse("nestedrelatedsource-list")
+    response = client.post(url, json=data)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert pointer == response.json()["errors"][0]["source"]["pointer"]
 
 
 @pytest.mark.urls("tests.urls")
@@ -262,6 +321,88 @@ def test_exception_handler_different_exceptions(
     assert response.json() == expected
 
 
+@pytest.mark.urls(__name__)
+@pytest.mark.parametrize(
+    "data,format_type,pointer",
+    [
+        # check nested serializer with no formatting
+        (
+            {
+                "data": {
+                    "type": "entries",
+                    "attributes": {
+                        "text": "text",
+                        "nested": {},
+                    },
+                }
+            },
+            False,
+            "/data/attributes/nested/nested_text",
+        ),
+        # check nested list serializer with camelize
+        # nested values are not JSON:API fields and therefore nested_text is not formatted
+        (
+            {
+                "data": {
+                    "type": "entries",
+                    "attributes": {
+                        "text": "text",
+                        "nested_many": [{}],
+                    },
+                }
+            },
+            "camelize",
+            "/data/attributes/nestedMany/0/nested_text",
+        ),
+        # check deeply nested list serializer
+        (
+            {
+                "data": {
+                    "type": "entries",
+                    "attributes": {
+                        "text": "text",
+                        "nested_many": [
+                            {"nested_text": "text", "deeply_nested_many": [{}]}
+                        ],
+                    },
+                }
+            },
+            False,
+            "/data/attributes/nested_many/0/deeply_nested_many/0/deeply_nested_text",
+        ),
+        # check deeply nested serializer
+        (
+            {
+                "data": {
+                    "type": "entries",
+                    "attributes": {
+                        "text": "text",
+                        "nested_many": [{"nested_text": "text", "deeply_nested": {}}],
+                    },
+                }
+            },
+            False,
+            "/data/attributes/nested_many/0/deeply_nested/deeply_nested_text",
+        ),
+    ],
+)
+def test_exception_handler_nested_serializer_pointer(
+    client, settings, data, format_type, pointer
+):
+    settings.JSON_API_FORMAT_FIELD_NAMES = format_type
+
+    url = reverse("entries-nested-list")
+    response = client.post(url, data=data)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    result = response.json()
+    assert "errors" in result
+    errors = result["errors"]
+    assert len(errors) == 1
+
+    assert errors[0]["source"]["pointer"] == pointer
+
+
 @pytest.mark.urls("tests.urls")
 def test_exception_handler_empty_response(client, monkeypatch):
     def mock_list(self, request, *args, **kwargs):
@@ -278,3 +419,35 @@ def test_exception_handler_empty_response(client, monkeypatch):
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.data is None
+
+
+# Routing setup
+
+
+class DeeplyNestedSerializer(serializers.Serializer):
+    deeply_nested_text = serializers.CharField(allow_null=False, required=True)
+
+
+class NestedSerializer(serializers.Serializer):
+    deeply_nested_many = DeeplyNestedSerializer(many=True, required=False)
+    deeply_nested = DeeplyNestedSerializer(required=False)
+    nested_text = serializers.CharField(allow_null=True, required=True)
+
+
+class EntrySerializer(serializers.Serializer):
+    nested_many = NestedSerializer(many=True, required=False)
+    nested = NestedSerializer(required=False)
+    text = serializers.CharField(allow_null=True, required=True)
+
+
+class EntryTestView(generics.CreateAPIView):
+    serializer_class = EntrySerializer
+    resource_name = "entries"
+
+    def get_serializer_context(self):
+        return {}
+
+
+urlpatterns = [
+    path("entries-nested", EntryTestView.as_view(), name="entries-nested-list")
+]
