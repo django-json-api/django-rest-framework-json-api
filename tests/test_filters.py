@@ -1,8 +1,15 @@
 import pytest
 from django.urls import reverse
+from inline_snapshot import snapshot
 from rest_framework import status
 
-from tests.models import BasicModel, ForeignKeySource, ForeignKeyTarget
+from tests.models import (
+    BasicModel,
+    ForeignKeySource,
+    ForeignKeyTarget,
+    NestedRelatedSource,
+)
+from tests.serializers import NestedRelatedSourceSerializer
 
 
 @pytest.mark.urls("tests.urls")
@@ -104,3 +111,94 @@ class TestOrderingFilter:
         assert response.status_code == status.HTTP_200_OK
         values = [d["attributes"]["name"] for d in result["data"]]
         assert values == expected
+
+
+@pytest.mark.urls("tests.urls")
+class TestIncludedResourcesValidation:
+    @pytest.mark.parametrize(
+        "include_value,errors",
+        [
+            # invalid include
+            (
+                "invalid",
+                snapshot(
+                    {
+                        "errors": [
+                            {
+                                "detail": (
+                                    "This endpoint does not support "
+                                    "the include parameter for path invalid"
+                                ),
+                                "status": "400",
+                                "code": "parse_error",
+                            }
+                        ]
+                    }
+                ),
+            ),
+            # includes are valid relations but not defined in include_serializers
+            (
+                "m2m_sources,m2m_sources.targets",
+                snapshot(
+                    {
+                        "errors": [
+                            {
+                                "detail": (
+                                    "This endpoint does not support "
+                                    "the include parameter for path m2m_sources"
+                                ),
+                                "status": "400",
+                                "code": "parse_error",
+                            }
+                        ]
+                    }
+                ),
+            ),
+        ],
+    )
+    def test_validate_included_resources(
+        self,
+        client,
+        nested_related_source,
+        django_assert_num_queries,
+        monkeypatch,
+        include_value,
+        errors,
+    ):
+        monkeypatch.setattr(NestedRelatedSourceSerializer, "included_serializers", {})
+
+        with django_assert_num_queries(0):
+            url = reverse("nestedrelatedsource-list")
+            response = client.get(url, data={"include": include_value})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == errors
+
+    def test_prefetch_includes(
+        self,
+        client,
+        nested_related_source,
+        foreign_key_source,
+        foreign_key_target,
+        many_to_many_targets,
+        many_to_many_sources,
+        django_assert_num_queries,
+    ):
+        # need a second nested related source for proper query testing
+        source = NestedRelatedSource.objects.create(
+            fk_source=foreign_key_source, fk_target=foreign_key_target
+        )
+        source.m2m_targets.add(*many_to_many_targets)
+        source.m2m_sources.add(*many_to_many_sources)
+
+        with django_assert_num_queries(5):
+            url = reverse("nestedrelatedsource-list")
+            response = client.get(
+                url,
+                data={
+                    "include": "m2m_sources,m2m_sources.targets,m2m_targets",
+                    "page[size]": 2,
+                },
+            )
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["data"]) == 2

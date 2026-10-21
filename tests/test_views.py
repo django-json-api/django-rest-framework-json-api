@@ -12,9 +12,30 @@ from rest_framework_json_api.parsers import JSONParser
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.renderers import JSONRenderer
 from rest_framework_json_api.utils import format_link_segment
-from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework_json_api.views import (
+    AutoPrefetchMixin,
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+)
 from tests.models import BasicModel, ForeignKeySource
 from tests.serializers import BasicModelSerializer, ForeignKeyTargetSerializer
+
+
+def test_auto_prefetch_mixin_deprecation():
+    with pytest.warns(DeprecationWarning, match="AutoPrefetchMixin"):
+
+        class TestAutoPrefetchView(AutoPrefetchMixin):
+            pass
+
+    with pytest.warns(DeprecationWarning, match="Included"):
+
+        class TestModelView(ModelViewSet):
+            filter_backends = []
+
+    with pytest.warns(DeprecationWarning, match="Included"):
+
+        class TestReadOnlyView(ReadOnlyModelViewSet):
+            filter_backends = []
 
 
 class TestModelViewSet:
@@ -150,17 +171,6 @@ class TestModelViewSet:
         ] == result[
             "included"
         ]
-
-    @pytest.mark.urls("tests.urls")
-    def test_list_with_invalid_include(self, client, foreign_key_source):
-        url = reverse("foreignkeysource-list")
-        response = client.get(url, data={"include": "invalid"})
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        result = response.json()
-        assert (
-            result["errors"][0]["detail"]
-            == "This endpoint does not support the include parameter for path invalid"
-        )
 
     @pytest.mark.urls(__name__)
     def test_list_with_default_included_resources(self, client, foreign_key_source):

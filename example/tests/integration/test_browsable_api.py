@@ -3,7 +3,17 @@ import re
 import pytest
 from django.urls import reverse
 
+from example.views import AuthorViewSet, EntryViewSet, ProjectTypeViewset
+
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def overwrite_filterbackends(monkeypatch):
+    # TODO remove monkey patching when addressing issue #812
+    monkeypatch.setattr(EntryViewSet, "filter_backends", [])
+    monkeypatch.setattr(AuthorViewSet, "filter_backends", [])
+    monkeypatch.setattr(ProjectTypeViewset, "filter_backends", [])
 
 
 def test_browsable_api_with_included_serializers(single_entry, client):

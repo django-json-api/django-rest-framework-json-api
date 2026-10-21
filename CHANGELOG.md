@@ -28,6 +28,9 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Set minimum required version of django-filter to 25.1, recommended is newest.
 * HTTP status code is now always added to error object.
+* Moved included resources validation and prefetching logic to new filter class `IncludedResourcesFilter`. This way validation happens before prefetching to avoid unnecessary db queries.
+
+  **BREAKING CHANGE** Please ensure that `IncludedResourcesFilter` is added to `DEFAULT_FILTER_BACKENDS` as shown in [README.rst](README.rst#settings).
 
 ### Removed
 
@@ -41,6 +44,10 @@ any parts of the framework not mentioned in the documentation should generally b
 ### Removed
 
 * Removed support for exposing Polymorphic resources through [django-polymorphic](https://github.com/django-commons/django-polymorphic) as JSON:API endpoints.
+
+### Deprecated
+
+* Deprecated `rest_framework_json_api.views.AutoPrefetchMixin` and `rest_framework_json_api.serializers.IncludedResourcesValidationMixin`. Use `rest_framework_json_api.filters.IncludedResourcesFilter` instead by ensuring it is added as [filter backend](https://www.django-rest-framework.org/api-guide/filtering/#setting-filter-backends). Simplest is to add `IncludedResourcesFilter` to `DEFAULT_FILTER_BACKENDS` as shown in the [README.rst](README.rst#settings).
 
 ## [8.1.0] - 2025-10-17
 

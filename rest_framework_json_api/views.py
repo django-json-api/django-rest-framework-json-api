@@ -1,3 +1,4 @@
+import warnings
 from collections.abc import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
@@ -77,9 +78,49 @@ class PreloadIncludesMixin:
 
 
 class AutoPrefetchMixin:
+    def __init_subclass__(cls, **kwargs):
+        from rest_framework_json_api.filters import IncludedResourcesFilter
+
+        cls._enable_deprecated_auto_prefetching = False
+        full_class_name = f"{cls.__module__}.{cls.__qualname__}"
+
+        # issubclass does not work for ModelViewSet and ReadOnlyModelViewSet itself
+        # as class is not created yet as we are in the initialization of the class itself.
+        if full_class_name not in (
+            "rest_framework_json_api.views.ModelViewSet",
+            "rest_framework_json_api.views.ReadOnlyModelViewSet",
+        ) and not issubclass(cls, (ModelViewSet, ReadOnlyModelViewSet)):
+            # warning when mixin is directly imported by user in their code base
+            cls._enable_deprecated_auto_prefetching = True
+            warnings.warn(
+                DeprecationWarning(
+                    "AutoPrefetchMixin is deprecated and "
+                    "will be removed in next major version. "
+                    "Use `IncludedResourcesFilter` instead."
+                ),
+                stacklevel=2,
+            )
+        elif IncludedResourcesFilter not in cls.filter_backends:
+            # warning when mixin is not directly used but filter is missing
+            cls._enable_deprecated_auto_prefetching = True
+            warnings.warn(
+                DeprecationWarning(
+                    "Included resources validation and prefetching logic got moved to "
+                    "`IncludedResourcesFilter`. Ensure that this filter is added to "
+                    "`DEFAULT_FILTER_BACKENDS` in the settings."
+                ),
+                stacklevel=2,
+            )
+
+        super().__init_subclass__(**kwargs)
+
     def get_queryset(self, *args, **kwargs):
         """This mixin adds automatic prefetching for OneToOne and ManyToMany fields."""
+
         qs = super().get_queryset(*args, **kwargs)
+
+        if not self._enable_deprecated_auto_prefetching:
+            return qs
 
         included_resources = get_included_resources(
             self.request, self.get_serializer_class()
@@ -230,6 +271,7 @@ class RelationshipView(generics.GenericAPIView):
     self_link_view_name = None
     related_link_view_name = None
     field_name_mapping = {}
+    filter_backends = []  # no filtering available on relationship links
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_serializer_class(self):
