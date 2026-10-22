@@ -1,3 +1,4 @@
+import warnings
 from collections.abc import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
@@ -77,9 +78,25 @@ class PreloadIncludesMixin:
 
 
 class AutoPrefetchMixin:
+    def __init_subclass__(cls, **kwargs):
+        warnings.warn(
+            DeprecationWarning(
+                "AutoPrefetchMixin is deprecated and "
+                "will be removed in next major version. "
+                "Use `IncludedResourcesFilter` instead."
+            ),
+            stacklevel=2,
+        )
+
+        super().__init_subclass__(**kwargs)
+
     def get_queryset(self, *args, **kwargs):
         """This mixin adds automatic prefetching for OneToOne and ManyToMany fields."""
+
         qs = super().get_queryset(*args, **kwargs)
+
+        if not self._enable_deprecated_auto_prefetching:
+            return qs
 
         included_resources = get_included_resources(
             self.request, self.get_serializer_class()
@@ -213,16 +230,58 @@ class RelatedMixin:
                 raise NotFound
 
 
-class ModelViewSet(
-    AutoPrefetchMixin, PreloadIncludesMixin, RelatedMixin, viewsets.ModelViewSet
-):
+class ModelViewSet(PreloadIncludesMixin, RelatedMixin, viewsets.ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        from rest_framework_json_api.filters import IncludedResourcesFilter
+
+        has_included_resources_filter = any(
+            issubclass(filter_backend, IncludedResourcesFilter)
+            for filter_backend in cls.filter_backends
+        )
+
+        if not has_included_resources_filter:
+            warnings.warn(
+                DeprecationWarning(
+                    "Included resources validation and prefetching logic got moved to "
+                    "`IncludedResourcesFilter`. Ensure that this filter is added to "
+                    "`DEFAULT_FILTER_BACKENDS` in the settings."
+                ),
+                stacklevel=2,
+            )
+
+            cls.filter_backends = cls.filter_backends + [IncludedResourcesFilter]
 
 
 class ReadOnlyModelViewSet(
-    AutoPrefetchMixin, PreloadIncludesMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
+    PreloadIncludesMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
 ):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        from rest_framework_json_api.filters import IncludedResourcesFilter
+
+        has_included_resources_filter = any(
+            issubclass(filter_backend, IncludedResourcesFilter)
+            for filter_backend in cls.filter_backends
+        )
+
+        if not has_included_resources_filter:
+            warnings.warn(
+                DeprecationWarning(
+                    "Included resources validation and prefetching logic got moved to "
+                    "`IncludedResourcesFilter`. Ensure that this filter is added to "
+                    "`DEFAULT_FILTER_BACKENDS` in the settings."
+                ),
+                stacklevel=2,
+            )
+
+            cls.filter_backends = cls.filter_backends + [IncludedResourcesFilter]
 
 
 class RelationshipView(generics.GenericAPIView):
@@ -230,6 +289,7 @@ class RelationshipView(generics.GenericAPIView):
     self_link_view_name = None
     related_link_view_name = None
     field_name_mapping = {}
+    filter_backends = []  # no filtering available on relationship links
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_serializer_class(self):

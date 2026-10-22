@@ -1,3 +1,4 @@
+import warnings
 from collections.abc import Mapping
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -121,6 +122,17 @@ class IncludedResourcesValidationMixin:
     Specification: https://jsonapi.org/format/#document-compound-documents)
     """
 
+    def __init_subclass__(cls, **kwargs):
+        warnings.warn(
+            DeprecationWarning(
+                "IncludedResourcesValidationMixin is deprecated and "
+                "will be removed in next major version. "
+                "Use `IncludedResourcesFilter` instead."
+            ),
+            stacklevel=2,
+        )
+        super().__init_subclass__(**kwargs)
+
     def __init__(self, *args, **kwargs):
         context = kwargs.get("context")
         request = context.get("request") if context else None
@@ -234,7 +246,6 @@ class SerializerMetaclass(SerializerMetaclass):
 # If user imports serializer from here we can catch class definition and check
 # nested serializers for depricated use.
 class Serializer(
-    IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
     ReservedFieldNamesMixin,
     Serializer,
@@ -258,7 +269,6 @@ class Serializer(
 
 
 class HyperlinkedModelSerializer(
-    IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
     ReservedFieldNamesMixin,
     HyperlinkedModelSerializer,
@@ -279,7 +289,6 @@ class HyperlinkedModelSerializer(
 
 
 class ModelSerializer(
-    IncludedResourcesValidationMixin,
     SparseFieldsetsMixin,
     ReservedFieldNamesMixin,
     ModelSerializer,

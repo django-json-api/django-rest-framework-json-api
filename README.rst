@@ -194,6 +194,7 @@ override ``settings.REST_FRAMEWORK``
             'rest_framework_json_api.filters.OrderingFilter',
             'rest_framework_json_api.django_filters.DjangoFilterBackend',
             'rest_framework.filters.SearchFilter',
+            'rest_framework_json_api.filters.IncludedResourcesFilter',
         ),
         'SEARCH_PARAM': 'filter[search]',
         'TEST_REQUEST_RENDERER_CLASSES': (

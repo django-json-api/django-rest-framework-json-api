@@ -1,9 +1,15 @@
 import re
 
-from rest_framework.exceptions import ValidationError
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor,
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
+)
+from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.filters import BaseFilterBackend, OrderingFilter
 
-from rest_framework_json_api.utils import undo_format_field_name
+from rest_framework_json_api.utils import get_included_resources, undo_format_field_name
 
 
 class OrderingFilter(OrderingFilter):
@@ -109,4 +115,93 @@ class QueryParameterValidationFilter(BaseFilterBackend):
         query params with :py:meth:`validate_query_params`
         """
         self.validate_query_params(request)
+        return queryset
+
+
+class IncludedResourcesFilter(BaseFilterBackend):
+    """
+    Validate `include` query parameter and prefetching related.
+
+    Specification: https://jsonapi.org/format/#document-compound-documents
+    """
+
+    def _validate_path(self, serializer_class, field_path, path):
+        serializers = getattr(serializer_class, "included_serializers", None)
+        if serializers is None:
+            # TODO create issue that errors from parameter should set source.parameter value
+            raise ParseError("This endpoint does not support the include parameter")
+        this_field_name = field_path[0]
+        this_included_serializer = serializers.get(this_field_name)
+        if this_included_serializer is None:
+            # TODO do not fail at first invalid include, but collect all invalid include values
+            # and embed it into exception detail
+            raise ParseError(
+                "This endpoint does not support the include parameter for path {}".format(
+                    path
+                )
+            )
+        if len(field_path) > 1:
+            new_included_field_path = field_path[1:]
+            # We go down one level in the path
+            self._validate_path(this_included_serializer, new_included_field_path, path)
+
+    def _validate_included_resources(self, included_resources, serializer_class):
+        """Validate that given include resources are valid."""
+
+        for included_field_name in included_resources:
+            included_field_path = included_field_name.split(".")
+
+            # lets validate the current path
+            self._validate_path(
+                serializer_class, included_field_path, included_field_name
+            )
+
+    def _prefetch_includes(self, included_resources, queryset):
+        for included in included_resources:
+            included_model = None
+            levels = included.split(".")
+            level_model = queryset.model
+            for level in levels:
+                if not hasattr(level_model, level):
+                    break
+                field = getattr(level_model, level)
+                field_class = field.__class__
+
+                is_forward_relation = issubclass(
+                    field_class, (ForwardManyToOneDescriptor, ManyToManyDescriptor)
+                )
+                is_reverse_relation = issubclass(
+                    field_class, (ReverseManyToOneDescriptor, ReverseOneToOneDescriptor)
+                )
+                if not (is_forward_relation or is_reverse_relation):
+                    break
+
+                if level == levels[-1]:
+                    included_model = field
+                else:
+                    if issubclass(field_class, ReverseOneToOneDescriptor):
+                        model_field = field.related.field
+                    else:
+                        model_field = field.field
+
+                    if is_forward_relation:
+                        level_model = model_field.related_model
+                    else:
+                        level_model = model_field.model
+
+            if included_model is not None:
+                queryset = queryset.prefetch_related(included.replace(".", "__"))
+
+        return queryset
+
+    def filter_queryset(self, request, queryset, view):
+        if "related_field" in view.kwargs:
+            serializer_class = view.get_related_serializer_class()
+        else:
+            serializer_class = view.get_serializer_class()
+
+        included_resources = get_included_resources(request, serializer_class)
+
+        self._validate_included_resources(included_resources, serializer_class)
+        queryset = self._prefetch_includes(included_resources, queryset)
         return queryset

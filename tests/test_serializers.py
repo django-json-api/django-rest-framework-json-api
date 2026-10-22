@@ -8,6 +8,13 @@ from tests.models import DJAModel, ManyToManyTarget
 from tests.serializers import ManyToManyTargetSerializer
 
 
+def test_included_resources_validation_deprecation():
+    with pytest.warns(DeprecationWarning, match="IncludedResourcesValidationMixin"):
+
+        class TestSerializer(serializers.IncludedResourcesValidationMixin):
+            pass
+
+
 def test_get_included_serializers():
     class IncludedSerializersModel(DJAModel):
         self = models.ForeignKey("self", on_delete=models.CASCADE)
