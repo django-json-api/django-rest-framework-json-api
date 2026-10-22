@@ -79,38 +79,14 @@ class PreloadIncludesMixin:
 
 class AutoPrefetchMixin:
     def __init_subclass__(cls, **kwargs):
-        from rest_framework_json_api.filters import IncludedResourcesFilter
-
-        cls._enable_deprecated_auto_prefetching = False
-        full_class_name = f"{cls.__module__}.{cls.__qualname__}"
-
-        # issubclass does not work for ModelViewSet and ReadOnlyModelViewSet itself
-        # as class is not created yet as we are in the initialization of the class itself.
-        if full_class_name not in (
-            "rest_framework_json_api.views.ModelViewSet",
-            "rest_framework_json_api.views.ReadOnlyModelViewSet",
-        ) and not issubclass(cls, (ModelViewSet, ReadOnlyModelViewSet)):
-            # warning when mixin is directly imported by user in their code base
-            cls._enable_deprecated_auto_prefetching = True
-            warnings.warn(
-                DeprecationWarning(
-                    "AutoPrefetchMixin is deprecated and "
-                    "will be removed in next major version. "
-                    "Use `IncludedResourcesFilter` instead."
-                ),
-                stacklevel=2,
-            )
-        elif IncludedResourcesFilter not in cls.filter_backends:
-            # warning when mixin is not directly used but filter is missing
-            cls._enable_deprecated_auto_prefetching = True
-            warnings.warn(
-                DeprecationWarning(
-                    "Included resources validation and prefetching logic got moved to "
-                    "`IncludedResourcesFilter`. Ensure that this filter is added to "
-                    "`DEFAULT_FILTER_BACKENDS` in the settings."
-                ),
-                stacklevel=2,
-            )
+        warnings.warn(
+            DeprecationWarning(
+                "AutoPrefetchMixin is deprecated and "
+                "will be removed in next major version. "
+                "Use `IncludedResourcesFilter` instead."
+            ),
+            stacklevel=2,
+        )
 
         super().__init_subclass__(**kwargs)
 
@@ -254,16 +230,58 @@ class RelatedMixin:
                 raise NotFound
 
 
-class ModelViewSet(
-    AutoPrefetchMixin, PreloadIncludesMixin, RelatedMixin, viewsets.ModelViewSet
-):
+class ModelViewSet(PreloadIncludesMixin, RelatedMixin, viewsets.ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        from rest_framework_json_api.filters import IncludedResourcesFilter
+
+        has_included_resources_filter = any(
+            issubclass(filter_backend, IncludedResourcesFilter)
+            for filter_backend in cls.filter_backends
+        )
+
+        if not has_included_resources_filter:
+            warnings.warn(
+                DeprecationWarning(
+                    "Included resources validation and prefetching logic got moved to "
+                    "`IncludedResourcesFilter`. Ensure that this filter is added to "
+                    "`DEFAULT_FILTER_BACKENDS` in the settings."
+                ),
+                stacklevel=2,
+            )
+
+            cls.filter_backends = cls.filter_backends + [IncludedResourcesFilter]
 
 
 class ReadOnlyModelViewSet(
-    AutoPrefetchMixin, PreloadIncludesMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
+    PreloadIncludesMixin, RelatedMixin, viewsets.ReadOnlyModelViewSet
 ):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        from rest_framework_json_api.filters import IncludedResourcesFilter
+
+        has_included_resources_filter = any(
+            issubclass(filter_backend, IncludedResourcesFilter)
+            for filter_backend in cls.filter_backends
+        )
+
+        if not has_included_resources_filter:
+            warnings.warn(
+                DeprecationWarning(
+                    "Included resources validation and prefetching logic got moved to "
+                    "`IncludedResourcesFilter`. Ensure that this filter is added to "
+                    "`DEFAULT_FILTER_BACKENDS` in the settings."
+                ),
+                stacklevel=2,
+            )
+
+            cls.filter_backends = cls.filter_backends + [IncludedResourcesFilter]
 
 
 class RelationshipView(generics.GenericAPIView):
