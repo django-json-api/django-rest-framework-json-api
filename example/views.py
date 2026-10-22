@@ -1,13 +1,6 @@
-import rest_framework.exceptions as exceptions
-import rest_framework.parsers
-import rest_framework.renderers
 from django_filters import rest_framework as filters
 
-import rest_framework_json_api.metadata
-import rest_framework_json_api.parsers
-import rest_framework_json_api.renderers
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
-from rest_framework_json_api.utils import format_drf_errors
 from rest_framework_json_api.views import ModelViewSet, RelationshipView
 
 from example.models import Author, Blog, Comment, Entry, ProjectType, Questionnaire
@@ -52,41 +45,6 @@ class DRFBlogViewSet(ModelViewSet):
         return super().get_object()
 
 
-class JsonApiViewSet(ModelViewSet):
-    """
-    This is an example on how to configure DRF-jsonapi from
-    within a class. It allows using DRF-jsonapi alongside
-    vanilla DRF API views.
-    """
-
-    parser_classes = [
-        rest_framework_json_api.parsers.JSONParser,
-        rest_framework.parsers.FormParser,
-        rest_framework.parsers.MultiPartParser,
-    ]
-    renderer_classes = [
-        rest_framework_json_api.renderers.JSONRenderer,
-        rest_framework.renderers.BrowsableAPIRenderer,
-    ]
-    metadata_class = rest_framework_json_api.metadata.JSONAPIMetadata
-
-    def handle_exception(self, exc):
-        if isinstance(exc, exceptions.ValidationError):
-            # some require that validation errors return 422 status
-            # for example ember-data (isInvalid method on adapter)
-            exc.status_code = HTTP_422_UNPROCESSABLE_ENTITY
-        # exception handler can't be set on class so you have to
-        # override the error response in this method
-        response = super().handle_exception(exc)
-        context = self.get_exception_handler_context()
-        return format_drf_errors(response, context, exc)
-
-
-class BlogCustomViewSet(JsonApiViewSet):
-    queryset = Blog.objects.all()
-    serializer_class = BlogSerializer
-
-
 class EntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
     # TODO it should not be supported to overwrite resource name
@@ -110,14 +68,6 @@ class DRFEntryViewSet(ModelViewSet):
     queryset = Entry.objects.all()
     serializer_class = EntryDRFSerializers
     lookup_url_kwarg = "entry_pk"
-
-    def get_object(self):
-        # Handle featured
-        entry_pk = self.kwargs.get(self.lookup_url_kwarg, None)
-        if entry_pk is not None:
-            return Entry.objects.exclude(pk=entry_pk).first()
-
-        return super().get_object()
 
 
 class NoPagination(JsonApiPageNumberPagination):
