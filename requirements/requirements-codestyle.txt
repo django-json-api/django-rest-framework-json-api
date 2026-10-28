@@ -1,4 +1,4 @@
-black==26.10.0
+black==26.10.1
 flake8==7.4.1
 flake8-bugbear==26.9.30
 flake8-isort==7.0.0
