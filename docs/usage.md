@@ -228,7 +228,8 @@ in the [example settings](#configuration) or individually add them as `.filter_b
  ```python
 from rest_framework_json_api import filters
 from rest_framework_json_api import django_filters
-from rest_framework import SearchFilter
+from rest_framework.filters import SearchFilter
+from rest_framework_json_api.views import ModelViewSet
 from models import MyModel
 
 class MyViewset(ModelViewSet):
@@ -238,7 +239,7 @@ class MyViewset(ModelViewSet):
 	                   django_filters.DjangoFilterBackend, SearchFilter)
     filterset_fields = {
         'id': ('exact', 'lt', 'gt', 'gte', 'lte', 'in'),
-        'descriptuon': ('icontains', 'iexact', 'contains'),
+        'description': ('icontains', 'iexact', 'contains'),
         'tagline': ('icontains', 'iexact', 'contains'),
     }
     search_fields = ('id', 'description', 'tagline',)
@@ -366,6 +367,8 @@ If in a view you want to build the output manually, you can set `resource_name` 
 
 Example:
 ```python
+from rest_framework.response import Response
+
 class User(ModelViewSet):
     resource_name = False
     queryset = User.objects.all()
@@ -373,7 +376,8 @@ class User(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        data = [{"id": 1, "type": "users", "attributes": {"fullName": "Test User"}}])
+        data = [{"id": 1, "type": "users", "attributes": {"fullName": "Test User"}}]
+        return Response(data)
 ```
 
 ### Inflecting object and relation keys
