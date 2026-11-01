@@ -1,7 +1,7 @@
 factory-boy==3.3.3
-Faker==40.41.0
-inline-snapshot==0.36.0
-pytest==9.1.1
+Faker==40.44.0
+inline-snapshot==0.36.1
+pytest==9.2.0
 pytest-cov==7.1.0
 pytest-django==4.14.0
 pytest-factoryboy==2.8.1
