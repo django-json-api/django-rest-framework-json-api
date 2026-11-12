@@ -117,25 +117,15 @@ class JSONParser(parsers.JSONParser):
         # Check for inconsistencies
         if method in ("PUT", "POST", "PATCH"):
             resource_name = get_resource_name(parser_context)
-            if isinstance(resource_name, str):
-                if data.get("type") != resource_name:
-                    raise exceptions.Conflict(
-                        "The resource object's type ({data_type}) is not the type that "
-                        "constitute the collection represented by the endpoint "
-                        "({resource_type}).".format(
-                            data_type=data.get("type"), resource_type=resource_name
-                        )
+            if data.get("type") != resource_name:
+                raise exceptions.Conflict(
+                    "The resource object's type ({data_type}) is not the type that "
+                    "constitute the collection represented by the endpoint "
+                    "({resource_type}).".format(
+                        data_type=data.get("type"), resource_type=resource_name
                     )
-            else:
-                if data.get("type") not in resource_name:
-                    raise exceptions.Conflict(
-                        "The resource object's type ({data_type}) is not the type that "
-                        "constitute the collection represented by the endpoint "
-                        "(one of [{resource_types}]).".format(
-                            data_type=data.get("type"),
-                            resource_types=", ".join(resource_name),
-                        )
-                    )
+                )
+
         if not data.get("id") and method in ("PATCH", "PUT"):
             raise ParseError(
                 "The resource identifier object must contain an 'id' member"
