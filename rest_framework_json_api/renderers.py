@@ -334,17 +334,13 @@ class JSONRenderer(renderers.JSONRenderer):
                 relation_queryset = list(relation_instance)
 
                 if serializer_data:
+                    serializer_fields = get_serializer_fields(serializer)
                     for position in range(len(serializer_data)):
                         serializer_resource = serializer_data[position]
                         nested_resource_instance = relation_queryset[position]
                         resource_type = (
                             relation_type
                             or get_resource_type_from_instance(nested_resource_instance)
-                        )
-                        serializer_fields = get_serializer_fields(
-                            serializer.__class__(
-                                nested_resource_instance, context=serializer.context
-                            )
                         )
                         new_item = cls.build_json_resource_obj(
                             serializer_fields,
