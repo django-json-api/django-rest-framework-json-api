@@ -12,7 +12,8 @@ any parts of the framework not mentioned in the documentation should generally b
 
 ### Fixed
 
-* Removed leftover polymorphic code leading to slight performance improvements when extracting included resources
+* Removed leftover polymorphic code leading to slight performance improvements when extracting included resources.
+* Moved logic of verifying type from parser to serializer, avoiding `RecursionError` when request.data is called before serialization.
 
 ## [9.0.0] - 2026-10-27
 

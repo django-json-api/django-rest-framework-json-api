@@ -20,6 +20,7 @@ from rest_framework_json_api.views import (
 )
 from tests.models import BasicModel, ForeignKeySource
 from tests.serializers import BasicModelSerializer, ForeignKeyTargetSerializer
+from tests.views import BasicModelViewSet
 
 
 def test_auto_prefetch_mixin_deprecation():
@@ -377,6 +378,32 @@ class TestModelViewSet:
                 },
             }
         }
+
+    @pytest.mark.urls("tests.urls")
+    def test_get_serializer_class_accessing_request_data(
+        self, client, model, monkeypatch
+    ):
+        def mock_get_serializer_class(self):
+            self.request.data  # this will trigger parser
+            return BasicModelSerializer
+
+        monkeypatch.setattr(
+            BasicModelViewSet, "get_serializer_class", mock_get_serializer_class
+        )
+
+        url = reverse("basicmodel-list")
+        response = client.post(
+            url,
+            data={
+                "data": {
+                    "id": None,
+                    "type": "BasicModel",
+                    "attributes": {"text": "Text", "long_text": "Long Text"},
+                }
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
 
 
 class TestReadonlyModelViewSet:
