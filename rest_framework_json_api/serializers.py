@@ -19,9 +19,11 @@ from rest_framework.serializers import (
 )
 from rest_framework.settings import api_settings
 
+from rest_framework_json_api.exceptions import Conflict
 from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api.utils import (
     get_included_resources,
+    get_resource_name,
     get_resource_type_from_instance,
     get_resource_type_from_model,
     get_resource_type_from_serializer,
@@ -171,6 +173,25 @@ class IncludedResourcesValidationMixin:
         super().__init__(*args, **kwargs)
 
 
+class ResourceTypeConsistencyMixin:
+    """Invalid resource type in initial data should lead to a 409 error."""
+
+    def to_internal_value(self, data):
+        # check type consistency
+        if "type" in data:
+            resource_name = get_resource_name(self.context)
+            if data["type"] != resource_name:
+                raise Conflict(
+                    "The resource object's type ({data_type}) is not the type that "
+                    "constitute the collection represented by the endpoint "
+                    "({resource_type}).".format(
+                        data_type=data.get("type"), resource_type=resource_name
+                    )
+                )
+
+        return super().to_internal_value(data)
+
+
 class ReservedFieldNamesMixin:
     """Ensures that reserved field names are not used and an error raised instead."""
 
@@ -248,6 +269,7 @@ class SerializerMetaclass(SerializerMetaclass):
 class Serializer(
     SparseFieldsetsMixin,
     ReservedFieldNamesMixin,
+    ResourceTypeConsistencyMixin,
     Serializer,
     metaclass=SerializerMetaclass,
 ):
@@ -271,6 +293,7 @@ class Serializer(
 class HyperlinkedModelSerializer(
     SparseFieldsetsMixin,
     ReservedFieldNamesMixin,
+    ResourceTypeConsistencyMixin,
     HyperlinkedModelSerializer,
     metaclass=SerializerMetaclass,
 ):
@@ -291,6 +314,7 @@ class HyperlinkedModelSerializer(
 class ModelSerializer(
     SparseFieldsetsMixin,
     ReservedFieldNamesMixin,
+    ResourceTypeConsistencyMixin,
     ModelSerializer,
     metaclass=SerializerMetaclass,
 ):
