@@ -450,10 +450,12 @@ def format_error_object(error, pointer, response):
     elif isinstance(error, dict):
         # a dict where keys are field names
         for k, v in error.items():
-            errors.extend(format_error_object(v, pointer + f"/{k}", response))
+            # errors of non validation exceptions have no pointer to extend
+            new_pointer = pointer + f"/{k}" if pointer is not None else None
+            errors.extend(format_error_object(v, new_pointer, response))
     elif isinstance(error, list):
         for num, nested_err in enumerate(error):
-            if isinstance(nested_err, (list, dict)):
+            if pointer is not None and isinstance(nested_err, (list, dict)):
                 new_pointer = pointer + f"/{num}"
             else:
                 new_pointer = pointer
