@@ -76,9 +76,9 @@ def test_exception_handler_validation_errors_format_attributes_pointer(
 
     settings.JSON_API_FORMAT_FIELD_NAMES = format_type
 
-    data = ({"data": {"type": "BasicModel", "attributes": {"text": "text"}}},)
+    data = {"data": {"type": "BasicModel", "attributes": {"text": "text"}}}
     url = reverse("basicmodel-list")
-    response = client.post(url, json=data)
+    response = client.post(url, data=data)
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert pointer == response.json()["errors"][0]["source"]["pointer"]
@@ -102,16 +102,14 @@ def test_exception_handler_validation_errors_format_relationships_pointer(
 
     settings.JSON_API_FORMAT_FIELD_NAMES = format_type
 
-    data = (
-        {
-            "data": {
-                "type": "NestedRelatedSource",
-                "relationships": {"fk_source": {}},
-            }
-        },
-    )
+    data = {
+        "data": {
+            "type": "NestedRelatedSource",
+            "relationships": {"fk_source": {}},
+        }
+    }
     url = reverse("nestedrelatedsource-list")
-    response = client.post(url, json=data)
+    response = client.post(url, data=data)
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert pointer == response.json()["errors"][0]["source"]["pointer"]
