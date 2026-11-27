@@ -3,7 +3,12 @@ from django.http import Http404
 from django.urls import path, reverse
 from inline_snapshot import snapshot
 from rest_framework import generics, serializers, status
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.exceptions import (
+    APIException,
+    AuthenticationFailed,
+    PermissionDenied,
+    ValidationError,
+)
 from rest_framework.response import Response
 
 from tests.serializers import BasicModelSerializer
@@ -280,6 +285,47 @@ def test_exception_handler_custom_serializer_validation(
                             "detail": "Token is invalid",
                             "status": "403",
                             "code": "custom_authentication_failed",
+                        }
+                    ]
+                }
+            ),
+        ),
+        # list of custom errors
+        (
+            APIException(
+                [
+                    {
+                        "detail": "Resource already exists",
+                        "code": "already_exists",
+                        "source": {"pointer": "/data/attributes/name"},
+                        "meta": {"existing_id": "1"},
+                    }
+                ]
+            ),
+            snapshot(
+                {
+                    "errors": [
+                        {
+                            "detail": "Resource already exists",
+                            "code": "already_exists",
+                            "source": {"pointer": "/data/attributes/name"},
+                            "meta": {"existing_id": "1"},
+                            "status": "500",
+                        }
+                    ]
+                }
+            ),
+        ),
+        # errors keyed by field name
+        (
+            PermissionDenied({"name": ["Not allowed to change name."]}),
+            snapshot(
+                {
+                    "errors": [
+                        {
+                            "detail": "Not allowed to change name.",
+                            "status": "403",
+                            "code": "permission_denied",
                         }
                     ]
                 }

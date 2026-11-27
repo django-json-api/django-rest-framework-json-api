@@ -14,6 +14,7 @@ any parts of the framework not mentioned in the documentation should generally b
 
 * Removed leftover polymorphic code leading to slight performance improvements when extracting included resources.
 * Moved logic of verifying type from parser to serializer, avoiding `RecursionError` when request.data is called before serialization.
+* Ensured that non validation errors with a list or dict as detail are rendered correctly instead of raising a `TypeError` (e.g. `PermissionDenied({"name": ["Not allowed."]})`).
 
 ## [9.0.0] - 2026-10-27
 
